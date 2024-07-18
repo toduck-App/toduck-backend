@@ -1,0 +1,7 @@
+* text=auto
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bat text merge=union eol=crlf
