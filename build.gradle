@@ -4,6 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.ec4j.editorconfig' version '0.0.2'
     id 'checkstyle'
+    id 'jacoco'
 }
 
 group = 'im.toduck'
@@ -58,6 +59,7 @@ dependencies {
 }
 
 tasks.named('test') {
+    finalizedBy jacocoTestReport
     useJUnitPlatform()
 }
 
@@ -76,7 +78,6 @@ checkstyle {
     sourceSets = [sourceSets.main]
     ignoreFailures = false
 }
-
 checkstyleMain.source = fileTree('src/main/java')
 
 // submodule 에서 민감정보 이동
@@ -85,5 +86,16 @@ tasks.register('copyPrivate', Copy) {
     include "*.properties"
     into 'src/main/resources'
 }
-
 processResources.dependsOn('copyPrivate')
+
+// Jacoco 설정
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required.set(true)
+    }
+}
