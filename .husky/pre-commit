@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=`cat $COMMIT_MSG_FILE`
+
+echo "$COMMIT_MSG"
+
+# Convention Check & Test
+./gradlew checkstyleMain
+./gradlew editorconfigCheck
+./gradlew editorconfigFormat
+#./gradlew test
