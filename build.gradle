@@ -78,3 +78,12 @@ checkstyle {
 }
 
 checkstyleMain.source = fileTree('src/main/java')
+
+// submodule 에서 민감정보 이동
+tasks.register('copyPrivate', Copy) {
+    from 'toduck-backend-private'
+    include "*.properties"
+    into 'src/main/resources'
+}
+
+processResources.dependsOn('copyPrivate')

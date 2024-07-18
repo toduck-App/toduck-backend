@@ -1,0 +1,3 @@
+[submodule "toduck-backend-private"]
+	path = toduck-backend-private
+	url = https://github.com/toduck-App/toduck-backend-private.git
