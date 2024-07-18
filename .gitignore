@@ -35,3 +35,16 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Ignore .DS_Store ###
+**/.DS_Store
+
+### Conventional Commit ###
+/node_modules
+
+### application*.properties ###
+src/main/resources/*.properties
+
+### docker ###
+docker-infra/*
+!docker-infra/*.yml
