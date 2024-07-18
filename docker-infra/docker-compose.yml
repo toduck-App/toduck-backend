@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mysql8:
+    image: mysql:8.0.28
+    platform: linux/x86_64
+    container_name: toduck_mysql
+    restart: always
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: toduck
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/config:/etc/mysql/conf.d
+      - ../sql:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD} --port 6379
+    container_name: todcuk_redis
+    hostname: root
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - "${REDIS_HOST_PORT}:6379"
+    environment:
+      TZ: Asia/Seoul
