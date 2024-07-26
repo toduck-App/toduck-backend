@@ -50,6 +50,7 @@ public class Schedule extends BaseEntity {
 	@Column(nullable = false)
 	private LocalTime time;
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Alarm alarm;
 
