@@ -1,14 +1,14 @@
 spring:
-  #  datasource:
-  #    driver-class-name: com.mysql.cj.jdbc.Driver
-  #    url: jdbc:mysql://localhost:3306/colla?allowPublicKeyRetrieval=true&useSSL=false
-  #    username: user
-  #    password: abcd1234@
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/toduck?allowPublicKeyRetrieval=true&useSSL=false
+    username: user
+    password: abcd1234@
 
-  #  data.redis:
-  #    host: localhost
-  #    port: 6379
-  #    password: abcd1234@
+  data.redis:
+    host: localhost
+    port: 6379
+    password: abcd1234@
 
   jpa:
     hibernate:
