@@ -2,3 +2,6 @@ spring:
   application:
     name:
       toduck-backend
+  config:
+    import:
+      - application-local.yml

@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "like")
+@Table(name = "likes")
 @NoArgsConstructor
 public class Like extends BaseEntity {
 

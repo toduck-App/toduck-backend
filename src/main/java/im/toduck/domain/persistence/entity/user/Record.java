@@ -1,5 +1,7 @@
 package im.toduck.domain.persistence.entity.user;
 
+import java.time.LocalTime;
+
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,6 +25,9 @@ public class Record extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@Column(nullable = false)
+	private LocalTime time;
 
 	@Lob
 	private String diary;

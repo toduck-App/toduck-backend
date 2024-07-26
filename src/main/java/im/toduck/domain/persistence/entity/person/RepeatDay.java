@@ -12,9 +12,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "repeat_day")
 @NoArgsConstructor
 public class RepeatDay extends BaseEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 }
