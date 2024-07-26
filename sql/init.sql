@@ -1,3 +1,5 @@
+USE toduck;
+
 CREATE TABLE users
 (
     -- TODO: 3. users 테이블  oauth 사용 시 필요한 사용자 식별값 → oauth 에서 전화번호 수집이 가능한지 다시 확인 필요
