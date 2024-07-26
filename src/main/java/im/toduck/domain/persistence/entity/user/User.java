@@ -23,6 +23,6 @@ public class User extends BaseEntity {
 	@Column(nullable = false, length = 50)
 	private String phoneNumber;
 
-	@Column(nullable = false, length = 100)
-	private String provider;
+	@Column(nullable = true, length = 100)
+	private OAuthProvider provider;
 }

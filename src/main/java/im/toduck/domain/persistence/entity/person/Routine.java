@@ -1,5 +1,7 @@
 package im.toduck.domain.persistence.entity.person;
 
+import java.time.LocalTime;
+
 import im.toduck.domain.persistence.entity.social.Social;
 import im.toduck.domain.persistence.entity.user.User;
 import im.toduck.global.base.entity.BaseEntity;
@@ -36,7 +38,6 @@ public class Routine extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isComplete;
 
-
 	@Column(nullable = false, length = 100)
 	private String title;
 
@@ -53,6 +54,9 @@ public class Routine extends BaseEntity {
 	@Lob
 	@Column(nullable = false)
 	private String memo;
+
+	@Column(nullable = false)
+	private LocalTime time;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "social_id", nullable = false)

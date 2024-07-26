@@ -1,5 +1,8 @@
 package im.toduck.domain.persistence.entity.person;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import im.toduck.domain.persistence.entity.user.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -24,10 +27,6 @@ public class Schedule extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Emoji emoji;
@@ -39,14 +38,25 @@ public class Schedule extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isComplete;
 
-
 	@Column(nullable = false, length = 100)
 	private String title;
 
 	@Column(nullable = false, length = 255)
 	private String location;
 
+	@Column(nullable = false) //TODO : 루틴 날짜 로직에 따라 null
+	private LocalDate date;
+
+	@Column(nullable = false)
+	private LocalTime time;
+
+	@Column(nullable = false)
+	private Alarm alarm;
 
 	@Column(nullable = false, length = 255)
 	private String memo;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 }
