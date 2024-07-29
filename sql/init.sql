@@ -118,7 +118,7 @@ CREATE TABLE schedule
     title       CHAR(100)      NOT NULL,
     location    VARCHAR(255)   NOT NULL,
     routine_day DATE           NULL,
-    alarm       TIME           NOT NULL,
+    alarm       ENUM ('10', '30', '60', 'OFF')   NOT NULL,
     memo        CHAR(255)      NOT NULL,
     created_at  DATETIME       NOT NULL,
     updated_at  DATETIME       NOT NULL,
