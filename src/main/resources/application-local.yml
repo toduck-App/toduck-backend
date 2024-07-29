@@ -4,12 +4,10 @@ spring:
     url: jdbc:mysql://localhost:3308/toduck?allowPublicKeyRetrieval=true&useSSL=false
     username: user
     password: abcd1234@
-
   data.redis:
     host: localhost
     port: 6380
     password: abcd1234@
-
   jpa:
     hibernate:
       ddl-auto: validate
