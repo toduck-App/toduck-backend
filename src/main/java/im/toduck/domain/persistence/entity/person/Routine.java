@@ -14,7 +14,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
@@ -38,7 +37,7 @@ public class Routine extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isComplete;
 
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, columnDefinition = "CHAR(100)")
 	private String title;
 
 	@Column(nullable = false, length = 255)
@@ -51,8 +50,7 @@ public class Routine extends BaseEntity {
 	@Column(nullable = false)
 	private Alarm alarm;
 
-	@Lob
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String memo;
 
 	@Column(nullable = false)

@@ -38,23 +38,23 @@ public class Schedule extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isComplete;
 
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, columnDefinition = "CHAR(100)")
 	private String title;
 
 	@Column(nullable = false, length = 255)
 	private String location;
 
-	@Column(nullable = false) //TODO : 루틴 날짜 로직에 따라 null
-	private LocalDate date;
+	@Column(nullable = true) //TODO : 루틴 날짜 로직에 따라 null
+	private LocalDate routineDay;
 
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private LocalTime time;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Alarm alarm;
 
-	@Column(nullable = false, length = 255)
+	@Column(nullable = false, columnDefinition = "CHAR(255)")
 	private String memo;
 
 	@ManyToOne(fetch = FetchType.LAZY)
