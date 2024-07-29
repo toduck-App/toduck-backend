@@ -1,4 +1,4 @@
-package im.toduck.global;
+package im.toduck.global.exception;
 
 import lombok.Getter;
 

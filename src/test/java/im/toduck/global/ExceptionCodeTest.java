@@ -7,6 +7,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import im.toduck.global.exception.ExceptionCode;
+
 class ExceptionCodeTest {
 	@Test
 	void 에러코드는_중복되지_않는다() {
