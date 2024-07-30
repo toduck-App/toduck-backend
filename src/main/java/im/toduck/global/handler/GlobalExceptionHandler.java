@@ -229,7 +229,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @return 서버 오류 메시지를 포함하는 ResponseEntity
 	 */
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<Object> handleCommonException(Exception ex) {
+	public ResponseEntity<Object> handleUnexpectedException(Exception ex) {
 		logger.error("Unexpected error 발생: " + ex.getMessage(), ex);
 		return ApiResponseEntityBuilder.createServerErrorEntity();
 	}
