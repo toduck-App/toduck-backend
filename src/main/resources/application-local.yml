@@ -16,3 +16,12 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
+
+
+jwt:
+  secret-key:
+    access-token: toduckAccessAccessAccessTokenSecretKeyForToduck
+    refresh-token: toduckRefreshRefreshRefreshTokenSecretKeyForToduck
+  expiration-time:
+    access-token: 1_800_000 # 30m (30 * 60 * 1000)
+    refresh-token: 604_800_000 # 7d (7 * 24 * 60 * 60 * 1000)
