@@ -1,5 +1,6 @@
-package im.toduck.domain.persistence.entity.person;
+package im.toduck.domain.social;
 
+import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,23 +13,19 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "repeat_day_link")
+@Table(name = "likes")
 @NoArgsConstructor
-public class RepeatDayLink extends BaseEntity {
+public class Like extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "routine_id")
-	private Routine routine;
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "schedule_id")
-	private Schedule schedule;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "repeat_day_id", nullable = false)
-	private RepeatDay repeatDay;
+	@JoinColumn(name = "social_id", nullable = false)
+	private Social social;
 }

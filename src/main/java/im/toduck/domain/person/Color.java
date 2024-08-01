@@ -1,4 +1,4 @@
-package im.toduck.domain.persistence.entity.person;
+package im.toduck.domain.person;
 
 //TODO : 임의 데이터 변경 필요
 public enum Color {

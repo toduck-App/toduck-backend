@@ -1,4 +1,4 @@
-package im.toduck.domain.persistence.entity.user;
+package im.toduck.domain.person;
 
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -12,20 +12,14 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "repeat_day")
 @NoArgsConstructor
-public class User extends BaseEntity {
+public class RepeatDay extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, length = 100)
-	private String nickname;
-
-	@Column(nullable = false, length = 50)
-	private String phoneNumber;
-
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = true, length = 100)
-	private OAuthProvider provider;
+	@Column(nullable = false)
+	private Day day;
 }

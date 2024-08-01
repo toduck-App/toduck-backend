@@ -1,9 +1,9 @@
-package im.toduck.domain.persistence.entity.person;
+package im.toduck.domain.person;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
-import im.toduck.domain.persistence.entity.user.User;
+import im.toduck.domain.social.Social;
+import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,14 +19,13 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "schedule")
+@Table(name = "routine")
 @NoArgsConstructor
-public class Schedule extends BaseEntity {
+public class Routine extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Emoji emoji;
@@ -44,18 +43,22 @@ public class Schedule extends BaseEntity {
 	@Column(nullable = false, length = 255)
 	private String location;
 
-	@Column(nullable = true) //TODO : 루틴 날짜 로직에 따라 null
-	private LocalDate routineDay;
-
-	@Column(nullable = true)
-	private LocalTime time;
+	@Column(nullable = false)
+	private Boolean isPublic;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Alarm alarm;
 
-	@Column(nullable = false, columnDefinition = "CHAR(255)")
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String memo;
+
+	@Column(nullable = false)
+	private LocalTime time;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "social_id", nullable = false)
+	private Social social;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)

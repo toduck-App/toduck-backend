@@ -1,4 +1,4 @@
-package im.toduck.domain.persistence.entity.social;
+package im.toduck.domain.social;
 
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;

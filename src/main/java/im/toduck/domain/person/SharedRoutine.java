@@ -1,5 +1,7 @@
-package im.toduck.domain.persistence.entity.user;
+package im.toduck.domain.person;
 
+import im.toduck.domain.social.Social;
+import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,19 +14,19 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "follow")
+@Table(name = "shared_routine")
 @NoArgsConstructor
-public class Follow extends BaseEntity {
+public class SharedRoutine extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "followed_id", nullable = false)
-	private User followed;
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
-	@ManyToOne
-	@JoinColumn(name = "follower_id", nullable = false)
-	private User follower;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "social_id", nullable = false)
+	private Social social;
 }

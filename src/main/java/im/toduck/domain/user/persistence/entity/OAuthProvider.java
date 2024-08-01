@@ -1,4 +1,4 @@
-package im.toduck.domain.persistence.entity.user;
+package im.toduck.domain.user.persistence.entity;
 
 public enum OAuthProvider {
 	KAKAO,

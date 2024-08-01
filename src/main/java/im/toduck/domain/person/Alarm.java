@@ -1,4 +1,4 @@
-package im.toduck.domain.persistence.entity.person;
+package im.toduck.domain.person;
 
 public enum Alarm {
 	TEN(10),

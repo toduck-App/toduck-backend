@@ -1,12 +1,7 @@
-package im.toduck.domain.persistence.entity.user;
-
-import java.time.LocalTime;
+package im.toduck.domain.social;
 
 import im.toduck.global.base.entity.BaseEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,26 +12,19 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "record")
+@Table(name = "social_category_link")
 @NoArgsConstructor
-public class Record extends BaseEntity {
+public class SocialCategoryLink extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private LocalTime time;
-
-	@Column(nullable = false, length = 2048)
-	private String diary;
-
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private Emotion emotion;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "social_id", nullable = false)
+	private Social social;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
-
+	@JoinColumn(name = "social_category_id", nullable = false)
+	private SocialCategory socialCategory;
 }
