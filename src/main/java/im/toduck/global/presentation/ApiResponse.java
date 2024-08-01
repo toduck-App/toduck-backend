@@ -1,5 +1,6 @@
 package im.toduck.global.presentation;
 
+import java.util.Collections;
 import java.util.Map;
 
 import im.toduck.global.exception.CommonException;
@@ -29,11 +30,20 @@ public class ApiResponse<T> {
 	 * 성공 응답을 생성합니다.
 	 *
 	 * @param content 응답 내용.
-	 * @param <T> 응답 내용의 타입.
+	 * @param <T>     응답 내용의 타입.
 	 * @return 성공 응답.
 	 */
 	public static <T> ApiResponse<T> createSuccess(T content) {
 		return new ApiResponse<>(SUCCESS_CODE, content, null);
+	}
+
+	/**
+	 * 성공 응답을 생성합니다. No Content (빈 Map)을 반환합니다.
+	 *
+	 * @return 성공 응답.
+	 */
+	public static ApiResponse<Map<String, Object>> createSuccessNoContent() {
+		return new ApiResponse<>(SUCCESS_CODE, Collections.emptyMap(), null);
 	}
 
 	/**
@@ -59,7 +69,7 @@ public class ApiResponse<T> {
 	/**
 	 * 일반 오류 응답을 생성합니다.
 	 *
-	 * @param ec 예외 코드.
+	 * @param ec  예외 코드.
 	 * @param <T> 응답 내용의 타입.
 	 * @return 오류 응답.
 	 */
@@ -70,7 +80,7 @@ public class ApiResponse<T> {
 	/**
 	 * 일반 오류 응답을 생성합니다.
 	 *
-	 * @param ex 공통 예외.
+	 * @param ex  공통 예외.
 	 * @param <T> 응답 내용의 타입.
 	 * @return 오류 응답.
 	 */
