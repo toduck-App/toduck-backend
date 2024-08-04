@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class SwaggerConfig {
 	private static final String JWT = "JWT";
 	private final Environment environment;
+	private final ApiSuccessResponseHandler apiSuccessResponseHandler;
 	private final ApiErrorResponseHandler apiErrorResponseHandler;
 
 	@Bean
@@ -54,8 +55,9 @@ public class SwaggerConfig {
 	@Bean
 	public OperationCustomizer customize() {
 		return (Operation operation, HandlerMethod handlerMethod) -> {
+			apiSuccessResponseHandler.handleApiSuccessResponse(operation, handlerMethod);
 			apiErrorResponseHandler.handleApiErrorResponse(operation, handlerMethod);
-
+			
 			return operation;
 		};
 	}
