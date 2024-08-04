@@ -1,13 +1,16 @@
 package im.toduck.global.config.swagger;
 
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.web.method.HandlerMethod;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class SwaggerConfig {
 	private static final String JWT = "JWT";
 	private final Environment environment;
+	private final ApiErrorResponseHandler apiErrorResponseHandler;
 
 	@Bean
 	public OpenAPI openApi() {
@@ -45,6 +49,15 @@ public class SwaggerConfig {
 	@Bean
 	ForwardedHeaderFilter forwardedHeaderFilter() {
 		return new ForwardedHeaderFilter();
+	}
+
+	@Bean
+	public OperationCustomizer customize() {
+		return (Operation operation, HandlerMethod handlerMethod) -> {
+			apiErrorResponseHandler.handleApiErrorResponse(operation, handlerMethod);
+
+			return operation;
+		};
 	}
 
 	private Components securitySchemes() {
