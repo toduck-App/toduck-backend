@@ -10,7 +10,7 @@ spring:
     password: abcd1234@
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
