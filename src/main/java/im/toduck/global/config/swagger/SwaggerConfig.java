@@ -35,7 +35,6 @@ public class SwaggerConfig {
 		String serverDescription = environment.getProperty("swagger.description");
 
 		SecurityRequirement securityRequirement = new SecurityRequirement().addList(JWT);
-
 		return new OpenAPI()
 			.info(apiInfo(activeProfile))
 			.addServersItem(
@@ -57,7 +56,6 @@ public class SwaggerConfig {
 		return (Operation operation, HandlerMethod handlerMethod) -> {
 			apiSuccessResponseHandler.handleApiSuccessResponse(operation, handlerMethod);
 			apiErrorResponseHandler.handleApiErrorResponse(operation, handlerMethod);
-			
 			return operation;
 		};
 	}
