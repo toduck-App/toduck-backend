@@ -7,8 +7,6 @@ import java.lang.annotation.Target;
 
 import org.springframework.http.HttpStatus;
 
-import im.toduck.domain.swaggertest.presentation.dto.response.CreateTeamspaceResponse;
-
 /**
  * {@code ApiSuccessResponseExplanation} 어노테이션은 특정 API 엔드포인트에서 성공적으로 처리된
  * 요청에 대한 응답 형식을 정의합니다.
@@ -18,7 +16,6 @@ import im.toduck.domain.swaggertest.presentation.dto.response.CreateTeamspaceRes
  * 성공적으로 처리된 요청에 대한 응답 형식을 API 소비자에게 명확히 전달합니다.</p>
  *
  * @see HttpStatus
- * @see CreateTeamspaceResponse
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
