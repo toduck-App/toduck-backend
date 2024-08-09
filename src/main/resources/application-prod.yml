@@ -1,1 +1,4 @@
+swagger:
+  server-url: ${PROD_BASE_URL}
+  description: "Prod 서버"
 
