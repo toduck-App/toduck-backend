@@ -21,7 +21,6 @@ public class User extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// TODO: DB에 role 추가 필요
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
@@ -32,7 +31,6 @@ public class User extends BaseEntity {
 	@Column(nullable = false, length = 50)
 	private String phoneNumber;
 
-	// TODO: DB에 password 추가 필요
 	@Column(nullable = true)
 	private String password;
 
