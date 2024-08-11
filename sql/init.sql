@@ -7,7 +7,7 @@ CREATE TABLE users
     nickname     VARCHAR(100)                               NOT NULL,
     phone_number VARCHAR(50)                                NOT NULL,
     password     VARCHAR(255)                               NULL,
-    role         ENUM ('ADMIN', 'USER')                     NULL,
+    role         ENUM ('ADMIN', 'USER')                     NOT NULL,
     provider     ENUM ('KAKAO', 'NAVER', 'GOOGLE', 'APPLE') NULL,
     created_at   DATETIME                                   NOT NULL,
     updated_at   DATETIME                                   NOT NULL,
