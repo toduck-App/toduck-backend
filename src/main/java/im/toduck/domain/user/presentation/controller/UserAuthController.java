@@ -36,6 +36,6 @@ public class UserAuthController {
 		userAuthUseCase.signOut(user.getUserId(), accessToken, refreshToken);
 		return ResponseEntity.ok()
 			.header(HttpHeaders.SET_COOKIE, cookieUtil.deleteCookie("refreshToken").toString())
-			.body(ApiResponse.createSuccessNoContent());
+			.body(ApiResponse.createSuccessWithNoContent());
 	}
 }

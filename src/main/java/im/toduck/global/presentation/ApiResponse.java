@@ -42,7 +42,7 @@ public class ApiResponse<T> {
 	 *
 	 * @return 성공 응답.
 	 */
-	public static ApiResponse<Map<String, Object>> createSuccessNoContent() {
+	public static ApiResponse<Map<String, Object>> createSuccessWithNoContent() {
 		return new ApiResponse<>(SUCCESS_CODE, Collections.emptyMap(), null);
 	}
 
