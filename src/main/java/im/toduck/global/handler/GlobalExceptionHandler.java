@@ -31,6 +31,11 @@ import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.presentation.builder.ApiResponseEntityBuilder;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +46,12 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+	private static final Map<Class<? extends JwtException>, ExceptionCode> JWT_EXCEPTION_CODE_MAP = Map.of(
+		ExpiredJwtException.class, ExceptionCode.EXPIRED_ACCESS_TOKEN,
+		MalformedJwtException.class, ExceptionCode.MALFORMED_TOKEN,
+		SignatureException.class, ExceptionCode.TAMPERED_TOKEN,
+		UnsupportedJwtException.class, ExceptionCode.UNSUPPORTED_JWT_TOKEN
+	);
 
 	/**
 	 * CommonException을 처리합니다.
@@ -53,14 +64,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return ApiResponseEntityBuilder.createErrorResponseEntityFromException(ex);
 	}
 
-	// TODO: 추후 처리 필요
-	// @ExceptionHandler(JwtException.class)
-	// public ResponseEntity<Object> handleJwtException(JwtException ex) {
-	//     Class<? extends Exception> exceptionClass = ex.getClass();
-	//     ExceptionCode exceptionCode = JWT_EXCEPTION_CODE_MAP.get(exceptionClass);
-	//     return ApiResponseEntityBuilder.createErrorResponseEntity(exceptionCode);
-	//     return null;
-	// }
+	/**
+	 * JwtException 처리합니다.
+	 *
+	 * @param ex 발생한 JwtException
+	 * @return ApiResponse를 포함하는 ResponseEntity
+	 */
+	@ExceptionHandler(JwtException.class)
+	public ResponseEntity<Object> handleJwtException(JwtException ex) {
+		Class<? extends Exception> exceptionClass = ex.getClass();
+		ExceptionCode exceptionCode = JWT_EXCEPTION_CODE_MAP.get(exceptionClass);
+		return ApiResponseEntityBuilder.createErrorResponseEntity(exceptionCode);
+	}
 
 	/**
 	 * VoException을 처리합니다.
