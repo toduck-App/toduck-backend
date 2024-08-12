@@ -1,16 +1,13 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3308/toduck?allowPublicKeyRetrieval=true&useSSL=false
-    username: user
-    password: abcd1234@
-  data.redis:
-    host: localhost
-    port: 6380
-    password: abcd1234@
+    url: jdbc:h2:mem:testdb;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   jpa:
-    hibernate:
-      ddl-auto: validate
+    # TODO: Comment Table 등 확정이 안된 것들이 많아서 test 에서는 validate 옵션 잠시 off
+    #    hibernate:
+    #      ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
@@ -25,7 +22,3 @@ jwt:
   expiration-time:
     access-token: 1_800_000 # 30m (30 * 60 * 1000)
     refresh-token: 604_800_000 # 7d (7 * 24 * 60 * 60 * 1000)
-
-swagger:
-  server-url: ${LOCAL_BASE_URL}
-  description: "Local 테스트용 서버"

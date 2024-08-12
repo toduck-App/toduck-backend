@@ -1,5 +1,6 @@
 package im.toduck.global.presentation;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,6 +39,15 @@ public class ApiResponse<T> {
 	 */
 	public static <T> ApiResponse<T> createSuccess(T content) {
 		return new ApiResponse<>(SUCCESS_CODE, content, null);
+	}
+
+	/**
+	 * 성공 응답을 생성합니다. No Content (빈 Map)을 반환합니다.
+	 *
+	 * @return 성공 응답.
+	 */
+	public static ApiResponse<Map<String, Object>> createSuccessWithNoContent() {
+		return new ApiResponse<>(SUCCESS_CODE, Collections.emptyMap(), null);
 	}
 
 	/**
