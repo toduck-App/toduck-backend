@@ -25,3 +25,7 @@ jwt:
   expiration-time:
     access-token: 1_800_000 # 30m (30 * 60 * 1000)
     refresh-token: 604_800_000 # 7d (7 * 24 * 60 * 60 * 1000)
+
+swagger:
+  server-url: ${LOCAL_BASE_URL}
+  description: "Local 테스트용 서버"

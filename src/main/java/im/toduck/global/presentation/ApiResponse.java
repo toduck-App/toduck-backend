@@ -3,6 +3,8 @@ package im.toduck.global.presentation;
 import java.util.Collections;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
@@ -23,7 +25,9 @@ public class ApiResponse<T> {
 	public static final String SERVER_ERROR_MESSAGE = "서버 오류입니다.";
 
 	private final int code;
+	@JsonInclude
 	private final T content;
+	@JsonInclude
 	private final String message;
 
 	/**
