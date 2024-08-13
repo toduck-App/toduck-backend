@@ -21,6 +21,4 @@ import im.toduck.global.exception.ExceptionCode;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiErrorResponseExplanation {
 	ExceptionCode exceptionCode();
-
-	String description() default "";
 }
