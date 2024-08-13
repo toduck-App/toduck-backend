@@ -35,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		@NonNull FilterChain filterChain) throws
 		ServletException, IOException {
 		if (isAnonymousRequest(request)) {
-			System.out.println("익명 함수");
 			filterChain.doFilter(request, response);
 			return;
 		}
