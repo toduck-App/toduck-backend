@@ -75,8 +75,16 @@ public class SwaggerConfig {
 
 	private Info apiInfo(String activeProfile) {
 		return new Info()
-			.title("Toduck API (" + activeProfile + ")")
-			.description("Toduck 백엔드 API 명세서")
+			.title("Toduck 백엔드 API 명세서 (" + activeProfile + ")")
+			.description(
+				"<p>이 문서는 Toduck 백엔드 API의 사용 방법과 예시를 제공합니다. "
+					+
+					"API에 대한 보다 자세한 설명은 <a href=\"https://kyxxn.notion.site/API-e775e161efa6459583a0ee0d586c4d19?pvs=74\" target='_blank'>API 개요</a>를 참고해 주세요.</p>"
+					+
+					"<p>사용 중 발생할 수 있는 예외 코드 목록은 <a href=\"/exception-codes\" target='_blank'>여기</a>에서 확인할 수 있습니다. 예외 응답은 Client에 노출 가능한 한정된 정보만 제공됩니다.</p>"
+					+
+					"<p>API 사용 중 문제가 발생하거나 추가 문의가 필요한 경우, 담당자에게 문의해 주세요.</p>"
+			)
 			.version("v1.0.0");
 	}
 }
