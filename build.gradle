@@ -26,10 +26,10 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
     flatDir {
         dirs 'libs'
     }
+    mavenCentral()
 }
 
 dependencies {
@@ -100,6 +100,11 @@ tasks.register('copyPrivate', Copy) {
     into 'src/main/resources'
 }
 processResources.dependsOn('copyPrivate')
+
+//
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 // Jacoco 설정
 jacoco {
