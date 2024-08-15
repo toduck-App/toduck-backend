@@ -101,7 +101,7 @@ tasks.register('copyPrivate', Copy) {
 }
 processResources.dependsOn('copyPrivate')
 
-//
+// springdoc-openapi-starter-webmvc 내부의 swagger-ui 가 아닌 직접 커스텀한 모듈을 사용하도록 duplicatesStrategy 변경합니다.
 tasks.withType(Jar).configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
