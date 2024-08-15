@@ -75,7 +75,7 @@ public class SwaggerConfig {
 
 	private Info apiInfo(String activeProfile) {
 		return new Info()
-			.title("Toduck 백엔드 API 명세서 (" + activeProfile + ")")
+			.title("백엔드 API 명세서 (" + activeProfile + ")")
 			.description(
 				"<p>이 문서는 Toduck 백엔드 API의 사용 방법과 예시를 제공합니다. "
 					+
