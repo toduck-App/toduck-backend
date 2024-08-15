@@ -2,7 +2,7 @@ package im.toduck.domain.person;
 
 import java.time.LocalTime;
 
-import im.toduck.domain.social.Social;
+import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;

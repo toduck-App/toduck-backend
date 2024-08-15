@@ -1,4 +1,4 @@
-package im.toduck.domain.social;
+package im.toduck.domain.social.persistence.entity;
 
 public enum SocialTag {
 	COMMUNICATION,

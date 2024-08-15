@@ -1,4 +1,4 @@
-package im.toduck.domain.social;
+package im.toduck.domain.social.persistence.entity;
 
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;

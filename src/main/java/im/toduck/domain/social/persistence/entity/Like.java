@@ -1,9 +1,9 @@
-package im.toduck.domain.social;
+package im.toduck.domain.social.persistence.entity;
 
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,21 +13,19 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "likes")
 @NoArgsConstructor
-public class Comment extends BaseEntity {
+public class Like extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
-	private String content;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "social_id", nullable = false)
 	private Social social;
 }
