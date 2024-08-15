@@ -84,6 +84,8 @@ public class SwaggerConfig {
 					"<p>사용 중 발생할 수 있는 예외 코드 목록은 <a href=\"/exception-codes\" target='_blank'>여기</a>에서 확인할 수 있습니다. 예외 응답은 Client에 노출 가능한 한정된 정보만 제공됩니다.</p>"
 					+
 					"<p>API 사용 중 문제가 발생하거나 추가 문의가 필요한 경우, 담당자에게 문의해 주세요.</p>"
+					+
+					"<p>/auth 로 시작하는 엔드포인터에는 Authorization Header 를 포함하지 않아야 합니다. 포함하는 경우 40102 에러가 발생합니다.</p>"
 			)
 			.version("v1.0.0");
 	}
