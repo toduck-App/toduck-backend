@@ -87,6 +87,14 @@
         .original-code-button:hover {
             color: #CC5B00;
         }
+
+
+        .group-description {
+            border-top: 1px solid #eceef1;
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -172,6 +180,10 @@
                         </svg>
                     </button>
                     <div x-show="isGroupOpen(groupName)" x-collapse>
+
+                        <div x-show="groupDescriptions[groupName]" x-text="groupDescriptions[groupName]"
+                             class="group-description"></div>
+
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
@@ -223,6 +235,34 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     const rawExceptionCodes = /*[[${exceptionCodes}]]*/ [];
+    // 새로운 에러 코드 추가
+
+    rawExceptionCodes.push(
+        {
+            errorCode: 30001,
+            httpStatusCode: 400,
+            httpStatusReasonPhrase: "Bad Request",
+            name: "VALIDATION_ERROR",
+            message: "유효성 검사 실패",
+            description: "클라이언트가 보낸 요청 데이터가 서버의 유효성 검사를 통과하지 못했을 때 발생합니다. 응답의 content 필드에 구체적인 오류 내용이 포함됩니다. 클라이언트에서 적절히 유효성 검사를 수행하도록 변경해주세요."
+        },
+        {
+            errorCode: 30002,
+            httpStatusCode: 400,
+            httpStatusReasonPhrase: "Bad Request",
+            name: "VO_EXCEPTION",
+            message: "백엔드 내부 유효성 검사 실패",
+            description: "서버 내부에서 데이터 처리 중 유효성 검사에 실패했을 때 발생합니다. 이 오류가 발생하면 개발팀에 문의해 주시기 바랍니다."
+        },
+        {
+            errorCode: 50000,
+            httpStatusCode: 500,
+            httpStatusReasonPhrase: "Internal Server Error",
+            name: "INTERNAL_SERVER_ERROR",
+            message: "서버 내부 오류",
+            description: "서버에서 예기치 않은 오류가 발생했을 때 사용됩니다. 이는 백엔드 코드의 결함을 나타내며, 발생 시 개발팀에 문의해야 합니다."
+        }
+    );
 
     function getGroupName(errorCode) {
         const prefix = Math.floor(errorCode / 100);
@@ -241,6 +281,9 @@
                 return 'Diary';
             case 406:
                 return 'Focus';
+            case 300:
+            case 500:
+                return 'Not 4XXXX';
             default:
                 return 'Other';
         }
@@ -269,6 +312,17 @@
             totalResults: 0,
             showOriginalCode: false,
             originalCode: '',
+            groupDescriptions: {
+                'Auth': '인증(Auth) 관련 예외 코드는 사용자 인증 및 권한 부여 과정에서 발생할 수 있는 다양한 오류 상황을 다룹니다. 자세한 설명은 Description 을 참고하세요.',
+                'User': '',
+                'Schedule': '',
+                'Routine': '',
+                'Social': '',
+                'Diary': '',
+                'Focus': '',
+                'Other': '',
+                'Not 4XXXX': '자세한 내용은 API 개요(https://kyxxn.notion.site/API-e775e161efa6459583a0ee0d586c4d19?pvs=74) 를 확인하세요.'
+            },
 
             async toggleOriginalCode() {
                 this.showOriginalCode = !this.showOriginalCode;
