@@ -20,10 +20,11 @@ public class SocialImageFile extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@Column(nullable = false, length = 1024)
 	private String url;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "social_id", nullable = false)
 	private Social social;
-
 }
