@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Toduck API Exception Codes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#FF7200',
+                            light: '#FF9540',
+                            dark: '#CC5B00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(-45deg, #FF7200, #FF9540, #CC5B00);
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .http-status-reason {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-left: 0.2rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+        }
+
+        .original-code {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .original-code-button {
+            font-size: 1rem;
+            color: #FF7200;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 1rem;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .original-code-button:hover {
+            color: #CC5B00;
+        }
+
+
+        .group-description {
+            border-top: 1px solid #eceef1;
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div id="app" x-data="appData" class="container mx-auto px-4 py-8">
+    <div x-show="!isDataLoaded" class="text-center py-4">Loading...</div>
+    <div x-show="isDataLoaded" x-cloak>
+        <header class="mb-8">
+            <div class="gradient-bg text-white py-4 px-6 rounded-t-lg shadow-lg">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <img src="/images/logo.png" alt="Toduck Logo" class="h-10 w-auto">
+                        <h1 class="text-2xl font-medium"> - API 예외 코드 명세</h1>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="/swagger-ui/index.html" target="_blank"
+                           class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-brand-dark bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-light transition-colors duration-300">
+                            <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                      d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z"
+                                      clip-rule="evenodd"></path>
+                            </svg>
+                            API 명세서
+                        </a>
+                        <a href="https://github.com/toduck-App/toduck-backend" target="_blank"
+                           class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-brand-dark bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-light transition-colors duration-300">
+                            <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                      d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
+                                      clip-rule="evenodd"></path>
+                            </svg>
+                            GitHub 레포지터리
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white border border-swagger-border rounded-b-lg p-6 mb-6 shadow py-10">
+                <p class="mb-4 text-xl">이 문서는 Toduck API에서 사용되는 예외 코드의 종합적인 목록을 제공합니다.</p>
+                <p> 각 코드는 분류되어 있으며, HTTP 상태, 에러 코드, 메시지, 그리고
+                    추가 설명과 같은 세부 정보를 포함하고 있습니다.<br/>특정 에러 코드, 메시지 또는 설명을 빠르게 찾으려면 검색 기능을 사용하세요.</p>
+                <button @click="toggleOriginalCode" class="original-code-button">
+                    원본 코드 보기 (Production)
+                </button>
+                <div x-show="showOriginalCode" x-cloak class="original-code" x-text="originalCode"></div>
+            </div>
+        </header>
+        <div class="mb-6 relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 search-icon" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input
+                    x-model="searchQuery"
+                    @input="filterExceptionCodes"
+                    type="text"
+                    placeholder="에러 코드, 메시지 또는 설명 검색"
+                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+            >
+        </div>
+        <div x-show="searchQuery" class="mb-4 text-sm text-gray-600">
+            검색 결과: <span x-text="totalResults"></span>개
+        </div>
+        <div x-show="searchQuery && totalResults === 0" class="text-center py-8">
+            <p class="text-xl font-semibold text-gray-700">검색 결과가 없습니다.</p>
+            <p class="mt-2 text-gray-500">다른 검색어를 시도해보세요.</p>
+        </div>
+        <div class="space-y-4">
+            <template x-for="(group, groupName) in filteredExceptionCodes" :key="groupName">
+                <div x-show="group.length > 0"
+                     class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                    <button
+                            @click="toggleGroup(groupName)"
+                            class="w-full px-4 py-3 text-left font-medium text-lg flex justify-between items-center transition-colors duration-300 hover:bg-brand hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-50"
+                    >
+                        <span x-text="groupName" class="text-gray-900"></span>
+                        <svg class="w-5 h-5 transform transition-transform duration-200 text-brand"
+                             :class="{ 'rotate-180': isGroupOpen(groupName) }" fill="none" stroke="currentColor"
+                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="isGroupOpen(groupName)" x-collapse>
+
+                        <div x-show="groupDescriptions[groupName]" x-text="groupDescriptions[groupName]"
+                             class="group-description"></div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
+                                        HTTP Status
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
+                                        Error Code
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/5">
+                                        Message
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                <template x-for="code in group" :key="code.errorCode">
+                                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="text-gray-600 text-base" x-text="code.httpStatusCode"></span>
+                                            <span class="http-status-reason"
+                                                  x-text="code.httpStatusReasonPhrase"></span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm font-medium text-brand" x-text="code.errorCode"></div>
+                                            <div class="text-xs text-gray-500 truncate" x-text="code.name"
+                                                 :title="code.name"></div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">
+                                            <div x-text="code.message"></div>
+                                            <div x-show="code.description" x-text="code.description"
+                                                 class="text-xs text-gray-400 mt-1"></div>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const rawExceptionCodes = /*[[${exceptionCodes}]]*/ [];
+    // 새로운 에러 코드 추가
+
+    rawExceptionCodes.push(
+        {
+            errorCode: 30001,
+            httpStatusCode: 400,
+            httpStatusReasonPhrase: "Bad Request",
+            name: "VALIDATION_ERROR",
+            message: "유효성 검사 실패",
+            description: "클라이언트가 보낸 요청 데이터가 서버의 유효성 검사를 통과하지 못했을 때 발생합니다. 응답의 content 필드에 구체적인 오류 내용이 포함됩니다. 클라이언트에서 적절히 유효성 검사를 수행하도록 변경해주세요."
+        },
+        {
+            errorCode: 30002,
+            httpStatusCode: 400,
+            httpStatusReasonPhrase: "Bad Request",
+            name: "VO_EXCEPTION",
+            message: "백엔드 내부 유효성 검사 실패",
+            description: "서버 내부에서 데이터 처리 중 유효성 검사에 실패했을 때 발생합니다. 이 오류가 발생하면 개발팀에 문의해 주시기 바랍니다."
+        },
+        {
+            errorCode: 50000,
+            httpStatusCode: 500,
+            httpStatusReasonPhrase: "Internal Server Error",
+            name: "INTERNAL_SERVER_ERROR",
+            message: "서버 내부 오류",
+            description: "서버에서 예기치 않은 오류가 발생했을 때 사용됩니다. 이는 백엔드 코드의 결함을 나타내며, 발생 시 개발팀에 문의해야 합니다."
+        }
+    );
+
+    function getGroupName(errorCode) {
+        const prefix = Math.floor(errorCode / 100);
+        switch (prefix) {
+            case 401:
+                return 'Auth';
+            case 402:
+                return 'User';
+            case 431:
+                return 'Schedule';
+            case 432:
+                return 'Routine';
+            case 404:
+                return 'Social';
+            case 405:
+                return 'Diary';
+            case 406:
+                return 'Focus';
+            case 300:
+            case 500:
+                return 'Not 4XXXX';
+            default:
+                return 'Other';
+        }
+    }
+
+    function groupExceptionCodes(codes) {
+        return codes.reduce((acc, code) => {
+            const groupName = getGroupName(code.errorCode);
+            if (!acc[groupName]) {
+                acc[groupName] = [];
+            }
+            acc[groupName].push(code);
+            return acc;
+        }, {});
+    }
+
+    const groupedExceptionCodes = groupExceptionCodes(rawExceptionCodes);
+
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('appData', () => ({
+            groupedExceptionCodes: groupedExceptionCodes,
+            filteredExceptionCodes: groupedExceptionCodes,
+            openGroups: Object.keys(groupedExceptionCodes),
+            isDataLoaded: true,
+            searchQuery: '',
+            totalResults: 0,
+            showOriginalCode: false,
+            originalCode: '',
+            groupDescriptions: {
+                'Auth': '인증(Auth) 관련 예외 코드는 사용자 인증 및 권한 부여 과정에서 발생할 수 있는 다양한 오류 상황을 다룹니다. 자세한 설명은 Description 을 참고하세요.',
+                'User': '',
+                'Schedule': '',
+                'Routine': '',
+                'Social': '',
+                'Diary': '',
+                'Focus': '',
+                'Other': '',
+                'Not 4XXXX': '자세한 내용은 API 개요(https://kyxxn.notion.site/API-e775e161efa6459583a0ee0d586c4d19?pvs=74) 를 확인하세요.'
+            },
+
+            async toggleOriginalCode() {
+                this.showOriginalCode = !this.showOriginalCode;
+                if (this.showOriginalCode && !this.originalCode) {
+                    try {
+                        const response = await fetch('https://raw.githubusercontent.com/toduck-App/toduck-backend/main/src/main/java/im/toduck/global/exception/ExceptionCode.java');
+                        this.originalCode = await response.text();
+                    } catch (error) {
+                        console.error('원본 코드를 가져오는 데 실패했습니다:', error);
+                        this.originalCode = '원본 코드를 불러오는 데 실패했습니다.';
+                    }
+                }
+            },
+            isGroupOpen(groupName) {
+                return this.openGroups.includes(groupName);
+            },
+            toggleGroup(groupName) {
+                if (this.isGroupOpen(groupName)) {
+                    this.openGroups = this.openGroups.filter(g => g !== groupName);
+                } else {
+                    this.openGroups.push(groupName);
+                }
+            },
+            filterExceptionCodes() {
+                const query = this.searchQuery.toLowerCase();
+                this.filteredExceptionCodes = Object.entries(this.groupedExceptionCodes).reduce((acc, [groupName, codes]) => {
+                    const filteredCodes = codes.filter(code =>
+                        code.errorCode.toString().includes(query) ||
+                        code.name.toLowerCase().includes(query) ||
+                        code.message.toLowerCase().includes(query) ||
+                        (code.description && code.description.toLowerCase().includes(query))
+                    );
+                    if (filteredCodes.length > 0) {
+                        acc[groupName] = filteredCodes;
+                    }
+                    return acc;
+                }, {});
+                this.openGroups = Object.keys(this.filteredExceptionCodes);
+                this.totalResults = Object.values(this.filteredExceptionCodes).reduce((sum, group) => sum + group.length, 0);
+            }
+        }));
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.user.domain.usecase.UserAuthUseCase;
+import im.toduck.domain.user.presentation.api.UserAuthApi;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import im.toduck.global.util.CookieUtil;
@@ -21,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/users")
-public class UserAuthController {
+public class UserAuthController implements UserAuthApi {
 	private final UserAuthUseCase userAuthUseCase;
 	private final CookieUtil cookieUtil;
 
