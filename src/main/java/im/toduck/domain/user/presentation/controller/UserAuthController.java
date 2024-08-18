@@ -26,6 +26,7 @@ public class UserAuthController implements UserAuthApi {
 	private final UserAuthUseCase userAuthUseCase;
 	private final CookieUtil cookieUtil;
 
+	@Override
 	@GetMapping("/logout")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> signOut(
