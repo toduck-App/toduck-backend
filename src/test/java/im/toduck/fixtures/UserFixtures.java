@@ -15,6 +15,11 @@ public class UserFixtures {
 	public static final String USER1_EMAIL = "010-1234-5678";
 
 	/**
+	 * USER_ID
+	 */
+	public static final String USER1_USER_ID = "GENERAL_USER_ID";
+
+	/**
 	 * PASSWORD
 	 */
 	public static final String USER1_PASSWORD = "GENERAL_PASSWORD";
@@ -23,7 +28,7 @@ public class UserFixtures {
 	 * ENTITY
 	 */
 	public static User GENERAL_USER() {
-		return User.createGeneralUser(USER1_USERNAME, USER1_PASSWORD, USER1_EMAIL);
+		return User.createGeneralUser(USER1_USERNAME,USER1_USER_ID ,USER1_PASSWORD, USER1_EMAIL);
 	}
 
 }

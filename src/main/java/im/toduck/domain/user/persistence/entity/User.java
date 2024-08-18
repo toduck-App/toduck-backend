@@ -31,6 +31,9 @@ public class User extends BaseEntity {
 	@Column(nullable = false, length = 50)
 	private String phoneNumber;
 
+	@Column(nullable = true, length = 100 )
+	private String userId;
+
 	@Column(nullable = true)
 	private String password;
 
@@ -38,14 +41,15 @@ public class User extends BaseEntity {
 	@Column(nullable = true, length = 100)
 	private OAuthProvider provider;
 
-	private User(String nickname, String password, String phoneNumber) {
+	private User(String nickname,String userId ,String password, String phoneNumber) {
 		this.role = UserRole.USER;
 		this.nickname = nickname;
+		this.userId = userId;
 		this.password = password;
 		this.phoneNumber = phoneNumber;
 	}
 
-	public static User createGeneralUser(String nickname, String password, String phoneNumber) {
-		return new User(nickname, password, phoneNumber);
+	public static User createGeneralUser(String nickname,String userId ,String password, String phoneNumber) {
+		return new User(nickname,userId,password, phoneNumber);
 	}
 }
