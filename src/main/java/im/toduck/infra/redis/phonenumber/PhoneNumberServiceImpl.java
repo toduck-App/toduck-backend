@@ -40,4 +40,17 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 		phoneNumberRepository.save(PhoneNumber.from(phoneNumber, verifyCode));
 		verifiyCodeUtil.sendVerifyCodeMessage(VerifyCodeDto.from(phoneNumber, verifyCode));
 	}
+
+	@Override
+	public void validateVerifiedCode(PhoneNumber phoneNumberEntity, String verifiedCode) {
+		if(phoneNumberEntity.isMaxVerifyCount()) {
+			throw CommonException.from(ExceptionCode.OVER_MAX_VERIFIED_COUNT);
+		}
+		phoneNumberEntity.countVerifyCount();
+		if (!phoneNumberEntity.isVerifiedCode(verifiedCode)) {
+			throw CommonException.from(ExceptionCode.INVALID_VERIFIED_CODE);
+		}
+		phoneNumberEntity.changeTrueVerify();
+		phoneNumberRepository.save(phoneNumberEntity);
+	}
 }

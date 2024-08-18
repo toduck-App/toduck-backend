@@ -8,4 +8,6 @@ public interface PhoneNumberService {
 	void reSendVerifiedCodeToPhoneNumber(PhoneNumber phoneNumber);
 
 	void sendVerifiedCodeToPhoneNumber(String phoneNumber);
+
+	void validateVerifiedCode(PhoneNumber phoneNumberEntity, String verifiedCode);
 }

@@ -3,6 +3,9 @@ package im.toduck.domain.auth.domain.usecase;
 import org.springframework.stereotype.Service;
 
 import im.toduck.domain.user.domain.service.UserService;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
+import im.toduck.infra.redis.phonenumber.PhoneNumber;
 import im.toduck.infra.redis.phonenumber.PhoneNumberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,5 +30,16 @@ public class GeneralSignUpUseCase {
 		phoneNumberService.findAlreadySentPhoneNumber(phoneNumber)
 			.ifPresentOrElse(phoneNumberService::reSendVerifiedCodeToPhoneNumber,
 				() -> phoneNumberService.sendVerifiedCodeToPhoneNumber(phoneNumber));
+	}
+
+	/**
+	 * 인증코드 확인 메서드
+	 * @param phoneNumber
+	 * @param verifiedCode
+	 */
+	public void checkVerifiedCode(String phoneNumber, String verifiedCode) {
+		PhoneNumber phoneNumberEntity = phoneNumberService.findAlreadySentPhoneNumber(phoneNumber)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_SEND_PHONE_NUMBER));
+		phoneNumberService.validateVerifiedCode(phoneNumberEntity, verifiedCode);
 	}
 }

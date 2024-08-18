@@ -58,6 +58,15 @@ public class AuthController {
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 
+	@GetMapping("/check-verfied-code")
+	@PreAuthorize("isAnonymous()")
+	public ResponseEntity<ApiResponse<Map<String,Object>>> checkVerifiedCode(
+		@RequestParam("phoneNumber") @Pattern(regexp = PHONE_NUMBER_REGEXP) String phoneNumber,
+		@RequestParam("verifiedCode") @Pattern(regexp = VERIFIED_CODE_REGEXP) String verifiedCode) {
+		generalSignUpUseCase.checkVerifiedCode(phoneNumber, verifiedCode);
+		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+	}
+
 	private ResponseEntity<ApiResponse<LoginResponse>> createAuthResponse(Pair<Long, JwtPair> userInfo) {
 		ResponseCookie cookie = cookieUtil.createCookie("refreshToken", userInfo.getSecond().refreshToken(),
 			Duration.ofDays(REFRESH_TOKEN_EXPIRES_IN_DAYS).toSeconds());
