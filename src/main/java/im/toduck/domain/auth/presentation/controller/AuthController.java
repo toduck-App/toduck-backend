@@ -67,6 +67,13 @@ public class AuthController {
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 
+	@GetMapping("/check-user-id")
+	@PreAuthorize("isAnonymous()")
+	public ResponseEntity<ApiResponse<Map<String,Object>>> checkUserId(@RequestParam("userId") @Pattern(regexp = USER_ID_REGEXP) String userId) {
+		generalSignUpUseCase.checkUserId(userId);
+		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+	}
+
 	private ResponseEntity<ApiResponse<LoginResponse>> createAuthResponse(Pair<Long, JwtPair> userInfo) {
 		ResponseCookie cookie = cookieUtil.createCookie("refreshToken", userInfo.getSecond().refreshToken(),
 			Duration.ofDays(REFRESH_TOKEN_EXPIRES_IN_DAYS).toSeconds());

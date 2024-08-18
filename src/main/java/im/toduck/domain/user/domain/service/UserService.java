@@ -32,4 +32,11 @@ public class UserService {
 			throw CommonException.from(ExceptionCode.EXISTS_PHONE_NUMBER);
 		});
 	}
+
+	@Transactional(readOnly = true)
+	public void validateByUserId(String userId) {
+		userRepository.findByUserId(userId).ifPresent(user -> {
+			throw CommonException.from(ExceptionCode.EXISTS_USER_ID);
+		});
+	}
 }

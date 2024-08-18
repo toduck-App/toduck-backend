@@ -1,6 +1,7 @@
 package im.toduck.domain.auth.domain.usecase;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.global.exception.CommonException;
@@ -41,5 +42,14 @@ public class GeneralSignUpUseCase {
 		PhoneNumber phoneNumberEntity = phoneNumberService.findAlreadySentPhoneNumber(phoneNumber)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_SEND_PHONE_NUMBER));
 		phoneNumberService.validateVerifiedCode(phoneNumberEntity, verifiedCode);
+	}
+
+	/**
+	 * userId 중복 확인 메서드
+	 * @param userId
+	 */
+	@Transactional(readOnly = true)
+	public void checkUserId(String userId) {
+		userService.validateByUserId(userId);
 	}
 }

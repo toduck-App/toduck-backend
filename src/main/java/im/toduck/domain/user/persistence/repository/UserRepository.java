@@ -8,4 +8,6 @@ import im.toduck.domain.user.persistence.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByPhoneNumber(String username);
+
+	Optional<User> findByUserId(String userId);
 }
