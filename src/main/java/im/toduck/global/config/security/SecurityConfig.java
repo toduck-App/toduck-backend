@@ -24,7 +24,9 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/swagger"};
+	private static final String[] SWAGGER_ENDPOINTS = {
+		"/api-docs/**", "/v3/api-docs/**", "/docs/open-api-3.0.1.yaml", "/swagger-ui/**", "/swagger", "/docs",
+		"/exception-codes"};
 	private static final String[] PUBLIC_ENDPOINTS = {"/", "/error"};
 	private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**"};
 

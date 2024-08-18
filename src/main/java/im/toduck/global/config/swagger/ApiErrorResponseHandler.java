@@ -58,8 +58,8 @@ public class ApiErrorResponseHandler {
 			.httpStatusCode(exceptionCode.getHttpStatus().value())
 			.name(exceptionCode.name())
 			.errorCode(exceptionCode.getErrorCode())
-			.description(apiErrorResponseExample.description())
-			.holder(createSwaggerExample(exceptionCode, apiErrorResponseExample.description()))
+			.description(exceptionCode.getDescription())
+			.holder(createSwaggerExample(exceptionCode, exceptionCode.getDescription()))
 			.build();
 	}
 
