@@ -1,6 +1,9 @@
 package im.toduck.domain.auth.presentation.controller;
 
+import static im.toduck.global.regex.UserRegex.*;
+
 import java.time.Duration;
+import java.util.Map;
 
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
@@ -12,15 +15,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.auth.domain.usecase.AuthUseCase;
+import im.toduck.domain.auth.domain.usecase.GeneralSignUpUseCase;
 import im.toduck.domain.auth.presentation.dto.JwtPair;
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
 import im.toduck.domain.auth.presentation.dto.response.LoginResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.util.CookieUtil;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,6 +36,7 @@ public class AuthController {
 	private static final int REFRESH_TOKEN_EXPIRES_IN_DAYS = 7;
 
 	private final AuthUseCase authUseCase;
+	private final GeneralSignUpUseCase generalSignUpUseCase;
 	private final CookieUtil cookieUtil;
 
 	@PostMapping("/login")
@@ -42,6 +49,13 @@ public class AuthController {
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken) {
 		return createAuthResponse(authUseCase.refresh(refreshToken));
+	}
+
+	@GetMapping("/verified-code")
+	@PreAuthorize("isAnonymous()")
+	public ResponseEntity<ApiResponse<Map<String,Object>>> sendVerifiedCode(@RequestParam("phoneNumber") @Pattern(regexp = PHONE_NUMBER_REGEXP) String phoneNumber) {
+		generalSignUpUseCase.sendVerifiedCodeToPhoneNumber(phoneNumber);
+		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 
 	private ResponseEntity<ApiResponse<LoginResponse>> createAuthResponse(Pair<Long, JwtPair> userInfo) {

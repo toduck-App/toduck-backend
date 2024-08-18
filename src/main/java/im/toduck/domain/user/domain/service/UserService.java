@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.domain.user.persistence.repository.UserRepository;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,5 +24,12 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public Optional<User> getUserByPhoneNumber(String phoneNumber) {
 		return userRepository.findByPhoneNumber(phoneNumber);
+	}
+
+	@Transactional(readOnly = true)
+	public void validateUserByPhoneNumber(String phoneNumber) {
+		userRepository.findByPhoneNumber(phoneNumber).ifPresent(user -> {
+			throw CommonException.from(ExceptionCode.EXISTS_PHONE_NUMBER);
+		});
 	}
 }
