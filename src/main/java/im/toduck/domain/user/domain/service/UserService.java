@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.global.exception.CommonException;
@@ -38,5 +39,11 @@ public class UserService {
 		userRepository.findByUserId(userId).ifPresent(user -> {
 			throw CommonException.from(ExceptionCode.EXISTS_USER_ID);
 		});
+	}
+
+	@Transactional
+	public void registerUser(RegisterRequest request, String nickName, String encodedPassword) {
+		User user = User.createGeneralUser(nickName, request.userId(), encodedPassword,request.phoneNumber());
+		userRepository.save(user);
 	}
 }

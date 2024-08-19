@@ -53,4 +53,13 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 		phoneNumberEntity.changeTrueVerify();
 		phoneNumberRepository.save(phoneNumberEntity);
 	}
+
+	@Override
+	public void validateVerifiedPhoneNumber(String phoneNumber) {
+		PhoneNumber phoneNumberEntity = phoneNumberRepository.findByPhoneNumber(phoneNumber)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_SEND_PHONE_NUMBER));
+		if (!phoneNumberEntity.isVerified()) {
+			throw CommonException.from(ExceptionCode.NOT_VERIFIED_PHONE_NUMBER);
+		}
+	}
 }

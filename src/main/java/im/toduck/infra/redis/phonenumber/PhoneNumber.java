@@ -58,5 +58,7 @@ public class PhoneNumber {
 		this.isVerified = true;
 	}
 
-
+	public boolean isVerified() {
+		return this.isVerified;
+	}
 }

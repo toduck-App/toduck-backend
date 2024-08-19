@@ -1,8 +1,11 @@
 package im.toduck.domain.auth.domain.usecase;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.auth.domain.service.NickNameGenerateService;
+import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -17,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 public class GeneralSignUpUseCase {
 	private final UserService userService;
 	private final PhoneNumberService phoneNumberService;
+	private final PasswordEncoder passwordEncoder;
+	private final NickNameGenerateService nickNameGenerateService;
 
 	/**
 	 * 인증코드를 보내는 메서드
@@ -51,5 +56,23 @@ public class GeneralSignUpUseCase {
 	@Transactional(readOnly = true)
 	public void checkUserId(String userId) {
 		userService.validateByUserId(userId);
+	}
+
+	/**
+	 * 회원가입 메서드
+	 * validate : userId 중복 확인
+	 * validate : phoneNumber 중복 확인
+	 * validate : 인증된 phoneNumber인지 확인
+	 * @param request
+	 */
+	@Transactional
+	public void signUp(RegisterRequest request) {
+		userService.validateByUserId(request.userId());
+		userService.validateUserByPhoneNumber(request.phoneNumber());
+		phoneNumberService.validateVerifiedPhoneNumber(request.phoneNumber());
+		String encodedPassword = passwordEncoder.encode(request.password());
+		String nickName = nickNameGenerateService.generateRandomNickname();
+
+		userService.registerUser(request,nickName,encodedPassword);
 	}
 }

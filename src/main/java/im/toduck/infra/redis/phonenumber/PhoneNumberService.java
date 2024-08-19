@@ -10,4 +10,6 @@ public interface PhoneNumberService {
 	void sendVerifiedCodeToPhoneNumber(String phoneNumber);
 
 	void validateVerifiedCode(PhoneNumber phoneNumberEntity, String verifiedCode);
+
+	void validateVerifiedPhoneNumber(String phoneNumber);
 }

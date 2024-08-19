@@ -22,6 +22,7 @@ import im.toduck.domain.auth.domain.usecase.AuthUseCase;
 import im.toduck.domain.auth.domain.usecase.GeneralSignUpUseCase;
 import im.toduck.domain.auth.presentation.dto.JwtPair;
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
+import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
 import im.toduck.domain.auth.presentation.dto.response.LoginResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.util.CookieUtil;
@@ -71,6 +72,13 @@ public class AuthController {
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<ApiResponse<Map<String,Object>>> checkUserId(@RequestParam("userId") @Pattern(regexp = USER_ID_REGEXP) String userId) {
 		generalSignUpUseCase.checkUserId(userId);
+		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@PostMapping("/register")
+	@PreAuthorize("isAnonymous()")
+	public ResponseEntity<ApiResponse<Map<String,Object>>> register(@RequestBody @Valid RegisterRequest request) {
+		generalSignUpUseCase.signUp(request);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 
