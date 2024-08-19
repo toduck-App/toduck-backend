@@ -42,12 +42,12 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 	}
 
 	@Override
-	public void validateVerifiedCode(PhoneNumber phoneNumberEntity, String verifiedCode) {
+	public void validateVerifiedCode(PhoneNumber phoneNumberEntity, String verifiedCodeRequest) {
 		if(phoneNumberEntity.isMaxVerifyCount()) {
 			throw CommonException.from(ExceptionCode.OVER_MAX_VERIFIED_COUNT);
 		}
 		phoneNumberEntity.countVerifyCount();
-		if (!phoneNumberEntity.isVerifiedCode(verifiedCode)) {
+		if (!phoneNumberEntity.isVerifiedCode(verifiedCodeRequest)) {
 			throw CommonException.from(ExceptionCode.INVALID_VERIFIED_CODE);
 		}
 		phoneNumberEntity.changeTrueVerify();

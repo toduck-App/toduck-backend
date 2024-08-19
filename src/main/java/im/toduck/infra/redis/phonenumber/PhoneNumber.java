@@ -23,11 +23,19 @@ public class PhoneNumber {
 		this.verifyCode =  verifyCode;
 		this.isVerified = false;
 		this.sendMessageCount = 1;
-		this.verifyCount = 1;
+		this.verifyCount = 0;
 	}
 
 	public static PhoneNumber from(String phoneNumber, String verifyCode) {
 		return new PhoneNumber(phoneNumber, verifyCode);
+	}
+
+	public static Integer getMaxMessageCount() {
+		return MAX_MESSAGE_COUNT;
+	}
+
+	public static Integer getMaxVerifedCount() {
+		return MAX_VERIFIED_COUNT;
 	}
 
 	public boolean isMaxMessageCount() {
