@@ -48,3 +48,6 @@ src/main/resources/*.properties
 ### docker ###
 docker-infra/*
 !docker-infra/*.yml
+
+### QueryDSL Generated ###
+/src/main/generated/
