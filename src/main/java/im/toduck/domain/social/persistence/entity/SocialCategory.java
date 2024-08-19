@@ -7,11 +7,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "social_category")
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SocialCategory extends BaseEntity {
 
 	@Id
@@ -20,4 +23,12 @@ public class SocialCategory extends BaseEntity {
 
 	@Column(nullable = false, length = 20)
 	private String name;
+
+	private SocialCategory(String name) {
+		this.name = name;
+	}
+
+	public static SocialCategory from(String name) {
+		return new SocialCategory(name);
+	}
 }
