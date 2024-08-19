@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.auth.domain.usecase.AuthUseCase;
 import im.toduck.domain.auth.domain.usecase.GeneralSignUpUseCase;
+import im.toduck.domain.auth.presentation.api.AuthControllerApi;
 import im.toduck.domain.auth.presentation.dto.JwtPair;
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
 import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
@@ -33,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/auth")
-public class AuthController {
+public class AuthController implements AuthControllerApi {
 	private static final int REFRESH_TOKEN_EXPIRES_IN_DAYS = 7;
 
 	private final AuthUseCase authUseCase;
