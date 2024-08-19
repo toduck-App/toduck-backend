@@ -51,6 +51,12 @@ dependencies {
     /* Redis */
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.3.1'
 
+    /* QueryDSL */
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
     /* Security */
     implementation 'org.springframework.boot:spring-boot-starter-security:3.3.1'
     testImplementation 'org.springframework.security:spring-security-test:6.2.3'
@@ -59,6 +65,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+    /* findbugs */
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
     /* Swagger */
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
@@ -71,6 +80,25 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.3.1'
 }
 
+// QueryDSL 설정
+def querydslDir = "src/main/generated"
+
+// java source set 에 querydsl QClass 위치 추가
+sourceSets {
+    main.java.srcDirs += [querydslDir]
+}
+
+// querydsl QClass 파일 생성 위치를 지정
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// gradle clean 시에 QClass 디렉토리 삭제
+clean.doLast {
+    file(querydslDir).deleteDir()
+}
+
+// test 커버리지 측정용
 tasks.named('test') {
     finalizedBy jacocoTestReport
     useJUnitPlatform()
