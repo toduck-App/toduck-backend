@@ -109,7 +109,7 @@ tasks.named('test') {
 
 // editorconfig 설정
 editorconfig {
-    excludes = ['build', 'node_modules', '.husky', 'docker-infra']
+    excludes = ['build', 'node_modules', '.husky', 'docker-infra', 'src/main/generated']
 }
 check.dependsOn editorconfigCheck
 
