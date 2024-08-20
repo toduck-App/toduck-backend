@@ -73,6 +73,6 @@ public class GeneralSignUpUseCase {
 		String encodedPassword = passwordEncoder.encode(request.password());
 		String nickName = nickNameGenerateService.generateRandomNickname();
 
-		userService.registerUser(request,nickName,encodedPassword);
+		userService.registerUser(request, nickName, encodedPassword);
 	}
 }

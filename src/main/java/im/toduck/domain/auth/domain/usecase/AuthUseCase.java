@@ -29,5 +29,4 @@ public class AuthUseCase {
 	public Pair<Long, JwtPair> refresh(String refreshToken) {
 		return jwtService.refresh(refreshToken);
 	}
-
 }

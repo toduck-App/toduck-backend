@@ -55,14 +55,15 @@ public class AuthController implements AuthControllerApi {
 
 	@GetMapping("/verified-code")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<ApiResponse<Map<String,Object>>> sendVerifiedCode(@RequestParam("phoneNumber") @Pattern(regexp = PHONE_NUMBER_REGEXP) String phoneNumber) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> sendVerifiedCode(
+		@RequestParam("phoneNumber") @Pattern(regexp = PHONE_NUMBER_REGEXP) String phoneNumber) {
 		generalSignUpUseCase.sendVerifiedCodeToPhoneNumber(phoneNumber);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 
 	@GetMapping("/check-verfied-code")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<ApiResponse<Map<String,Object>>> checkVerifiedCode(
+	public ResponseEntity<ApiResponse<Map<String, Object>>> checkVerifiedCode(
 		@RequestParam("phoneNumber") @Pattern(regexp = PHONE_NUMBER_REGEXP) String phoneNumber,
 		@RequestParam("verifiedCode") @Pattern(regexp = VERIFIED_CODE_REGEXP) String verifiedCode) {
 		generalSignUpUseCase.checkVerifiedCode(phoneNumber, verifiedCode);
@@ -71,14 +72,15 @@ public class AuthController implements AuthControllerApi {
 
 	@GetMapping("/check-user-id")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<ApiResponse<Map<String,Object>>> checkUserId(@RequestParam("userId") @Pattern(regexp = USER_ID_REGEXP) String userId) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> checkUserId(
+		@RequestParam("userId") @Pattern(regexp = USER_ID_REGEXP) String userId) {
 		generalSignUpUseCase.checkUserId(userId);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 
 	@PostMapping("/register")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<ApiResponse<Map<String,Object>>> register(@RequestBody @Valid RegisterRequest request) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid RegisterRequest request) {
 		generalSignUpUseCase.signUp(request);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}

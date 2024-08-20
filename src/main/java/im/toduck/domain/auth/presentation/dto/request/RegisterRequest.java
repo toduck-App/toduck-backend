@@ -2,7 +2,6 @@ package im.toduck.domain.auth.presentation.dto.request;
 
 import static im.toduck.global.regex.UserRegex.*;
 
-import im.toduck.global.regex.UserRegex;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

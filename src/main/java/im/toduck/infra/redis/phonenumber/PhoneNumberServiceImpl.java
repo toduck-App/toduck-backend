@@ -31,7 +31,8 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 		phoneNumber.countMessageCount();
 		phoneNumber.reSetVerifyCode(verifiyCodeUtil.generateVerifyCode());
 		phoneNumberRepository.save(phoneNumber);
-		verifiyCodeUtil.sendVerifyCodeMessage(VerifyCodeDto.from(phoneNumber.getPhoneNumber(), phoneNumber.getVerifyCode()));
+		verifiyCodeUtil.sendVerifyCodeMessage(
+			VerifyCodeDto.from(phoneNumber.getPhoneNumber(), phoneNumber.getVerifyCode()));
 	}
 
 	@Override
@@ -43,7 +44,7 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 
 	@Override
 	public void validateVerifiedCode(PhoneNumber phoneNumberEntity, String verifiedCodeRequest) {
-		if(phoneNumberEntity.isMaxVerifyCount()) {
+		if (phoneNumberEntity.isMaxVerifyCount()) {
 			throw CommonException.from(ExceptionCode.OVER_MAX_VERIFIED_COUNT);
 		}
 		phoneNumberEntity.countVerifyCount();

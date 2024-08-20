@@ -28,7 +28,6 @@ public class UserFixtures {
 	 * ENTITY
 	 */
 	public static User GENERAL_USER() {
-		return User.createGeneralUser(USER1_USERNAME,USER1_USER_ID ,USER1_PASSWORD, USER1_EMAIL);
+		return User.createGeneralUser(USER1_USERNAME, USER1_USER_ID, USER1_PASSWORD, USER1_EMAIL);
 	}
-
 }

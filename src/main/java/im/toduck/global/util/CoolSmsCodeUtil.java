@@ -29,7 +29,7 @@ public class CoolSmsCodeUtil implements VerifiyCodeUtil {
 	private DefaultMessageService messageService;
 
 	@PostConstruct
-	private void init(){
+	private void init() {
 		this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecretKey, "https://api.coolsms.co.kr");
 	}
 

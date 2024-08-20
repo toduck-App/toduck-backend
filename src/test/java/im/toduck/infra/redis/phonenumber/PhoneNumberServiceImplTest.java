@@ -1,9 +1,9 @@
 package im.toduck.infra.redis.phonenumber;
 
 import static im.toduck.fixtures.PhoneNumberFixtures.*;
-
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.BDDMockito.*;
+
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +42,7 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 
 	@Nested
 	@DisplayName("<전화번호 캐시 조회 테스트>")
-	class findAlreadySentPhoneNumberTest{
+	class findAlreadySentPhoneNumberTest {
 		@Test
 		void 캐시_조회_성공() {
 			// given
@@ -53,11 +53,16 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 
 			//then
 			assertSoftly(softly -> {
-				softly.assertThat(alreadySentPhoneNumber.getPhoneNumber()).isEqualTo(buildPhoneNumberEntity.getPhoneNumber());
-				softly.assertThat(alreadySentPhoneNumber.getVerifyCode()).isEqualTo(buildPhoneNumberEntity.getVerifyCode());
-				softly.assertThat(alreadySentPhoneNumber.getIsVerified()).isEqualTo(buildPhoneNumberEntity.getIsVerified());
-				softly.assertThat(alreadySentPhoneNumber.getSendMessageCount()).isEqualTo(buildPhoneNumberEntity.getSendMessageCount());
-				softly.assertThat(alreadySentPhoneNumber.getVerifyCount()).isEqualTo(buildPhoneNumberEntity.getVerifyCount());
+				softly.assertThat(alreadySentPhoneNumber.getPhoneNumber())
+					.isEqualTo(buildPhoneNumberEntity.getPhoneNumber());
+				softly.assertThat(alreadySentPhoneNumber.getVerifyCode())
+					.isEqualTo(buildPhoneNumberEntity.getVerifyCode());
+				softly.assertThat(alreadySentPhoneNumber.getIsVerified())
+					.isEqualTo(buildPhoneNumberEntity.getIsVerified());
+				softly.assertThat(alreadySentPhoneNumber.getSendMessageCount())
+					.isEqualTo(buildPhoneNumberEntity.getSendMessageCount());
+				softly.assertThat(alreadySentPhoneNumber.getVerifyCount())
+					.isEqualTo(buildPhoneNumberEntity.getVerifyCount());
 			});
 		}
 
@@ -67,7 +72,8 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 			String errorPhoneNumber = errorPhoneNumberEntity.getPhoneNumber();
 
 			//when
-			Optional<PhoneNumber> alreadySentPhoneNumber = phoneNumberService.findAlreadySentPhoneNumber(errorPhoneNumber);
+			Optional<PhoneNumber> alreadySentPhoneNumber = phoneNumberService.findAlreadySentPhoneNumber(
+				errorPhoneNumber);
 
 			//then
 			assertSoftly(softly -> {
@@ -87,7 +93,8 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 			given(verifiyCodeUtil.generateVerifyCode()).willReturn(reVerifyCode);
 			//when
 			phoneNumberService.reSendVerifiedCodeToPhoneNumber(phoneNumber);
-			PhoneNumber changedPhoneNumberEntity = phoneNumberService.findAlreadySentPhoneNumber(phoneNumber.getPhoneNumber()).get();
+			PhoneNumber changedPhoneNumberEntity = phoneNumberService.findAlreadySentPhoneNumber(
+				phoneNumber.getPhoneNumber()).get();
 
 			//then
 			assertSoftly(softly -> {
@@ -136,10 +143,13 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 
 			//then
 			assertSoftly(softly -> {
-				softly.assertThat(savendPhoneNumber.getPhoneNumber()).isEqualTo(buildPhoneNumberEntity.getPhoneNumber());
+				softly.assertThat(savendPhoneNumber.getPhoneNumber())
+					.isEqualTo(buildPhoneNumberEntity.getPhoneNumber());
 				softly.assertThat(savendPhoneNumber.getVerifyCode()).isEqualTo(buildPhoneNumberEntity.getVerifyCode());
-				softly.assertThat(savendPhoneNumber.getSendMessageCount()).isEqualTo(buildPhoneNumberEntity.getSendMessageCount());
-				softly.assertThat(savendPhoneNumber.getVerifyCount()).isEqualTo(buildPhoneNumberEntity.getVerifyCount());
+				softly.assertThat(savendPhoneNumber.getSendMessageCount())
+					.isEqualTo(buildPhoneNumberEntity.getSendMessageCount());
+				softly.assertThat(savendPhoneNumber.getVerifyCount())
+					.isEqualTo(buildPhoneNumberEntity.getVerifyCount());
 				softly.assertThat(savendPhoneNumber.getIsVerified()).isEqualTo(buildPhoneNumberEntity.getIsVerified());
 			});
 		}
@@ -156,13 +166,15 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 			Integer preVerifyCount = phoneNumber.getVerifyCount();
 			//when
 			phoneNumberService.validateVerifiedCode(phoneNumber, verifiedCode);
-			PhoneNumber changedPhoneNumberEntity = phoneNumberService.findAlreadySentPhoneNumber(phoneNumber.getPhoneNumber()).get();
+			PhoneNumber changedPhoneNumberEntity = phoneNumberService.findAlreadySentPhoneNumber(
+				phoneNumber.getPhoneNumber()).get();
 
 			//then
 			assertSoftly(softly -> {
 				softly.assertThat(changedPhoneNumberEntity.getPhoneNumber()).isEqualTo(phoneNumber.getPhoneNumber());
 				softly.assertThat(changedPhoneNumberEntity.getVerifyCode()).isEqualTo(phoneNumber.getVerifyCode());
-				softly.assertThat(changedPhoneNumberEntity.getSendMessageCount()).isEqualTo(phoneNumber.getSendMessageCount());
+				softly.assertThat(changedPhoneNumberEntity.getSendMessageCount())
+					.isEqualTo(phoneNumber.getSendMessageCount());
 				softly.assertThat(changedPhoneNumberEntity.getVerifyCount()).isEqualTo(preVerifyCount + 1);
 				softly.assertThat(changedPhoneNumberEntity.getIsVerified()).isEqualTo(true);
 			});
@@ -175,7 +187,8 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> phoneNumberService.validateVerifiedCode(phoneNumber, phoneNumber.getVerifyCode()))
+				softly.assertThatThrownBy(
+						() -> phoneNumberService.validateVerifiedCode(phoneNumber, phoneNumber.getVerifyCode()))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.OVER_MAX_VERIFIED_COUNT.getErrorCode())
 					.hasFieldOrPropertyWithValue("message", ExceptionCode.OVER_MAX_VERIFIED_COUNT.getMessage())
@@ -197,7 +210,7 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 					.hasFieldOrPropertyWithValue("message", ExceptionCode.INVALID_VERIFIED_CODE.getMessage())
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.INVALID_VERIFIED_CODE.getHttpStatus());
 
-				softly.assertThat(phoneNumber.getVerifyCount()).isEqualTo(preVerifyCount+1);
+				softly.assertThat(phoneNumber.getVerifyCount()).isEqualTo(preVerifyCount + 1);
 			});
 		}
 
@@ -207,7 +220,7 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 	@DisplayName("<전화번호 인증 여부 검증 테스트>")
 	class validateVerifiedPhoneNumberTest {
 		@Test
-		void 인증된_전화번호인지_검증_성공 () {
+		void 인증된_전화번호인지_검증_성공() {
 			// given
 			String phoneNumber = buildSuccessVerifiedPhoneNumberEntity.getPhoneNumber();
 			// when
@@ -247,7 +260,5 @@ class PhoneNumberServiceImplTest extends ServiceTest {
 			});
 		}
 	}
-
-
 
 }

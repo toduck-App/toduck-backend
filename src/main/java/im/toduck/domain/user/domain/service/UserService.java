@@ -43,7 +43,7 @@ public class UserService {
 
 	@Transactional
 	public void registerUser(RegisterRequest request, String nickName, String encodedPassword) {
-		User user = User.createGeneralUser(nickName, request.userId(), encodedPassword,request.phoneNumber());
+		User user = User.createGeneralUser(nickName, request.userId(), encodedPassword, request.phoneNumber());
 		userRepository.save(user);
 	}
 }

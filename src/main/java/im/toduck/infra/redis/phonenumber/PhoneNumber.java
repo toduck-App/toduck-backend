@@ -20,7 +20,7 @@ public class PhoneNumber {
 
 	private PhoneNumber(String phoneNumber, String verifyCode) {
 		this.phoneNumber = phoneNumber;
-		this.verifyCode =  verifyCode;
+		this.verifyCode = verifyCode;
 		this.isVerified = false;
 		this.sendMessageCount = 1;
 		this.verifyCount = 0;
