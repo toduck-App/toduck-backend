@@ -81,6 +81,10 @@ dependencies {
 
     /* CoolSMS */
     implementation 'net.nurigo:sdk:4.3.0'
+
+    // test-containers
+    testImplementation "org.testcontainers:testcontainers:1.19.0"
+    testImplementation "org.testcontainers:junit-jupiter:1.19.0"
 }
 
 // QueryDSL 설정
