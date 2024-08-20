@@ -72,9 +72,9 @@ public class AuthController implements AuthControllerApi {
 
 	@GetMapping("/check-user-id")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> checkUserId(
-		@RequestParam("userId") @Pattern(regexp = USER_ID_REGEXP) String userId) {
-		generalSignUpUseCase.checkUserId(userId);
+	public ResponseEntity<ApiResponse<Map<String, Object>>> checkLoginId(
+		@RequestParam("loginId") @Pattern(regexp = LOGIN_ID_REGEXP) String loginId) {
+		generalSignUpUseCase.checkLoginId(loginId);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 

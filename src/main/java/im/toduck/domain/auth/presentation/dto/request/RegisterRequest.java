@@ -14,9 +14,9 @@ public record RegisterRequest(
 	String phoneNumber,
 
 	@Schema(description = "사용자 아이디", example = "toduck")
-	@Pattern(regexp = USER_ID_REGEXP, message = "올바른 ID를 입력해주세요.")
+	@Pattern(regexp = LOGIN_ID_REGEXP, message = "올바른 ID를 입력해주세요.")
 	@NotBlank(message = "아이디를 입력해주세요.")
-	String userId,
+	String loginId,
 
 	@Schema(description = "사용자 비밀번호", example = "password123")
 	@Pattern(regexp = PASSWORD_REGEXP, message = "올바른 비밀번호를 입력해주세요.")

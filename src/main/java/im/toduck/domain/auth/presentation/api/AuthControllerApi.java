@@ -86,18 +86,18 @@ public interface AuthControllerApi {
 		@RequestParam("verifiedCode") @Pattern(regexp = VERIFIED_CODE_REGEXP) String verifiedCode);
 
 	@Operation(
-		summary = "userId 중복 확인",
-		description = "userId 중복 확인을 수행합니다."
+		summary = "loginId 중복 확인",
+		description = "loginId 중복 확인을 수행합니다."
 	)
 	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(description = "userId 중복 확인 성공\n"
+		success = @ApiSuccessResponseExplanation(description = "loginId 중복 확인 성공\n"
 			+ "userId가 중복되지 않으면 성공합니다."),
 		errors = {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_USER_ID),
 		}
 	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> checkUserId(
-		@RequestParam("userId") @Pattern(regexp = USER_ID_REGEXP) String userId);
+	ResponseEntity<ApiResponse<Map<String, Object>>> checkLoginId(
+		@RequestParam("loginId") @Pattern(regexp = LOGIN_ID_REGEXP) String loginId);
 
 	@Operation(
 		summary = "회원가입",

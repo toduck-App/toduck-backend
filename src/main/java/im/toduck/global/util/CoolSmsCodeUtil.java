@@ -25,12 +25,13 @@ public class CoolSmsCodeUtil implements VerifiyCodeUtil {
 	private String callerNumber;
 
 	private static final String SMS_MESSAGE_FORAMT = "[toduck] 아래의 인증번호를 입력해주세요\n";
+	private static final String SMS_DOMAIN = "https://api.coolsms.co.kr";
 
 	private DefaultMessageService messageService;
 
 	@PostConstruct
 	private void init() {
-		this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecretKey, "https://api.coolsms.co.kr");
+		this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecretKey, SMS_DOMAIN);
 	}
 
 	@Async("threadSMSTaskExecutor")

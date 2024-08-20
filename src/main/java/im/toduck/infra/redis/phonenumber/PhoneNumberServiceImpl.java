@@ -32,14 +32,14 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 		phoneNumber.reSetVerifyCode(verifiyCodeUtil.generateVerifyCode());
 		phoneNumberRepository.save(phoneNumber);
 		verifiyCodeUtil.sendVerifyCodeMessage(
-			VerifyCodeDto.from(phoneNumber.getPhoneNumber(), phoneNumber.getVerifyCode()));
+			VerifyCodeDto.of(phoneNumber.getPhoneNumber(), phoneNumber.getVerifyCode()));
 	}
 
 	@Override
 	public void sendVerifiedCodeToPhoneNumber(String phoneNumber) {
 		String verifyCode = verifiyCodeUtil.generateVerifyCode();
 		phoneNumberRepository.save(PhoneNumber.from(phoneNumber, verifyCode));
-		verifiyCodeUtil.sendVerifyCodeMessage(VerifyCodeDto.from(phoneNumber, verifyCode));
+		verifiyCodeUtil.sendVerifyCodeMessage(VerifyCodeDto.of(phoneNumber, verifyCode));
 	}
 
 	@Override

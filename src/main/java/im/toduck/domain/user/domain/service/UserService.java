@@ -35,15 +35,15 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public void validateByUserId(String userId) {
-		userRepository.findByUserId(userId).ifPresent(user -> {
+	public void validateByLoginId(String loginId) {
+		userRepository.findByLoginId(loginId).ifPresent(user -> {
 			throw CommonException.from(ExceptionCode.EXISTS_USER_ID);
 		});
 	}
 
 	@Transactional
 	public void registerUser(RegisterRequest request, String nickName, String encodedPassword) {
-		User user = User.createGeneralUser(nickName, request.userId(), encodedPassword, request.phoneNumber());
+		User user = User.createGeneralUser(nickName, request.loginId(), encodedPassword, request.phoneNumber());
 		userRepository.save(user);
 	}
 }

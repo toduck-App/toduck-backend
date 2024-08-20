@@ -7,19 +7,19 @@ import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@ToString(of = {"phoneNumber", "code", "time"})
+@ToString
 public class VerifyCodeDto {
 	private String phoneNumber;
 	private String code;
 	private String time;
 
-	public VerifyCodeDto(String phoneNumber, String code) {
+	private VerifyCodeDto(String phoneNumber, String code) {
 		this.phoneNumber = phoneNumber;
 		this.code = code;
 		this.time = String.valueOf(System.currentTimeMillis());
 	}
 
-	public static VerifyCodeDto from(String phoneNumber, String verifyCode) {
+	public static VerifyCodeDto of(String phoneNumber, String verifyCode) {
 		return new VerifyCodeDto(phoneNumber, verifyCode);
 	}
 }
