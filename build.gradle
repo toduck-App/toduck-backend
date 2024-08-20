@@ -71,9 +71,6 @@ dependencies {
 
     /* Swagger */
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-
-    /* CoolSMS */
-    implementation 'net.nurigo:sdk:4.3.0'
     implementation(group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0') {
         exclude group: 'org.webjars', module: 'swagger-ui'
     }
@@ -81,6 +78,9 @@ dependencies {
 
     /* Thymeleaf */
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.3.1'
+
+    /* CoolSMS */
+    implementation 'net.nurigo:sdk:4.3.0'
 }
 
 // QueryDSL 설정
