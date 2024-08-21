@@ -36,18 +36,30 @@ CREATE TABLE routine
     emoji       ENUM ('SMILE')                 NOT NULL,
     -- TODO: 4. routine 테이블의 color enum 값 필요
     color       ENUM ('RED')                   NOT NULL,
-    is_complete BOOLEAN                        NOT NULL,
-    time        TIME                           NOT NULL,
+    time        TIME                           NULL,
+    days_of_week TINYINT UNSIGNED              NOT NULL,
     title       CHAR(100)                      NOT NULL,
     location    VARCHAR(255)                   NOT NULL,
     is_public   BOOLEAN                        NOT NULL,
-    alarm       ENUM ('10', '30', '60', 'OFF') NOT NULL,
+    reminder_minutes INT UNSIGNED              NULL,
     memo        TEXT                           NULL,
     created_at  DATETIME                       NOT NULL,
     updated_at  DATETIME                       NOT NULL,
     deleted_at  DATETIME                       NULL,
     FOREIGN KEY (social_id) REFERENCES social (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE routine_record
+(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    routine_id BIGINT NULL,
+    record_at DATETIME NOT NULL,
+    is_completed BOOLEAN NOT NULL DEFAULT false,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME NULL,
+    FOREIGN KEY (routine_id) REFERENCES routine (id) ON DELETE SET NULL
 );
 
 CREATE TABLE comment

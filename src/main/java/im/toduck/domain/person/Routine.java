@@ -26,16 +26,16 @@ public class Routine extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	// TODO: 변경 필요
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Emoji emoji;
 
+	// TODO: 변경 필요
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Color color;
-
-	@Column(nullable = false)
-	private Boolean isComplete;
 
 	@Column(nullable = false, columnDefinition = "CHAR(100)")
 	private String title;
@@ -46,15 +46,17 @@ public class Routine extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isPublic;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private Alarm alarm;
+	@Column(name = "reminder_minutes")
+	private Integer reminderMinutes;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
+	@Column(columnDefinition = "TEXT")
 	private String memo;
 
-	@Column(nullable = false)
+	@Column
 	private LocalTime time;
+
+	@Column(name = "days_of_week", nullable = false)
+	private Byte daysOfWeek;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "social_id", nullable = false)
