@@ -165,29 +165,6 @@ CREATE TABLE social_category_link
     FOREIGN KEY (social_category_id) REFERENCES social_category (id)
 );
 
-CREATE TABLE repeat_day
-(
-    id         BIGINT PRIMARY KEY auto_increment,
-    day        ENUM ('MON','TUE','WED','THU','FRI','SAT','SUN') NOT NULL,
-    created_at DATETIME                                         NOT NULL,
-    updated_at DATETIME                                         NOT NULL,
-    deleted_at DATETIME                                         NULL
-);
-
-CREATE TABLE repeat_day_link
-(
-    id            BIGINT PRIMARY KEY auto_increment,
-    routine_id    BIGINT   NULL,
-    schedule_id   BIGINT   NULL,
-    repeat_day_id BIGINT   NOT NULL,
-    created_at    DATETIME NOT NULL,
-    updated_at    DATETIME NOT NULL,
-    deleted_at    DATETIME NULL,
-    FOREIGN KEY (routine_id) REFERENCES routine (id),
-    FOREIGN KEY (schedule_id) REFERENCES schedule (id),
-    FOREIGN KEY (repeat_day_id) REFERENCES repeat_day (id)
-);
-
 INSERT INTO social_category (name, created_at, updated_at)
 VALUES ('CONCENTRATION', NOW(), NOW()),
        ('MEMORY', NOW(), NOW()),
