@@ -124,9 +124,9 @@ CREATE TABLE schedule
  id          BIGINT PRIMARY KEY auto_increment,
  user_id     BIGINT         NOT NULL,
  -- TODO: 8. routine 의 이모지 필드 enum 값 필요
- emoji       ENUM ('SMILE') NOT NULL,
+ category       ENUM ('SMILE') NULL,
  -- TODO: 4. routine 테이블의 color enum 값 필요
- color       ENUM ('RED')   NOT NULL,
+ color       ENUM ('RED')   NULL,
  is_complete BOOLEAN        NOT NULL,
  time        TIME           NULL,
  title       CHAR(100)      NOT NULL,

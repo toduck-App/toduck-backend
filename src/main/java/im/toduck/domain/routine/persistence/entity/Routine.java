@@ -31,12 +31,10 @@ public class Routine extends BaseEntity {
 
 	// TODO: 변경 필요
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private Emoji emoji;
+	private Emoji category;
 
 	// TODO: 변경 필요
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
 	private Color color;
 
 	@Column(nullable = false, columnDefinition = "CHAR(100)")
