@@ -15,5 +15,4 @@ public class UserAuthUseCase {
 	public void signOut(Long userId, String authHeader, String refreshToken) {
 		jwtService.removeAccessTokenAndRefreshToken(userId, authHeader, refreshToken);
 	}
-
 }
