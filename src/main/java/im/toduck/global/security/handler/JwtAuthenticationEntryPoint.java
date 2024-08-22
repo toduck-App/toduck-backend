@@ -31,5 +31,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		response.setStatus(EMPTY_ACCESS_TOKEN.getHttpStatus().value());
 		objectMapper.writeValue(response.getWriter(), ApiResponse.createError(EMPTY_ACCESS_TOKEN));
 	}
-
 }

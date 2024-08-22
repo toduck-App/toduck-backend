@@ -16,7 +16,7 @@ public class StringStripJsonDeserializer extends JsonDeserializer<String> {
 	 * JSON 문자열 값을 역직렬화합니다.
 	 * 문자열의 앞뒤 공백을 제거하고, 결과가 빈 문자열이면 null을 반환합니다.
 	 *
-	 * @param jp JSON 파서 객체
+	 * @param jp  JSON 파서 객체
 	 * @param ctx 역직렬화 컨텍스트
 	 * @return 공백이 제거된 문자열 또는 null
 	 * @throws IOException JSON 파싱 중 발생할 수 있는 입출력 예외
