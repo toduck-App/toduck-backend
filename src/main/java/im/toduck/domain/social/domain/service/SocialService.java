@@ -43,7 +43,7 @@ public class SocialService {
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}
 
-		socialBoard.remove();
+		socialRepository.delete(socialBoard);
 	}
 
 	private boolean isOwner(Social socialBoard, User user) {

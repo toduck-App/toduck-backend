@@ -1,6 +1,7 @@
 package im.toduck.domain.social.persistence.entity;
 
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -20,6 +21,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "social_image_file")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE social_image_file SET deleted_at = NOW() where id=?")
+@SQLRestriction(value = "deleted_at is NULL")
 public class SocialImageFile extends BaseEntity {
 
 	@Id
@@ -40,9 +43,5 @@ public class SocialImageFile extends BaseEntity {
 
 	public static SocialImageFile of(Social social, String url) {
 		return new SocialImageFile(social, url);
-	}
-
-	public void remove() {
-		this.deletedAt = LocalDateTime.now();
 	}
 }
