@@ -43,6 +43,7 @@ public enum ExceptionCode {
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
 	UNAUTHORIZED_ACCESS_SOCIAL_BOARD(HttpStatus.FORBIDDEN, 40402, "게시글에 접근 권한이 없습니다."),
+	NOT_FOUND_SOCIAL_CATEGORY(HttpStatus.NOT_FOUND, 40403, "찾을 수 없는 카테고리가 포함되어 있습니다."),
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),

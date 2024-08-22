@@ -1,9 +1,12 @@
 package im.toduck.domain.social.domain.usecase;
 
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.domain.service.SocialService;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.domain.user.domain.service.UserService;
@@ -25,9 +28,19 @@ public class SocialUseCase {
 	public CreateSocialResponse createSocialBoard(Long userId, CreateSocialRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		Social social = socialService.createSocialBoard(user, request);
+		List<SocialCategory> socialCategories = socialService.findAllSocialCategories(request.socialCategoryIds());
+
+		if (isInvalidCategoryIncluded(request, socialCategories)) {
+			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
+		}
+
+		Social social = socialService.createSocialBoard(user, socialCategories, request);
 
 		return CreateSocialResponse.from(social.getId());
+	}
+
+	private boolean isInvalidCategoryIncluded(CreateSocialRequest request, List<SocialCategory> socialCategories) {
+		return socialCategories.size() != request.socialCategoryIds().size();
 	}
 
 	public void deleteSocialBoard(Long userId, Long socialId) {

@@ -18,6 +18,7 @@ import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,7 +31,7 @@ public class SocialController implements SocialControllerApi {
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<CreateSocialResponse>> createSocialBoard(
-		@RequestBody CreateSocialRequest request,
+		@RequestBody @Valid CreateSocialRequest request,
 		@AuthenticationPrincipal CustomUserDetails user) {
 
 		return ResponseEntity.ok()

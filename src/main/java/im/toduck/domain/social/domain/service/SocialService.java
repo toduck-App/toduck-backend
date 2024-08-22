@@ -24,10 +24,8 @@ public class SocialService {
 	private final SocialCategoryRepository socialCategoryRepository;
 
 	@Transactional
-	public Social createSocialBoard(User user, CreateSocialRequest request) {
+	public Social createSocialBoard(User user, List<SocialCategory> socialCategories, CreateSocialRequest request) {
 		Social socialBoard = Social.of(user, request.content(), request.isAnonymous());
-		List<SocialCategory> socialCategories = socialCategoryRepository.findAllById(request.socialCategoryIds());
-
 		socialBoard.addSocialCategoryLinks(socialCategories);
 		socialBoard.addSocialImageFiles(request.socialImageUrls());
 
@@ -48,5 +46,10 @@ public class SocialService {
 
 	private boolean isOwner(Social socialBoard, User user) {
 		return socialBoard.isOwner(user);
+	}
+
+	@Transactional(readOnly = true)
+	public List<SocialCategory> findAllSocialCategories(List<Long> socialCategoryIds) {
+		return socialCategoryRepository.findAllById(socialCategoryIds);
 	}
 }
