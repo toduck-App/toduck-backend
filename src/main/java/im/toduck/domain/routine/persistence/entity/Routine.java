@@ -1,7 +1,9 @@
-package im.toduck.domain.person;
+package im.toduck.domain.routine.persistence.entity;
 
 import java.time.LocalTime;
 
+import im.toduck.domain.person.Color;
+import im.toduck.domain.person.Emoji;
 import im.toduck.domain.social.Social;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
@@ -39,9 +41,6 @@ public class Routine extends BaseEntity {
 
 	@Column(nullable = false, columnDefinition = "CHAR(100)")
 	private String title;
-
-	@Column(nullable = false, length = 255)
-	private String location;
 
 	@Column(nullable = false)
 	private Boolean isPublic;
