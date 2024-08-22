@@ -22,7 +22,11 @@ public interface SocialControllerApi {
 		summary = "소셜 게시글 생성",
 		description = "소셜 게시글을 작성합니다."
 	)
-	@ApiResponseExplanations
+	@ApiResponseExplanations(
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY),
+		}
+	)
 	ResponseEntity<ApiResponse<CreateSocialResponse>> createSocialBoard(
 		CreateSocialRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
@@ -42,5 +46,4 @@ public interface SocialControllerApi {
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
-
 }

@@ -1,6 +1,7 @@
 package im.toduck.domain.social.domain.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,11 @@ public class SocialService {
 	private final SocialRepository socialRepository;
 	private final SocialCategoryRepository socialCategoryRepository;
 
+	@Transactional(readOnly = true)
+	public Optional<Social> getSocialById(Long socialId) {
+		return socialRepository.findById(socialId);
+	}
+
 	@Transactional
 	public Social createSocialBoard(User user, List<SocialCategory> socialCategories, CreateSocialRequest request) {
 		Social socialBoard = Social.of(user, request.content(), request.isAnonymous());
@@ -33,10 +39,7 @@ public class SocialService {
 	}
 
 	@Transactional
-	public void deleteSocialBoard(User user, Long socialId) {
-		Social socialBoard = socialRepository.findById(socialId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-
+	public void deleteSocialBoard(User user, Social socialBoard) {
 		if (!isOwner(socialBoard, user)) {
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}

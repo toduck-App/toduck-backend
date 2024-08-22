@@ -43,11 +43,14 @@ public class SocialUseCase {
 		return socialCategories.size() != request.socialCategoryIds().size();
 	}
 
+	@Transactional
 	public void deleteSocialBoard(Long userId, Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
-		socialService.deleteSocialBoard(user, socialId);
+		socialService.deleteSocialBoard(user, socialBoard);
 	}
 }
 
