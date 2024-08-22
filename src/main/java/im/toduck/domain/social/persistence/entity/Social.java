@@ -9,8 +9,6 @@ import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,12 +35,10 @@ public class Social extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
+	// TODO: Routine 추가 (생성자, 정적 팩터리 메소드에도 추가 필요)
+
 	@Column(nullable = false, length = 255)
 	private String content;
-
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private SocialTag tag;
 
 	@Column(nullable = false)
 	private Boolean isAnonymous;
@@ -53,15 +49,14 @@ public class Social extends BaseEntity {
 	@OneToMany(mappedBy = "social", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<SocialImageFile> socialImageFileList = new ArrayList<>();
 
-	private Social(User user, String content, SocialTag tag, Boolean isAnonymous) {
+	private Social(User user, String content, Boolean isAnonymous) {
 		this.user = user;
 		this.content = content;
-		this.tag = tag;
 		this.isAnonymous = isAnonymous;
 	}
 
-	public static Social of(User user, String content, SocialTag tag, Boolean isAnonymous) {
-		return new Social(user, content, tag, isAnonymous);
+	public static Social of(User user, String content, Boolean isAnonymous) {
+		return new Social(user, content, isAnonymous);
 	}
 
 	public void remove() {
