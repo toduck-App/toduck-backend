@@ -1,7 +1,6 @@
 package im.toduck.domain.social.persistence.entity;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import java.time.LocalDateTime;
 
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Entity;
@@ -20,8 +19,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "social_category_link")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE social_category_link SET deleted_at = NOW() where id=?")
-@SQLRestriction(value = "deleted_at is NULL")
 public class SocialCategoryLink extends BaseEntity {
 
 	@Id
@@ -41,7 +38,11 @@ public class SocialCategoryLink extends BaseEntity {
 		this.socialCategory = socialCategory;
 	}
 
-	public static SocialCategoryLink of(Social social, SocialCategory socialCategory) {
-		return new SocialCategoryLink(social, socialCategory);
+	public static SocialCategoryLink of(Social socialBoard, SocialCategory socialCategory) {
+		return new SocialCategoryLink(socialBoard, socialCategory);
+	}
+
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
 	}
 }

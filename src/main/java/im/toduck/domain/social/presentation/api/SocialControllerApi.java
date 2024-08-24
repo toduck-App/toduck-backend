@@ -5,8 +5,10 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
+import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -15,6 +17,7 @@ import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @Tag(name = "Social")
 public interface SocialControllerApi {
@@ -46,4 +49,22 @@ public interface SocialControllerApi {
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
+
+	@Operation(
+		summary = "소셜 게시글 수정",
+		description = "소셜 게시글을 수정합니다."
+	)
+	@ApiResponseExplanations(
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> updateSocialBoard(
+		@PathVariable Long socialId,
+		@RequestBody @Valid UpdateSocialRequest request,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
 }

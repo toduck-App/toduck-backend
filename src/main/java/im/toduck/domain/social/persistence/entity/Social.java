@@ -1,14 +1,10 @@
 package im.toduck.domain.social.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,12 +42,6 @@ public class Social extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isAnonymous;
 
-	@OneToMany(mappedBy = "social", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<SocialCategoryLink> socialCategoryLinkList = new ArrayList<>();
-
-	@OneToMany(mappedBy = "social", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<SocialImageFile> socialImageFileList = new ArrayList<>();
-
 	private Social(User user, String content, Boolean isAnonymous) {
 		this.user = user;
 		this.content = content;
@@ -63,19 +52,15 @@ public class Social extends BaseEntity {
 		return new Social(user, content, isAnonymous);
 	}
 
-	public void addSocialImageFiles(List<String> socialImageUrls) {
-		for (String imageUrl : socialImageUrls) {
-			socialImageFileList.add(SocialImageFile.of(this, imageUrl));
-		}
-	}
-
-	public void addSocialCategoryLinks(List<SocialCategory> socialCategories) {
-		for (SocialCategory socialCategory : socialCategories) {
-			socialCategoryLinkList.add(SocialCategoryLink.of(this, socialCategory));
-		}
-	}
-
 	public boolean isOwner(User requestingUser) {
 		return this.user.getId().equals(requestingUser.getId());
+	}
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
+
+	public void updateIsAnonymous(Boolean isAnonymous) {
+		this.isAnonymous = isAnonymous;
 	}
 }

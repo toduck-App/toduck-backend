@@ -8,6 +8,7 @@ import im.toduck.domain.social.domain.service.SocialService;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
+import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -28,19 +29,12 @@ public class SocialUseCase {
 	public CreateSocialResponse createSocialBoard(Long userId, CreateSocialRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialService.createSocialBoard(user, request);
 		List<SocialCategory> socialCategories = socialService.findAllSocialCategories(request.socialCategoryIds());
+		socialService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
+		socialService.addSocialImageFiles(request.socialImageUrls(), socialBoard);
 
-		if (isInvalidCategoryIncluded(request, socialCategories)) {
-			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
-		}
-
-		Social social = socialService.createSocialBoard(user, socialCategories, request);
-
-		return CreateSocialResponse.from(social.getId());
-	}
-
-	private boolean isInvalidCategoryIncluded(CreateSocialRequest request, List<SocialCategory> socialCategories) {
-		return socialCategories.size() != request.socialCategoryIds().size();
+		return CreateSocialResponse.from(socialBoard.getId());
 	}
 
 	@Transactional
@@ -51,6 +45,16 @@ public class SocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
 		socialService.deleteSocialBoard(user, socialBoard);
+	}
+
+	@Transactional
+	public void updateSocialBoard(Long userId, Long socialId, UpdateSocialRequest request) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+		socialService.updateSocialBoard(user, socialBoard, request);
 	}
 }
 

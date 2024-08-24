@@ -8,9 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
+import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
+import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
+import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
+import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -23,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SocialService {
 	private final SocialRepository socialRepository;
 	private final SocialCategoryRepository socialCategoryRepository;
+	private final SocialImageFileRepository socialImageFileRepository;
+	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
 
 	@Transactional(readOnly = true)
 	public Optional<Social> getSocialById(Long socialId) {
@@ -30,10 +37,8 @@ public class SocialService {
 	}
 
 	@Transactional
-	public Social createSocialBoard(User user, List<SocialCategory> socialCategories, CreateSocialRequest request) {
+	public Social createSocialBoard(User user, CreateSocialRequest request) {
 		Social socialBoard = Social.of(user, request.content(), request.isAnonymous());
-		socialBoard.addSocialCategoryLinks(socialCategories);
-		socialBoard.addSocialImageFiles(request.socialImageUrls());
 
 		return socialRepository.save(socialBoard);
 	}
@@ -44,15 +49,80 @@ public class SocialService {
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}
 
+		List<SocialImageFile> imageFiles = socialImageFileRepository.findAllBySocial(socialBoard);
+		imageFiles.forEach(SocialImageFile::softDelete);
+
+		List<SocialCategoryLink> socialCategoryLinks = socialCategoryLinkRepository.findAllBySocial(socialBoard);
+		socialCategoryLinks.forEach(SocialCategoryLink::softDelete);
+
 		socialRepository.delete(socialBoard);
 	}
 
-	private boolean isOwner(Social socialBoard, User user) {
-		return socialBoard.isOwner(user);
+	@Transactional
+	public void updateSocialBoard(User user, Social socialBoard, UpdateSocialRequest request) {
+		if (!isOwner(socialBoard, user)) {
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		if (request.socialCategoryIds() != null) {
+			List<SocialCategory> socialCategories = findAllSocialCategories(request.socialCategoryIds());
+
+			if (isInvalidCategoryIncluded(request.socialCategoryIds(), socialCategories)) {
+				throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
+			}
+
+			socialCategoryLinkRepository.deleteAllBySocial(socialBoard);
+			addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
+		}
+
+		if (request.content() != null) {
+			socialBoard.updateContent(request.content());
+		}
+
+		if (request.isAnonymous() != null) {
+			socialBoard.updateIsAnonymous(request.isAnonymous());
+		}
+
+		if (request.socialImageUrls() != null) {
+			socialImageFileRepository.deleteAllBySocial(socialBoard);
+			addSocialImageFiles(request.socialImageUrls(), socialBoard);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	public List<SocialCategory> findAllSocialCategories(List<Long> socialCategoryIds) {
 		return socialCategoryRepository.findAllById(socialCategoryIds);
 	}
+
+	@Transactional
+	public void addSocialImageFiles(List<String> imageUrls, Social socialBoard) {
+		List<SocialImageFile> socialImageFiles = imageUrls.stream()
+			.map(url -> SocialImageFile.of(socialBoard, url))
+			.toList();
+
+		socialImageFileRepository.saveAll(socialImageFiles);
+	}
+
+	@Transactional
+	public void addSocialCategoryLinks(List<Long> categoryIds, List<SocialCategory> socialCategories,
+		Social socialBoard) {
+		if (isInvalidCategoryIncluded(categoryIds, socialCategories)) {
+			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
+		}
+
+		List<SocialCategoryLink> socialCategoryLinks = socialCategories.stream()
+			.map(sc -> SocialCategoryLink.of(socialBoard, sc))
+			.toList();
+
+		socialCategoryLinkRepository.saveAll(socialCategoryLinks);
+	}
+
+	private boolean isOwner(Social socialBoard, User user) {
+		return socialBoard.isOwner(user);
+	}
+
+	private boolean isInvalidCategoryIncluded(List<Long> socialCategoryIds, List<SocialCategory> socialCategories) {
+		return socialCategories.size() != socialCategoryIds.size();
+	}
+
 }
