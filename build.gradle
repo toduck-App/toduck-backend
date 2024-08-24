@@ -78,6 +78,13 @@ dependencies {
 
     /* Thymeleaf */
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.3.1'
+
+    /* CoolSMS */
+    implementation 'net.nurigo:sdk:4.3.0'
+
+    // test-containers
+    testImplementation "org.testcontainers:testcontainers:1.19.0"
+    testImplementation "org.testcontainers:junit-jupiter:1.19.0"
 }
 
 // QueryDSL 설정
@@ -106,7 +113,7 @@ tasks.named('test') {
 
 // editorconfig 설정
 editorconfig {
-    excludes = ['build', 'node_modules', '.husky', 'docker-infra']
+    excludes = ['build', 'node_modules', '.husky', 'docker-infra', 'src/main/generated', 'gradlew.bat']
 }
 check.dependsOn editorconfigCheck
 

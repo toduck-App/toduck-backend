@@ -36,6 +36,13 @@ public enum ExceptionCode {
 	TAKEN_AWAY_TOKEN(HttpStatus.FORBIDDEN, 40108, "인증 불가, 관리자에게 문의하세요.", "보안 위험이므로 완전히 로그아웃 처리해주세요."),
 	EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, 40109, "재 로그인이 필요합니다.",
 		"해당 예외 발생시, RefreshToken까지 만료된 경우이므로, 재 로그인을 수행해 주세요."),
+	EXISTS_PHONE_NUMBER(HttpStatus.CONFLICT, 40110, "이미 가입된 전화번호입니다."),
+	OVER_MAX_MESSAGE_COUNT(HttpStatus.FORBIDDEN, 40111, "인증코드 요청 횟수를 초과하였습니다."),
+	OVER_MAX_VERIFIED_COUNT(HttpStatus.FORBIDDEN, 40112, "인증코드 확인 횟수를 초과하였습니다."),
+	EXISTS_USER_ID(HttpStatus.CONFLICT, 40113, "이미 가입된 아이디입니다."),
+	NOT_SEND_PHONE_NUMBER(HttpStatus.NOT_FOUND, 40114, "인증 요청이 보내지 않은 전화번호입니다."),
+	INVALID_VERIFIED_CODE(HttpStatus.FORBIDDEN, 40115, "인증 코드가 일치하지 않습니다."),
+	NOT_VERIFIED_PHONE_NUMBER(HttpStatus.FORBIDDEN, 40116, "인증되지 않은 전화번호입니다."),
 
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),

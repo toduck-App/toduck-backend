@@ -1,9 +1,16 @@
 package im.toduck.domain.auth.presentation.api;
 
+import static im.toduck.global.regex.UserRegex.*;
+
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
+import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
 import im.toduck.domain.auth.presentation.dto.response.LoginResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -13,6 +20,7 @@ import im.toduck.global.presentation.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 @Tag(name = "Auth")
 public interface AuthControllerApi {
@@ -43,4 +51,67 @@ public interface AuthControllerApi {
 		}
 	)
 	ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken);
+
+	@Operation(
+		summary = "인증번호 발송",
+		description = "전화번호로 인증번호를 발송합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(description = "인증번호 발송 성공\n"
+			+ "인증번호는 5자리 숫자이며 메시지로 전송됩니다.\n"
+			+ "현재 인증번호는 유효시간에만 인증할 수 있습니다."),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_PHONE_NUMBER),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.OVER_MAX_MESSAGE_COUNT),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> sendVerifiedCode(
+		@RequestParam("phoneNumber") @Pattern(regexp = PHONE_NUMBER_REGEXP) String phoneNumber);
+
+	@Operation(
+		summary = "인증번호 확인",
+		description = "전화번호로 발송된 인증번호를 확인합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(description = "인증번호 확인 성공\n"
+			+ "인증번호가 일치하면 인증 완료 처리됩니다."),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_SEND_PHONE_NUMBER),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.OVER_MAX_VERIFIED_COUNT),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_VERIFIED_CODE),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> checkVerifiedCode(
+		@RequestParam("phoneNumber") @Pattern(regexp = PHONE_NUMBER_REGEXP) String phoneNumber,
+		@RequestParam("verifiedCode") @Pattern(regexp = VERIFIED_CODE_REGEXP) String verifiedCode);
+
+	@Operation(
+		summary = "loginId 중복 확인",
+		description = "loginId 중복 확인을 수행합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(description = "loginId 중복 확인 성공\n"
+			+ "userId가 중복되지 않으면 성공합니다."),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_USER_ID),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> checkLoginId(
+		@RequestParam("loginId") @Pattern(regexp = LOGIN_ID_REGEXP) String loginId);
+
+	@Operation(
+		summary = "회원가입",
+		description = "회원가입을 수행합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(description = "회원가입 성공\n"
+			+ "회원가입이 완료되면 성공합니다."),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_USER_ID),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_PHONE_NUMBER),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_SEND_PHONE_NUMBER),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_VERIFIED_PHONE_NUMBER),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid RegisterRequest request);
 }

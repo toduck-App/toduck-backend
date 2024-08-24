@@ -41,7 +41,6 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 		ServletException, IOException {
 		try {
 			filterChain.doFilter(request, response);
-
 		} catch (JwtException ex) {
 			Class<? extends Exception> exceptionClass = ex.getClass();
 			ExceptionCode exceptionCode = JWT_EXCEPTION_CODE_MAP.get(exceptionClass);

@@ -10,6 +10,7 @@ import im.toduck.builder.BuilderSupporter;
 import im.toduck.builder.TestFixtureBuilder;
 import im.toduck.global.security.jwt.access.AccessTokenProvider;
 import im.toduck.global.security.jwt.refresh.RefreshTokenProvider;
+import im.toduck.global.util.VerifiyCodeUtil;
 import im.toduck.infra.redis.forbidden.ForbiddenTokenService;
 import im.toduck.infra.redis.refresh.RefreshTokenService;
 
@@ -31,4 +32,7 @@ public abstract class ServiceTest {
 
 	@MockBean
 	protected ForbiddenTokenService forbiddenTokenService;
+
+	@MockBean
+	protected VerifiyCodeUtil verifiyCodeUtil;
 }
