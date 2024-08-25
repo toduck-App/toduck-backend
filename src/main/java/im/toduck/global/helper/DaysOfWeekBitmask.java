@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,11 +41,15 @@ public class DaysOfWeekBitmask {
 		this.bitmask = bitmask;
 	}
 
-	public static DaysOfWeekBitmask of(@NotNull DayOfWeek[] daysOfWeek) {
-		byte bitmask = (byte)Arrays.stream(daysOfWeek)
+	public static DaysOfWeekBitmask createByDayOfWeek(@NotNull List<DayOfWeek> daysOfWeek) {
+		byte bitmask = (byte)daysOfWeek.stream()
 			.mapToInt(DaysOfWeekBitmask::getDayBitmask)
 			.reduce(0, (a, b) -> a | b);
 
+		return new DaysOfWeekBitmask(bitmask);
+	}
+
+	public static DaysOfWeekBitmask from(byte bitmask) {
 		return new DaysOfWeekBitmask(bitmask);
 	}
 
@@ -68,6 +73,10 @@ public class DaysOfWeekBitmask {
 
 	private static byte getDayBitmask(DayOfWeek day) {
 		return (byte)(1 << (day.getValue() - 1));
+	}
+
+	public byte getValue() {
+		return bitmask;
 	}
 
 	@Override
