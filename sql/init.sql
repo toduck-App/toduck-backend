@@ -31,12 +31,11 @@ CREATE TABLE social
 CREATE TABLE routine
 (
 id          BIGINT PRIMARY KEY auto_increment,
-social_id   BIGINT                         NOT NULL,
 user_id     BIGINT                         NOT NULL,
 -- TODO: 8. routine 의 이모지 필드 enum 값 필요
-emoji       ENUM ('SMILE')                 NOT NULL,
+category    ENUM ('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY')  NULL,
 -- TODO: 4. routine 테이블의 color enum 값 필요
-color       ENUM ('RED')                   NOT NULL,
+color       VARCHAR(10)                    NULL,
 time        TIME                           NULL,
 days_of_week TINYINT UNSIGNED              NOT NULL,
 title       CHAR(100)                      NOT NULL,
@@ -46,7 +45,6 @@ memo        TEXT                           NULL,
 created_at  DATETIME                       NOT NULL,
 updated_at  DATETIME                       NOT NULL,
 deleted_at  DATETIME                       NULL,
-FOREIGN KEY (social_id) REFERENCES social (id),
 FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
@@ -124,9 +122,9 @@ CREATE TABLE schedule
  id          BIGINT PRIMARY KEY auto_increment,
  user_id     BIGINT         NOT NULL,
  -- TODO: 8. routine 의 이모지 필드 enum 값 필요
- category       ENUM ('SMILE') NULL,
+ emoji       ENUM ('SMILE') NOT NULL,
  -- TODO: 4. routine 테이블의 color enum 값 필요
- color       ENUM ('RED')   NULL,
+ color       ENUM ('RED')   NOT NULL,
  is_complete BOOLEAN        NOT NULL,
  time        TIME           NULL,
  title       CHAR(100)      NOT NULL,

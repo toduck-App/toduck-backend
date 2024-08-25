@@ -2,12 +2,13 @@ package im.toduck.domain.routine.persistence.entity;
 
 import java.time.LocalTime;
 
-import im.toduck.domain.person.Color;
-import im.toduck.domain.person.Emoji;
-import im.toduck.domain.social.Social;
+import im.toduck.domain.person.PlanCategory;
+import im.toduck.domain.routine.converter.DaysOfWeekBitmaskConverter;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
+import im.toduck.global.helper.DaysOfWeekBitmask;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,9 +19,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "routine")
 @NoArgsConstructor
 public class Routine extends BaseEntity {
@@ -31,11 +35,10 @@ public class Routine extends BaseEntity {
 
 	// TODO: 변경 필요
 	@Enumerated(EnumType.STRING)
-	private Emoji category;
+	private PlanCategory category;
 
 	// TODO: 변경 필요
-	@Enumerated(EnumType.STRING)
-	private Color color;
+	private String color;
 
 	@Column(nullable = false, columnDefinition = "CHAR(100)")
 	private String title;
@@ -52,14 +55,34 @@ public class Routine extends BaseEntity {
 	@Column
 	private LocalTime time;
 
+	@Convert(converter = DaysOfWeekBitmaskConverter.class)
 	@Column(name = "days_of_week", nullable = false)
-	private Byte daysOfWeek;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "social_id", nullable = false)
-	private Social social;
+	private DaysOfWeekBitmask daysOfWeekBitmask;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
+
+	@Builder
+	private Routine(
+		PlanCategory category,
+		String color,
+		String title,
+		Boolean isPublic,
+		Integer reminderMinutes,
+		String memo,
+		LocalTime time,
+		DaysOfWeekBitmask daysOfWeekBitmask,
+		User user
+	) {
+		this.category = category;
+		this.color = color;
+		this.title = title;
+		this.isPublic = isPublic;
+		this.reminderMinutes = reminderMinutes;
+		this.memo = memo;
+		this.time = time;
+		this.daysOfWeekBitmask = daysOfWeekBitmask;
+		this.user = user;
+	}
 }
