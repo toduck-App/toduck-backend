@@ -18,6 +18,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
+@Deprecated
+/*
+ * 추후 변경 예정
+ * */
 @Entity
 @Table(name = "schedule")
 @NoArgsConstructor
