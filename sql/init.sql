@@ -20,7 +20,6 @@ CREATE TABLE social
  id           BIGINT PRIMARY KEY auto_increment,
  user_id      BIGINT                             NOT NULL,
  content      VARCHAR(255)                       NOT NULL,
- tag          ENUM ('COMMUNICATION', 'QUESTION') NOT NULL,
  is_anonymous BOOLEAN                            NOT NULL,
  created_at   DATETIME                           NOT NULL,
  updated_at   DATETIME                           NOT NULL,
