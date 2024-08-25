@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
+import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
@@ -34,6 +36,7 @@ public class SocialService {
 	private final SocialImageFileRepository socialImageFileRepository;
 	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
 	private final CommentRepository commentRepository;
+	private final LikeRepository likeRepository;
 
 	@Transactional(readOnly = true)
 	public Optional<Social> getSocialById(Long socialId) {
@@ -61,6 +64,9 @@ public class SocialService {
 
 		List<Comment> comments = commentRepository.findAllBySocial(socialBoard);
 		comments.forEach(Comment::softDelete);
+
+		List<Like> likes = likeRepository.findAllBySocial(socialBoard);
+		likes.forEach(Like::softDelete);
 
 		socialRepository.delete(socialBoard);
 	}
@@ -139,11 +145,11 @@ public class SocialService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Comment> getSocialCommentById(Long commentId) {
+	public Optional<Comment> getCommentById(Long commentId) {
 		return commentRepository.findById(commentId);
 	}
 
-	public void deleteSocialComment(User user, Social socialBoard, Comment comment) {
+	public void deleteComment(User user, Social socialBoard, Comment comment) {
 		if (!isCommentOwner(comment, user)) {
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT);
 		}
@@ -162,4 +168,43 @@ public class SocialService {
 	private boolean isCommentInSocialBoard(Social socialBoard, Comment comment) {
 		return comment.isInSocialBoard(socialBoard);
 	}
+
+	@Transactional
+	public Like createLike(User user, Social socialBoard) {
+		Optional<Like> existedLike = likeRepository.findByUserAndSocial(user, socialBoard);
+
+		if (existedLike.isPresent()) {
+			throw CommonException.from(ExceptionCode.EXISTS_LIKE);
+		}
+
+		Like like = Like.of(user, socialBoard);
+		return likeRepository.save(like);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Like> getLikeById(Long likeId) {
+		return likeRepository.findById(likeId);
+	}
+
+	@Transactional
+	public void deleteLike(User user, Social socialBoard, Like like) {
+		if (!isLikeOwner(like, user)) {
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_LIKE);
+		}
+
+		if (!isLikeInSocialBoard(socialBoard, like)) {
+			throw CommonException.from(ExceptionCode.INVALID_LIKE_FOR_BOARD);
+		}
+
+		likeRepository.delete(like);
+	}
+
+	private boolean isLikeInSocialBoard(Social socialBoard, Like like) {
+		return like.isInSocialBoard(socialBoard);
+	}
+
+	private boolean isLikeOwner(Like like, User user) {
+		return like.isOwner(user);
+	}
+
 }

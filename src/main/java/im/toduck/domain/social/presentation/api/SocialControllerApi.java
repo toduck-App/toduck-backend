@@ -11,6 +11,7 @@ import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
 import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
+import im.toduck.domain.social.presentation.dto.response.CreateLikeResponse;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -99,6 +100,40 @@ public interface SocialControllerApi {
 	ResponseEntity<ApiResponse<Map<String, Object>>> deleteComment(
 		@PathVariable Long socialId,
 		@PathVariable Long commentId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "게시글 좋아요",
+		description = "게시글을 좋아요 합니다."
+	)
+	@ApiResponseExplanations(
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_LIKE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+		}
+	)
+	ResponseEntity<ApiResponse<CreateLikeResponse>> createLike(
+		@PathVariable Long socialId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "게시글 좋아요 취소",
+		description = "게시글 좋아요를 취소합니다."
+	)
+	@ApiResponseExplanations(
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_LIKE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_LIKE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_LIKE_FOR_BOARD),
+
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
+		@PathVariable Long socialId,
+		@PathVariable Long likeId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 

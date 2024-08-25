@@ -19,6 +19,7 @@ import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
 import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
+import im.toduck.domain.social.presentation.dto.response.CreateLikeResponse;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -85,6 +86,29 @@ public class SocialController implements SocialControllerApi {
 		@PathVariable Long commentId,
 		CustomUserDetails user) {
 		socialUseCase.deleteComment(user.getUserId(), socialId, commentId);
+
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@Override
+	@PostMapping("/{socialId}/likes")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CreateLikeResponse>> createLike(
+		@PathVariable Long socialId,
+		CustomUserDetails user) {
+
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(socialUseCase.createLike(user.getUserId(), socialId)));
+	}
+
+	@Override
+	@DeleteMapping("/{socialId}/likes/{likeId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
+		@PathVariable Long socialId,
+		@PathVariable Long likeId,
+		CustomUserDetails user) {
+		socialUseCase.deleteLike(user.getUserId(), socialId, likeId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}

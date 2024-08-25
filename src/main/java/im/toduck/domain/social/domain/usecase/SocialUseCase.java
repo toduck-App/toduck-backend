@@ -6,12 +6,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.domain.service.SocialService;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
 import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
+import im.toduck.domain.social.presentation.dto.response.CreateLikeResponse;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -78,11 +80,33 @@ public class SocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Comment comment = socialService.getSocialCommentById(commentId)
+		Comment comment = socialService.getCommentById(commentId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT));
 
-		socialService.deleteSocialComment(user, socialBoard, comment);
+		socialService.deleteComment(user, socialBoard, comment);
 	}
 
+	@Transactional
+	public CreateLikeResponse createLike(Long userId, Long socialId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+		Like like = socialService.createLike(user, socialBoard);
+
+		return CreateLikeResponse.from(like.getId());
+	}
+
+	@Transactional
+	public void deleteLike(Long userId, Long socialId, Long likeId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+		Like like = socialService.getLikeById(likeId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_LIKE));
+
+		socialService.deleteLike(user, socialBoard, like);
+	}
 }
 
