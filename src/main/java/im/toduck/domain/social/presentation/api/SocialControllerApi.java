@@ -7,8 +7,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
+import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -64,6 +66,39 @@ public interface SocialControllerApi {
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateSocialBoard(
 		@PathVariable Long socialId,
 		@RequestBody @Valid UpdateSocialRequest request,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "게시글 댓글 생성",
+		description = "게시글 댓글을 작성합니다."
+	)
+	@ApiResponseExplanations(
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+		}
+	)
+	ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(
+		@PathVariable Long socialId,
+		CreateCommentRequest request,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "게시글 댓글 삭제",
+		description = "게시글 댓글을 삭제합니다."
+	)
+	@ApiResponseExplanations(
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_COMMENT_FOR_BOARD),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteComment(
+		@PathVariable Long socialId,
+		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 

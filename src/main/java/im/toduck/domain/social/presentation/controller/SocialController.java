@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.social.domain.usecase.SocialUseCase;
 import im.toduck.domain.social.presentation.api.SocialControllerApi;
+import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
+import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
 import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -59,6 +61,30 @@ public class SocialController implements SocialControllerApi {
 		@RequestBody @Valid UpdateSocialRequest request,
 		@AuthenticationPrincipal CustomUserDetails user) {
 		socialUseCase.updateSocialBoard(user.getUserId(), socialId, request);
+
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@Override
+	@PostMapping("/{socialId}/comments")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(
+		@PathVariable Long socialId,
+		@RequestBody @Valid CreateCommentRequest request,
+		CustomUserDetails user) {
+
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(socialUseCase.createComment(user.getUserId(), socialId, request)));
+	}
+
+	@Override
+	@DeleteMapping("/{socialId}/comments/{commentId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteComment(
+		@PathVariable Long socialId,
+		@PathVariable Long commentId,
+		CustomUserDetails user) {
+		socialUseCase.deleteComment(user.getUserId(), socialId, commentId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}

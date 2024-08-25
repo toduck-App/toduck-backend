@@ -6,14 +6,17 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
+import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
 import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
 import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
 import im.toduck.domain.user.persistence.entity.User;
@@ -30,6 +33,7 @@ public class SocialService {
 	private final SocialCategoryRepository socialCategoryRepository;
 	private final SocialImageFileRepository socialImageFileRepository;
 	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
+	private final CommentRepository commentRepository;
 
 	@Transactional(readOnly = true)
 	public Optional<Social> getSocialById(Long socialId) {
@@ -45,7 +49,7 @@ public class SocialService {
 
 	@Transactional
 	public void deleteSocialBoard(User user, Social socialBoard) {
-		if (!isOwner(socialBoard, user)) {
+		if (!isBoardOwner(socialBoard, user)) {
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}
 
@@ -55,12 +59,15 @@ public class SocialService {
 		List<SocialCategoryLink> socialCategoryLinks = socialCategoryLinkRepository.findAllBySocial(socialBoard);
 		socialCategoryLinks.forEach(SocialCategoryLink::softDelete);
 
+		List<Comment> comments = commentRepository.findAllBySocial(socialBoard);
+		comments.forEach(Comment::softDelete);
+
 		socialRepository.delete(socialBoard);
 	}
 
 	@Transactional
 	public void updateSocialBoard(User user, Social socialBoard, UpdateSocialRequest request) {
-		if (!isOwner(socialBoard, user)) {
+		if (!isBoardOwner(socialBoard, user)) {
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}
 
@@ -117,7 +124,7 @@ public class SocialService {
 		socialCategoryLinkRepository.saveAll(socialCategoryLinks);
 	}
 
-	private boolean isOwner(Social socialBoard, User user) {
+	private boolean isBoardOwner(Social socialBoard, User user) {
 		return socialBoard.isOwner(user);
 	}
 
@@ -125,4 +132,34 @@ public class SocialService {
 		return socialCategories.size() != socialCategoryIds.size();
 	}
 
+	@Transactional
+	public Comment createComment(User user, Social socialBoard, CreateCommentRequest request) {
+		Comment comment = Comment.of(user, socialBoard, request.content());
+		return commentRepository.save(comment);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Comment> getSocialCommentById(Long commentId) {
+		return commentRepository.findById(commentId);
+	}
+
+	public void deleteSocialComment(User user, Social socialBoard, Comment comment) {
+		if (!isCommentOwner(comment, user)) {
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT);
+		}
+
+		if (!isCommentInSocialBoard(socialBoard, comment)) {
+			throw CommonException.from(ExceptionCode.INVALID_COMMENT_FOR_BOARD);
+		}
+
+		commentRepository.delete(comment);
+	}
+
+	private boolean isCommentOwner(Comment comment, User user) {
+		return comment.isOwner(user);
+	}
+
+	private boolean isCommentInSocialBoard(Social socialBoard, Comment comment) {
+		return comment.isInSocialBoard(socialBoard);
+	}
 }
