@@ -93,6 +93,7 @@ public class SocialUseCase {
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 		Like like = socialService.createLike(user, socialBoard);
+		socialBoard.incrementLikeCount();
 
 		return CreateLikeResponse.from(like.getId());
 	}
@@ -105,6 +106,7 @@ public class SocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 		Like like = socialService.getLikeById(likeId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_LIKE));
+		socialBoard.decrementLikeCount();
 
 		socialService.deleteLike(user, socialBoard, like);
 	}

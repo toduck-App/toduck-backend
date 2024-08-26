@@ -21,6 +21,7 @@ CREATE TABLE social
  user_id      BIGINT                             NOT NULL,
  content      VARCHAR(255)                       NOT NULL,
  is_anonymous BOOLEAN                            NOT NULL,
+ like_count   int                                NOT NULL DEFAULT 0,
  created_at   DATETIME                           NOT NULL,
  updated_at   DATETIME                           NOT NULL,
  deleted_at   DATETIME                           NULL,

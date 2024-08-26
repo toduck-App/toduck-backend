@@ -36,6 +36,9 @@ public class Social extends BaseEntity {
 
 	// TODO: Routine 추가 (생성자, 정적 팩터리 메소드에도 추가 필요)
 
+	@Column(nullable = false, columnDefinition = "int default 0")
+	private int likeCount;
+
 	@Column(nullable = false, length = 255)
 	private String content;
 
@@ -62,5 +65,15 @@ public class Social extends BaseEntity {
 
 	public void updateIsAnonymous(Boolean isAnonymous) {
 		this.isAnonymous = isAnonymous;
+	}
+
+	public void incrementLikeCount() {
+		this.likeCount++;
+	}
+
+	public void decrementLikeCount() {
+		if (this.likeCount > 0) {
+			this.likeCount--;
+		}
 	}
 }
