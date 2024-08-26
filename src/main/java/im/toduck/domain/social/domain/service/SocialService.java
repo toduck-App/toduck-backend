@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.mapper.CommentMapper;
 import im.toduck.domain.social.mapper.LikeMapper;
+import im.toduck.domain.social.mapper.SocialCategoryLinkMapper;
+import im.toduck.domain.social.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
@@ -112,7 +114,7 @@ public class SocialService {
 	@Transactional
 	public void addSocialImageFiles(List<String> imageUrls, Social socialBoard) {
 		List<SocialImageFile> socialImageFiles = imageUrls.stream()
-			.map(url -> SocialImageFile.of(socialBoard, url))
+			.map(url -> SocialImageFileMapper.toSocialImageFile(socialBoard, url))
 			.toList();
 
 		socialImageFileRepository.saveAll(socialImageFiles);
@@ -126,7 +128,7 @@ public class SocialService {
 		}
 
 		List<SocialCategoryLink> socialCategoryLinks = socialCategories.stream()
-			.map(sc -> SocialCategoryLink.of(socialBoard, sc))
+			.map(sc -> SocialCategoryLinkMapper.toSocialCategoryLink(socialBoard, sc))
 			.toList();
 
 		socialCategoryLinkRepository.saveAll(socialCategoryLinks);

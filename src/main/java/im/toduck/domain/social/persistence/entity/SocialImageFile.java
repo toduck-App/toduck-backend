@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,13 +34,10 @@ public class SocialImageFile extends BaseEntity {
 	@Column(nullable = false, length = 1024)
 	private String url;
 
+	@Builder
 	private SocialImageFile(Social social, String url) {
 		this.social = social;
 		this.url = url;
-	}
-
-	public static SocialImageFile of(Social social, String url) {
-		return new SocialImageFile(social, url);
 	}
 
 	public void softDelete() {

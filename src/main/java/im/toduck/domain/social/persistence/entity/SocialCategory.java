@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,11 +25,8 @@ public class SocialCategory extends BaseEntity {
 	@Column(nullable = false, length = 20)
 	private String name;
 
+	@Builder
 	private SocialCategory(String name) {
 		this.name = name;
-	}
-
-	public static SocialCategory from(String name) {
-		return new SocialCategory(name);
 	}
 }

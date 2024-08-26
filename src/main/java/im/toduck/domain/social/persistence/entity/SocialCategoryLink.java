@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,13 +34,10 @@ public class SocialCategoryLink extends BaseEntity {
 	@JoinColumn(name = "social_category_id", nullable = false)
 	private SocialCategory socialCategory;
 
+	@Builder
 	private SocialCategoryLink(Social social, SocialCategory socialCategory) {
 		this.social = social;
 		this.socialCategory = socialCategory;
-	}
-
-	public static SocialCategoryLink of(Social socialBoard, SocialCategory socialCategory) {
-		return new SocialCategoryLink(socialBoard, socialCategory);
 	}
 
 	public void softDelete() {
