@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.social.domain.service.SocialService;
 import im.toduck.domain.social.mapper.CommentMapper;
 import im.toduck.domain.social.mapper.LikeMapper;
+import im.toduck.domain.social.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
@@ -41,7 +42,7 @@ public class SocialUseCase {
 		socialService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		socialService.addSocialImageFiles(request.socialImageUrls(), socialBoard);
 
-		return SocialCreateResponse.from(socialBoard.getId());
+		return SocialMapper.toSocialCreateResponse(socialBoard);
 	}
 
 	@Transactional

@@ -6,9 +6,4 @@ import lombok.Builder;
 public record SocialCreateResponse(
 	Long socialId
 ) {
-	public static SocialCreateResponse from(Long socialId) {
-		return SocialCreateResponse.builder()
-			.socialId(socialId)
-			.build();
-	}
 }

@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,14 +46,11 @@ public class Social extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isAnonymous;
 
+	@Builder
 	private Social(User user, String content, Boolean isAnonymous) {
 		this.user = user;
 		this.content = content;
 		this.isAnonymous = isAnonymous;
-	}
-
-	public static Social of(User user, String content, Boolean isAnonymous) {
-		return new Social(user, content, isAnonymous);
 	}
 
 	public boolean isOwner(User requestingUser) {

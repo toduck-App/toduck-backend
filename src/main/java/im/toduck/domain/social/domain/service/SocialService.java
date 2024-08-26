@@ -10,6 +10,7 @@ import im.toduck.domain.social.mapper.CommentMapper;
 import im.toduck.domain.social.mapper.LikeMapper;
 import im.toduck.domain.social.mapper.SocialCategoryLinkMapper;
 import im.toduck.domain.social.mapper.SocialImageFileMapper;
+import im.toduck.domain.social.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
@@ -49,7 +50,7 @@ public class SocialService {
 
 	@Transactional
 	public Social createSocialBoard(User user, SocialCreateRequest request) {
-		Social socialBoard = Social.of(user, request.content(), request.isAnonymous());
+		Social socialBoard = SocialMapper.toSocial(user, request.content(), request.isAnonymous());
 
 		return socialRepository.save(socialBoard);
 	}
