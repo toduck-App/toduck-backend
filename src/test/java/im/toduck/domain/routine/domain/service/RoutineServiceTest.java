@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.person.PlanCategory;
-import im.toduck.domain.routine.mapper.RoutineMapper;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
@@ -30,9 +29,6 @@ class RoutineServiceTest extends ServiceTest {
 
 	@Autowired
 	private RoutineRepository routineRepository;
-
-	@Autowired
-	private RoutineMapper routineMapper;
 
 	private User user;
 

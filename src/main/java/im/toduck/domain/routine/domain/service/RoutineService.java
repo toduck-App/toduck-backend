@@ -17,13 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RoutineService {
 	private final RoutineRepository routineRepository;
-	private final RoutineMapper routineMapper;
 
 	@Transactional
 	public RoutineCreateResponse create(final User user, final RoutineCreateRequest request) {
-		Routine routine = routineMapper.toRoutine(user, request);
+		Routine routine = RoutineMapper.toRoutine(user, request);
 
-		return routineMapper.toRoutineCreateResponse(
+		return RoutineMapper.toRoutineCreateResponse(
 			routineRepository.save(routine)
 		);
 	}

@@ -6,12 +6,12 @@ import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.global.annotation.Mapper;
 import im.toduck.global.helper.DaysOfWeekBitmask;
+import lombok.NoArgsConstructor;
 
-@Mapper
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class RoutineMapper {
-	public Routine toRoutine(User user, RoutineCreateRequest request) {
+	public static Routine toRoutine(User user, RoutineCreateRequest request) {
 		DaysOfWeekBitmask daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
 		PlanCategoryColor planCategoryColor = PlanCategoryColor.from(request.color());
 		RoutineMemo routineMemo = RoutineMemo.from(request.memo());
@@ -29,7 +29,7 @@ public class RoutineMapper {
 			.build();
 	}
 
-	public RoutineCreateResponse toRoutineCreateResponse(Routine routine) {
+	public static RoutineCreateResponse toRoutineCreateResponse(Routine routine) {
 		return RoutineCreateResponse.builder()
 			.routineId(routine.getId())
 			.build();
