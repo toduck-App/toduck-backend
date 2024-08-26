@@ -13,6 +13,8 @@ import im.toduck.global.helper.DaysOfWeekBitmask;
 @Mapper
 public class RoutineMapper {
 	public Routine toRoutine(User user, RoutineCreateRequest request) {
+		DaysOfWeekBitmask daysOfWeekBitmask = getDaysOfWeekBitmask(request.daysOfWeek());
+
 		return Routine.builder()
 			.user(user)
 			.category(request.category())
@@ -22,7 +24,7 @@ public class RoutineMapper {
 			.isPublic(request.isPublic())
 			.reminderMinutes(request.reminderMinutes())
 			.time(request.time())
-			.daysOfWeekBitmask(getDaysOfWeekBitmask(request.daysOfWeek()))
+			.daysOfWeekBitmask(daysOfWeekBitmask)
 			.build();
 	}
 
