@@ -13,6 +13,7 @@ import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.exception.ExceptionCode;
@@ -132,6 +133,16 @@ public interface SocialControllerApi {
 		}
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
+		@PathVariable Long socialId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "게시글 단건 조회",
+		description = "게시글 단건 세부사항을 조회합니다."
+	)
+	@ApiResponseExplanations
+	ResponseEntity<ApiResponse<SocialDetailResponse>> getSocialDetail(
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);

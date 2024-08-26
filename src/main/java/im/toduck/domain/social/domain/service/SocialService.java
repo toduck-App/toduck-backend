@@ -212,4 +212,30 @@ public class SocialService {
 		return like.isOwner(user);
 	}
 
+	@Transactional(readOnly = true)
+	public List<SocialCategory> getCategoriesBySocial(Social socialBoard) {
+		List<SocialCategoryLink> socialCategoryLinks = socialCategoryLinkRepository.findAllBySocial(socialBoard);
+		List<Long> categoryIds = socialCategoryLinks.stream()
+			.map(sc -> sc.getSocialCategory().getId())
+			.toList();
+
+		return socialCategoryRepository.findAllById(categoryIds);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Comment> getCommentsBySocial(Social socialBoard) {
+		return commentRepository.findAllBySocial(socialBoard);
+	}
+
+	@Transactional(readOnly = true)
+	public List<SocialImageFile> getSocialImagesBySocial(Social socialBoard) {
+		return socialImageFileRepository.findAllBySocial(socialBoard);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean getIsLiked(User user, Social socialBoard) {
+		Optional<Like> like = likeRepository.findByUserAndSocial(user, socialBoard);
+
+		return like.isPresent();
+	}
 }

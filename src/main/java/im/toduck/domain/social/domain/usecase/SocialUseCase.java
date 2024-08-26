@@ -12,12 +12,14 @@ import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
+import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -112,6 +114,20 @@ public class SocialUseCase {
 		socialBoard.decrementLikeCount();
 
 		socialService.deleteLike(user, socialBoard, like);
+	}
+
+	@Transactional(readOnly = true)
+	public SocialDetailResponse getSocialDetail(Long userId, Long socialId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+		List<SocialCategory> categories = socialService.getCategoriesBySocial(socialBoard);
+		List<SocialImageFile> imageFiles = socialService.getSocialImagesBySocial(socialBoard);
+		List<Comment> comments = socialService.getCommentsBySocial(socialBoard);
+		boolean isLiked = socialService.getIsLiked(user, socialBoard);
+
+		return SocialMapper.toSocialDetailResponse(socialBoard, categories, imageFiles, comments, isLiked);
 	}
 }
 

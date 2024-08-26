@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -110,5 +112,15 @@ public class SocialController implements SocialControllerApi {
 		socialUseCase.deleteLike(user.getUserId(), socialId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@Override
+	@GetMapping("/{socialId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<SocialDetailResponse>> getSocialDetail(
+		@PathVariable Long socialId,
+		CustomUserDetails user) {
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(socialUseCase.getSocialDetail(user.getUserId(), socialId)));
 	}
 }
