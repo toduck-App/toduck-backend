@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,14 +37,11 @@ public class Comment extends BaseEntity {
 	@JoinColumn(name = "social_id", nullable = false)
 	private Social social;
 
+	@Builder
 	private Comment(User user, Social social, String content) {
 		this.user = user;
 		this.social = social;
 		this.content = content;
-	}
-
-	public static Comment of(User user, Social social, String content) {
-		return new Comment(user, social, content);
 	}
 
 	public boolean isOwner(User requestingUser) {

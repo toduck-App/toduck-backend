@@ -7,12 +7,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
-import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
-import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
-import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
-import im.toduck.domain.social.presentation.dto.response.CreateLikeResponse;
-import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
+import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.exception.ExceptionCode;
@@ -33,8 +33,8 @@ public interface SocialControllerApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY),
 		}
 	)
-	ResponseEntity<ApiResponse<CreateSocialResponse>> createSocialBoard(
-		CreateSocialRequest request,
+	ResponseEntity<ApiResponse<SocialCreateResponse>> createSocialBoard(
+		SocialCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -66,7 +66,7 @@ public interface SocialControllerApi {
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateSocialBoard(
 		@PathVariable Long socialId,
-		@RequestBody @Valid UpdateSocialRequest request,
+		@RequestBody @Valid SocialUpdateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -79,9 +79,9 @@ public interface SocialControllerApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
 		}
 	)
-	ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(
+	ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(
 		@PathVariable Long socialId,
-		CreateCommentRequest request,
+		CommentCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -113,7 +113,7 @@ public interface SocialControllerApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
 		}
 	)
-	ResponseEntity<ApiResponse<CreateLikeResponse>> createLike(
+	ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
@@ -133,7 +133,6 @@ public interface SocialControllerApi {
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
 		@PathVariable Long socialId,
-		@PathVariable Long likeId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 

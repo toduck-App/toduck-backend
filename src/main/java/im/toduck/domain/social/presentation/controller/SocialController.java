@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.social.domain.usecase.SocialUseCase;
 import im.toduck.domain.social.presentation.api.SocialControllerApi;
-import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
-import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
-import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
-import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
-import im.toduck.domain.social.presentation.dto.response.CreateLikeResponse;
-import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
+import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -35,8 +35,8 @@ public class SocialController implements SocialControllerApi {
 	@Override
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<CreateSocialResponse>> createSocialBoard(
-		@RequestBody @Valid CreateSocialRequest request,
+	public ResponseEntity<ApiResponse<SocialCreateResponse>> createSocialBoard(
+		@RequestBody @Valid SocialCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user) {
 
 		return ResponseEntity.ok()
@@ -59,7 +59,7 @@ public class SocialController implements SocialControllerApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> updateSocialBoard(
 		@PathVariable Long socialId,
-		@RequestBody @Valid UpdateSocialRequest request,
+		@RequestBody @Valid SocialUpdateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user) {
 		socialUseCase.updateSocialBoard(user.getUserId(), socialId, request);
 
@@ -69,9 +69,9 @@ public class SocialController implements SocialControllerApi {
 	@Override
 	@PostMapping("/{socialId}/comments")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(
+	public ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(
 		@PathVariable Long socialId,
-		@RequestBody @Valid CreateCommentRequest request,
+		@RequestBody @Valid CommentCreateRequest request,
 		CustomUserDetails user) {
 
 		return ResponseEntity.ok()
@@ -93,7 +93,7 @@ public class SocialController implements SocialControllerApi {
 	@Override
 	@PostMapping("/{socialId}/likes")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<CreateLikeResponse>> createLike(
+	public ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
 		@PathVariable Long socialId,
 		CustomUserDetails user) {
 
@@ -102,13 +102,12 @@ public class SocialController implements SocialControllerApi {
 	}
 
 	@Override
-	@DeleteMapping("/{socialId}/likes/{likeId}")
+	@DeleteMapping("/{socialId}/likes")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
 		@PathVariable Long socialId,
-		@PathVariable Long likeId,
 		CustomUserDetails user) {
-		socialUseCase.deleteLike(user.getUserId(), socialId, likeId);
+		socialUseCase.deleteLike(user.getUserId(), socialId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}

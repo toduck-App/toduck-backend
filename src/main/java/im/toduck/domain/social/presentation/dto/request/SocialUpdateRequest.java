@@ -6,7 +6,7 @@ import im.toduck.global.annotation.valid.ValidCategoryIds;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Size;
 
-public record UpdateSocialRequest(
+public record SocialUpdateRequest(
 	@Nullable
 	@Size(min = 1, max = 255, message = "내용은 공백일 수 없으며 255자 이하여야 합니다.")
 	String content,

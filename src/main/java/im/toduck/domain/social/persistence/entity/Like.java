@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,13 +34,10 @@ public class Like extends BaseEntity {
 	@JoinColumn(name = "social_id", nullable = false)
 	private Social social;
 
+	@Builder
 	private Like(User user, Social social) {
 		this.user = user;
 		this.social = social;
-	}
-
-	public static Like of(User user, Social social) {
-		return new Like(user, social);
 	}
 
 	public boolean isOwner(User requestingUser) {

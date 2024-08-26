@@ -3,11 +3,11 @@ package im.toduck.domain.social.presentation.dto.response;
 import lombok.Builder;
 
 @Builder
-public record CreateLikeResponse(
+public record LikeCreateResponse(
 	Long likeId
 ) {
-	public static CreateLikeResponse from(Long likeId) {
-		return CreateLikeResponse.builder()
+	public static LikeCreateResponse from(Long likeId) {
+		return LikeCreateResponse.builder()
 			.likeId(likeId)
 			.build();
 	}

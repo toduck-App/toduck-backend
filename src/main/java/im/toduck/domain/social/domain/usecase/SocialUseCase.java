@@ -5,16 +5,18 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.domain.service.SocialService;
+import im.toduck.domain.social.mapper.CommentMapper;
+import im.toduck.domain.social.mapper.LikeMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
-import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
-import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
-import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
-import im.toduck.domain.social.presentation.dto.response.CreateCommentResponse;
-import im.toduck.domain.social.presentation.dto.response.CreateLikeResponse;
-import im.toduck.domain.social.presentation.dto.response.CreateSocialResponse;
+import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -31,7 +33,7 @@ public class SocialUseCase {
 	private final UserService userService;
 
 	@Transactional
-	public CreateSocialResponse createSocialBoard(Long userId, CreateSocialRequest request) {
+	public SocialCreateResponse createSocialBoard(Long userId, SocialCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.createSocialBoard(user, request);
@@ -39,7 +41,7 @@ public class SocialUseCase {
 		socialService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		socialService.addSocialImageFiles(request.socialImageUrls(), socialBoard);
 
-		return CreateSocialResponse.from(socialBoard.getId());
+		return SocialCreateResponse.from(socialBoard.getId());
 	}
 
 	@Transactional
@@ -53,7 +55,7 @@ public class SocialUseCase {
 	}
 
 	@Transactional
-	public void updateSocialBoard(Long userId, Long socialId, UpdateSocialRequest request) {
+	public void updateSocialBoard(Long userId, Long socialId, SocialUpdateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.getSocialById(socialId)
@@ -63,15 +65,15 @@ public class SocialUseCase {
 	}
 
 	@Transactional
-	public CreateCommentResponse createComment(Long userId, Long socialId,
-		CreateCommentRequest request) {
+	public CommentCreateResponse createComment(Long userId, Long socialId,
+		CommentCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 		Comment comment = socialService.createComment(user, socialBoard, request);
 
-		return CreateCommentResponse.from(comment.getId());
+		return CommentMapper.toCommentCreateResponse(comment);
 	}
 
 	@Transactional
@@ -87,7 +89,7 @@ public class SocialUseCase {
 	}
 
 	@Transactional
-	public CreateLikeResponse createLike(Long userId, Long socialId) {
+	public LikeCreateResponse createLike(Long userId, Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.getSocialById(socialId)
@@ -95,16 +97,16 @@ public class SocialUseCase {
 		Like like = socialService.createLike(user, socialBoard);
 		socialBoard.incrementLikeCount();
 
-		return CreateLikeResponse.from(like.getId());
+		return LikeMapper.toLikeCreateResponse(like);
 	}
 
 	@Transactional
-	public void deleteLike(Long userId, Long socialId, Long likeId) {
+	public void deleteLike(Long userId, Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Like like = socialService.getLikeById(likeId)
+		Like like = socialService.getLikeByUserAndSocial(user, socialBoard)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_LIKE));
 		socialBoard.decrementLikeCount();
 

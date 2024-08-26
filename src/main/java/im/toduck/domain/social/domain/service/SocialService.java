@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.social.mapper.CommentMapper;
+import im.toduck.domain.social.mapper.LikeMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
@@ -18,9 +20,9 @@ import im.toduck.domain.social.persistence.repository.SocialCategoryLinkReposito
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
-import im.toduck.domain.social.presentation.dto.request.CreateCommentRequest;
-import im.toduck.domain.social.presentation.dto.request.CreateSocialRequest;
-import im.toduck.domain.social.presentation.dto.request.UpdateSocialRequest;
+import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -44,7 +46,7 @@ public class SocialService {
 	}
 
 	@Transactional
-	public Social createSocialBoard(User user, CreateSocialRequest request) {
+	public Social createSocialBoard(User user, SocialCreateRequest request) {
 		Social socialBoard = Social.of(user, request.content(), request.isAnonymous());
 
 		return socialRepository.save(socialBoard);
@@ -72,7 +74,7 @@ public class SocialService {
 	}
 
 	@Transactional
-	public void updateSocialBoard(User user, Social socialBoard, UpdateSocialRequest request) {
+	public void updateSocialBoard(User user, Social socialBoard, SocialUpdateRequest request) {
 		if (!isBoardOwner(socialBoard, user)) {
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}
@@ -139,8 +141,8 @@ public class SocialService {
 	}
 
 	@Transactional
-	public Comment createComment(User user, Social socialBoard, CreateCommentRequest request) {
-		Comment comment = Comment.of(user, socialBoard, request.content());
+	public Comment createComment(User user, Social socialBoard, CommentCreateRequest request) {
+		Comment comment = CommentMapper.toComment(user, socialBoard, request);
 		return commentRepository.save(comment);
 	}
 
@@ -177,13 +179,13 @@ public class SocialService {
 			throw CommonException.from(ExceptionCode.EXISTS_LIKE);
 		}
 
-		Like like = Like.of(user, socialBoard);
+		Like like = LikeMapper.toLike(user, socialBoard);
 		return likeRepository.save(like);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Like> getLikeById(Long likeId) {
-		return likeRepository.findById(likeId);
+	public Optional<Like> getLikeByUserAndSocial(User user, Social socialBoard) {
+		return likeRepository.findByUserAndSocial(user, socialBoard);
 	}
 
 	@Transactional
