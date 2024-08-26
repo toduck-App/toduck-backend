@@ -4,11 +4,14 @@ import java.time.LocalTime;
 
 import im.toduck.domain.person.PlanCategory;
 import im.toduck.domain.routine.converter.DaysOfWeekBitmaskConverter;
+import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
+import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import im.toduck.global.helper.DaysOfWeekBitmask;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,7 +41,8 @@ public class Routine extends BaseEntity {
 	private PlanCategory category;
 
 	// TODO: 변경 필요
-	private String color;
+	@Embedded
+	private PlanCategoryColor color;
 
 	@Column(nullable = false, columnDefinition = "CHAR(100)")
 	private String title;
@@ -49,8 +53,8 @@ public class Routine extends BaseEntity {
 	@Column(name = "reminder_minutes")
 	private Integer reminderMinutes;
 
-	@Column(columnDefinition = "TEXT")
-	private String memo;
+	@Embedded
+	private RoutineMemo memo;
 
 	@Column
 	private LocalTime time;
@@ -66,11 +70,11 @@ public class Routine extends BaseEntity {
 	@Builder
 	private Routine(
 		PlanCategory category,
-		String color,
+		PlanCategoryColor color,
 		String title,
 		Boolean isPublic,
 		Integer reminderMinutes,
-		String memo,
+		RoutineMemo memo,
 		LocalTime time,
 		DaysOfWeekBitmask daysOfWeekBitmask,
 		User user

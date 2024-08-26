@@ -1,5 +1,7 @@
 package im.toduck.domain.routine.presentation.dto.request;
 
+import static im.toduck.global.regex.PlanRegex.*;
+
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,7 +31,7 @@ public record RoutineCreateRequest(
 	PlanCategory category, // TODO: 확정 필요
 
 	@Schema(description = "루틴 색상 (색상 없으면 null)", example = "#FF5733")
-	@Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "색상은 유효한 Hex code 여야 합니다.")
+	@Pattern(regexp = HEX_COLOR_CODE_REGEX, message = "색상은 유효한 Hex code 여야 합니다.")
 	String color,
 
 	@JsonDeserialize(using = LocalTimeDeserializer.class)

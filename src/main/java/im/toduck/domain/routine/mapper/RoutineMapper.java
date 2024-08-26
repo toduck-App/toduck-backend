@@ -1,9 +1,8 @@
 package im.toduck.domain.routine.mapper;
 
-import java.time.DayOfWeek;
-import java.util.List;
-
 import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
+import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
@@ -13,14 +12,16 @@ import im.toduck.global.helper.DaysOfWeekBitmask;
 @Mapper
 public class RoutineMapper {
 	public Routine toRoutine(User user, RoutineCreateRequest request) {
-		DaysOfWeekBitmask daysOfWeekBitmask = getDaysOfWeekBitmask(request.daysOfWeek());
+		DaysOfWeekBitmask daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
+		PlanCategoryColor planCategoryColor = PlanCategoryColor.from(request.color());
+		RoutineMemo routineMemo = RoutineMemo.from(request.memo());
 
 		return Routine.builder()
 			.user(user)
 			.category(request.category())
-			.color(request.color())
+			.color(planCategoryColor)
 			.title(request.title())
-			.memo(request.memo())
+			.memo(routineMemo)
 			.isPublic(request.isPublic())
 			.reminderMinutes(request.reminderMinutes())
 			.time(request.time())
@@ -34,7 +35,4 @@ public class RoutineMapper {
 			.build();
 	}
 
-	private DaysOfWeekBitmask getDaysOfWeekBitmask(List<DayOfWeek> daysOfWeek) {
-		return DaysOfWeekBitmask.createByDayOfWeek(daysOfWeek);
-	}
 }
