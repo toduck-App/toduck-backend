@@ -1,4 +1,4 @@
-package im.toduck.domain.routine.converter;
+package im.toduck.domain.routine.common.converter;
 
 import im.toduck.global.helper.DaysOfWeekBitmask;
 import jakarta.persistence.AttributeConverter;

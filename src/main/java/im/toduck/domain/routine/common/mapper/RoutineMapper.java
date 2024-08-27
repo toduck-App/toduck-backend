@@ -1,4 +1,4 @@
-package im.toduck.domain.routine.mapper;
+package im.toduck.domain.routine.common.mapper;
 
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
