@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/routine")
+@RequestMapping("/v1/routines")
 public class RoutineController implements RoutineApi {
 
 	private final RoutineUseCase routineUseCase;
