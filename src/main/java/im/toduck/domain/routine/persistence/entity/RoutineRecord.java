@@ -1,6 +1,9 @@
-package im.toduck.domain.person;
+package im.toduck.domain.routine.persistence.entity;
+
+import java.time.LocalDateTime;
 
 import im.toduck.global.base.entity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,9 +15,9 @@ import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "repeat_day_link")
+@Table(name = "routine_record")
 @NoArgsConstructor
-public class RepeatDayLink extends BaseEntity {
+public class RoutineRecord extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +27,9 @@ public class RepeatDayLink extends BaseEntity {
 	@JoinColumn(name = "routine_id")
 	private Routine routine;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "schedule_id")
-	private Schedule schedule;
+	@Column(name = "record_at", nullable = false)
+	private LocalDateTime recordAt;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "repeat_day_id", nullable = false)
-	private RepeatDay repeatDay;
+	@Column(name = "is_completed", nullable = false)
+	private Boolean isCompleted = false;
 }

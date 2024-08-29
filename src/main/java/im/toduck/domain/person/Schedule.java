@@ -18,6 +18,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 
+@Deprecated
+/*
+ * 추후 변경 예정
+ * */
 @Entity
 @Table(name = "schedule")
 @NoArgsConstructor
@@ -29,7 +33,7 @@ public class Schedule extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private Emoji emoji;
+	private PlanCategory emoji;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
