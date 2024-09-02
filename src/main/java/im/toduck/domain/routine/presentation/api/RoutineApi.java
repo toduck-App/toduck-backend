@@ -16,6 +16,7 @@ import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -40,17 +41,16 @@ public interface RoutineApi {
 		summary = "특정 날짜 본인 루틴 목록 조회",
 		description = "특정 날짜에 대한 자신의 루틴 목록을 조회합니다. 루틴 목록은 시간순으로 정렬되어 있지 않을 수 있습니다."
 	)
+
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
 			responseClass = MyRoutineReadListResponse.class,
 			description = "루틴 목록 조회 성공, 루틴의 고유 Id, 루틴 Color, 완료 여부를 반환합니다."
-		),
-		errors = {
-
-		}
+		)
 	)
 	ResponseEntity<ApiResponse<MyRoutineReadListResponse>> getMyRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "조회할 루틴의 날짜 (형식: YYYY-MM-DD)", required = true, example = "2024-09-02")
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
 	);
 }
