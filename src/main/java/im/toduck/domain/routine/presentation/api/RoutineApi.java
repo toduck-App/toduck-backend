@@ -38,7 +38,7 @@ public interface RoutineApi {
 
 	@Operation(
 		summary = "특정 날짜 본인 루틴 목록 조회",
-		description = "특정 날짜에 대한 자신의 루틴 목록을 조회합니다."
+		description = "특정 날짜에 대한 자신의 루틴 목록을 조회합니다. 루틴 목록은 시간순으로 정렬되어 있지 않을 수 있습니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
