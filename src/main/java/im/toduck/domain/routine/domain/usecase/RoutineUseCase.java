@@ -48,6 +48,7 @@ public class RoutineUseCase {
 		List<RoutineRecord> routineRecords = routineRecordService.getRecords(user, date);
 		List<Routine> routines = routineService.getUnrecordedRoutinesForDate(user, date, routineRecords);
 
+		log.info("본인 루틴 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
 		return RoutineMapper.toMyRoutineReadResponse(date, routines, routineRecords);
 	}
 }
