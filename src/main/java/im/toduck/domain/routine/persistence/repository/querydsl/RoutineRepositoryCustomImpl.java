@@ -57,7 +57,7 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 	private BooleanExpression routineMatchesDate(LocalDate date) {
 		byte dayBitmask = DaysOfWeekBitmask.getDayBitmask(date.getDayOfWeek());
 		return Expressions.numberTemplate(
-				Byte.class, "function('bitand', {0}, {1})", routine.daysOfWeekBitmask, dayBitmask
+				Byte.class, "function('bitand', {0}, CAST({1} as byte))", routine.daysOfWeekBitmask, dayBitmask
 			)
 
 			.gt((byte)0);
