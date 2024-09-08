@@ -10,14 +10,14 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 
 @Builder
-public record SocialDetailResponse(
+public record SocialResponse(
 	Long id,
 	OwnerDto owner,
 	String content,
 	boolean hasImages,
 	List<SocialImageDto> images,
 	LikeDto likeInfo,
-	List<CommentDto> comments,
+	int commentCount,
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	LocalDateTime createdAt

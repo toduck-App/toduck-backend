@@ -13,6 +13,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialCategoryDto;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
+import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.Mapper;
 
@@ -34,14 +35,12 @@ public class SocialMapper {
 
 	public static SocialDetailResponse toSocialDetailResponse(
 		Social socialBoard,
-		List<SocialCategory> categories,
 		List<SocialImageFile> imageFiles,
 		List<Comment> comments,
 		boolean isLiked) {
 		return SocialDetailResponse.builder()
 			.id(socialBoard.getId())
 			.owner(getOwner(socialBoard.getUser()))
-			.categories(getCategoryDtos(categories))
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
 			.content(socialBoard.getContent())
@@ -50,6 +49,24 @@ public class SocialMapper {
 			.createdAt(socialBoard.getCreatedAt())
 			.build();
 
+	}
+
+	public static SocialResponse toSocialResponse(
+		Social socialBoard,
+		List<SocialImageFile> imageFiles,
+		int commentCount,
+		boolean isLiked) {
+
+		return SocialResponse.builder()
+			.id(socialBoard.getId())
+			.owner(getOwner(socialBoard.getUser()))
+			.content(socialBoard.getContent())
+			.hasImages(!imageFiles.isEmpty())
+			.images(getImageDtos(imageFiles))
+			.likeInfo(getLikeDto(socialBoard, isLiked))
+			.commentCount(commentCount)
+			.createdAt(socialBoard.getCreatedAt())
+			.build();
 	}
 
 	private static LikeDto getLikeDto(Social socialBoard, boolean isLiked) {

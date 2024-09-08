@@ -3,6 +3,7 @@ package im.toduck.domain.social.domain.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -213,16 +215,6 @@ public class SocialService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SocialCategory> getCategoriesBySocial(Social socialBoard) {
-		List<SocialCategoryLink> socialCategoryLinks = socialCategoryLinkRepository.findAllBySocial(socialBoard);
-		List<Long> categoryIds = socialCategoryLinks.stream()
-			.map(sc -> sc.getSocialCategory().getId())
-			.toList();
-
-		return socialCategoryRepository.findAllById(categoryIds);
-	}
-
-	@Transactional(readOnly = true)
 	public List<Comment> getCommentsBySocial(Social socialBoard) {
 		return commentRepository.findAllBySocial(socialBoard);
 	}
@@ -237,5 +229,17 @@ public class SocialService {
 		Optional<Like> like = likeRepository.findByUserAndSocial(user, socialBoard);
 
 		return like.isPresent();
+	}
+
+	@Transactional(readOnly = true)
+	public List<Social> getSocials(Long after, Integer limit) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+		return socialRepository.findByIdAfterOrderByIdDesc(after, pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Social> findLatestSocials(int limit) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+		return socialRepository.findLatestSocials(pageRequest);
 	}
 }

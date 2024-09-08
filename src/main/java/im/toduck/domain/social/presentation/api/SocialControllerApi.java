@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
@@ -14,12 +15,16 @@ import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
+import im.toduck.global.annotation.valid.PaginationLimit;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.presentation.ApiResponse;
+import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -35,7 +40,7 @@ public interface SocialControllerApi {
 		}
 	)
 	ResponseEntity<ApiResponse<SocialCreateResponse>> createSocialBoard(
-		SocialCreateRequest request,
+		@RequestBody @Valid SocialCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -82,7 +87,7 @@ public interface SocialControllerApi {
 	)
 	ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(
 		@PathVariable Long socialId,
-		CommentCreateRequest request,
+		@RequestBody @Valid CommentCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -141,10 +146,25 @@ public interface SocialControllerApi {
 		summary = "게시글 단건 조회",
 		description = "게시글 단건 세부사항을 조회합니다."
 	)
-	@ApiResponseExplanations
+	@ApiResponseExplanations(
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD)
+		}
+	)
 	ResponseEntity<ApiResponse<SocialDetailResponse>> getSocialDetail(
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "게시글 목록 조회",
+		description = "게시글을 커서 기반 페이지네이션으로 조회합니다."
+	)
+	@ApiResponseExplanations
+	ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long after,
+		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
 	);
 
 }

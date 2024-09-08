@@ -6,9 +6,9 @@ import java.util.function.Function;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 
 public class PaginationUtil {
-
-	// 페이지네이션에서 추가로 가져올 항목 수를 상수로 정의
-	public static final int ADDITIONAL_ITEM_FOR_NEXT_PAGE = 1;
+	private static final int ADDITIONAL_ITEM_FOR_NEXT_PAGE = 1;
+	private static final int LAST_ITEM_OFFSET = 1;
+	public static final int FIRST_PAGE_INDEX = 0;
 
 	/**
 	 * 실제 사용할 페이지네이션 limit 값을 결정하는 메서드.
@@ -57,7 +57,7 @@ public class PaginationUtil {
 		if (!hasMore || items.isEmpty()) {
 			return null;
 		}
-		return getIdFunction.apply(items.get(limit - 1));
+		return getIdFunction.apply(items.get(limit - LAST_ITEM_OFFSET));
 	}
 
 	/**

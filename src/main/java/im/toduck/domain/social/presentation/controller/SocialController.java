@@ -23,7 +23,10 @@ import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialResponse;
+import im.toduck.global.annotation.valid.PaginationLimit;
 import im.toduck.global.presentation.ApiResponse;
+import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -122,5 +125,16 @@ public class SocialController implements SocialControllerApi {
 		CustomUserDetails user) {
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialUseCase.getSocialDetail(user.getUserId(), socialId)));
+	}
+
+	@Override
+	@GetMapping
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
+		CustomUserDetails user,
+		Long after,
+		@PaginationLimit Integer limit) {
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(socialUseCase.getSocials(user.getUserId(), after, limit)));
 	}
 }

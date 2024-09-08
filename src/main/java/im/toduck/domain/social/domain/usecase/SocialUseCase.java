@@ -20,11 +20,14 @@ import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
+import im.toduck.global.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class SocialUseCase {
+	private static final int DEFAULT_SOCIAL_PAGE_SIZE = 10;
+
 	private final SocialService socialService;
 	private final UserService userService;
 
@@ -39,6 +44,7 @@ public class SocialUseCase {
 	public SocialCreateResponse createSocialBoard(Long userId, SocialCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
 		Social socialBoard = socialService.createSocialBoard(user, request);
 		List<SocialCategory> socialCategories = socialService.findAllSocialCategories(request.socialCategoryIds());
 		socialService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
@@ -122,12 +128,48 @@ public class SocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		List<SocialCategory> categories = socialService.getCategoriesBySocial(socialBoard);
 		List<SocialImageFile> imageFiles = socialService.getSocialImagesBySocial(socialBoard);
 		List<Comment> comments = socialService.getCommentsBySocial(socialBoard);
 		boolean isLiked = socialService.getIsLiked(user, socialBoard);
 
-		return SocialMapper.toSocialDetailResponse(socialBoard, categories, imageFiles, comments, isLiked);
+		return SocialMapper.toSocialDetailResponse(socialBoard, imageFiles, comments, isLiked);
+	}
+
+	@Transactional(readOnly = true)
+	public CursorPaginationResponse<SocialResponse> getSocials(Long userId, Long after, Integer limit) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
+		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
+
+		List<Social> socialBoards = fetchSocialBoards(after, fetchLimit);
+		boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
+		Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
+
+		List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
+
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
+	}
+
+	private List<Social> fetchSocialBoards(Long after, int fetchLimit) {
+		if (after == null) {
+			return socialService.findLatestSocials(fetchLimit);
+		} else {
+			return socialService.getSocials(after, fetchLimit);
+		}
+	}
+
+	private List<SocialResponse> createSocialResponses(List<Social> socialBoards, User user, int actualLimit) {
+		return socialBoards.stream()
+			.limit(actualLimit)
+			.map(sb -> {
+				List<SocialImageFile> imageFiles = socialService.getSocialImagesBySocial(sb);
+				List<Comment> comments = socialService.getCommentsBySocial(sb);
+				boolean isLiked = socialService.getIsLiked(user, sb);
+				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isLiked);
+			})
+			.toList();
 	}
 }
 
