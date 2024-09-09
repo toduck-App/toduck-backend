@@ -120,8 +120,6 @@ class RoutineRepositoryTest extends RepositoryTest {
 			Routine WEEKDAY_MORNING_ROUTINE2 = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
 			LocalDate weekday = getNextDayOfWeek(DayOfWeek.MONDAY);
 
-			System.out.println("ㅎㅇ" + WEEKDAY_MORNING_ROUTINE1.getCreatedAt());
-
 			// when
 			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, weekday,
 				List.of());
