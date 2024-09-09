@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +31,16 @@ class RoutineServiceTest extends ServiceTest {
 	@Autowired
 	private RoutineRepository routineRepository;
 
-	private User user;
+	private User USER;
 
 	@BeforeEach
 	void setUp() {
 		// given
-		user = testFixtureBuilder.buildUser(GENERAL_USER());
+		USER = testFixtureBuilder.buildUser(GENERAL_USER());
 	}
 
 	@Nested
+	@DisplayName("루틴 생성시")
 	class CreateTest {
 		private RoutineCreateRequest request;
 
@@ -59,7 +61,7 @@ class RoutineServiceTest extends ServiceTest {
 		@Test
 		void 루틴을_생성할_수_있다() {
 			// when
-			RoutineCreateResponse result = routineService.create(user, request);
+			RoutineCreateResponse result = routineService.create(USER, request);
 
 			// then
 			assertSoftly(softly -> {
@@ -69,7 +71,7 @@ class RoutineServiceTest extends ServiceTest {
 				Routine savedRoutine = routineRepository.findById(result.routineId()).orElse(null);
 				softly.assertThat(savedRoutine).isNotNull();
 				softly.assertThat(savedRoutine.getTitle()).isEqualTo(request.title());
-				softly.assertThat(savedRoutine.getUser()).isEqualTo(user);
+				softly.assertThat(savedRoutine.getUser()).isEqualTo(USER);
 			});
 		}
 	}

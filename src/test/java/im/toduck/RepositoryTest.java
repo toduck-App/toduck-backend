@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.builder.BuilderSupporter;
 import im.toduck.builder.TestFixtureBuilder;
@@ -37,7 +36,6 @@ import im.toduck.global.config.querydsl.QueryDslConfig;
 @AutoConfigureDataRedis
 @ActiveProfiles("test")
 @Import(value = {TestFixtureBuilder.class, BuilderSupporter.class, QueryDslConfig.class})
-@Transactional
 public abstract class RepositoryTest {
 
 	@Autowired

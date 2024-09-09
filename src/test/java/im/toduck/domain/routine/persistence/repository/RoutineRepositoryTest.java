@@ -4,6 +4,7 @@ import static im.toduck.fixtures.RoutineFixtures.*;
 import static im.toduck.fixtures.RoutineRecordFixtures.*;
 import static im.toduck.fixtures.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -109,8 +110,12 @@ class RoutineRepositoryTest extends RepositoryTest {
 				mondayMorning.toLocalDate(), List.of());
 
 			// then
-			assertThat(sundayRoutines).contains(SUNDAY_NIGHT_ROUTINE).doesNotContain(MONDAY_MORNING_ROUTINE);
-			assertThat(mondayRoutines).contains(MONDAY_MORNING_ROUTINE).doesNotContain(SUNDAY_NIGHT_ROUTINE);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(sundayRoutines).contains(SUNDAY_NIGHT_ROUTINE).doesNotContain(MONDAY_MORNING_ROUTINE);
+				softly.assertThat(mondayRoutines).contains(MONDAY_MORNING_ROUTINE).doesNotContain(SUNDAY_NIGHT_ROUTINE);
+			});
 		}
 
 		@Test

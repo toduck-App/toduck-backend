@@ -4,6 +4,7 @@ import static im.toduck.fixtures.RoutineFixtures.*;
 import static im.toduck.fixtures.RoutineRecordFixtures.*;
 import static im.toduck.fixtures.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -48,8 +49,11 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 			);
 
 			// then
-			assertThat(records).hasSize(1);
-			assertThat(records).contains(RECORD);
+			assertSoftly(softly -> {
+				assertThat(records).hasSize(1);
+				assertThat(records).contains(RECORD);
+			});
+
 		}
 
 		@Test
@@ -78,13 +82,15 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 			);
 
 			// then
-			assertThat(records).hasSize(4);
-			assertThat(records).containsExactlyInAnyOrder(
-				RECORD_WEEKLY1_1,
-				RECORD_WEEKLY1_2,
-				RECORD_WEEKLY2_1,
-				RECORD_WEEKLY2_2
-			);
+			assertSoftly(softly -> {
+				softly.assertThat(records).hasSize(4);
+				softly.assertThat(records).containsExactlyInAnyOrder(
+					RECORD_WEEKLY1_1,
+					RECORD_WEEKLY1_2,
+					RECORD_WEEKLY2_1,
+					RECORD_WEEKLY2_2
+				);
+			});
 		}
 	}
 }
