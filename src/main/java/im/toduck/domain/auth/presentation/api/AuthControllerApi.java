@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
-import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
+import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.auth.presentation.dto.response.LoginResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -113,5 +113,5 @@ public interface AuthControllerApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_VERIFIED_PHONE_NUMBER),
 		}
 	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid RegisterRequest request);
+	ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid SignUpRequest.General request);
 }

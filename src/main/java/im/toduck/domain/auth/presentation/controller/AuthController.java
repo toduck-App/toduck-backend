@@ -23,7 +23,7 @@ import im.toduck.domain.auth.domain.usecase.GeneralSignUpUseCase;
 import im.toduck.domain.auth.presentation.api.AuthControllerApi;
 import im.toduck.domain.auth.presentation.dto.JwtPair;
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
-import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
+import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.auth.presentation.dto.response.LoginResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.util.CookieUtil;
@@ -41,7 +41,7 @@ public class AuthController implements AuthControllerApi {
 	private final GeneralSignUpUseCase generalSignUpUseCase;
 	private final CookieUtil cookieUtil;
 
-	@PostMapping("/login")
+	@PostMapping("/login") //TODO : 일반 로그인 설계자에게 URL 변경 의논 요청해야함
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<ApiResponse<LoginResponse>> signIn(@RequestBody @Valid LoginRequest request) {
 		return createAuthResponse(authUseCase.signIn(request));
@@ -80,7 +80,8 @@ public class AuthController implements AuthControllerApi {
 
 	@PostMapping("/register")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid RegisterRequest request) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> register(
+		@RequestBody @Valid SignUpRequest.General request) {
 		generalSignUpUseCase.signUp(request);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
