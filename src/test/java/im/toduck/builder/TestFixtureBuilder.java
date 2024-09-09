@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.infra.redis.phonenumber.PhoneNumber;
 
@@ -29,6 +30,11 @@ public class TestFixtureBuilder {
 
 	public List<Social> buildSocials(final List<Social> socials) {
 		return bs.socialRepository().saveAll(socials);
+	}
+
+	public List<SocialCategory> buildCategories(final List<SocialCategory> categories) {
+		System.out.println("@@@" + categories.size());
+		return bs.socialCategoryRepository().saveAll(categories);
 	}
 
 }

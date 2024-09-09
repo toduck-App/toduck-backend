@@ -3,6 +3,7 @@ package im.toduck.builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.infra.redis.phonenumber.PhoneNumberRepository;
@@ -16,6 +17,8 @@ public class BuilderSupporter {
 	private PhoneNumberRepository phoneNumberRepository;
 	@Autowired
 	private SocialRepository socialRepository;
+	@Autowired
+	private SocialCategoryRepository socialCategoryRepository;
 
 	public UserRepository userRepository() {
 		return userRepository;
@@ -27,6 +30,10 @@ public class BuilderSupporter {
 
 	public SocialRepository socialRepository() {
 		return socialRepository;
+	}
+
+	public SocialCategoryRepository socialCategoryRepository() {
+		return socialCategoryRepository;
 	}
 
 }

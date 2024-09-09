@@ -1,5 +1,6 @@
 package im.toduck.domain.social.persistence.repository;
 
+import static im.toduck.fixtures.social.SocialFixtures.*;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
@@ -15,7 +16,6 @@ import im.toduck.RepositoryTest;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.UserFixtures;
-import im.toduck.fixtures.social.SocialFixtures;
 
 public class SocialRepositoryTest extends RepositoryTest {
 
@@ -28,8 +28,7 @@ public class SocialRepositoryTest extends RepositoryTest {
 	public void setUp() {
 		User user = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
 
-		socialList = SocialFixtures.createMultipleSocials(user, 5);
-		testFixtureBuilder.buildSocials(socialList);
+		socialList = testFixtureBuilder.buildSocials(CREATE_MULTIPLE_SOCIALS(user, 5));
 	}
 
 	@Test
