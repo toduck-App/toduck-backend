@@ -28,7 +28,7 @@ public class User extends BaseEntity {
 	@Column(nullable = false, length = 100)
 	private String nickname;
 
-	@Column(nullable = false, length = 50)
+	@Column(nullable = true, length = 50)
 	private String phoneNumber;
 
 	@Column(nullable = true, length = 100)
@@ -41,6 +41,9 @@ public class User extends BaseEntity {
 	@Column(nullable = true, length = 100)
 	private OAuthProvider provider;
 
+	@Column(nullable = true, length = 100)
+	private String email;
+
 	private User(String nickname, String loginId, String password, String phoneNumber) {
 		this.role = UserRole.USER;
 		this.nickname = nickname;
@@ -49,7 +52,19 @@ public class User extends BaseEntity {
 		this.phoneNumber = phoneNumber;
 	}
 
+	private User(String nickname, OAuthProvider provider, String email) {
+		this.role = UserRole.USER;
+		this.nickname = nickname;
+		this.provider = provider;
+		this.email = email;
+	}
+
 	public static User createGeneralUser(String nickname, String loginId, String password, String phoneNumber) {
 		return new User(nickname, loginId, password, phoneNumber);
+	}
+
+	public static User createOAuthUser(String nickname, OAuthProvider provider,
+		String email) { // TODO : 팀원 pr merge 후 mapper 로 변경
+		return new User(nickname, provider, email);
 	}
 }
