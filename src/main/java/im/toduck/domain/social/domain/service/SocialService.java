@@ -232,9 +232,9 @@ public class SocialService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Social> getSocials(Long after, Integer limit) {
+	public List<Social> getSocials(Long cursor, Integer limit) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.findByIdAfterOrderByIdDesc(after, pageRequest);
+		return socialRepository.findByIdBeforeOrderByIdDesc(cursor, pageRequest);
 	}
 
 	@Transactional(readOnly = true)

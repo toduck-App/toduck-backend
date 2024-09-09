@@ -10,8 +10,8 @@ import im.toduck.domain.social.persistence.entity.Social;
 import io.lettuce.core.dynamic.annotation.Param;
 
 public interface SocialRepository extends JpaRepository<Social, Long> {
-	@Query("SELECT s FROM Social s WHERE s.id > :after ORDER BY s.id DESC")
-	List<Social> findByIdAfterOrderByIdDesc(@Param("after") Long after, Pageable pageable);
+	@Query("SELECT s FROM Social s WHERE s.id < :cursor ORDER BY s.id DESC")
+	List<Social> findByIdBeforeOrderByIdDesc(@Param("cursor") Long cursor, Pageable pageable);
 
 	@Query("SELECT s FROM Social s WHERE s.deletedAt IS NULL ORDER BY s.id DESC")
 	List<Social> findLatestSocials(Pageable pageable);

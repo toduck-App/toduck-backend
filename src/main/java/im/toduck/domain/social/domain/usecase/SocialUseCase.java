@@ -136,14 +136,14 @@ public class SocialUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public CursorPaginationResponse<SocialResponse> getSocials(Long userId, Long after, Integer limit) {
+	public CursorPaginationResponse<SocialResponse> getSocials(Long userId, Long cursor, Integer limit) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
 		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
 
-		List<Social> socialBoards = fetchSocialBoards(after, fetchLimit);
+		List<Social> socialBoards = fetchSocialBoards(cursor, fetchLimit);
 		boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
 		Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
 
@@ -152,11 +152,11 @@ public class SocialUseCase {
 		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
 	}
 
-	private List<Social> fetchSocialBoards(Long after, int fetchLimit) {
-		if (after == null) {
+	private List<Social> fetchSocialBoards(Long cursor, int fetchLimit) {
+		if (cursor == null) {
 			return socialService.findLatestSocials(fetchLimit);
 		} else {
-			return socialService.getSocials(after, fetchLimit);
+			return socialService.getSocials(cursor, fetchLimit);
 		}
 	}
 

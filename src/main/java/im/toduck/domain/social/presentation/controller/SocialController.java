@@ -132,9 +132,9 @@ public class SocialController implements SocialControllerApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		CustomUserDetails user,
-		Long after,
+		Long cursor,
 		@PaginationLimit Integer limit) {
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialUseCase.getSocials(user.getUserId(), after, limit)));
+			.body(ApiResponse.createSuccess(socialUseCase.getSocials(user.getUserId(), cursor, limit)));
 	}
 }

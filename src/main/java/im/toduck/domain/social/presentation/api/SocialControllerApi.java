@@ -163,7 +163,7 @@ public interface SocialControllerApi {
 	@ApiResponseExplanations
 	ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		@AuthenticationPrincipal CustomUserDetails user,
-		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long after,
+		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long cursor,
 		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
 	);
 
