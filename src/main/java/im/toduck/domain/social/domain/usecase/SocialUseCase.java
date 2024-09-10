@@ -50,6 +50,7 @@ public class SocialUseCase {
 		socialService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		socialService.addSocialImageFiles(request.socialImageUrls(), socialBoard);
 
+		log.info("소셜 게시글 생성 - UserId: {}, SocialBoardId: {}", userId, socialBoard.getId());
 		return SocialMapper.toSocialCreateResponse(socialBoard);
 	}
 
@@ -60,6 +61,7 @@ public class SocialUseCase {
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
+		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
 		socialService.deleteSocialBoard(user, socialBoard);
 	}
 
@@ -70,6 +72,7 @@ public class SocialUseCase {
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
+		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
 		socialService.updateSocialBoard(user, socialBoard, request);
 	}
 
@@ -82,6 +85,7 @@ public class SocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 		Comment comment = socialService.createComment(user, socialBoard, request);
 
+		log.info("소셜 게시글 댓글 생성 - UserId: {}, SocialBoardId: {}, CommentId: {}", userId, socialId, comment.getId());
 		return CommentMapper.toCommentCreateResponse(comment);
 	}
 
@@ -94,6 +98,7 @@ public class SocialUseCase {
 		Comment comment = socialService.getCommentById(commentId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT));
 
+		log.info("소셜 게시글 댓글 삭제 - UserId: {}, SocialBoardId: {}, CommentId: {}", userId, socialId, commentId);
 		socialService.deleteComment(user, socialBoard, comment);
 	}
 
@@ -106,6 +111,7 @@ public class SocialUseCase {
 		Like like = socialService.createLike(user, socialBoard);
 		socialBoard.incrementLikeCount();
 
+		log.info("소셜 게시글 좋아요 생성 - UserId: {}, SocialBoardId: {}, LikeId: {}", userId, socialId, like.getId());
 		return LikeMapper.toLikeCreateResponse(like);
 	}
 
@@ -119,6 +125,7 @@ public class SocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_LIKE));
 		socialBoard.decrementLikeCount();
 
+		log.info("소셜 게시글 좋아요 삭제 - UserId: {}, SocialBoardId: {}, LikeId: {}", userId, socialId, like.getId());
 		socialService.deleteLike(user, socialBoard, like);
 	}
 
@@ -132,6 +139,7 @@ public class SocialUseCase {
 		List<Comment> comments = socialService.getCommentsBySocial(socialBoard);
 		boolean isLiked = socialService.getIsLiked(user, socialBoard);
 
+		log.info("소셜 게시글 단건 상세 조회 - UserId: {}, SocialBoardId: {}", userId, socialId);
 		return SocialMapper.toSocialDetailResponse(socialBoard, imageFiles, comments, isLiked);
 	}
 
@@ -149,6 +157,7 @@ public class SocialUseCase {
 
 		List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
 
+		log.info("소셜 게시글 목록 조회 - UserId: {}, HasMore: {}, NextCursor: {}", userId, hasMore, nextCursor);
 		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
 	}
 

@@ -60,6 +60,7 @@ public class SocialService {
 	@Transactional
 	public void deleteSocialBoard(User user, Social socialBoard) {
 		if (!isBoardOwner(socialBoard, user)) {
+			log.error("권한이 없는 유저가 게시글 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}
 
@@ -81,17 +82,22 @@ public class SocialService {
 	@Transactional
 	public void updateSocialBoard(User user, Social socialBoard, SocialUpdateRequest request) {
 		if (!isBoardOwner(socialBoard, user)) {
+			log.error("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
 		}
 
 		if (request.socialCategoryIds() != null) {
 			if (request.socialCategoryIds().isEmpty()) {
+				log.error("게시글 업데이트시 빈 카테고리 리스트로 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(),
+					socialBoard.getId());
 				throw CommonException.from(ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST);
 			}
 
 			List<SocialCategory> socialCategories = findAllSocialCategories(request.socialCategoryIds());
 
 			if (isInvalidCategoryIncluded(request.socialCategoryIds(), socialCategories)) {
+				log.error("게시글 업데이트시 유효하지 않은 카테고리가 포함됨 - UserId: {}, SocialBoardId: {}, CategoryIds: {}", user.getId(),
+					socialBoard.getId(), request.socialCategoryIds());
 				throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
 			}
 
@@ -162,10 +168,12 @@ public class SocialService {
 
 	public void deleteComment(User user, Social socialBoard, Comment comment) {
 		if (!isCommentOwner(comment, user)) {
+			log.error("권한이 없는 유저가 댓글 삭제 시도 - UserId: {}, CommentId: {}", user.getId(), comment.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT);
 		}
 
 		if (!isCommentInSocialBoard(socialBoard, comment)) {
+			log.error("댓글이 소셜 게시글에 속하지 않음 - SocialBoardId: {}, CommentId: {}", socialBoard.getId(), comment.getId());
 			throw CommonException.from(ExceptionCode.INVALID_COMMENT_FOR_BOARD);
 		}
 
@@ -185,6 +193,7 @@ public class SocialService {
 		Optional<Like> existedLike = likeRepository.findByUserAndSocial(user, socialBoard);
 
 		if (existedLike.isPresent()) {
+			log.error("이미 좋아요가 존재 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
 			throw CommonException.from(ExceptionCode.EXISTS_LIKE);
 		}
 
@@ -200,10 +209,12 @@ public class SocialService {
 	@Transactional
 	public void deleteLike(User user, Social socialBoard, Like like) {
 		if (!isLikeOwner(like, user)) {
+			log.error("권한이 없는 유저가 좋아요 삭제 시도 - UserId: {}, LikeId: {}", user.getId(), like.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_LIKE);
 		}
 
 		if (!isLikeInSocialBoard(socialBoard, like)) {
+			log.error("좋아요가 소셜 게시글에 속하지 않음 - SocialBoardId: {}, LikeId: {}", socialBoard.getId(), like.getId());
 			throw CommonException.from(ExceptionCode.INVALID_LIKE_FOR_BOARD);
 		}
 
