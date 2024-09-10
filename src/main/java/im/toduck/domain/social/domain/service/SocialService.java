@@ -85,6 +85,10 @@ public class SocialService {
 		}
 
 		if (request.socialCategoryIds() != null) {
+			if (request.socialCategoryIds().isEmpty()) {
+				throw CommonException.from(ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST);
+			}
+
 			List<SocialCategory> socialCategories = findAllSocialCategories(request.socialCategoryIds());
 
 			if (isInvalidCategoryIncluded(request.socialCategoryIds(), socialCategories)) {
