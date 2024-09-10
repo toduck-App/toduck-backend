@@ -33,7 +33,6 @@ public class TestFixtureBuilder {
 	}
 
 	public List<SocialCategory> buildCategories(final List<SocialCategory> categories) {
-		System.out.println("@@@" + categories.size());
 		return bs.socialCategoryRepository().saveAll(categories);
 	}
 

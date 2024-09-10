@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import im.toduck.ServiceTest;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
+import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
@@ -30,6 +31,9 @@ public class SocialUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private SocialUseCase socialUseCase;
+
+	@Autowired
+	private SocialRepository socialRepository;
 
 	private User user;
 	private Social socialBoard;
@@ -164,7 +168,54 @@ public class SocialUseCaseTest extends ServiceTest {
 				.isInstanceOf(VoException.class)
 				.hasMessage("댓글 내용은 비어 있을 수 없습니다.");
 		}
+	}
 
+	@Nested
+	@DisplayName("게시글 삭제시")
+	class DeleteSocialBoard {
+
+		@Test
+		void 주어진_요청에_따라_게시글을_삭제할_수_있다() {
+			// when
+			socialUseCase.deleteSocialBoard(user.getId(), socialBoard.getId());
+
+			// then
+			assertThat(socialRepository.findById(socialBoard.getId())).isEmpty();
+		}
+
+		@Test
+		void 사용자를_조회할_수_없는_경우_게시글_삭제에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(nonExistentUserId, socialBoard.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+
+		@Test
+		void 게시글이_존재하지_않는_경우_삭제에_실패한다() {
+			// given
+			Long nonExistentSocialBoardId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(user.getId(), nonExistentSocialBoardId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+
+		@Test
+		void 게시글의_소유자가_아닌_경우_삭제에_실패한다() {
+			// given
+			User anotherUser = testFixtureBuilder.buildUser(GENERAL_USER());
+			Long socialBoardId = socialBoard.getId();
+
+			// when & then
+			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(anotherUser.getId(), socialBoardId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD.getMessage());
+		}
 	}
 
 }
