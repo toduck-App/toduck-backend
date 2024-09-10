@@ -30,25 +30,35 @@ CREATE TABLE social
 
 CREATE TABLE routine
 (
- id          BIGINT PRIMARY KEY auto_increment,
- social_id   BIGINT                         NOT NULL,
- user_id     BIGINT                         NOT NULL,
- -- TODO: 8. routine 의 이모지 필드 enum 값 필요
- emoji       ENUM ('SMILE')                 NOT NULL,
- -- TODO: 4. routine 테이블의 color enum 값 필요
- color       ENUM ('RED')                   NOT NULL,
- is_complete BOOLEAN                        NOT NULL,
- time        TIME                           NOT NULL,
- title       CHAR(100)                      NOT NULL,
- location    VARCHAR(255)                   NOT NULL,
- is_public   BOOLEAN                        NOT NULL,
- alarm       ENUM ('10', '30', '60', 'OFF') NOT NULL,
- memo        TEXT                           NULL,
- created_at  DATETIME                       NOT NULL,
- updated_at  DATETIME                       NOT NULL,
- deleted_at  DATETIME                       NULL,
- FOREIGN KEY (social_id) REFERENCES social (id),
- FOREIGN KEY (user_id) REFERENCES users (id)
+id          BIGINT PRIMARY KEY auto_increment,
+user_id     BIGINT                         NOT NULL,
+-- TODO: 8. routine 의 이모지 필드 enum 값 필요
+category    ENUM ('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY')  NULL,
+-- TODO: 4. routine 테이블의 color enum 값 필요
+color       VARCHAR(10)                    NULL,
+time        TIME                           NULL,
+days_of_week TINYINT UNSIGNED              NOT NULL,
+title       CHAR(100)                      NOT NULL,
+is_public   BOOLEAN                        NOT NULL,
+reminder_minutes INT UNSIGNED              NULL,
+memo        TEXT                           NULL,
+created_at  DATETIME                       NOT NULL,
+updated_at  DATETIME                       NOT NULL,
+deleted_at  DATETIME                       NULL,
+FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE routine_record
+(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    routine_id BIGINT NULL,
+    record_at DATETIME NOT NULL,
+    is_all_day BOOLEAN NOT NULL,
+    is_completed BOOLEAN NOT NULL DEFAULT false,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME NULL,
+    FOREIGN KEY (routine_id) REFERENCES routine (id) ON DELETE SET NULL
 );
 
 CREATE TABLE comment
@@ -164,29 +174,6 @@ CREATE TABLE social_category_link
  social_category_id BIGINT   NOT NULL,
  FOREIGN KEY (social_id) REFERENCES social (id),
  FOREIGN KEY (social_category_id) REFERENCES social_category (id)
-);
-
-CREATE TABLE repeat_day
-(
- id         BIGINT PRIMARY KEY auto_increment,
- day        ENUM ('MON','TUE','WED','THU','FRI','SAT','SUN') NOT NULL,
- created_at DATETIME                                         NOT NULL,
- updated_at DATETIME                                         NOT NULL,
- deleted_at DATETIME                                         NULL
-);
-
-CREATE TABLE repeat_day_link
-(
- id            BIGINT PRIMARY KEY auto_increment,
- routine_id    BIGINT   NULL,
- schedule_id   BIGINT   NULL,
- repeat_day_id BIGINT   NOT NULL,
- created_at    DATETIME NOT NULL,
- updated_at    DATETIME NOT NULL,
- deleted_at    DATETIME NULL,
- FOREIGN KEY (routine_id) REFERENCES routine (id),
- FOREIGN KEY (schedule_id) REFERENCES schedule (id),
- FOREIGN KEY (repeat_day_id) REFERENCES repeat_day (id)
 );
 
 INSERT INTO social_category (name, created_at, updated_at)

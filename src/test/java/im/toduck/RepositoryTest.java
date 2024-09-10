@@ -23,6 +23,7 @@ import im.toduck.global.config.querydsl.QueryDslConfig;
  *   <li>JPA와 Redis 테스트 환경을 모두 구성합니다.</li>
  *   <li>"test" 프로필을 활성화합니다.</li>
  *   <li>테스트 픽스처를 위한 필요한 설정과 빌더를 가져옵니다.</li>
+ *   <li>테스트를 위한 트랜잭션 관리를 활성화합니다.</li>
  * </ul>
  *
  * <p>사용법: JPA와 Redis 테스팅 기능을 모두 활용하려면 리포지토리 테스트 클래스에서 이 클래스를 상속하세요.</p>

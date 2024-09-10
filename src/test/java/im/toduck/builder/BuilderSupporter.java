@@ -3,6 +3,8 @@ package im.toduck.builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
+import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
@@ -16,18 +18,30 @@ public class BuilderSupporter {
 
 	@Autowired
 	private UserRepository userRepository;
+
 	@Autowired
 	private PhoneNumberRepository phoneNumberRepository;
+
 	@Autowired
 	private SocialRepository socialRepository;
+
 	@Autowired
 	private SocialCategoryRepository socialCategoryRepository;
+
 	@Autowired
 	private CommentRepository commentRepository;
+
 	@Autowired
 	private LikeRepository likeRepository;
+
 	@Autowired
 	private SocialImageFileRepository socialImageFileRepository;
+
+	@Autowired
+	private RoutineRepository routineRepository;
+
+	@Autowired
+	private RoutineRecordRepository routineRecordRepository;
 
 	public UserRepository userRepository() {
 		return userRepository;
@@ -55,6 +69,14 @@ public class BuilderSupporter {
 
 	public SocialImageFileRepository socialImageFileRepository() {
 		return socialImageFileRepository;
+	}
+
+	public RoutineRepository routineRepository() {
+		return routineRepository;
+	}
+
+	public RoutineRecordRepository routineRecord() {
+		return routineRecordRepository;
 	}
 
 }

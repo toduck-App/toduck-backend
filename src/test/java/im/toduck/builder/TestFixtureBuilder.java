@@ -10,6 +10,8 @@ import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.infra.redis.phonenumber.PhoneNumber;
 
@@ -25,6 +27,14 @@ public class TestFixtureBuilder {
 
 	public PhoneNumber buildPhoneNumber(final PhoneNumber phoneNumber) {
 		return bs.phoneNumberRepository().save(phoneNumber);
+	}
+
+	public Routine buildRoutine(final Routine routine) {
+		return bs.routineRepository().save(routine);
+	}
+
+	public RoutineRecord buildRoutineRecord(final RoutineRecord routineRecord) {
+		return bs.routineRecord().save(routineRecord);
 	}
 
 	public Social buildSocial(final Social social) {
