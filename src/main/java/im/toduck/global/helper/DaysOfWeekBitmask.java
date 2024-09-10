@@ -71,7 +71,7 @@ public class DaysOfWeekBitmask {
 			.collect(Collectors.toCollection(() -> EnumSet.noneOf(DayOfWeek.class)));
 	}
 
-	private static byte getDayBitmask(DayOfWeek day) {
+	public static byte getDayBitmask(DayOfWeek day) {
 		return (byte)(1 << (day.getValue() - 1));
 	}
 

@@ -12,9 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "routine_record")
 @NoArgsConstructor
 public class RoutineRecord extends BaseEntity {
@@ -30,6 +33,17 @@ public class RoutineRecord extends BaseEntity {
 	@Column(name = "record_at", nullable = false)
 	private LocalDateTime recordAt;
 
+	@Column(name = "is_all_day", nullable = false)
+	private Boolean isAllDay;
+
 	@Column(name = "is_completed", nullable = false)
 	private Boolean isCompleted = false;
+
+	@Builder
+	private RoutineRecord(Routine routine, LocalDateTime recordAt, Boolean isAllDay, Boolean isCompleted) {
+		this.routine = routine;
+		this.recordAt = recordAt;
+		this.isAllDay = isAllDay;
+		this.isCompleted = isCompleted;
+	}
 }
