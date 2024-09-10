@@ -37,10 +37,10 @@ public class SocialFixtures {
 		return socials;
 	}
 
-	public static Social CREATE_SINGLE_SOCIAL(User user, String content, boolean isAnonymous, int likeCount) {
+	public static Social CREATE_SINGLE_SOCIAL(User user, boolean isAnonymous) {
 		return Social.builder()
 			.user(user)
-			.content(content)
+			.content(DEFAULT_CONTENT)
 			.isAnonymous(isAnonymous)
 			.build();
 	}

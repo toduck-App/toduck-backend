@@ -2,9 +2,10 @@ package im.toduck.domain.social.persistence.entity;
 
 import java.time.LocalDateTime;
 
+import im.toduck.domain.social.persistence.vo.CommentContent;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
-import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,8 +27,8 @@ public class Comment extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
-	private String content;
+	@Embedded
+	private CommentContent content;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
@@ -38,7 +39,7 @@ public class Comment extends BaseEntity {
 	private Social social;
 
 	@Builder
-	private Comment(User user, Social social, String content) {
+	private Comment(User user, Social social, CommentContent content) {
 		this.user = user;
 		this.social = social;
 		this.content = content;

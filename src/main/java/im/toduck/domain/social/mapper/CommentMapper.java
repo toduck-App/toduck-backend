@@ -2,6 +2,7 @@ package im.toduck.domain.social.mapper;
 
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.vo.CommentContent;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
@@ -15,7 +16,7 @@ public class CommentMapper {
 		return Comment.builder()
 			.user(user)
 			.social(socialBoard)
-			.content(request.content())
+			.content(CommentContent.from(request.content()))
 			.build();
 	}
 
@@ -29,7 +30,7 @@ public class CommentMapper {
 		return CommentDto.builder()
 			.id(comment.getId())
 			.owner(getOwner(comment.getUser()))
-			.content(comment.getContent())
+			.content(comment.getContent().getValue())
 			.createdAt(comment.getCreatedAt())
 			.build();
 	}
