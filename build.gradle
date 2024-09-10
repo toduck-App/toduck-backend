@@ -19,6 +19,10 @@ java {
     }
 }
 
+ext {
+    springCloudVersion = '2021.0.3'
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -30,6 +34,12 @@ repositories {
         dirs 'libs'
     }
     mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 dependencies {
@@ -81,6 +91,9 @@ dependencies {
 
     /* CoolSMS */
     implementation 'net.nurigo:sdk:4.3.0'
+
+    /* Feign */
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     // test-containers
     testImplementation "org.testcontainers:testcontainers:1.19.0"
