@@ -1,12 +1,14 @@
 package im.toduck.domain.social.domain.usecase;
 
 import static im.toduck.fixtures.UserFixtures.*;
+import static im.toduck.fixtures.social.CommentFixtures.*;
 import static im.toduck.fixtures.social.SocialCategoryFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +19,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
+import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
@@ -37,6 +42,8 @@ import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
 
 public class SocialUseCaseTest extends ServiceTest {
+	private User USER;
+	private Social SOCIAL_BOARD;
 
 	@Autowired
 	private SocialUseCase socialUseCase;
@@ -50,13 +57,13 @@ public class SocialUseCaseTest extends ServiceTest {
 	@Autowired
 	private SocialCategoryLinkRepository socialCategoryLinkRepository;
 
-	private User user;
-	private Social socialBoard;
+	@Autowired
+	private CommentRepository commentRepository;
 
 	@BeforeEach
 	public void setUp() {
-		user = testFixtureBuilder.buildUser(GENERAL_USER());
-		socialBoard = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(user, false));
+		USER = testFixtureBuilder.buildUser(GENERAL_USER());
+		SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
 	}
 
 	@Nested
@@ -80,7 +87,7 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 주어진_요청에_따라_게시글을_생성할_수_있다() {
 			// when
-			SocialCreateResponse response = socialUseCase.createSocialBoard(user.getId(), request);
+			SocialCreateResponse response = socialUseCase.createSocialBoard(USER.getId(), request);
 
 			// then
 			assertSoftly(softly -> {
@@ -110,7 +117,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			);
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.createSocialBoard(user.getId(), invalidRequest))
+			assertThatThrownBy(() -> socialUseCase.createSocialBoard(USER.getId(), invalidRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY.getMessage());
 		}
@@ -129,7 +136,7 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 주어진_요청에_따라_댓글을_생성할_수_있다() {
 			// when
-			CommentCreateResponse response = socialUseCase.createComment(user.getId(), socialBoard.getId(), request);
+			CommentCreateResponse response = socialUseCase.createComment(USER.getId(), SOCIAL_BOARD.getId(), request);
 
 			// then
 			assertSoftly(softly -> {
@@ -144,7 +151,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			Long nonExistentUserId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.createComment(nonExistentUserId, socialBoard.getId(), request))
+			assertThatThrownBy(() -> socialUseCase.createComment(nonExistentUserId, SOCIAL_BOARD.getId(), request))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
 		}
@@ -155,7 +162,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			Long nonExistentSocialBoardId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.createComment(user.getId(), nonExistentSocialBoardId, request))
+			assertThatThrownBy(() -> socialUseCase.createComment(USER.getId(), nonExistentSocialBoardId, request))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
@@ -167,7 +174,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			CommentCreateRequest emptyRequest = new CommentCreateRequest(emptyContent);
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.createComment(user.getId(), socialBoard.getId(), emptyRequest))
+			assertThatThrownBy(() -> socialUseCase.createComment(USER.getId(), SOCIAL_BOARD.getId(), emptyRequest))
 				.isInstanceOf(VoException.class)
 				.hasMessage("댓글 내용은 비어 있을 수 없습니다.");
 		}
@@ -179,9 +186,108 @@ public class SocialUseCaseTest extends ServiceTest {
 			CommentCreateRequest whitespaceRequest = new CommentCreateRequest(whitespaceContent);
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.createComment(user.getId(), socialBoard.getId(), whitespaceRequest))
+			assertThatThrownBy(() -> socialUseCase.createComment(USER.getId(), SOCIAL_BOARD.getId(), whitespaceRequest))
 				.isInstanceOf(VoException.class)
 				.hasMessage("댓글 내용은 비어 있을 수 없습니다.");
+		}
+	}
+
+	@Nested
+	@DisplayName("게시글 댓글 삭제시")
+	class DeleteComment {
+		Comment comment;
+
+		@BeforeEach
+		void setUp() {
+			comment = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, SOCIAL_BOARD));
+		}
+
+		@Test
+		@Transactional
+		void 게시글이_삭제되면_댓글은_soft_delete_된다() {
+			// when
+			socialUseCase.deleteSocialBoard(USER.getId(), SOCIAL_BOARD.getId());
+
+			// then
+			Optional<Comment> softDeletedComment = commentRepository.findById(comment.getId());
+			assertSoftly(softly -> {
+				softly.assertThat(softDeletedComment).isPresent();
+				softDeletedComment.ifPresent(value -> softly.assertThat(value.getDeletedAt()).isNotNull());
+
+			});
+		}
+
+		@Test
+		void 댓글이_직접_삭제되면_hard_delete_된다() {
+			// when
+			socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), comment.getId());
+
+			// then
+			assertThat(commentRepository.findById(comment.getId())).isNotPresent();
+		}
+
+		@Test
+		void 사용자를_조회할_수_없는_경우_댓글_삭제에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialUseCase.deleteComment(nonExistentUserId, SOCIAL_BOARD.getId(), comment.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+
+		@Test
+		void 게시글이_존재하지_않는_경우_댓글_삭제에_실패한다() {
+			// given
+			Long nonExistentSocialBoardId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialUseCase.deleteComment(USER.getId(), nonExistentSocialBoardId, comment.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+
+		@Test
+		void 댓글이_존재하지_않는_경우_댓글_삭제에_실패한다() {
+			// given
+			Long nonExistentCommentId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), nonExistentCommentId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT.getMessage());
+		}
+
+		@Test
+		void 댓글의_소유자가_아닌_경우_삭제에_실패한다() {
+			// given
+			User anotherUser = testFixtureBuilder.buildUser(GENERAL_USER());
+			Comment anotherUserComment = testFixtureBuilder.buildComment(
+				CREATE_SINGLE_COMMENT(anotherUser, SOCIAL_BOARD)
+			);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), anotherUserComment.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT.getMessage());
+		}
+
+		@Test
+		void 댓글이_게시글에_속하지_않는_경우_삭제에_실패한다() {
+			// given
+			Social anotherBoard = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			Comment anotherBoardComment = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, anotherBoard));
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), anotherBoardComment.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.INVALID_COMMENT_FOR_BOARD.getMessage());
 		}
 	}
 
@@ -192,10 +298,10 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 주어진_요청에_따라_게시글을_삭제할_수_있다() {
 			// when
-			socialUseCase.deleteSocialBoard(user.getId(), socialBoard.getId());
+			socialUseCase.deleteSocialBoard(USER.getId(), SOCIAL_BOARD.getId());
 
 			// then
-			assertThat(socialRepository.findById(socialBoard.getId())).isEmpty();
+			assertThat(socialRepository.findById(SOCIAL_BOARD.getId())).isEmpty();
 		}
 
 		@Test
@@ -204,7 +310,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			Long nonExistentUserId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(nonExistentUserId, socialBoard.getId()))
+			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(nonExistentUserId, SOCIAL_BOARD.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
 		}
@@ -215,7 +321,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			Long nonExistentSocialBoardId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(user.getId(), nonExistentSocialBoardId))
+			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(USER.getId(), nonExistentSocialBoardId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
@@ -224,7 +330,7 @@ public class SocialUseCaseTest extends ServiceTest {
 		void 게시글의_소유자가_아닌_경우_삭제에_실패한다() {
 			// given
 			User anotherUser = testFixtureBuilder.buildUser(GENERAL_USER());
-			Long socialBoardId = socialBoard.getId();
+			Long socialBoardId = SOCIAL_BOARD.getId();
 
 			// when & then
 			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(anotherUser.getId(), socialBoardId))
@@ -275,10 +381,10 @@ public class SocialUseCaseTest extends ServiceTest {
 			List<String> updatedImageUrls
 		) {
 			// given - 기존 게시글 상태 저장
-			String originalContent = socialBoard.getContent();
-			Boolean originalIsAnonymous = socialBoard.getIsAnonymous();
-			List<SocialImageFile> originalImages = socialImageFileRepository.findAllBySocial(socialBoard);
-			List<SocialCategoryLink> originalCategories = socialCategoryLinkRepository.findAllBySocial(socialBoard);
+			String originalContent = SOCIAL_BOARD.getContent();
+			Boolean originalIsAnonymous = SOCIAL_BOARD.getIsAnonymous();
+			List<SocialImageFile> originalImages = socialImageFileRepository.findAllBySocial(SOCIAL_BOARD);
+			List<SocialCategoryLink> originalCategories = socialCategoryLinkRepository.findAllBySocial(SOCIAL_BOARD);
 
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updatedContent,
@@ -288,10 +394,10 @@ public class SocialUseCaseTest extends ServiceTest {
 			);
 
 			// when - 게시글 수정
-			socialUseCase.updateSocialBoard(user.getId(), socialBoard.getId(), updateRequest);
+			socialUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest);
 
 			// then - 수정 후 상태 검증
-			Social updatedSocialBoard = socialRepository.findById(socialBoard.getId()).orElseThrow();
+			Social updatedSocialBoard = socialRepository.findById(SOCIAL_BOARD.getId()).orElseThrow();
 			assertSoftly(softly -> {
 				if (updatedContent == null) {
 					softly.assertThat(updatedSocialBoard.getContent()).isEqualTo(originalContent);
@@ -348,7 +454,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 			// when & then
 			assertThatThrownBy(
-				() -> socialUseCase.updateSocialBoard(user.getId(), nonExistentSocialBoardId, updateRequest))
+				() -> socialUseCase.updateSocialBoard(USER.getId(), nonExistentSocialBoardId, updateRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
@@ -366,7 +472,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 			// when & then
 			assertThatThrownBy(
-				() -> socialUseCase.updateSocialBoard(anotherUser.getId(), socialBoard.getId(), updateRequest))
+				() -> socialUseCase.updateSocialBoard(anotherUser.getId(), SOCIAL_BOARD.getId(), updateRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD.getMessage());
 		}
@@ -382,7 +488,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			);
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.updateSocialBoard(user.getId(), socialBoard.getId(), updateRequest))
+			assertThatThrownBy(() -> socialUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY.getMessage());
 		}
@@ -398,7 +504,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			);
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.updateSocialBoard(user.getId(), socialBoard.getId(), updateRequest))
+			assertThatThrownBy(() -> socialUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST.getMessage());
 		}
