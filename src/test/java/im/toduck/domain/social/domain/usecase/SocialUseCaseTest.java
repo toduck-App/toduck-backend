@@ -40,7 +40,10 @@ import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.fixtures.social.SocialImageFileFixtures;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
@@ -272,14 +275,14 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 댓글의_소유자가_아닌_경우_삭제에_실패한다() {
 			// given
-			User anotherUser = testFixtureBuilder.buildUser(GENERAL_USER());
-			Comment anotherUserComment = testFixtureBuilder.buildComment(
-				CREATE_SINGLE_COMMENT(anotherUser, SOCIAL_BOARD)
+			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
+			Comment ANOTHER_USER_COMMENT = testFixtureBuilder.buildComment(
+				CREATE_SINGLE_COMMENT(ANOTHER_USER, SOCIAL_BOARD)
 			);
 
 			// when & then
 			assertThatThrownBy(
-				() -> socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), anotherUserComment.getId()))
+				() -> socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), ANOTHER_USER_COMMENT.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT.getMessage());
 		}
@@ -287,12 +290,12 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 댓글이_게시글에_속하지_않는_경우_삭제에_실패한다() {
 			// given
-			Social anotherBoard = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
-			Comment anotherBoardComment = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, anotherBoard));
+			Social ANOTHER_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			Comment ANOTHER_BOARD_COMMENT = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, ANOTHER_BOARD));
 
 			// when & then
 			assertThatThrownBy(
-				() -> socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), anotherBoardComment.getId()))
+				() -> socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), ANOTHER_BOARD_COMMENT.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.INVALID_COMMENT_FOR_BOARD.getMessage());
 		}
@@ -336,11 +339,11 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 게시글의_소유자가_아닌_경우_삭제에_실패한다() {
 			// given
-			User anotherUser = testFixtureBuilder.buildUser(GENERAL_USER());
+			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
 			Long socialBoardId = SOCIAL_BOARD.getId();
 
 			// when & then
-			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(anotherUser.getId(), socialBoardId))
+			assertThatThrownBy(() -> socialUseCase.deleteSocialBoard(ANOTHER_USER.getId(), socialBoardId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD.getMessage());
 		}
@@ -387,7 +390,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			List<Long> updatedCategoryIds,
 			List<String> updatedImageUrls
 		) {
-			// given - 기존 게시글 상태 저장
+			// given
 			String originalContent = SOCIAL_BOARD.getContent();
 			Boolean originalIsAnonymous = SOCIAL_BOARD.getIsAnonymous();
 			List<SocialImageFile> originalImages = socialImageFileRepository.findAllBySocial(SOCIAL_BOARD);
@@ -400,10 +403,10 @@ public class SocialUseCaseTest extends ServiceTest {
 				updatedImageUrls
 			);
 
-			// when - 게시글 수정
+			// when
 			socialUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest);
 
-			// then - 수정 후 상태 검증
+			// then
 			Social updatedSocialBoard = socialRepository.findById(SOCIAL_BOARD.getId()).orElseThrow();
 			assertSoftly(softly -> {
 				if (updatedContent == null) {
@@ -469,7 +472,7 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 게시글_소유자가_아닌_경우_수정에_실패한다() {
 			// given
-			User anotherUser = testFixtureBuilder.buildUser(GENERAL_USER());
+			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
 				isAnonymous,
@@ -479,7 +482,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 			// when & then
 			assertThatThrownBy(
-				() -> socialUseCase.updateSocialBoard(anotherUser.getId(), SOCIAL_BOARD.getId(), updateRequest))
+				() -> socialUseCase.updateSocialBoard(ANOTHER_USER.getId(), SOCIAL_BOARD.getId(), updateRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD.getMessage());
 		}
@@ -572,7 +575,7 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 게시글에_좋아요를_성공적으로_취소한다() {
 			// given
-			Like like = testFixtureBuilder.buildLike(CREATE_LIKE(USER, SOCIAL_BOARD));
+			Like LIKE = testFixtureBuilder.buildLike(CREATE_LIKE(USER, SOCIAL_BOARD));
 
 			// when
 			socialUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId());
@@ -600,6 +603,66 @@ public class SocialUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> socialUseCase.deleteLike(USER.getId(), nonExistentSocialId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("게시글 단건 조회시")
+	class GetSocialDetail {
+		Like LIKE;
+		List<SocialImageFile> IMAGE_FILES;
+		List<String> imageUrls = List.of("image1.jpg", "image2.jpg");
+
+		@BeforeEach
+		void setUp() {
+			LIKE = testFixtureBuilder.buildLike(CREATE_LIKE(USER, SOCIAL_BOARD));
+			IMAGE_FILES = testFixtureBuilder.buildSocialImageFiles(
+				SocialImageFileFixtures.CREATE_MULTIPLE_IMAGE_FILES(SOCIAL_BOARD, imageUrls)
+			);
+
+		}
+
+		@Test
+		void 게시글_단건_조회에_성공한다() {
+			// when
+			SocialDetailResponse response = socialUseCase.getSocialDetail(USER.getId(), SOCIAL_BOARD.getId());
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.id()).isEqualTo(SOCIAL_BOARD.getId());
+				softly.assertThat(response.content()).isEqualTo(SOCIAL_BOARD.getContent());
+				softly.assertThat(response.hasImages()).isTrue();
+				softly.assertThat(response.likeInfo().isLiked()).isTrue();
+				softly.assertThat(response.images())
+					.hasSize(IMAGE_FILES.size())
+					.extracting(SocialImageDto::url)
+					.containsExactlyInAnyOrderElementsOf(
+						IMAGE_FILES.stream().map(SocialImageFile::getUrl).toList()
+					);
+			});
+		}
+
+		@Test
+		void 게시글이_없는_경우_단건_조회에_실패_한다() {
+			// given
+			Long nonExistentSocialId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialUseCase.getSocialDetail(USER.getId(), nonExistentSocialId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+
+		@Test
+		void 소유자를_찾을_수_없는_경우_게시글_단건_조회에_실패_한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialUseCase.getSocialDetail(nonExistentUserId, SOCIAL_BOARD.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
 		}
 	}
 

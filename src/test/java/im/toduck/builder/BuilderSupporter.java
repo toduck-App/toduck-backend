@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
+import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.infra.redis.phonenumber.PhoneNumberRepository;
@@ -25,6 +26,8 @@ public class BuilderSupporter {
 	private CommentRepository commentRepository;
 	@Autowired
 	private LikeRepository likeRepository;
+	@Autowired
+	private SocialImageFileRepository socialImageFileRepository;
 
 	public UserRepository userRepository() {
 		return userRepository;
@@ -48,6 +51,10 @@ public class BuilderSupporter {
 
 	public LikeRepository likeRepository() {
 		return likeRepository;
+	}
+
+	public SocialImageFileRepository socialImageFileRepository() {
+		return socialImageFileRepository;
 	}
 
 }

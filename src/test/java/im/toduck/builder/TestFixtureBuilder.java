@@ -9,6 +9,7 @@ import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
+import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.infra.redis.phonenumber.PhoneNumber;
 
@@ -44,6 +45,10 @@ public class TestFixtureBuilder {
 
 	public Like buildLike(final Like like) {
 		return bs.likeRepository().save(like);
+	}
+
+	public List<SocialImageFile> buildSocialImageFiles(final List<SocialImageFile> socialImageFiles) {
+		return bs.socialImageFileRepository().saveAll(socialImageFiles);
 	}
 
 }
