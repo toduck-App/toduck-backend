@@ -42,15 +42,16 @@ import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
+import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.social.SocialImageFileFixtures;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
+import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 
 public class SocialUseCaseTest extends ServiceTest {
 	private User USER;
-	private Social SOCIAL_BOARD;
 
 	@Autowired
 	private SocialUseCase socialUseCase;
@@ -73,7 +74,6 @@ public class SocialUseCaseTest extends ServiceTest {
 	@BeforeEach
 	public void setUp() {
 		USER = testFixtureBuilder.buildUser(GENERAL_USER());
-		SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
 	}
 
 	@Nested
@@ -137,11 +137,15 @@ public class SocialUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("댓글 작성시")
 	class CreateComment {
+		Social SOCIAL_BOARD;
 		String commentContent = "This is a test comment.";
 
-		CommentCreateRequest request = new CommentCreateRequest(
-			commentContent
-		);
+		CommentCreateRequest request = new CommentCreateRequest(commentContent);
+
+		@BeforeEach
+		public void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+		}
 
 		@Test
 		void 주어진_요청에_따라_댓글을_생성할_수_있다() {
@@ -205,11 +209,13 @@ public class SocialUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 댓글 삭제시")
 	class DeleteComment {
-		Comment comment;
+		Social SOCIAL_BOARD;
+		Comment COMMENT;
 
 		@BeforeEach
 		void setUp() {
-			comment = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, SOCIAL_BOARD));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			COMMENT = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, SOCIAL_BOARD));
 		}
 
 		@Test
@@ -219,7 +225,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			socialUseCase.deleteSocialBoard(USER.getId(), SOCIAL_BOARD.getId());
 
 			// then
-			Optional<Comment> softDeletedComment = commentRepository.findById(comment.getId());
+			Optional<Comment> softDeletedComment = commentRepository.findById(COMMENT.getId());
 			assertSoftly(softly -> {
 				softly.assertThat(softDeletedComment).isPresent();
 				softDeletedComment.ifPresent(value -> softly.assertThat(value.getDeletedAt()).isNotNull());
@@ -230,10 +236,10 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 댓글이_직접_삭제되면_hard_delete_된다() {
 			// when
-			socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), comment.getId());
+			socialUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), COMMENT.getId());
 
 			// then
-			assertThat(commentRepository.findById(comment.getId())).isNotPresent();
+			assertThat(commentRepository.findById(COMMENT.getId())).isNotPresent();
 		}
 
 		@Test
@@ -243,7 +249,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 			// when & then
 			assertThatThrownBy(
-				() -> socialUseCase.deleteComment(nonExistentUserId, SOCIAL_BOARD.getId(), comment.getId()))
+				() -> socialUseCase.deleteComment(nonExistentUserId, SOCIAL_BOARD.getId(), COMMENT.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
 		}
@@ -255,7 +261,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 			// when & then
 			assertThatThrownBy(
-				() -> socialUseCase.deleteComment(USER.getId(), nonExistentSocialBoardId, comment.getId()))
+				() -> socialUseCase.deleteComment(USER.getId(), nonExistentSocialBoardId, COMMENT.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
@@ -305,6 +311,13 @@ public class SocialUseCaseTest extends ServiceTest {
 	@DisplayName("게시글 삭제시")
 	class DeleteSocialBoard {
 
+		Social SOCIAL_BOARD;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+		}
+
 		@Test
 		void 주어진_요청에_따라_게시글을_삭제할_수_있다() {
 			// when
@@ -352,12 +365,18 @@ public class SocialUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 수정시")
 	class UpdateSocialBoard {
+		Social SOCIAL_BOARD;
 		String updateContent = "This is a test update.";
 		Boolean isAnonymous = true;
 		List<SocialCategory> categories = testFixtureBuilder.buildCategories(CREATE_MULTIPLE_CATEGORIES(2));
 		List<Long> validCategoryIds = List.of(categories.get(0).getId(), categories.get(1).getId());
 		List<Long> invalidCategoryIds = List.of(-1L);
 		List<String> imageUrls = List.of("updatedImage1.jpg", "updatedImage2.jpg");
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+		}
 
 		// 여러 케이스를 위한 데이터 제공 메소드
 		static Stream<Arguments> provideUpdateRequests() {
@@ -523,6 +542,12 @@ public class SocialUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 좋아요 생성시")
 	class CreateLikeTest {
+		Social SOCIAL_BOARD;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+		}
 
 		@Test
 		void 게시글에_좋아요를_성공적으로_생성한다() {
@@ -571,6 +596,12 @@ public class SocialUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 좋아요 취소시")
 	class DeleteLikeTest {
+		Social SOCIAL_BOARD;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+		}
 
 		@Test
 		void 게시글에_좋아요를_성공적으로_취소한다() {
@@ -609,12 +640,14 @@ public class SocialUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 단건 조회시")
 	class GetSocialDetail {
+		Social SOCIAL_BOARD;
 		Like LIKE;
 		List<SocialImageFile> IMAGE_FILES;
 		List<String> imageUrls = List.of("image1.jpg", "image2.jpg");
 
 		@BeforeEach
 		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
 			LIKE = testFixtureBuilder.buildLike(CREATE_LIKE(USER, SOCIAL_BOARD));
 			IMAGE_FILES = testFixtureBuilder.buildSocialImageFiles(
 				SocialImageFileFixtures.CREATE_MULTIPLE_IMAGE_FILES(SOCIAL_BOARD, imageUrls)
@@ -661,6 +694,44 @@ public class SocialUseCaseTest extends ServiceTest {
 
 			// when & then
 			assertThatThrownBy(() -> socialUseCase.getSocialDetail(nonExistentUserId, SOCIAL_BOARD.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("게시글 목록 조회시")
+	class GetSocials {
+
+		@Test
+		void 게시글_목록을_성공적으로_조회한다() {
+			// given
+			int numberOfPosts = 15;
+			List<Social> socials = testFixtureBuilder.buildSocials(CREATE_MULTIPLE_SOCIALS(USER, numberOfPosts));
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialUseCase.getSocials(USER.getId(), cursor, limit);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results()).hasSize(limit);
+				softly.assertThat(response.hasMore()).isTrue();
+				softly.assertThat(response.nextCursor()).isNotNull();
+			});
+		}
+
+		@Test
+		void 존재하지_않는_사용자일_경우_조회에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when & then
+			assertThatThrownBy(() -> socialUseCase.getSocials(nonExistentUserId, cursor, limit))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
 		}
