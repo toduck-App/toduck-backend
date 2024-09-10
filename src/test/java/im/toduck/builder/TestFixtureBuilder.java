@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.user.persistence.entity.User;
@@ -39,6 +40,10 @@ public class TestFixtureBuilder {
 
 	public Comment buildComment(final Comment comment) {
 		return bs.commentRepository().save(comment);
+	}
+
+	public Like buildLike(final Like like) {
+		return bs.likeRepository().save(like);
 	}
 
 }

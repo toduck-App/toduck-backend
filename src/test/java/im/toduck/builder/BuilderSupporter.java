@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import im.toduck.domain.social.persistence.repository.CommentRepository;
+import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.user.persistence.repository.UserRepository;
@@ -22,6 +23,8 @@ public class BuilderSupporter {
 	private SocialCategoryRepository socialCategoryRepository;
 	@Autowired
 	private CommentRepository commentRepository;
+	@Autowired
+	private LikeRepository likeRepository;
 
 	public UserRepository userRepository() {
 		return userRepository;
@@ -41,6 +44,10 @@ public class BuilderSupporter {
 
 	public CommentRepository commentRepository() {
 		return commentRepository;
+	}
+
+	public LikeRepository likeRepository() {
+		return likeRepository;
 	}
 
 }
