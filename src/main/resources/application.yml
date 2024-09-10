@@ -2,6 +2,8 @@ spring:
   application:
     name:
       toduck-backend
+  profiles: # 로컬이든 prod 이든 활성화할 properties
+    active: sms
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8

@@ -17,11 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class CoolSmsCodeUtil implements VerifiyCodeUtil {
-	@Value("${coolsms.api.key}")
+	@Value("${coolsms-api-key}")
 	private String apiKey;
-	@Value("${coolsms.api.secret}")
+	@Value("${coolsms-api-secret}")
 	private String apiSecretKey;
-	@Value("${coolsms.api.caller-number}")
+	@Value("${coolsms-api-caller-number}")
 	private String callerNumber;
 
 	private static final String SMS_MESSAGE_FORAMT = "[toduck] 아래의 인증번호를 입력해주세요\n";
