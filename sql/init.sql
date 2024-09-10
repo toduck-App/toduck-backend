@@ -54,6 +54,7 @@ CREATE TABLE routine_record
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     routine_id BIGINT NULL,
     record_at DATETIME NOT NULL,
+    is_all_day BOOLEAN NOT NULL,
     is_completed BOOLEAN NOT NULL DEFAULT false,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,

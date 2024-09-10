@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "routine")
 @NoArgsConstructor
+// TODO: SQLRestriction 등 Soft delete 를 위한 설정 및 어노테이션 필요
 public class Routine extends BaseEntity {
 
 	@Id
@@ -88,5 +89,9 @@ public class Routine extends BaseEntity {
 		this.time = time;
 		this.daysOfWeekBitmask = daysOfWeekBitmask;
 		this.user = user;
+	}
+
+	public String getColorValue() {
+		return color.getValue();
 	}
 }

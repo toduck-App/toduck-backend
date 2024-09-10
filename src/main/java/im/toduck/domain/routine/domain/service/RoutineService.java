@@ -1,10 +1,14 @@
 package im.toduck.domain.routine.domain.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
@@ -27,4 +31,11 @@ public class RoutineService {
 		);
 	}
 
+	public List<Routine> getUnrecordedRoutinesForDate(
+		final User user,
+		final LocalDate date,
+		final List<RoutineRecord> routineRecords
+	) {
+		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
+	}
 }
