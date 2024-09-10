@@ -14,8 +14,8 @@ import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
-import im.toduck.global.oauth.OidcProvider;
-import im.toduck.global.oauth.oidc.OidcPayload;
+import im.toduck.infra.oauth.OidcProvider;
+import im.toduck.infra.oauth.oidc.dto.OidcPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

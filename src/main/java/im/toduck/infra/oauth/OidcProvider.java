@@ -1,4 +1,4 @@
-package im.toduck.global.oauth;
+package im.toduck.infra.oauth;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

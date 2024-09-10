@@ -1,4 +1,4 @@
-package im.toduck.global.oauth.oidc;
+package im.toduck.infra.oauth.oidc.dto;
 
 public record OidcPayload(
 	/* issuer */

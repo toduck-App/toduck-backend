@@ -45,6 +45,9 @@ public enum ExceptionCode {
 	NOT_VERIFIED_PHONE_NUMBER(HttpStatus.FORBIDDEN, 40116, "인증되지 않은 전화번호입니다."),
 	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다."),
 	EXISTS_EMAIL(HttpStatus.CONFLICT, 40117, "이미 가입된 이메일입니다."),
+	INVALID_ID_TOKEN(HttpStatus.FORBIDDEN, 40118, "유효하지 않은 ID 토큰입니다.", "ID 토큰이 유효하지 않을 때 발생하는 오류입니다."),
+	ABNORMAL_ID_TOKEN(HttpStatus.FORBIDDEN, 40119, "비정상적인 ID 토큰입니다.", "ID 토큰 공개키로 암호화 도중에 발생하는 오류입니다."),
+	NOT_MATCHED_PUBLIC_KEY(HttpStatus.NOT_FOUND, 40120, "일치하는 공개키를 찾을 수 없습니다.", "KID 와 공개키가 일치하지 않을 때 발생하는 오류입니다."),
 
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),

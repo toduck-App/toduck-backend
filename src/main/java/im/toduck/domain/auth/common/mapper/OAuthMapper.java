@@ -2,7 +2,7 @@ package im.toduck.domain.auth.common.mapper;
 
 import im.toduck.domain.user.persistence.entity.OAuthProvider;
 import im.toduck.global.exception.VoException;
-import im.toduck.global.oauth.OidcProvider;
+import im.toduck.infra.oauth.OidcProvider;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
