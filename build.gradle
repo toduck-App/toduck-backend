@@ -20,7 +20,7 @@ java {
 }
 
 ext {
-    springCloudVersion = '2021.0.3'
+    springCloudVersion = '2023.0.1'
 }
 
 configurations {

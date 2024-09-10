@@ -7,9 +7,9 @@ import im.toduck.infra.oauth.oidc.client.OidcClient;
 import im.toduck.infra.oauth.oidc.dto.OidcPublicKeyResponse;
 
 @FeignClient(
-	name = "AppleOauthClient",
+	name = "AppleOidcClient",
 	url = "${oauth2.client.provider.apple.jwks-uri}",
-	qualifiers = "appleOauthClient"
+	qualifiers = "appleOidcClient"
 )
 public interface AppleOidcClient extends OidcClient {
 	@Override

@@ -27,18 +27,18 @@ public class OAuthOidcHelper {
 
 	public OAuthOidcHelper(
 		JwtOidcProvider jwtOidcProvider,
-		KakaoOidcClient kakaoOauthClient,
-		GoogleOidcClient googleOauthClient,
-		AppleOidcClient appleOauthClient,
-		KakaoOidcProperties kakaoOauthClientProperties,
-		GoogleOidcProperties googleOauthClientProperties,
-		AppleOidcProperties appleOauthClientProperties
+		KakaoOidcClient kakaoOidcClient,
+		GoogleOidcClient googleOidcClient,
+		AppleOidcClient appleOidcClient,
+		KakaoOidcProperties kakaoOidcProperties,
+		GoogleOidcProperties googleOidcProperties,
+		AppleOidcProperties appleOidcProperties
 	) {
 		this.jwtOidcProvider = jwtOidcProvider;
 		this.oauthOidcClients = Map.of(
-			OidcProvider.KAKAO, Map.of(kakaoOauthClient, kakaoOauthClientProperties),
-			OidcProvider.GOOGLE, Map.of(googleOauthClient, googleOauthClientProperties),
-			OidcProvider.APPLE, Map.of(appleOauthClient, appleOauthClientProperties)
+			OidcProvider.KAKAO, Map.of(kakaoOidcClient, kakaoOidcProperties),
+			OidcProvider.GOOGLE, Map.of(googleOidcClient, googleOidcProperties),
+			OidcProvider.APPLE, Map.of(appleOidcClient, appleOidcProperties)
 		);
 	}
 
