@@ -33,6 +33,7 @@ public class RoutineController implements RoutineApi {
 
 	private final RoutineUseCase routineUseCase;
 
+	@Override
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<RoutineCreateResponse>> postRoutine(
@@ -44,6 +45,7 @@ public class RoutineController implements RoutineApi {
 		);
 	}
 
+	@Override
 	@GetMapping("/me")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<MyRoutineReadListResponse>> getMyRoutineList(
@@ -55,6 +57,7 @@ public class RoutineController implements RoutineApi {
 		);
 	}
 
+	@Override
 	@PutMapping("/{routineId}/completion")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<?>> putRoutineCompletion(
