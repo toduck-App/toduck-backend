@@ -22,13 +22,13 @@ public class CommentMapper {
 
 	public static CommentCreateResponse toCommentCreateResponse(Comment comment) {
 		return CommentCreateResponse.builder()
-			.socialCommentId(comment.getId())
+			.commentId(comment.getId())
 			.build();
 	}
 
 	public static CommentDto toCommentDto(Comment comment) {
 		return CommentDto.builder()
-			.id(comment.getId())
+			.commentId(comment.getId())
 			.owner(getOwner(comment.getUser()))
 			.content(comment.getContent().getValue())
 			.createdAt(comment.getCreatedAt())

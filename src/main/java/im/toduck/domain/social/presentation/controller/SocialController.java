@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.social.domain.usecase.SocialUseCase;
-import im.toduck.domain.social.presentation.api.SocialControllerApi;
+import im.toduck.domain.social.presentation.api.SocialApi;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/socials")
-public class SocialController implements SocialControllerApi {
+public class SocialController implements SocialApi {
 	private final SocialUseCase socialUseCase;
 
 	@Override
