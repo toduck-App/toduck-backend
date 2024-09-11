@@ -155,7 +155,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
-				softly.assertThat(response.socialCommentId()).isNotNull();
+				softly.assertThat(response.commentId()).isNotNull();
 			});
 		}
 
