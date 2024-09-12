@@ -35,64 +35,79 @@ class PaginationUtilTest {
 		}
 	}
 
-	@Test
-	void 총_fetch_크기는_limit보다_1만큼_더_크다() {
-		int limit = 5;
-		int fetchSize = PaginationUtil.calculateTotalFetchSize(limit);
+	@Nested
+	@DisplayName("calculateTotalFetchSize 메서드 테스트")
+	class CalculateTotalFetchSizeTest {
 
-		assertThat(fetchSize).isEqualTo(limit + 1);
+		@Test
+		void 총_fetch_크기는_limit보다_1만큼_더_크다() {
+			int limit = 5;
+			int fetchSize = PaginationUtil.calculateTotalFetchSize(limit);
+
+			assertThat(fetchSize).isEqualTo(limit + 1);
+		}
 	}
 
-	@Test
-	void 리스트_크기가_limit보다_큰_경우_true를_반환한다() {
-		List<Integer> items = List.of(1, 2, 3, 4, 5, 6);
-		int limit = 5;
+	@Nested
+	@DisplayName("hasMore 메서드 테스트")
+	class HasMoreTest {
 
-		boolean hasMore = PaginationUtil.hasMore(items, limit);
+		@Test
+		void 리스트_크기가_limit보다_큰_경우_true를_반환한다() {
+			List<Integer> items = List.of(1, 2, 3, 4, 5, 6);
+			int limit = 5;
 
-		assertThat(hasMore).isTrue();
+			boolean hasMore = PaginationUtil.hasMore(items, limit);
+
+			assertThat(hasMore).isTrue();
+		}
+
+		@Test
+		void 리스트_크기가_limit_이하일_경우_false를_반환한다() {
+			List<Integer> items = List.of(1, 2, 3, 4, 5);
+			int limit = 5;
+
+			boolean hasMore = PaginationUtil.hasMore(items, limit);
+
+			assertThat(hasMore).isFalse();
+		}
 	}
 
-	@Test
-	void 리스트_크기가_limit_이하일_경우_false를_반환한다() {
-		List<Integer> items = List.of(1, 2, 3, 4, 5);
-		int limit = 5;
+	@Nested
+	@DisplayName("getNextCursor 메서드 테스트")
+	class GetNextCursorTest {
 
-		boolean hasMore = PaginationUtil.hasMore(items, limit);
+		@Test
+		void hasMore가_true일_때_마지막_항목의_ID를_반환한다() {
+			List<TestItem> items = List.of(
+				new TestItem(1L),
+				new TestItem(2L),
+				new TestItem(3L),
+				new TestItem(4L),
+				new TestItem(5L)
+			);
+			boolean hasMore = true;
+			int limit = 5;
 
-		assertThat(hasMore).isFalse();
-	}
+			Long nextCursor = PaginationUtil.getNextCursor(hasMore, items, limit, TestItem::id);
 
-	@Test
-	void hasMore가_true일_때_마지막_항목의_ID를_반환한다() {
-		List<TestItem> items = List.of(
-			new TestItem(1L),
-			new TestItem(2L),
-			new TestItem(3L),
-			new TestItem(4L),
-			new TestItem(5L)
-		);
-		boolean hasMore = true;
-		int limit = 5;
+			assertThat(nextCursor).isEqualTo(5L);
+		}
 
-		Long nextCursor = PaginationUtil.getNextCursor(hasMore, items, limit, TestItem::id);
+		@Test
+		void hasMore가_false일_때_null을_반환한다() {
+			List<TestItem> items = List.of(
+				new TestItem(1L),
+				new TestItem(2L),
+				new TestItem(3L)
+			);
+			boolean hasMore = false;
+			int limit = 3;
 
-		assertThat(nextCursor).isEqualTo(5L);
-	}
+			Long nextCursor = PaginationUtil.getNextCursor(hasMore, items, limit, TestItem::id);
 
-	@Test
-	void hasMore가_false일_때_null을_반환한다() {
-		List<TestItem> items = List.of(
-			new TestItem(1L),
-			new TestItem(2L),
-			new TestItem(3L)
-		);
-		boolean hasMore = false;
-		int limit = 3;
-
-		Long nextCursor = PaginationUtil.getNextCursor(hasMore, items, limit, TestItem::id);
-
-		assertThat(nextCursor).isNull();
+			assertThat(nextCursor).isNull();
+		}
 	}
 
 	record TestItem(Long id) {
