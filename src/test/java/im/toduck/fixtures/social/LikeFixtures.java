@@ -13,7 +13,7 @@ public class LikeFixtures {
 	 * @param socialBoard 좋아요가 달린 게시글
 	 * @return 생성된 Like 엔티티
 	 */
-	public static Like CREATE_LIKE(User user, Social socialBoard) {
+	public static Like LIKE(User user, Social socialBoard) {
 		return Like.builder()
 			.user(user)
 			.social(socialBoard)

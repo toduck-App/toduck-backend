@@ -21,9 +21,6 @@ public class CommentContent {
 	}
 
 	public static CommentContent from(String content) {
-		if (content == null) {
-			return null;
-		}
 		return new CommentContent(content);
 	}
 

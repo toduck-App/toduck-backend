@@ -28,7 +28,7 @@ public class SocialRepositoryTest extends RepositoryTest {
 	public void setUp() {
 		User user = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
 
-		socialList = testFixtureBuilder.buildSocials(CREATE_MULTIPLE_SOCIALS(user, 5));
+		socialList = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(user, 5));
 	}
 
 	@Test

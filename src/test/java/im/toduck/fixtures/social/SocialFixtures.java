@@ -21,7 +21,7 @@ public class SocialFixtures {
 	 * @param count  생성할 게시글 수
 	 * @return 생성된 Social 엔티티 리스트
 	 */
-	public static List<Social> CREATE_MULTIPLE_SOCIALS(User user, int count) {
+	public static List<Social> MULTIPLE_SOCIALS(User user, int count) {
 		List<Social> socials = new ArrayList<>();
 		Random random = new Random();
 
@@ -37,7 +37,7 @@ public class SocialFixtures {
 		return socials;
 	}
 
-	public static Social CREATE_SINGLE_SOCIAL(User user, boolean isAnonymous) {
+	public static Social SINGLE_SOCIAL(User user, boolean isAnonymous) {
 		return Social.builder()
 			.user(user)
 			.content(DEFAULT_CONTENT)

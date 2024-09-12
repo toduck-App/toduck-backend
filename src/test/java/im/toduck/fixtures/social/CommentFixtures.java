@@ -19,7 +19,7 @@ public class CommentFixtures {
 	 * @param social 댓글이 속한 게시글
 	 * @return 생성된 Comment 엔티티
 	 */
-	public static Comment CREATE_SINGLE_COMMENT(User user, Social social) {
+	public static Comment SINGLE_COMMENT(User user, Social social) {
 		return Comment.builder()
 			.user(user)
 			.social(social)

@@ -164,9 +164,9 @@ public class SocialUseCase {
 	private List<Social> fetchSocialBoards(Long cursor, int fetchLimit) {
 		if (cursor == null) {
 			return socialService.findLatestSocials(fetchLimit);
-		} else {
-			return socialService.getSocials(cursor, fetchLimit);
 		}
+
+		return socialService.getSocials(cursor, fetchLimit);
 	}
 
 	private List<SocialResponse> createSocialResponses(List<Social> socialBoards, User user, int actualLimit) {

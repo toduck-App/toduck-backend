@@ -18,7 +18,7 @@ public class SocialCategoryFixtures {
 	 * @param count 생성할 카테고리 수
 	 * @return 생성된 SocialCategory 엔티티 리스트
 	 */
-	public static List<SocialCategory> CREATE_MULTIPLE_CATEGORIES(int count) {
+	public static List<SocialCategory> MULTIPLE_CATEGORIES(int count) {
 		List<SocialCategory> categories = new ArrayList<>();
 
 		for (int i = 1; i <= count; i++) {

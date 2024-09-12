@@ -82,7 +82,7 @@ public class SocialUseCaseTest extends ServiceTest {
 		String content = "Test Content";
 		Boolean isAnonymous = false;
 		List<String> imageUrls = List.of("image1.jpg", "image2.jpg");
-		List<Long> categoryIds = testFixtureBuilder.buildCategories(CREATE_MULTIPLE_CATEGORIES(2))
+		List<Long> categoryIds = testFixtureBuilder.buildCategories(MULTIPLE_CATEGORIES(2))
 			.stream()
 			.map(SocialCategory::getId)
 			.toList();
@@ -144,7 +144,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		public void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
 		}
 
 		@Test
@@ -214,8 +214,8 @@ public class SocialUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
-			COMMENT = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, SOCIAL_BOARD));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
 		}
 
 		@Test
@@ -283,7 +283,7 @@ public class SocialUseCaseTest extends ServiceTest {
 			// given
 			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
 			Comment ANOTHER_USER_COMMENT = testFixtureBuilder.buildComment(
-				CREATE_SINGLE_COMMENT(ANOTHER_USER, SOCIAL_BOARD)
+				SINGLE_COMMENT(ANOTHER_USER, SOCIAL_BOARD)
 			);
 
 			// when & then
@@ -296,8 +296,8 @@ public class SocialUseCaseTest extends ServiceTest {
 		@Test
 		void 댓글이_게시글에_속하지_않는_경우_삭제에_실패한다() {
 			// given
-			Social ANOTHER_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
-			Comment ANOTHER_BOARD_COMMENT = testFixtureBuilder.buildComment(CREATE_SINGLE_COMMENT(USER, ANOTHER_BOARD));
+			Social ANOTHER_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			Comment ANOTHER_BOARD_COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, ANOTHER_BOARD));
 
 			// when & then
 			assertThatThrownBy(
@@ -315,7 +315,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
 		}
 
 		@Test
@@ -368,14 +368,14 @@ public class SocialUseCaseTest extends ServiceTest {
 		Social SOCIAL_BOARD;
 		String updateContent = "This is a test update.";
 		Boolean isAnonymous = true;
-		List<SocialCategory> categories = testFixtureBuilder.buildCategories(CREATE_MULTIPLE_CATEGORIES(2));
+		List<SocialCategory> categories = testFixtureBuilder.buildCategories(MULTIPLE_CATEGORIES(2));
 		List<Long> validCategoryIds = List.of(categories.get(0).getId(), categories.get(1).getId());
 		List<Long> invalidCategoryIds = List.of(-1L);
 		List<String> imageUrls = List.of("updatedImage1.jpg", "updatedImage2.jpg");
 
 		@BeforeEach
 		void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
 		}
 
 		// 여러 케이스를 위한 데이터 제공 메소드
@@ -546,7 +546,7 @@ public class SocialUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
 		}
 
 		@Test
@@ -600,13 +600,13 @@ public class SocialUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
 		}
 
 		@Test
 		void 게시글에_좋아요를_성공적으로_취소한다() {
 			// given
-			Like LIKE = testFixtureBuilder.buildLike(CREATE_LIKE(USER, SOCIAL_BOARD));
+			Like LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));
 
 			// when
 			socialUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId());
@@ -647,10 +647,10 @@ public class SocialUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(CREATE_SINGLE_SOCIAL(USER, false));
-			LIKE = testFixtureBuilder.buildLike(CREATE_LIKE(USER, SOCIAL_BOARD));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));
 			IMAGE_FILES = testFixtureBuilder.buildSocialImageFiles(
-				SocialImageFileFixtures.CREATE_MULTIPLE_IMAGE_FILES(SOCIAL_BOARD, imageUrls)
+				SocialImageFileFixtures.MULTIPLE_IMAGE_FILES(SOCIAL_BOARD, imageUrls)
 			);
 
 		}
@@ -707,7 +707,7 @@ public class SocialUseCaseTest extends ServiceTest {
 		void 게시글_목록을_성공적으로_조회한다() {
 			// given
 			int numberOfPosts = 15;
-			List<Social> socials = testFixtureBuilder.buildSocials(CREATE_MULTIPLE_SOCIALS(USER, numberOfPosts));
+			List<Social> socials = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, numberOfPosts));
 			Long cursor = null;
 			Integer limit = 10;
 

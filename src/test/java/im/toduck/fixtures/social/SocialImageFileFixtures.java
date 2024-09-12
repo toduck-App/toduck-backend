@@ -15,7 +15,7 @@ public class SocialImageFileFixtures {
 	 * @param imageUrls 이미지 URL 목록
 	 * @return 생성된 SocialImageFile 리스트
 	 */
-	public static List<SocialImageFile> CREATE_MULTIPLE_IMAGE_FILES(Social social, List<String> imageUrls) {
+	public static List<SocialImageFile> MULTIPLE_IMAGE_FILES(Social social, List<String> imageUrls) {
 		List<SocialImageFile> imageFiles = new ArrayList<>();
 		for (String url : imageUrls) {
 			imageFiles.add(SocialImageFile.builder()
