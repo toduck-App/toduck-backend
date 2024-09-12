@@ -7,6 +7,7 @@ import lombok.Builder;
 public record OwnerDto(
 	@Schema(description = "작성자 ID", example = "1")
 	Long id,
+
 	@Schema(description = "작성자 닉네임", example = "오리발")
 	String nickname
 ) {
