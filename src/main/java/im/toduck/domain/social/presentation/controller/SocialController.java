@@ -42,7 +42,8 @@ public class SocialController implements SocialApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<SocialCreateResponse>> createSocialBoard(
 		@RequestBody @Valid SocialCreateRequest request,
-		@AuthenticationPrincipal CustomUserDetails user) {
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialUseCase.createSocialBoard(user.getUserId(), request)));
@@ -53,7 +54,8 @@ public class SocialController implements SocialApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteSocialBoard(
 		@PathVariable Long socialId,
-		@AuthenticationPrincipal CustomUserDetails user) {
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
 		socialUseCase.deleteSocialBoard(user.getUserId(), socialId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
@@ -65,7 +67,8 @@ public class SocialController implements SocialApi {
 	public ResponseEntity<ApiResponse<Map<String, Object>>> updateSocialBoard(
 		@PathVariable Long socialId,
 		@RequestBody @Valid SocialUpdateRequest request,
-		@AuthenticationPrincipal CustomUserDetails user) {
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
 		socialUseCase.updateSocialBoard(user.getUserId(), socialId, request);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
@@ -77,7 +80,8 @@ public class SocialController implements SocialApi {
 	public ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(
 		@PathVariable Long socialId,
 		@RequestBody @Valid CommentCreateRequest request,
-		CustomUserDetails user) {
+		CustomUserDetails user
+	) {
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialUseCase.createComment(user.getUserId(), socialId, request)));
@@ -89,7 +93,8 @@ public class SocialController implements SocialApi {
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteComment(
 		@PathVariable Long socialId,
 		@PathVariable Long commentId,
-		CustomUserDetails user) {
+		CustomUserDetails user
+	) {
 		socialUseCase.deleteComment(user.getUserId(), socialId, commentId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
@@ -100,7 +105,8 @@ public class SocialController implements SocialApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
 		@PathVariable Long socialId,
-		CustomUserDetails user) {
+		CustomUserDetails user
+	) {
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialUseCase.createLike(user.getUserId(), socialId)));
@@ -111,7 +117,8 @@ public class SocialController implements SocialApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
 		@PathVariable Long socialId,
-		CustomUserDetails user) {
+		CustomUserDetails user
+	) {
 		socialUseCase.deleteLike(user.getUserId(), socialId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
@@ -122,7 +129,9 @@ public class SocialController implements SocialApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<SocialDetailResponse>> getSocialDetail(
 		@PathVariable Long socialId,
-		CustomUserDetails user) {
+		CustomUserDetails user
+	) {
+
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialUseCase.getSocialDetail(user.getUserId(), socialId)));
 	}
@@ -133,7 +142,9 @@ public class SocialController implements SocialApi {
 	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		CustomUserDetails user,
 		Long cursor,
-		@PaginationLimit Integer limit) {
+		@PaginationLimit Integer limit
+	) {
+
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialUseCase.getSocials(user.getUserId(), cursor, limit)));
 	}
