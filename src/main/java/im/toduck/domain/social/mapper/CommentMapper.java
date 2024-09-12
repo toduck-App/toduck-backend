@@ -8,9 +8,7 @@ import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
 import im.toduck.domain.social.presentation.dto.response.OwnerDto;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.global.annotation.Mapper;
 
-@Mapper
 public class CommentMapper {
 	public static Comment toComment(User user, Social socialBoard, CommentCreateRequest request) {
 		return Comment.builder()

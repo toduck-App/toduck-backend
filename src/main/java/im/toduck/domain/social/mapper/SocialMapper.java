@@ -15,9 +15,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.global.annotation.Mapper;
 
-@Mapper
 public class SocialMapper {
 	public static Social toSocial(User user, String content, Boolean isAnonymous) {
 		return Social.builder()
