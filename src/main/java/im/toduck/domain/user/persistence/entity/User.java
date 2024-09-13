@@ -1,6 +1,8 @@
 package im.toduck.domain.user.persistence.entity;
 
 import im.toduck.global.base.entity.BaseEntity;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -55,5 +57,26 @@ public class User extends BaseEntity {
 		this.password = password;
 		this.provider = provider;
 		this.email = email;
+		validateOAuthOrGeneralFields();
+	}
+
+	private void validateOAuthOrGeneralFields() {
+		if (isOAuthUser()) {
+			if (!(phoneNumber == null && loginId == null && password == null)) {
+				throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
+			}
+		} else if (isGeneralUser()) {
+			if (!(provider == null && email == null)) {
+				throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
+			}
+		}
+	}
+
+	private boolean isGeneralUser() {
+		return phoneNumber != null && loginId != null && password != null;
+	}
+
+	private boolean isOAuthUser() {
+		return this.provider != null && this.email != null;
 	}
 }
