@@ -1,5 +1,6 @@
 package im.toduck.fixtures;
 
+import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.persistence.entity.User;
 
 public class UserFixtures {
@@ -28,6 +29,6 @@ public class UserFixtures {
 	 * ENTITY
 	 */
 	public static User GENERAL_USER() {
-		return User.createGeneralUser(USER1_USERNAME, USER1_USER_ID, USER1_PASSWORD, USER1_EMAIL);
+		return UserMapper.createGeneralUser(USER1_USERNAME, USER1_USER_ID, USER1_PASSWORD, USER1_EMAIL);
 	}
 }

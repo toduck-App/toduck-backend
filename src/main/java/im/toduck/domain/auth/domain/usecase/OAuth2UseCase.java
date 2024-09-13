@@ -10,6 +10,7 @@ import im.toduck.domain.auth.domain.service.JwtService;
 import im.toduck.domain.auth.domain.service.NickNameGenerateService;
 import im.toduck.domain.auth.presentation.dto.JwtPair;
 import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
+import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -35,8 +36,8 @@ public class OAuth2UseCase {
 		userService.findByProviderAndEmail(OAuthMapper.fromOidcProvider(provider), payload.email()).ifPresent(user -> {
 			throw CommonException.from(ExceptionCode.EXISTS_EMAIL);
 		});
-		User oAuthUser = User.createOAuthUser(nickNameGenerateService.generateRandomNickname(),
-			OAuthMapper.fromOidcProvider(provider), payload.email()); // TODO : 팀원 pr 받은 후 mapper 로 변경
+		User oAuthUser = UserMapper.createOAuthUser(nickNameGenerateService.generateRandomNickname(),
+			OAuthMapper.fromOidcProvider(provider), payload.email());
 		User user = userService.registerOAuthUser(oAuthUser);
 		return Pair.of(user.getId(), jwtService.createToken(user));
 	}

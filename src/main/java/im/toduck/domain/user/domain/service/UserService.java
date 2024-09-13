@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.user.persistence.entity.OAuthProvider;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.domain.user.persistence.repository.UserRepository;
@@ -43,9 +42,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public void registerGeneralUser(SignUpRequest.General request, String nickName,
-		String encodedPassword) { // TODOD : refactor 필요
-		User user = User.createGeneralUser(nickName, request.loginId(), encodedPassword, request.phoneNumber());
+	public void registerGeneralUser(User user) { // TODOD : refactor 필요
 		userRepository.save(user);
 	}
 

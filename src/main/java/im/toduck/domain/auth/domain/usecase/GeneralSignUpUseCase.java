@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.auth.domain.service.NickNameGenerateService;
 import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
+import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -50,6 +51,7 @@ public class GeneralSignUpUseCase {
 		String encodedPassword = passwordEncoder.encode(request.password());
 		String nickName = nickNameGenerateService.generateRandomNickname();
 
-		userService.registerGeneralUser(request, nickName, encodedPassword);
+		userService.registerGeneralUser(
+			UserMapper.createGeneralUser(nickName, request.loginId(), encodedPassword, request.phoneNumber()));
 	}
 }

@@ -99,7 +99,7 @@ public class JwtOidcProvider {
 	}
 
 	/**
-	 * 공개키로 서명을 검증하는 메서드
+	 * n과 e 의 조합으로 공개키를 생성하고 ID Token을 검증하는 메서드
 	 */
 	private Jws<Claims> getOidcTokenJws(String token, String modulus, String exponent) {
 		try {
@@ -115,7 +115,7 @@ public class JwtOidcProvider {
 	}
 
 	/**
-	 * n, e 조합으로 공개키를 생성하는 메서드
+	 * 공개된 n, e 조합으로 공개키를 생성하는 메서드
 	 */
 	private PublicKey getRsaPublicKey(String modulus, String exponent) throws
 		NoSuchAlgorithmException,

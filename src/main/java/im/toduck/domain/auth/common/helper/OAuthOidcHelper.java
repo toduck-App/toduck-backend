@@ -66,7 +66,7 @@ public class OAuthOidcHelper {
 	 * @param iss      : ID Token을 발급한 provider의 URL
 	 * @param sub      : ID Token의 subject (사용자 식별자)
 	 * @param aud      : ID Token이 발급된 앱의 앱 키
-	 * @param nonce    : 인증 서버 로그인 요청 시 전달한 임의의 문자열 (Optional, 현재는 사용하지 않음)
+	 * @param nonce    : 인증 서버 로그인 요청 시 전달한 임의의 문자열
 	 * @param response : 공개키 목록
 	 * @return OidcPayload : ID Token의 payload
 	 */
