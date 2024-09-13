@@ -65,6 +65,7 @@ public class RoutineController implements RoutineApi {
 		@PathVariable final Long routineId,
 		@RequestBody @Valid final RoutinePutCompletionRequest request
 	) {
+		routineUseCase.updateRoutineCompletion(userDetails.getUserId(), routineId, request);
 
 		return ResponseEntity.ok(
 			ApiResponse.createSuccessWithNoContent()
