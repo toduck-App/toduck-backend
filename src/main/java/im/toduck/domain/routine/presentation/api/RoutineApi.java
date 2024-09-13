@@ -13,8 +13,10 @@ import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
+import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
+import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +67,8 @@ public interface RoutineApi {
 			description = "루틴 완료 상태 변경 성공"
 		),
 		errors = {
-			// TODO: 에러 등록 필요
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.ROUTINE_INVALID_DATE)
 		}
 	)
 	ResponseEntity<ApiResponse<?>> putRoutineCompletion(
