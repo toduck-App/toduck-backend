@@ -76,7 +76,7 @@ public class RoutineUseCase {
 			return;
 		}
 
-		if (routineService.canCreateRecordForDate(routine, date)) {
+		if (!routineService.canCreateRecordForDate(routine, date)) {
 			log.info("루틴 상태 변경 실패 - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
 			throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
 		}
