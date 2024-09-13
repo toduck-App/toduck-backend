@@ -8,5 +8,11 @@ import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.user.persistence.entity.User;
 
 public interface RoutineRepositoryCustom {
-	List<Routine> findUnrecordedRoutinesForDate(User user, LocalDate date, List<RoutineRecord> routineRecords);
+	List<Routine> findUnrecordedRoutinesForDate(
+		final User user,
+		final LocalDate date,
+		final List<RoutineRecord> routineRecords
+	);
+
+	boolean isActiveForDate(final Routine routine, final LocalDate date);
 }
