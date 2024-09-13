@@ -13,8 +13,6 @@ import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.global.exception.CommonException;
-import im.toduck.global.exception.ExceptionCode;
 import im.toduck.infra.oauth.OidcProvider;
 import im.toduck.infra.oauth.oidc.dto.OidcPayload;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +31,14 @@ public class OAuth2UseCase {
 	public Pair<Long, JwtPair> signUp(OidcProvider provider, SignUpRequest.Oidc request) {
 		OidcPayload payload = oauthOidcHelper.getPayload(provider, request.oauthId(), request.idToken(),
 			request.nonce());
-		userService.findByProviderAndEmail(OAuthMapper.fromOidcProvider(provider), payload.email()).ifPresent(user -> {
-			throw CommonException.from(ExceptionCode.EXISTS_EMAIL);
-		});
-		User oAuthUser = UserMapper.createOAuthUser(nickNameGenerateService.generateRandomNickname(),
-			OAuthMapper.fromOidcProvider(provider), payload.email());
-		User user = userService.registerOAuthUser(oAuthUser);
-		return Pair.of(user.getId(), jwtService.createToken(user));
+
+		return userService.findByProviderAndEmail(OAuthMapper.fromOidcProvider(provider), payload.email())
+			.map(user -> Pair.of(user.getId(), jwtService.createToken(user))) // 이메일이 존재할 경우
+			.orElseGet(() -> { // 이메일이 존재하지 않을 경우
+				User oAuthUser = UserMapper.createOAuthUser(nickNameGenerateService.generateRandomNickname(),
+					OAuthMapper.fromOidcProvider(provider), payload.email());
+				User newUser = userService.registerOAuthUser(oAuthUser);
+				return Pair.of(newUser.getId(), jwtService.createToken(newUser));
+			});
 	}
 }
