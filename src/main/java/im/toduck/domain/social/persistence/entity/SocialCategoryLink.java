@@ -1,4 +1,6 @@
-package im.toduck.domain.social;
+package im.toduck.domain.social.persistence.entity;
+
+import java.time.LocalDateTime;
 
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Entity;
@@ -9,11 +11,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "social_category_link")
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SocialCategoryLink extends BaseEntity {
 
 	@Id
@@ -27,4 +33,14 @@ public class SocialCategoryLink extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "social_category_id", nullable = false)
 	private SocialCategory socialCategory;
+
+	@Builder
+	private SocialCategoryLink(Social social, SocialCategory socialCategory) {
+		this.social = social;
+		this.socialCategory = socialCategory;
+	}
+
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }

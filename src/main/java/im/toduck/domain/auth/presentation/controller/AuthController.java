@@ -41,12 +41,13 @@ public class AuthController implements AuthControllerApi {
 	private final GeneralSignUpUseCase generalSignUpUseCase;
 	private final CookieUtil cookieUtil;
 
-	@PostMapping("/login") //TODO : 일반 로그인 설계자에게 URL 변경 의논 요청해야함
+	@PostMapping("/login")
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<ApiResponse<LoginResponse>> signIn(@RequestBody @Valid LoginRequest request) {
 		return createAuthResponse(authUseCase.signIn(request));
 	}
 
+	@Override
 	@GetMapping("/refresh")
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken) {
