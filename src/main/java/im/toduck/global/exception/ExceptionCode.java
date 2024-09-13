@@ -51,7 +51,7 @@ public enum ExceptionCode {
 
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),
-	INVALID_USER_FILED(HttpStatus.FORBIDDEN, 40201, "유효하지 않은 사용자 필드입니다.",
+	INVALID_USER_FILED(HttpStatus.FORBIDDEN, 40202, "유효하지 않은 사용자 필드입니다.",
 		"Oauth 사용자 필드와 일반 사용자 필드가 중복되어 사용될 때 발생하는 오류입니다."),
 
 	/* 404xx */
