@@ -41,12 +41,14 @@ public class AuthController implements AuthControllerApi {
 	private final GeneralSignUpUseCase generalSignUpUseCase;
 	private final CookieUtil cookieUtil;
 
+	@Override
 	@PostMapping("/login")
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<ApiResponse<LoginResponse>> signIn(@RequestBody @Valid LoginRequest request) {
 		return createAuthResponse(authUseCase.signIn(request));
 	}
 
+	@Override
 	@GetMapping("/refresh")
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken) {

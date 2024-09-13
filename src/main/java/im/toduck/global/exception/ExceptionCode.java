@@ -47,6 +47,19 @@ public enum ExceptionCode {
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),
 
+	/* 404xx */
+	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_SOCIAL_BOARD(HttpStatus.FORBIDDEN, 40402, "게시글에 접근 권한이 없습니다."),
+	NOT_FOUND_SOCIAL_CATEGORY(HttpStatus.NOT_FOUND, 40403, "찾을 수 없는 카테고리가 포함되어 있습니다."),
+	NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, 40404, "해당 댓글을 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_COMMENT(HttpStatus.FORBIDDEN, 40405, "해당 댓글에 접근 권한이 없습니다."),
+	INVALID_COMMENT_FOR_BOARD(HttpStatus.BAD_REQUEST, 40406, "해당 게시글에 댓글이 속하지 않습니다."),
+	EXISTS_LIKE(HttpStatus.CONFLICT, 40407, "이미 좋아요가 존재합니다."),
+	NOT_FOUND_LIKE(HttpStatus.NOT_FOUND, 40408, "해당 좋아요를 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_LIKE(HttpStatus.FORBIDDEN, 40409, "해당 좋아요에 접근 권한이 없습니다."),
+	INVALID_LIKE_FOR_BOARD(HttpStatus.BAD_REQUEST, 40410, "해당 게시글에 좋아요가 속하지 않습니다."),
+	EMPTY_SOCIAL_CATEGORY_LIST(HttpStatus.BAD_REQUEST, 40411, "카테고리 목록은 최소 1개의 항목을 포함해야 합니다."),
+
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
 	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다.");
