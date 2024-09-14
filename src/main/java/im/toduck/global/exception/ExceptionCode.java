@@ -60,7 +60,7 @@ public enum ExceptionCode {
 	INVALID_LIKE_FOR_BOARD(HttpStatus.BAD_REQUEST, 40410, "해당 게시글에 좋아요가 속하지 않습니다."),
 	EMPTY_SOCIAL_CATEGORY_LIST(HttpStatus.BAD_REQUEST, 40411, "카테고리 목록은 최소 1개의 항목을 포함해야 합니다."),
 
-  /* 432xx */
+	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),
 	ROUTINE_INVALID_DATE(HttpStatus.BAD_REQUEST, 43202, "유효하지 않은 루틴 날짜입니다.",
 		"요청된 날짜에 대한 루틴 변경이 불가능합니다. 루틴의 반복 요일과 현재 날짜를 확인하고 올바른 날짜로 다시 요청해 주세요."),
