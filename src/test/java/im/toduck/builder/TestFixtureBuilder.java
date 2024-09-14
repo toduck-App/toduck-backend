@@ -1,8 +1,15 @@
 package im.toduck.builder;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.Like;
+import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.entity.SocialCategory;
+import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.user.persistence.entity.User;
@@ -28,6 +35,30 @@ public class TestFixtureBuilder {
 
 	public RoutineRecord buildRoutineRecord(final RoutineRecord routineRecord) {
 		return bs.routineRecord().save(routineRecord);
+	}
+
+	public Social buildSocial(final Social social) {
+		return bs.socialRepository().save(social);
+	}
+
+	public List<Social> buildSocials(final List<Social> socials) {
+		return bs.socialRepository().saveAll(socials);
+	}
+
+	public List<SocialCategory> buildCategories(final List<SocialCategory> categories) {
+		return bs.socialCategoryRepository().saveAll(categories);
+	}
+
+	public Comment buildComment(final Comment comment) {
+		return bs.commentRepository().save(comment);
+	}
+
+	public Like buildLike(final Like like) {
+		return bs.likeRepository().save(like);
+	}
+
+	public List<SocialImageFile> buildSocialImageFiles(final List<SocialImageFile> socialImageFiles) {
+		return bs.socialImageFileRepository().saveAll(socialImageFiles);
 	}
 
 }

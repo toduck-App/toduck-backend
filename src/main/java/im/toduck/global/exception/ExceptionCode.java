@@ -47,7 +47,20 @@ public enum ExceptionCode {
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),
 
-	/* 432xx */
+	/* 404xx */
+	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_SOCIAL_BOARD(HttpStatus.FORBIDDEN, 40402, "게시글에 접근 권한이 없습니다."),
+	NOT_FOUND_SOCIAL_CATEGORY(HttpStatus.NOT_FOUND, 40403, "찾을 수 없는 카테고리가 포함되어 있습니다."),
+	NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, 40404, "해당 댓글을 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_COMMENT(HttpStatus.FORBIDDEN, 40405, "해당 댓글에 접근 권한이 없습니다."),
+	INVALID_COMMENT_FOR_BOARD(HttpStatus.BAD_REQUEST, 40406, "해당 게시글에 댓글이 속하지 않습니다."),
+	EXISTS_LIKE(HttpStatus.CONFLICT, 40407, "이미 좋아요가 존재합니다."),
+	NOT_FOUND_LIKE(HttpStatus.NOT_FOUND, 40408, "해당 좋아요를 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_LIKE(HttpStatus.FORBIDDEN, 40409, "해당 좋아요에 접근 권한이 없습니다."),
+	INVALID_LIKE_FOR_BOARD(HttpStatus.BAD_REQUEST, 40410, "해당 게시글에 좋아요가 속하지 않습니다."),
+	EMPTY_SOCIAL_CATEGORY_LIST(HttpStatus.BAD_REQUEST, 40411, "카테고리 목록은 최소 1개의 항목을 포함해야 합니다."),
+
+  /* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),
 	ROUTINE_INVALID_DATE(HttpStatus.BAD_REQUEST, 43202, "유효하지 않은 루틴 날짜입니다.",
 		"요청된 날짜에 대한 루틴 변경이 불가능합니다. 루틴의 반복 요일과 현재 날짜를 확인하고 올바른 날짜로 다시 요청해 주세요."),
