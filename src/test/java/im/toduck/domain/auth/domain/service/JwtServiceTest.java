@@ -1,6 +1,6 @@
 package im.toduck.domain.auth.domain.service;
 
-import static im.toduck.fixtures.UserFixtures.*;
+import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.BDDMockito.*;
 

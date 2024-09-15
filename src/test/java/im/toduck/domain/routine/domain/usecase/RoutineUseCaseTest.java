@@ -2,7 +2,7 @@ package im.toduck.domain.routine.domain.usecase;
 
 import static im.toduck.fixtures.RoutineFixtures.*;
 import static im.toduck.fixtures.RoutineRecordFixtures.*;
-import static im.toduck.fixtures.UserFixtures.*;
+import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.ArgumentMatchers.*;

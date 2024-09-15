@@ -73,7 +73,6 @@ public class OAuthOidcHelper {
 	private OidcPayload getPayloadFromIdToken(String idToken, String iss, String sub, String aud, String nonce,
 		OidcPublicKeyResponse response) {
 		String kid = jwtOidcProvider.getKidFromUnsignedTokenHeader(idToken, iss, sub, aud, nonce);
-
 		OidcPublicKey key = response.getKeys().stream()
 			.filter(k -> k.kid().equals(kid))
 			.findFirst()
