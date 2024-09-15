@@ -69,6 +69,8 @@ public class User extends BaseEntity {
 			if (!(provider == null && email == null)) {
 				throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
 			}
+		} else {
+			throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
 		}
 	}
 
