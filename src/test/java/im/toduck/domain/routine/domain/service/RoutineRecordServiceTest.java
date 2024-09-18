@@ -101,7 +101,8 @@ class RoutineRecordServiceTest extends ServiceTest {
 		@Test
 		void 기록이_존재하지_않는_경우에_변경이_이루어지지_않는다() {
 			// when
-			final boolean isUpdated = routineRecordService.updateIfPresent(ROUTINE, LocalDate.now(), true);
+			LocalDate unrecordedDate = LocalDate.now();
+			final boolean isUpdated = routineRecordService.updateIfPresent(ROUTINE, unrecordedDate, true);
 
 			// then
 			List<RoutineRecord> routineRecords = routineRecordRepository.findAll();
