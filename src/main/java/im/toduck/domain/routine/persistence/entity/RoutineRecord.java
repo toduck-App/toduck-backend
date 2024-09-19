@@ -46,4 +46,8 @@ public class RoutineRecord extends BaseEntity {
 		this.isAllDay = isAllDay;
 		this.isCompleted = isCompleted;
 	}
+
+	public void changeCompletion(Boolean isCompleted) {
+		this.isCompleted = isCompleted;
+	}
 }

@@ -8,6 +8,7 @@ import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,8 +51,8 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 
 			// then
 			assertSoftly(softly -> {
-				assertThat(records).hasSize(1);
-				assertThat(records).contains(RECORD);
+				softly.assertThat(records).hasSize(1);
+				softly.assertThat(records).contains(RECORD);
 			});
 
 		}
@@ -90,6 +91,65 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 					RECORD_WEEKLY2_1,
 					RECORD_WEEKLY2_2
 				);
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("루틴과 날짜로 기록 조회시")
+	class FindByRoutineAndRecordDateTest {
+
+		@Test
+		void 유효한_루틴_기록을_조회할_수_있다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(COMPLETED_SYNCED_RECORD(ROUTINE));
+
+			// when
+			Optional<RoutineRecord> foundRecord = routineRecordRepository.findByRoutineAndRecordDate(
+				ROUTINE,
+				LocalDate.from(RECORD.getRecordAt())
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(foundRecord).isPresent();
+				softly.assertThat(foundRecord.get()).isEqualTo(RECORD);
+			});
+		}
+
+		@Test
+		void 존재하지_않는_루틴_기록은_빈_Optional을_반환한다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			LocalDate NON_EXISTENT_DATE = LocalDate.now().plusDays(1);
+
+			// when
+			Optional<RoutineRecord> foundRecord = routineRecordRepository.findByRoutineAndRecordDate(
+				ROUTINE,
+				NON_EXISTENT_DATE
+			);
+
+			// then
+			assertThat(foundRecord).isEmpty();
+		}
+
+		@Test
+		void 종일_루틴의_기록이_정상적으로_조회된디() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE_ALL_DAY(USER));
+			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(COMPLETED_SYNCED_RECORD(ROUTINE));
+
+			// when
+			Optional<RoutineRecord> foundRecord = routineRecordRepository.findByRoutineAndRecordDate(
+				ROUTINE,
+				LocalDate.from(RECORD.getRecordAt())
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(foundRecord).isPresent();
+				softly.assertThat(foundRecord.get()).isEqualTo(RECORD);
 			});
 		}
 	}

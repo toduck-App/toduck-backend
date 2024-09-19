@@ -28,6 +28,17 @@ public class RoutineFixtures {
 			.build();
 	}
 
+	public static Routine MONDAY_ONLY_MORNING_ROUTINE_ALL_DAY(User user) {
+		return Routine.builder()
+			.user(user)
+			.title("월요일 아침 루틴")
+			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.MONDAY)))
+			.time(null)
+			.color(PlanCategoryColor.from("#FF0000"))
+			.isPublic(true)
+			.build();
+	}
+
 	public static Routine WEEKDAY_MORNING_ROUTINE(User user) {
 		return Routine.builder()
 			.user(user)
