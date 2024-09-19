@@ -22,25 +22,43 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
-	private final QRoutine routine = QRoutine.routine;
+	private final QRoutine qRoutine = QRoutine.routine;
 
 	@Override
-	public List<Routine> findUnrecordedRoutinesForDate(User user, LocalDate date,
-		List<RoutineRecord> recordedRoutines) {
+	public List<Routine> findUnrecordedRoutinesForDate(
+		final User user,
+		final LocalDate date,
+		final List<RoutineRecord> routineRecords
+	) {
 		return queryFactory
-			.selectFrom(routine)
+			.selectFrom(qRoutine)
 			.where(
-				routine.user.eq(user),
+				qRoutine.user.eq(user),
 				routineCreatedOnOrBeforeDate(date),
-				routineNotRecorded(recordedRoutines),
+				routineNotRecorded(routineRecords),
 				routineMatchesDate(date)
 			)
 			.fetch();
 	}
 
+	@Override
+	public boolean isActiveForDate(Routine routine, LocalDate date) {
+		Integer fetchOne = queryFactory
+			.selectOne()
+			.from(qRoutine)
+			.where(
+				qRoutine.eq(routine),
+				routineCreatedOnOrBeforeDate(date),
+				routineMatchesDate(date)
+			)
+			.fetchFirst();
+
+		return fetchOne != null;
+	}
+
 	private BooleanExpression routineCreatedOnOrBeforeDate(LocalDate date) {
 		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-		return routine.createdAt.loe(endOfDay);
+		return qRoutine.createdAt.loe(endOfDay);
 	}
 
 	private BooleanExpression routineNotRecorded(List<RoutineRecord> recordedRoutines) {
@@ -48,7 +66,7 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			return null;
 		}
 
-		return routine.id.notIn(recordedRoutines.stream()
+		return qRoutine.id.notIn(recordedRoutines.stream()
 			.map(RoutineRecord::getRoutine)
 			.map(Routine::getId)
 			.toList());
@@ -57,9 +75,7 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 	private BooleanExpression routineMatchesDate(LocalDate date) {
 		byte dayBitmask = DaysOfWeekBitmask.getDayBitmask(date.getDayOfWeek());
 		return Expressions.numberTemplate(
-				Byte.class, "function('bitand', {0}, CAST({1} as byte))", routine.daysOfWeekBitmask, dayBitmask
-			)
-
-			.gt((byte)0);
+			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, dayBitmask
+		).gt((byte)0);
 	}
 }

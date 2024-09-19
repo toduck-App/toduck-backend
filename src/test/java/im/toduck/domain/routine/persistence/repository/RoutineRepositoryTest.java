@@ -82,7 +82,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		}
 
 		@Test
-		void 매일_반복되는_루틴이_존재할_때_모든_요일에_조회되는지_확인한다() {
+		void 매일_반복되는_루틴이_존재할_때_모든_요일에_조회된다() {
 			// given
 			Routine DAILYROUTINE = testFixtureBuilder.buildRoutine(DAILY_EVENING_ROUTINE(USER));
 
@@ -96,7 +96,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		}
 
 		@Test
-		void 일요일_자정_직전과_월요일_자정_직후_루틴이_올바르게_조회되는지_확인한다() {
+		void 일요일_자정_직전과_월요일_자정_직후_루틴이_올바르게_조회된다() {
 			// given
 			Routine SUNDAY_NIGHT_ROUTINE = testFixtureBuilder.buildRoutine(LAST_DAY_OF_WEEK_NIGHT_ROUTINE(USER));
 			Routine MONDAY_MORNING_ROUTINE = testFixtureBuilder.buildRoutine(FIRST_DAY_OF_WEEK_MORNING_ROUTINE(USER));
@@ -119,7 +119,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		}
 
 		@Test
-		void 동일한_요일_패턴을_가진_여러_루틴이_있을_때_모두_조회되는지_확인한다() {
+		void 동일한_요일_패턴을_가진_여러_루틴이_있을_때_모두_조회된다() {
 			// given
 			Routine WEEKDAY_MORNING_ROUTINE1 = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
 			Routine WEEKDAY_MORNING_ROUTINE2 = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
@@ -135,13 +135,68 @@ class RoutineRepositoryTest extends RepositoryTest {
 
 		@Disabled("삭제된 루틴에 대한 테스트 케이스 아직 구현되지 않음")
 		@Test
-		void 삭제된_루틴이_조회되지_않음을_확인한다() {
+		void 삭제된_루틴이_조회되지_않는다() {
 			// TODO: 삭제된 루틴에 대한 테스트 케이스 구현
 		}
 
 		@Disabled("특정 기간 동안 유효한 루틴에 대한 테스트 케이스 아직 구현되지 않음")
 		@Test
-		void 특정_기간_동안만_유효한_루틴이_해당_기간_내외에서_올바르게_조회되는지_확인한다() {
+		void 특정_기간_동안만_유효한_루틴이_해당_기간_내에서_올바르게_조회된다() {
+			// TODO: 특정 기간 동안 유효한 루틴에 대한 테스트 케이스 구현
+		}
+	}
+
+	@Nested
+	@DisplayName("루틴 날짜 유효성 검증시")
+	class IsActiveForDateTest {
+		@Test
+		void 날짜가_유효한_경우를_정상적으로_확인한다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
+
+			// when
+			boolean isActive = routineRepository.isActiveForDate(ROUTINE, monday);
+
+			// then
+			assertThat(isActive).isTrue();
+		}
+
+		@Test
+		void 루틴_생성_날짜가_검증_날짜보다_이후인_경우를_정상적으로_확인한다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			LocalDate previousMonday = getPreviousDayOfWeek(DayOfWeek.MONDAY);
+
+			// when
+			boolean isActive = routineRepository.isActiveForDate(ROUTINE, previousMonday);
+
+			// then
+			assertThat(isActive).isFalse();
+		}
+
+		@Test
+		void 루틴의_반복_요일이_날짜의_요일과_일치하지_않는_경우를_정상적으로_확인한다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			LocalDate tuesday = getNextDayOfWeek(DayOfWeek.TUESDAY);
+
+			// when
+			boolean isActive = routineRepository.isActiveForDate(ROUTINE, tuesday);
+
+			// then
+			assertThat(isActive).isFalse();
+		}
+
+		@Disabled
+		@Test
+		void 모_루틴이_삭제된_경우에도_정상적으로_확인한다() {
+			// TODO: 삭제된 루틴에 대한 테스트 케이스 구현
+		}
+
+		@Disabled
+		@Test
+		void 특정_기간_동안만_유효한_루틴이_해당_기간_내에서_확인된다() {
 			// TODO: 특정 기간 동안 유효한 루틴에 대한 테스트 케이스 구현
 		}
 	}

@@ -2,6 +2,7 @@ package im.toduck.domain.routine.domain.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,5 +38,13 @@ public class RoutineService {
 		final List<RoutineRecord> routineRecords
 	) {
 		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
+	}
+
+	public Optional<Routine> getUserRoutine(final User user, final Long id) {
+		return routineRepository.findByIdAndUser(id, user);
+	}
+
+	public boolean canCreateRecordForDate(final Routine routine, final LocalDate date) {
+		return routineRepository.isActiveForDate(routine, date);
 	}
 }

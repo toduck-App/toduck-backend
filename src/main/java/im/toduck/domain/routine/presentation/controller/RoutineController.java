@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import im.toduck.domain.routine.domain.usecase.RoutineUseCase;
 import im.toduck.domain.routine.presentation.api.RoutineApi;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -30,6 +33,7 @@ public class RoutineController implements RoutineApi {
 
 	private final RoutineUseCase routineUseCase;
 
+	@Override
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<RoutineCreateResponse>> postRoutine(
@@ -41,6 +45,7 @@ public class RoutineController implements RoutineApi {
 		);
 	}
 
+	@Override
 	@GetMapping("/me")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<MyRoutineReadListResponse>> getMyRoutineList(
@@ -49,6 +54,21 @@ public class RoutineController implements RoutineApi {
 	) {
 		return ResponseEntity.ok(
 			ApiResponse.createSuccess(routineUseCase.readMyRoutineList(userDetails.getUserId(), date))
+		);
+	}
+
+	@Override
+	@PutMapping("/{routineId}/completion")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<?>> putRoutineCompletion(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@PathVariable final Long routineId,
+		@RequestBody @Valid final RoutinePutCompletionRequest request
+	) {
+		routineUseCase.updateRoutineCompletion(userDetails.getUserId(), routineId, request);
+
+		return ResponseEntity.ok(
+			ApiResponse.createSuccessWithNoContent()
 		);
 	}
 }
