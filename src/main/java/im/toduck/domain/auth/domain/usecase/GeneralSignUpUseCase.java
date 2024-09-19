@@ -49,9 +49,9 @@ public class GeneralSignUpUseCase {
 		userService.validateUserByPhoneNumber(request.phoneNumber());
 		phoneNumberService.validateVerifiedPhoneNumber(request.phoneNumber());
 		String encodedPassword = passwordEncoder.encode(request.password());
-		String nickName = nickNameGenerateService.generateRandomNickname();
+		String nickname = nickNameGenerateService.generateRandomNickname();
 
 		userService.registerGeneralUser(
-			UserMapper.createGeneralUser(nickName, request.loginId(), encodedPassword, request.phoneNumber()));
+			UserMapper.toGeneralUser(nickname, request.loginId(), encodedPassword, request.phoneNumber()));
 	}
 }

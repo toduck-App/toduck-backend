@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class UserMapper {
-	public static User createGeneralUser(String nickname, String loginId, String password, String phoneNumber) {
+	public static User toGeneralUser(String nickname, String loginId, String password, String phoneNumber) {
 		return User.builder()
 			.role(UserRole.USER)
 			.nickname(nickname)
@@ -17,7 +17,7 @@ public class UserMapper {
 			.build();
 	}
 
-	public static User createOAuthUser(final String nickname, final OAuthProvider provider, final String email) {
+	public static User toOAuthUser(final String nickname, final OAuthProvider provider, final String email) {
 		return User.builder()
 			.role(UserRole.USER)
 			.nickname(nickname)

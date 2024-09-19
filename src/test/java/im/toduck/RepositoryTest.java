@@ -36,7 +36,7 @@ import im.toduck.global.config.querydsl.QueryDslConfig;
  */
 @DataJpaTest
 @TypeExcludeFilters(DataRedisTypeExcludeFilter.class)
-@ImportAutoConfiguration({FeignAutoConfiguration.class}) //TODO : OidcHelper 가 로드 되지 않는 문제 원인 찾을 필요 있음
+@ImportAutoConfiguration({FeignAutoConfiguration.class})
 @AutoConfigureDataRedis
 @ActiveProfiles("test")
 @Import(value = {TestFixtureBuilder.class, BuilderSupporter.class, QueryDslConfig.class})

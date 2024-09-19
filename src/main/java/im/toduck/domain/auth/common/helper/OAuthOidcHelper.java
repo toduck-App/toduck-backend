@@ -2,7 +2,7 @@ package im.toduck.domain.auth.common.helper;
 
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -20,7 +20,7 @@ import im.toduck.infra.oauth.oidc.properties.google.GoogleOidcProperties;
 import im.toduck.infra.oauth.oidc.properties.kakao.KakaoOidcProperties;
 import im.toduck.infra.oauth.oidc.provider.JwtOidcProvider;
 
-@Service
+@Component
 public class OAuthOidcHelper {
 	private final JwtOidcProvider jwtOidcProvider;
 	private final Map<OidcProvider, Map<OidcClient, OidcClientProperties>> oauthOidcClients;

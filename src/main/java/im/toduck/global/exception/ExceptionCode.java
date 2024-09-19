@@ -43,7 +43,6 @@ public enum ExceptionCode {
 	NOT_SEND_PHONE_NUMBER(HttpStatus.NOT_FOUND, 40114, "인증 요청이 보내지 않은 전화번호입니다."),
 	INVALID_VERIFIED_CODE(HttpStatus.FORBIDDEN, 40115, "인증 코드가 일치하지 않습니다."),
 	NOT_VERIFIED_PHONE_NUMBER(HttpStatus.FORBIDDEN, 40116, "인증되지 않은 전화번호입니다."),
-	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다."),
 	EXISTS_EMAIL(HttpStatus.CONFLICT, 40117, "이미 가입된 이메일입니다."),
 	INVALID_ID_TOKEN(HttpStatus.FORBIDDEN, 40118, "유효하지 않은 ID 토큰입니다.", "ID 토큰이 유효하지 않을 때 발생하는 오류입니다."),
 	ABNORMAL_ID_TOKEN(HttpStatus.FORBIDDEN, 40119, "비정상적인 ID 토큰입니다.", "ID 토큰 공개키로 암호화 도중에 발생하는 오류입니다."),
@@ -68,7 +67,8 @@ public enum ExceptionCode {
 	EMPTY_SOCIAL_CATEGORY_LIST(HttpStatus.BAD_REQUEST, 40411, "카테고리 목록은 최소 1개의 항목을 포함해야 합니다."),
 
 	/* 499xx ETC */
-	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다.");
+	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
+	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다.");
 
 	private final HttpStatus httpStatus;
 	private final int errorCode;

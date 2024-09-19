@@ -35,7 +35,7 @@ public class OAuth2UseCase {
 		return userService.findByProviderAndEmail(OAuthMapper.fromOidcProvider(provider), payload.email())
 			.map(user -> Pair.of(user.getId(), jwtService.createToken(user))) // 이메일이 존재할 경우
 			.orElseGet(() -> { // 이메일이 존재하지 않을 경우
-				User oAuthUser = UserMapper.createOAuthUser(nickNameGenerateService.generateRandomNickname(),
+				User oAuthUser = UserMapper.toOAuthUser(nickNameGenerateService.generateRandomNickname(),
 					OAuthMapper.fromOidcProvider(provider), payload.email());
 				User newUser = userService.registerOAuthUser(oAuthUser);
 				return Pair.of(newUser.getId(), jwtService.createToken(newUser));

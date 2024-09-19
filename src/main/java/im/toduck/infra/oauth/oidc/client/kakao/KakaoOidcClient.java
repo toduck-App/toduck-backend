@@ -16,5 +16,5 @@ public interface KakaoOidcClient extends OidcClient {
 	@Override
 	@Cacheable(value = "KakaoOauth", cacheManager = "oidcCacheManager")
 	@GetMapping("/.well-known/jwks.json")
-	OidcPublicKeyResponse getOidcPublicKey(); //TODO : 캐싱을 통해 성능 향상 고려해볼 필요 있음
+	OidcPublicKeyResponse getOidcPublicKey();
 }

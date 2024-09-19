@@ -9,15 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OAuthMapper {
 	public static OAuthProvider fromOidcProvider(OidcProvider oidcProvider) {
-		switch (oidcProvider) {
-			case KAKAO:
-				return OAuthProvider.KAKAO;
-			case GOOGLE:
-				return OAuthProvider.GOOGLE;
-			case APPLE:
-				return OAuthProvider.APPLE;
-			default:
-				throw new VoException("Unknown OidcProvider : " + oidcProvider);
-		}
+		return switch (oidcProvider) {
+			case KAKAO -> OAuthProvider.KAKAO;
+			case GOOGLE -> OAuthProvider.GOOGLE;
+			case APPLE -> OAuthProvider.APPLE;
+			default -> throw new VoException("Unknown OidcProvider : " + oidcProvider);
+		};
 	}
 }

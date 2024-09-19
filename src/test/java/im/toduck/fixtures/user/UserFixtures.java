@@ -42,12 +42,12 @@ public class UserFixtures {
 	 * ENTITY
 	 */
 	public static User GENERAL_USER() {
-		return UserMapper.createGeneralUser(GENERAL_USER1_USERNAME, GENERAL_USER1_USER_ID, GENERAL_USER1_PASSWORD,
+		return UserMapper.toGeneralUser(GENERAL_USER1_USERNAME, GENERAL_USER1_USER_ID, GENERAL_USER1_PASSWORD,
 			GENERAL_USER1_PHONENUMBER);
 	}
 
 	public static User OAUTH_USER() {
-		return UserMapper.createOAuthUser(OAUTH_USER1_USERNAME, OAUTHE_USER1_PROVIDER, OAUTH_USER1_EMAIL);
+		return UserMapper.toOAuthUser(OAUTH_USER1_USERNAME, OAUTHE_USER1_PROVIDER, OAUTH_USER1_EMAIL);
 	}
 
 	/**

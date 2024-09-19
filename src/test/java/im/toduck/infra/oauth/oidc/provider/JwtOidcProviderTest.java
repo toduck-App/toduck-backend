@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -50,58 +52,67 @@ class JwtOidcProviderTest {
 		given(claims.get("email", String.class)).willReturn(TEST_EMAIL);
 	}
 
-	// getKidFromUnsignedTokenHeader 성공 케이스 테스트
-	@Test
-	void getKidFromUnsignedTokenHeader_정상적인_KID_추출() throws Exception {
-		// given
-		Map<String, String> header = Map.of("kid", TEST_KID);
-		Map<String, String> payload = Map.of(
-			"iss", TEST_ISS,
-			"sub", TEST_SUB,
-			"aud", TEST_AUD,
-			"nonce", TEST_NONCE
-		);
-		when(objectMapper.readValue(anyString(), eq(Map.class))).thenReturn(header).thenReturn(payload);
+	@Nested
+	@DisplayName("<getKidFromUnsignedTokenHeader 메서드 테스트> id token header에서 kid 추출")
+	class GetKidFromUnsignedTokenHeaderTest {
+		@Test
+		void getKidFromUnsignedTokenHeader_정상적인_KID_추출() throws Exception {
+			// given
+			Map<String, String> header = Map.of("kid", TEST_KID);
+			Map<String, String> payload = Map.of(
+				"iss", TEST_ISS,
+				"sub", TEST_SUB,
+				"aud", TEST_AUD,
+				"nonce", TEST_NONCE
+			);
+			when(objectMapper.readValue(anyString(), eq(Map.class))).thenReturn(header).thenReturn(payload);
 
-		// when
-		String result = jwtOidcProvider.getKidFromUnsignedTokenHeader(TEST_TOKEN, TEST_ISS, TEST_SUB, TEST_AUD,
-			TEST_NONCE);
+			// when
+			String result = jwtOidcProvider.getKidFromUnsignedTokenHeader(TEST_TOKEN, TEST_ISS, TEST_SUB, TEST_AUD,
+				TEST_NONCE);
 
-		// then
-		assertSoftly(softly -> {
-			softly.assertThat(result).isEqualTo(TEST_KID);
-		});
-		verify(objectMapper, times(2)).readValue(anyString(), eq(Map.class));
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(result).isEqualTo(TEST_KID);
+			});
+			verify(objectMapper, times(2)).readValue(anyString(), eq(Map.class));
+		}
+
+		@Test
+		void getKidFromUnsignedTokenHeader_잘못된_토큰_예외발생() throws Exception {
+			// given
+			String invalidToken = "invalid.token";
+
+			// when & then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> {
+					jwtOidcProvider.getKidFromUnsignedTokenHeader(invalidToken, TEST_ISS, TEST_SUB, TEST_AUD,
+						TEST_NONCE);
+				}).isInstanceOf(CommonException.class);
+			});
+		}
 	}
 
-	@Test
-	void getKidFromUnsignedTokenHeader_잘못된_토큰_예외발생() throws Exception {
-		// given
-		String invalidToken = "invalid.token";
+	@Nested
+	@DisplayName("<getOidcTokenBody 메서드 테스트> id token body 추출")
+	class GetOidcTokenBodyTest {
 
-		// when & then
-		assertSoftly(softly -> {
-			softly.assertThatThrownBy(() -> {
-				jwtOidcProvider.getKidFromUnsignedTokenHeader(invalidToken, TEST_ISS, TEST_SUB, TEST_AUD, TEST_NONCE);
-			}).isInstanceOf(CommonException.class);
-		});
-	}
+		@Test
+		void getOidcTokenBody_성공적인_토큰_추출() {
+			//TODO: 테스트 코드 작성해야함
+		}
 
-	@Test
-	void getOidcTokenBody_성공적인_토큰_추출() {
-		//TODO: 테스트 코드 작성해야함
-	}
+		@Test
+		void getOidcTokenBody_잘못된_토큰_예외발생() {
+			// given
+			String invalidToken = "invalid.token";
 
-	@Test
-	void getOidcTokenBody_잘못된_토큰_예외발생() {
-		// given
-		String invalidToken = "invalid.token";
-
-		// when & then
-		assertSoftly(softly -> {
-			softly.assertThatThrownBy(() -> {
-				jwtOidcProvider.getOidcTokenBody(invalidToken, TEST_MODULUS, TEST_EXPONENT);
-			}).isInstanceOf(CommonException.class);
-		});
+			// when & then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> {
+					jwtOidcProvider.getOidcTokenBody(invalidToken, TEST_MODULUS, TEST_EXPONENT);
+				}).isInstanceOf(CommonException.class);
+			});
+		}
 	}
 }
