@@ -126,7 +126,7 @@ tasks.named('test') {
 
 // editorconfig 설정
 editorconfig {
-    excludes = ['build', 'node_modules', '.husky', 'docker-infra', 'src/main/generated', 'gradlew.bat']
+    excludes = ['build', 'node_modules', '.husky', 'docker-infra', 'src/main/generated', 'gradlew.bat', 'toduck-backend-private/application.properties', 'src/main/resources/application.properties']
 }
 check.dependsOn editorconfigCheck
 
