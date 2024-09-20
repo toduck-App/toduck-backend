@@ -2,7 +2,7 @@ package im.toduck.domain.routine.domain.usecase;
 
 import static im.toduck.fixtures.RoutineFixtures.*;
 import static im.toduck.fixtures.RoutineRecordFixtures.*;
-import static im.toduck.fixtures.UserFixtures.*;
+import static im.toduck.fixtures.user.UserFixtures.*;
 import static im.toduck.global.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -33,6 +33,8 @@ import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListRespo
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
+
+;
 
 @Transactional
 class RoutineUseCaseTest extends ServiceTest {

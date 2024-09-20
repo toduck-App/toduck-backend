@@ -1,10 +1,10 @@
 package im.toduck.domain.social.domain.usecase;
 
-import static im.toduck.fixtures.UserFixtures.*;
 import static im.toduck.fixtures.social.CommentFixtures.*;
 import static im.toduck.fixtures.social.LikeFixtures.*;
 import static im.toduck.fixtures.social.SocialCategoryFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
+import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 

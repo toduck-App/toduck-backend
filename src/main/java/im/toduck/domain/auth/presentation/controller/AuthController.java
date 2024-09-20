@@ -20,13 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.auth.domain.usecase.AuthUseCase;
 import im.toduck.domain.auth.domain.usecase.GeneralSignUpUseCase;
+import im.toduck.domain.auth.domain.usecase.OAuth2UseCase;
 import im.toduck.domain.auth.presentation.api.AuthControllerApi;
 import im.toduck.domain.auth.presentation.dto.JwtPair;
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
-import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
+import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.auth.presentation.dto.response.LoginResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.util.CookieUtil;
+import im.toduck.infra.oauth.OidcProvider;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +41,9 @@ public class AuthController implements AuthControllerApi {
 
 	private final AuthUseCase authUseCase;
 	private final GeneralSignUpUseCase generalSignUpUseCase;
+	private final OAuth2UseCase oauth2UseCase;
 	private final CookieUtil cookieUtil;
 
-	@Override
 	@PostMapping("/login")
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<ApiResponse<LoginResponse>> signIn(@RequestBody @Valid LoginRequest request) {
@@ -82,9 +84,18 @@ public class AuthController implements AuthControllerApi {
 
 	@PostMapping("/register")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid RegisterRequest request) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> register(
+		@RequestBody @Valid SignUpRequest.General request) {
 		generalSignUpUseCase.signUp(request);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@PostMapping("/oauth/register")
+	@PreAuthorize("isAnonymous()")
+	public ResponseEntity<ApiResponse<LoginResponse>> oauthRegister(
+		@RequestParam OidcProvider provider,
+		@RequestBody @Valid SignUpRequest.Oidc request) {
+		return createAuthResponse(oauth2UseCase.signUp(provider, request));
 	}
 
 	private ResponseEntity<ApiResponse<LoginResponse>> createAuthResponse(Pair<Long, JwtPair> userInfo) {

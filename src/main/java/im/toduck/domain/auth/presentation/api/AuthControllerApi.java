@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.auth.presentation.dto.request.LoginRequest;
-import im.toduck.domain.auth.presentation.dto.request.RegisterRequest;
+import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.auth.presentation.dto.response.LoginResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.presentation.ApiResponse;
+import im.toduck.infra.oauth.OidcProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -113,5 +114,24 @@ public interface AuthControllerApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_VERIFIED_PHONE_NUMBER),
 		}
 	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid RegisterRequest request);
+	ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody @Valid SignUpRequest.General request);
+
+	@Operation(
+		summary = "OAuth 회원가입",
+		description = "OAuth OIDC 회원가입을 수행합니다. \n"
+			+ "이미 회원가입이 완료된 User라면 로그인 완료 됩니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(responseClass = LoginResponse.class, description = "인증이 완료된다면"
+			+ "AccessToken은 응답으로 제공되며, RefreshToken은 Cookie로 제공됩니다.\n"),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_MATCHED_PUBLIC_KEY),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_ID_TOKEN),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.ABNORMAL_ID_TOKEN),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_USER_FILED),
+		}
+	)
+	public ResponseEntity<ApiResponse<LoginResponse>> oauthRegister(
+		@RequestParam OidcProvider provider,
+		@RequestBody @Valid SignUpRequest.Oidc request);
 }

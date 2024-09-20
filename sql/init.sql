@@ -5,9 +5,10 @@ CREATE TABLE users
  -- TODO: 3. users 테이블  oauth 사용 시 필요한 사용자 식별값 → oauth 에서 전화번호 수집이 가능한지 다시 확인 필요
  id           BIGINT PRIMARY KEY auto_increment,
  nickname     VARCHAR(100)                               NOT NULL,
- phone_number VARCHAR(50)                                NOT NULL,
+ phone_number VARCHAR(50)                                NULL,
  login_id     VARCHAR(100)                               NULL,
  password     VARCHAR(255)                               NULL,
+ email        VARCHAR(100)                               NULL,
  role         ENUM ('ADMIN', 'USER')                     NOT NULL,
  provider     ENUM ('KAKAO', 'NAVER', 'GOOGLE', 'APPLE') NULL,
  created_at   DATETIME                                   NOT NULL,

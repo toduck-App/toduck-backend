@@ -1,6 +1,8 @@
 package im.toduck.domain.user.persistence.entity;
 
 import im.toduck.global.base.entity.BaseEntity;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +31,7 @@ public class User extends BaseEntity {
 	@Column(nullable = false, length = 100)
 	private String nickname;
 
-	@Column(nullable = false, length = 50)
+	@Column(nullable = true, length = 50)
 	private String phoneNumber;
 
 	@Column(nullable = true, length = 100)
@@ -41,15 +44,49 @@ public class User extends BaseEntity {
 	@Column(nullable = true, length = 100)
 	private OAuthProvider provider;
 
-	private User(String nickname, String loginId, String password, String phoneNumber) {
-		this.role = UserRole.USER;
+	@Column(nullable = true, length = 100)
+	private String email;
+
+	@Builder
+	private User(UserRole role, String nickname, String phoneNumber, String loginId, String password,
+		OAuthProvider provider, String email) {
+		this.role = role;
 		this.nickname = nickname;
+		this.phoneNumber = phoneNumber;
 		this.loginId = loginId;
 		this.password = password;
-		this.phoneNumber = phoneNumber;
+		this.provider = provider;
+		this.email = email;
+		validateOAuthOrGeneralFields();
 	}
 
-	public static User createGeneralUser(String nickname, String loginId, String password, String phoneNumber) {
-		return new User(nickname, loginId, password, phoneNumber);
+	private void validateOAuthOrGeneralFields() {
+		if (isOAuthUser()) {
+			validateOAuthUser();
+		} else if (isGeneralUser()) {
+			validateGeneralUser();
+		} else {
+			throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
+		}
+	}
+
+	private void validateOAuthUser() {
+		if (phoneNumber != null || loginId != null || password != null) {
+			throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
+		}
+	}
+
+	private void validateGeneralUser() {
+		if (provider != null || email != null) {
+			throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
+		}
+	}
+
+	private boolean isGeneralUser() {
+		return phoneNumber != null && loginId != null && password != null;
+	}
+
+	private boolean isOAuthUser() {
+		return provider != null && email != null;
 	}
 }

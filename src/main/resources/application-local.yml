@@ -17,7 +17,6 @@ spring:
         format_sql: true
     open-in-view: false
 
-
 jwt:
   secret-key:
     access-token: toduckAccessAccessAccessTokenSecretKeyForToduck
@@ -29,3 +28,18 @@ jwt:
 swagger:
   server-url: ${LOCAL_BASE_URL}
   description: "Local 테스트용 서버"
+
+oauth2:
+  client:
+    provider:
+      apple:
+        jwks-uri: https://appleid.apple.com/auth/keys
+        secret: appleSecret
+      google:
+        jwks-uri: https://www.googleapis.com
+        secret: googleSecret
+        issuer: https://accounts.google.com
+      kakao:
+        jwks-uri: https://kauth.kakao.com
+        secret: kakaoSecret
+

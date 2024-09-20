@@ -22,3 +22,17 @@ jwt:
   expiration-time:
     access-token: 1_800_000 # 30m (30 * 60 * 1000)
     refresh-token: 604_800_000 # 7d (7 * 24 * 60 * 60 * 1000)
+
+oauth2:
+  client:
+    provider:
+      apple:
+        jwks-uri: https://appleid.apple.com/auth/keys
+        secret: appleSecret
+      google:
+        jwks-uri: https://www.googleapis.com
+        secret: googleSecret
+        issuer: https://accounts.google.com
+      kakao:
+        jwks-uri: https://kauth.kakao.com
+        secret: kakaoSecret

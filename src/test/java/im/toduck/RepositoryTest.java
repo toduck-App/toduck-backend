@@ -1,10 +1,12 @@
 package im.toduck;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTypeExcludeFilter;
 import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -22,6 +24,7 @@ import im.toduck.global.config.querydsl.QueryDslConfig;
  * <ul>
  *   <li>JPA와 Redis 테스트 환경을 모두 구성합니다.</li>
  *   <li>"test" 프로필을 활성화합니다.</li>
+ *   <li> FeignClient Bean 생성을 위한 Config를 import 합니다.</li>
  *   <li>테스트 픽스처를 위한 필요한 설정과 빌더를 가져옵니다.</li>
  *   <li>테스트를 위한 트랜잭션 관리를 활성화합니다.</li>
  * </ul>
@@ -33,6 +36,7 @@ import im.toduck.global.config.querydsl.QueryDslConfig;
  */
 @DataJpaTest
 @TypeExcludeFilters(DataRedisTypeExcludeFilter.class)
+@ImportAutoConfiguration({FeignAutoConfiguration.class})
 @AutoConfigureDataRedis
 @ActiveProfiles("test")
 @Import(value = {TestFixtureBuilder.class, BuilderSupporter.class, QueryDslConfig.class})

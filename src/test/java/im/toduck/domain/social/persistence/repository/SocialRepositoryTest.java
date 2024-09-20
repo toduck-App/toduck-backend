@@ -15,7 +15,7 @@ import org.springframework.data.domain.Pageable;
 import im.toduck.RepositoryTest;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.fixtures.UserFixtures;
+import im.toduck.fixtures.user.UserFixtures;
 
 public class SocialRepositoryTest extends RepositoryTest {
 

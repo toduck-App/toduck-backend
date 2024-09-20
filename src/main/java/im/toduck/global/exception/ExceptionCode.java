@@ -43,9 +43,15 @@ public enum ExceptionCode {
 	NOT_SEND_PHONE_NUMBER(HttpStatus.NOT_FOUND, 40114, "인증 요청이 보내지 않은 전화번호입니다."),
 	INVALID_VERIFIED_CODE(HttpStatus.FORBIDDEN, 40115, "인증 코드가 일치하지 않습니다."),
 	NOT_VERIFIED_PHONE_NUMBER(HttpStatus.FORBIDDEN, 40116, "인증되지 않은 전화번호입니다."),
+	EXISTS_EMAIL(HttpStatus.CONFLICT, 40117, "이미 가입된 이메일입니다."),
+	INVALID_ID_TOKEN(HttpStatus.FORBIDDEN, 40118, "유효하지 않은 ID 토큰입니다.", "ID 토큰이 유효하지 않을 때 발생하는 오류입니다."),
+	ABNORMAL_ID_TOKEN(HttpStatus.FORBIDDEN, 40119, "비정상적인 ID 토큰입니다.", "ID 토큰 공개키로 암호화 도중에 발생하는 오류입니다."),
+	NOT_MATCHED_PUBLIC_KEY(HttpStatus.NOT_FOUND, 40120, "일치하는 공개키를 찾을 수 없습니다.", "KID 와 공개키가 일치하지 않을 때 발생하는 오류입니다."),
 
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),
+	INVALID_USER_FILED(HttpStatus.FORBIDDEN, 40202, "유효하지 않은 사용자 필드입니다.",
+		"Oauth 사용자 필드와 일반 사용자 필드가 중복되어 사용될 때 발생하는 오류입니다."),
 
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
