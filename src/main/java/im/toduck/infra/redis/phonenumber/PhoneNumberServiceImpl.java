@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import im.toduck.domain.auth.presentation.dto.VerifyCodeDto;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
-import im.toduck.global.util.VerifiyCodeUtil;
+import im.toduck.infra.sms.VerifiyCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
