@@ -62,31 +62,25 @@ public class User extends BaseEntity {
 
 	private void validateOAuthOrGeneralFields() {
 		if (isOAuthUser()) {
-			validateOAuthUser();
-		} else if (isGeneralUser()) {
-			validateGeneralUser();
-		} else {
-			throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
+			return;
 		}
-	}
-
-	private void validateOAuthUser() {
-		if (phoneNumber != null || loginId != null || password != null) {
-			throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
+		if (isGeneralUser()) {
+			return;
 		}
-	}
-
-	private void validateGeneralUser() {
-		if (provider != null || email != null) {
-			throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
-		}
-	}
-
-	private boolean isGeneralUser() {
-		return phoneNumber != null && loginId != null && password != null;
+		throw CommonException.from(ExceptionCode.INVALID_USER_FILED);
 	}
 
 	private boolean isOAuthUser() {
-		return provider != null && email != null;
+		if (provider != null && email != null) {
+			return phoneNumber == null && loginId == null && password == null;
+		}
+		return false;
+	}
+
+	private boolean isGeneralUser() {
+		if (phoneNumber != null && loginId != null && password != null) {
+			return provider == null && email == null;
+		}
+		return false;
 	}
 }
