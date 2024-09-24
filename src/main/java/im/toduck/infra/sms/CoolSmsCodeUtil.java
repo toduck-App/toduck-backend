@@ -1,4 +1,4 @@
-package im.toduck.global.util;
+package im.toduck.infra.sms;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class CoolSmsCodeUtil implements VerifiyCodeUtil {
+public class CoolSmsCodeUtil extends VerifiyCodeUtil {
 	@Value("${coolsms-api-key}")
 	private String apiKey;
 	@Value("${coolsms-api-secret}")

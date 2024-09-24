@@ -10,9 +10,9 @@ import im.toduck.builder.BuilderSupporter;
 import im.toduck.builder.TestFixtureBuilder;
 import im.toduck.global.security.jwt.access.AccessTokenProvider;
 import im.toduck.global.security.jwt.refresh.RefreshTokenProvider;
-import im.toduck.global.util.VerifiyCodeUtil;
 import im.toduck.infra.redis.forbidden.ForbiddenTokenService;
 import im.toduck.infra.redis.refresh.RefreshTokenService;
+import im.toduck.infra.sms.VerifiyCodeUtil;
 
 @SpringBootTest
 @ActiveProfiles("test")
