@@ -12,7 +12,8 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
-import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -42,7 +43,7 @@ public class RoutineUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public MyRoutineReadListResponse readMyRoutineList(final Long userId, final LocalDate date) {
+	public MyRoutineRecordReadListResponse readMyRoutineRecordList(final Long userId, final LocalDate date) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
@@ -86,5 +87,10 @@ public class RoutineUseCase {
 			"루틴 상태 변경 성공(기록 생성) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}, 완료상태: {}",
 			userId, routineId, date, isCompleted
 		);
+	}
+
+	@Transactional(readOnly = true)
+	public MyRoutineAvailableListResponse readMyAvailableRoutineList(final Long userId) {
+		return null;
 	}
 }

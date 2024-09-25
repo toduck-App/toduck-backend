@@ -9,7 +9,7 @@ import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
-import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
@@ -43,33 +43,33 @@ public class RoutineMapper {
 			.build();
 	}
 
-	public static MyRoutineReadListResponse toMyRoutineReadResponse(
+	public static MyRoutineRecordReadListResponse toMyRoutineReadResponse(
 		final LocalDate queryDate,
 		final List<Routine> routines,
 		final List<RoutineRecord> routineRecords
 	) {
-		List<MyRoutineReadListResponse.MyRoutineReadResponse> routineResponses = routines.stream()
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> routineResponses = routines.stream()
 			.map(routine -> toMyRoutineReadResponse(routine, INCOMPLETE_STATUS))
 			.toList();
 
-		List<MyRoutineReadListResponse.MyRoutineReadResponse> recordResponses = routineRecords.stream()
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> recordResponses = routineRecords.stream()
 			.map(record -> toMyRoutineReadResponse(record.getRoutine(), record.getIsCompleted()))
 			.toList();
 
-		List<MyRoutineReadListResponse.MyRoutineReadResponse> combinedResponses =
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> combinedResponses =
 			Stream.concat(routineResponses.stream(), recordResponses.stream()).toList();
 
-		return MyRoutineReadListResponse.builder()
+		return MyRoutineRecordReadListResponse.builder()
 			.queryDate(queryDate)
 			.routines(combinedResponses)
 			.build();
 	}
 
-	private static MyRoutineReadListResponse.MyRoutineReadResponse toMyRoutineReadResponse(
+	private static MyRoutineRecordReadListResponse.MyRoutineReadResponse toMyRoutineReadResponse(
 		final Routine routine,
 		final boolean isCompleted
 	) {
-		return MyRoutineReadListResponse.MyRoutineReadResponse.builder()
+		return MyRoutineRecordReadListResponse.MyRoutineReadResponse.builder()
 			.routineId(routine.getId())
 			.color(routine.getColorValue())
 			.time(routine.getTime())
