@@ -85,7 +85,7 @@ public interface RoutineApi {
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
 			responseClass = MyRoutineAvailableListResponse.class,
-			description = "루틴 목록 조회 성공"
+			description = "루틴 목록 조회 성공, 마지막으로 수정된 일시를 기준으로 내림차순 정렬됩니다."
 		)
 	)
 	ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyRoutineList(

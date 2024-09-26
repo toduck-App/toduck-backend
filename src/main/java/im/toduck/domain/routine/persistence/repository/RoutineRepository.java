@@ -14,5 +14,5 @@ import im.toduck.domain.user.persistence.entity.User;
 public interface RoutineRepository extends JpaRepository<Routine, Long>, RoutineRepositoryCustom {
 	Optional<Routine> findByIdAndUser(Long id, User user);
 
-	List<Routine> findAllByUser(User user);
+	List<Routine> findAllByUserOrderByUpdatedAtDesc(User user);
 }
