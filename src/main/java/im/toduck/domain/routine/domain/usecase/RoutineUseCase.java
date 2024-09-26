@@ -50,8 +50,8 @@ public class RoutineUseCase {
 		List<RoutineRecord> routineRecords = routineRecordService.getRecords(user, date);
 		List<Routine> routines = routineService.getUnrecordedRoutinesForDate(user, date, routineRecords);
 
-		log.info("본인 루틴 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
-		return RoutineMapper.toMyRoutineReadResponse(date, routines, routineRecords);
+		log.info("본인 루틴 기록 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
+		return RoutineMapper.toMyRoutineRecordReadListResponse(date, routines, routineRecords);
 	}
 
 	@Transactional
@@ -91,6 +91,12 @@ public class RoutineUseCase {
 
 	@Transactional(readOnly = true)
 	public MyRoutineAvailableListResponse readMyAvailableRoutineList(final Long userId) {
-		return null;
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		List<Routine> routines = routineService.getAvailableRoutine(user);
+
+		log.info("사용가능한 본인 루틴 목록 조회 - 사용자 Id: {}", userId);
+		return RoutineMapper.toMyRoutineAvailableListResponse(routines);
 	}
 }

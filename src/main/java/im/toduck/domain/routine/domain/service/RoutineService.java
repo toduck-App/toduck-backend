@@ -47,4 +47,8 @@ public class RoutineService {
 	public boolean canCreateRecordForDate(final Routine routine, final LocalDate date) {
 		return routineRepository.isActiveForDate(routine, date);
 	}
+
+	public List<Routine> getAvailableRoutine(final User user) {
+		return routineRepository.findAllByUser(user);
+	}
 }

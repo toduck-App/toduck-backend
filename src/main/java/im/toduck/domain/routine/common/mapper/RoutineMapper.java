@@ -9,6 +9,7 @@ import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
@@ -43,17 +44,17 @@ public class RoutineMapper {
 			.build();
 	}
 
-	public static MyRoutineRecordReadListResponse toMyRoutineReadResponse(
+	public static MyRoutineRecordReadListResponse toMyRoutineRecordReadListResponse(
 		final LocalDate queryDate,
 		final List<Routine> routines,
 		final List<RoutineRecord> routineRecords
 	) {
 		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> routineResponses = routines.stream()
-			.map(routine -> toMyRoutineReadResponse(routine, INCOMPLETE_STATUS))
+			.map(routine -> toMyRoutineRecordReadResponse(routine, INCOMPLETE_STATUS))
 			.toList();
 
 		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> recordResponses = routineRecords.stream()
-			.map(record -> toMyRoutineReadResponse(record.getRoutine(), record.getIsCompleted()))
+			.map(record -> toMyRoutineRecordReadResponse(record.getRoutine(), record.getIsCompleted()))
 			.toList();
 
 		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> combinedResponses =
@@ -65,7 +66,7 @@ public class RoutineMapper {
 			.build();
 	}
 
-	private static MyRoutineRecordReadListResponse.MyRoutineReadResponse toMyRoutineReadResponse(
+	private static MyRoutineRecordReadListResponse.MyRoutineReadResponse toMyRoutineRecordReadResponse(
 		final Routine routine,
 		final boolean isCompleted
 	) {
@@ -75,6 +76,27 @@ public class RoutineMapper {
 			.time(routine.getTime())
 			.title(routine.getTitle())
 			.isCompleted(isCompleted)
+			.build();
+	}
+
+	public static MyRoutineAvailableListResponse toMyRoutineAvailableListResponse(final List<Routine> routines) {
+		List<MyRoutineAvailableListResponse.MyRoutineAvailableResponse> routineResponses = routines.stream()
+			.map(RoutineMapper::toMyRoutineRecordReadResponse)
+			.toList();
+
+		return MyRoutineAvailableListResponse.builder()
+			.routines(routineResponses)
+			.build();
+	}
+
+	private static MyRoutineAvailableListResponse.MyRoutineAvailableResponse toMyRoutineRecordReadResponse(
+		final Routine routine
+	) {
+		return MyRoutineAvailableListResponse.MyRoutineAvailableResponse.builder()
+			.routineId(routine.getId())
+			.category(routine.getCategory())
+			.title(routine.getTitle())
+			.memo(routine.getMemoValue())
 			.build();
 	}
 }
