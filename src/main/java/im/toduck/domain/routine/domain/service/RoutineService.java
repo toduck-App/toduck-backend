@@ -49,6 +49,6 @@ public class RoutineService {
 	}
 
 	public List<Routine> getAvailableRoutine(final User user) {
-		return routineRepository.findAllByUserOrderByUpdatedAtDesc(user);
+		return routineRepository.findAllByUserAndIsPublicTrueOrderByUpdatedAtDesc(user);
 	}
 }

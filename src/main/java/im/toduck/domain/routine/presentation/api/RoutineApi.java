@@ -80,7 +80,7 @@ public interface RoutineApi {
 
 	@Operation(
 		summary = "사용가능한 본인 루틴 목록 조회",
-		description = "자신의 루틴 목록을 조회합니다. 소셜 게시글에서 루틴을 공유하는 경우에 루틴의 목록을 조회할 때 사용될 수 있습니다."
+		description = "자신의 루틴 목록을 조회합니다. 소셜 게시글에서 루틴을 공유하는 경우에 루틴의 목록을 조회할 때 사용될 수 있습니다. 이미 삭제되었거나 비공개로 설정된 루틴은 제외됩니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -88,7 +88,7 @@ public interface RoutineApi {
 			description = "루틴 목록 조회 성공, 마지막으로 수정된 일시를 기준으로 내림차순 정렬됩니다."
 		)
 	)
-	ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyRoutineList(
+	ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	);
 }

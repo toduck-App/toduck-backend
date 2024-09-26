@@ -76,7 +76,7 @@ public class RoutineController implements RoutineApi {
 	@Override
 	@GetMapping("/me/available")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyRoutineList(
+	public ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	) {
 		return ResponseEntity.ok(
