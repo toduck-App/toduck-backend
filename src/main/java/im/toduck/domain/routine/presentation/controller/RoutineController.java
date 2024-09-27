@@ -21,6 +21,7 @@ import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -69,6 +70,18 @@ public class RoutineController implements RoutineApi {
 
 		return ResponseEntity.ok(
 			ApiResponse.createSuccessWithNoContent()
+		);
+	}
+
+	@Override
+	@GetMapping("/{routineId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<RoutineDetailResponse>> getMyRoutineDetail(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@PathVariable final Long routineId
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.createSuccess(routineUseCase.readDetail(userDetails.getUserId(), routineId))
 		);
 	}
 }
