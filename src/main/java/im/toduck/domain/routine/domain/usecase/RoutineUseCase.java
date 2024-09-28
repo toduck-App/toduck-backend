@@ -12,7 +12,8 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
-import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.domain.user.domain.service.UserService;
@@ -43,15 +44,15 @@ public class RoutineUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public MyRoutineReadListResponse readMyRoutineList(final Long userId, final LocalDate date) {
+	public MyRoutineRecordReadListResponse readMyRoutineRecordList(final Long userId, final LocalDate date) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		List<RoutineRecord> routineRecords = routineRecordService.getRecords(user, date);
 		List<Routine> routines = routineService.getUnrecordedRoutinesForDate(user, date, routineRecords);
 
-		log.info("본인 루틴 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
-		return RoutineMapper.toMyRoutineReadResponse(date, routines, routineRecords);
+		log.info("본인 루틴 기록 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
+		return RoutineMapper.toMyRoutineRecordReadListResponse(date, routines, routineRecords);
 	}
 
 	@Transactional
@@ -99,5 +100,15 @@ public class RoutineUseCase {
 
 		log.info("본인 루틴 상세조회 - UserId: {}, RoutineId: {}", userId, routineId);
 		return RoutineMapper.toRoutineDetailResponse(routine);
+
+  @Transactional(readOnly = true)
+	public MyRoutineAvailableListResponse readMyAvailableRoutineList(final Long userId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		List<Routine> routines = routineService.getAvailableRoutine(user);
+
+		log.info("사용가능한 본인 루틴 목록 조회 - 사용자 Id: {}", userId);
+		return RoutineMapper.toMyRoutineAvailableListResponse(routines);
 	}
 }
