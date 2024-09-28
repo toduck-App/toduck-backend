@@ -94,4 +94,8 @@ public class Routine extends BaseEntity {
 	public String getColorValue() {
 		return color.getValue();
 	}
+
+	public String getMemoValue() {
+		return memo.getValue();
+	}
 }

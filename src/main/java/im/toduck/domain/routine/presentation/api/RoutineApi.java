@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
-import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -42,16 +43,16 @@ public interface RoutineApi {
 	);
 
 	@Operation(
-		summary = "특정 날짜 본인 루틴 목록 조회",
-		description = "특정 날짜에 대한 자신의 루틴 목록을 조회합니다. 루틴 목록은 시간순으로 정렬되어 있지 않을 수 있습니다."
+		summary = "특정 날짜 본인 루틴 기록 목록 조회",
+		description = "특정 날짜에 대한 자신의 루틴 기록 목록을 조회합니다. 루틴 목록은 시간순으로 정렬되어 있지 않을 수 있습니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = MyRoutineReadListResponse.class,
+			responseClass = MyRoutineRecordReadListResponse.class,
 			description = "루틴 목록 조회 성공, 루틴의 고유 Id, 루틴 Color, 완료 여부를 반환합니다."
 		)
 	)
-	ResponseEntity<ApiResponse<MyRoutineReadListResponse>> getMyRoutineList(
+	ResponseEntity<ApiResponse<MyRoutineRecordReadListResponse>> getMyRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
 		@Parameter(description = "조회할 루틴의 날짜 (형식: YYYY-MM-DD)", required = true, example = "2024-09-02")
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
@@ -75,5 +76,19 @@ public interface RoutineApi {
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
 		@Parameter(description = "변경할 루틴 고유 Id", required = true, example = "1") @PathVariable final Long routineId,
 		@RequestBody @Valid final RoutinePutCompletionRequest request
+	);
+
+	@Operation(
+		summary = "사용가능한 본인 루틴 목록 조회",
+		description = "자신의 루틴 목록을 조회합니다. 소셜 게시글에서 루틴을 공유하는 경우에 루틴의 목록을 조회할 때 사용될 수 있습니다. 이미 삭제되었거나 비공개로 설정된 루틴은 제외됩니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = MyRoutineAvailableListResponse.class,
+			description = "루틴 목록 조회 성공, 마지막으로 수정된 일시를 기준으로 내림차순 정렬됩니다."
+		)
+	)
+	ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(
+		@AuthenticationPrincipal final CustomUserDetails userDetails
 	);
 }
