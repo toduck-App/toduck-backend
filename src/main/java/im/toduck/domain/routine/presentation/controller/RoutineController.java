@@ -83,10 +83,10 @@ public class RoutineController implements RoutineApi {
 	) {
 		return ResponseEntity.ok(
 			ApiResponse.createSuccess(routineUseCase.readDetail(userDetails.getUserId(), routineId))
-    );
-  }
+		);
+	}
 
-  @Override
+	@Override
 	@GetMapping("/me/available")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(

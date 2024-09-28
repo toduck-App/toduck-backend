@@ -94,6 +94,8 @@ public class RoutineMapper {
 			.title(routine.getTitle())
 			.time(routine.getTime())
 			.daysOfWeek(daysOfWeek)
+			.build();
+	}
 
 	public static MyRoutineAvailableListResponse toMyRoutineAvailableListResponse(final List<Routine> routines) {
 		List<MyRoutineAvailableListResponse.MyRoutineAvailableResponse> routineResponses = routines.stream()

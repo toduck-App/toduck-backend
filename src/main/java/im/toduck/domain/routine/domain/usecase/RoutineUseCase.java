@@ -100,8 +100,9 @@ public class RoutineUseCase {
 
 		log.info("본인 루틴 상세조회 - UserId: {}, RoutineId: {}", userId, routineId);
 		return RoutineMapper.toRoutineDetailResponse(routine);
+	}
 
-  @Transactional(readOnly = true)
+	@Transactional(readOnly = true)
 	public MyRoutineAvailableListResponse readMyAvailableRoutineList(final Long userId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
