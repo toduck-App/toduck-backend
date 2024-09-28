@@ -15,6 +15,7 @@ import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionReq
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -87,6 +88,18 @@ public class RoutineUseCase {
 			"루틴 상태 변경 성공(기록 생성) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}, 완료상태: {}",
 			userId, routineId, date, isCompleted
 		);
+	}
+
+	@Transactional(readOnly = true)
+	public RoutineDetailResponse readDetail(final Long userId, final Long routineId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		Routine routine = routineService.getUserRoutine(user, routineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		log.info("본인 루틴 상세조회 - UserId: {}, RoutineId: {}", userId, routineId);
+		return RoutineMapper.toRoutineDetailResponse(routine);
 	}
 
 	@Transactional(readOnly = true)

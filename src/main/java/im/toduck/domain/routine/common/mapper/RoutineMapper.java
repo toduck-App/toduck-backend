@@ -1,5 +1,6 @@
 package im.toduck.domain.routine.common.mapper;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
@@ -12,6 +13,7 @@ import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
 import lombok.NoArgsConstructor;
@@ -76,6 +78,22 @@ public class RoutineMapper {
 			.time(routine.getTime())
 			.title(routine.getTitle())
 			.isCompleted(isCompleted)
+			.build();
+	}
+
+	public static RoutineDetailResponse toRoutineDetailResponse(final Routine routine) {
+		DaysOfWeekBitmask daysOfWeekBitmask = routine.getDaysOfWeekBitmask();
+		List<DayOfWeek> daysOfWeek = daysOfWeekBitmask.getDaysOfWeek().stream()
+			.sorted()
+			.toList();
+
+		return RoutineDetailResponse.builder()
+			.routineId(routine.getId())
+			.category(routine.getCategory())
+			.color(routine.getColorValue())
+			.title(routine.getTitle())
+			.time(routine.getTime())
+			.daysOfWeek(daysOfWeek)
 			.build();
 	}
 

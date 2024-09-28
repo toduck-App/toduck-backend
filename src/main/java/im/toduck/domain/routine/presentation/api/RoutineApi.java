@@ -14,6 +14,7 @@ import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionReq
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -76,6 +77,25 @@ public interface RoutineApi {
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
 		@Parameter(description = "변경할 루틴 고유 Id", required = true, example = "1") @PathVariable final Long routineId,
 		@RequestBody @Valid final RoutinePutCompletionRequest request
+	);
+
+	@Operation(
+		summary = "본인 루틴 상세 조회",
+		description = "본인 루틴의 상세 정보를 조회합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = RoutineDetailResponse.class,
+			description = "상세 루틴 조회 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE)
+		}
+	)
+	ResponseEntity<ApiResponse<RoutineDetailResponse>> getMyRoutineDetail(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "상세 조회할 루틴의 Id", required = true, example = "1")
+		@PathVariable Long routineId
 	);
 
 	@Operation(

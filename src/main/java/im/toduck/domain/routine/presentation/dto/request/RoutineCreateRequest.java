@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 
 import im.toduck.domain.person.PlanCategory;
-import im.toduck.global.util.DayOfWeekListDeserializer;
+import im.toduck.global.serializer.DayOfWeekListDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

@@ -1,4 +1,4 @@
-package im.toduck.global.util;
+package im.toduck.global.serializer;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
