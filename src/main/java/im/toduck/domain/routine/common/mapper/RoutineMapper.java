@@ -1,5 +1,6 @@
 package im.toduck.domain.routine.common.mapper;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
@@ -9,8 +10,10 @@ import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
-import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
 import lombok.NoArgsConstructor;
@@ -43,38 +46,75 @@ public class RoutineMapper {
 			.build();
 	}
 
-	public static MyRoutineReadListResponse toMyRoutineReadResponse(
+	public static MyRoutineRecordReadListResponse toMyRoutineRecordReadListResponse(
 		final LocalDate queryDate,
 		final List<Routine> routines,
 		final List<RoutineRecord> routineRecords
 	) {
-		List<MyRoutineReadListResponse.MyRoutineReadResponse> routineResponses = routines.stream()
-			.map(routine -> toMyRoutineReadResponse(routine, INCOMPLETE_STATUS))
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> routineResponses = routines.stream()
+			.map(routine -> toMyRoutineRecordReadResponse(routine, INCOMPLETE_STATUS))
 			.toList();
 
-		List<MyRoutineReadListResponse.MyRoutineReadResponse> recordResponses = routineRecords.stream()
-			.map(record -> toMyRoutineReadResponse(record.getRoutine(), record.getIsCompleted()))
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> recordResponses = routineRecords.stream()
+			.map(record -> toMyRoutineRecordReadResponse(record.getRoutine(), record.getIsCompleted()))
 			.toList();
 
-		List<MyRoutineReadListResponse.MyRoutineReadResponse> combinedResponses =
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> combinedResponses =
 			Stream.concat(routineResponses.stream(), recordResponses.stream()).toList();
 
-		return MyRoutineReadListResponse.builder()
+		return MyRoutineRecordReadListResponse.builder()
 			.queryDate(queryDate)
 			.routines(combinedResponses)
 			.build();
 	}
 
-	private static MyRoutineReadListResponse.MyRoutineReadResponse toMyRoutineReadResponse(
+	private static MyRoutineRecordReadListResponse.MyRoutineReadResponse toMyRoutineRecordReadResponse(
 		final Routine routine,
 		final boolean isCompleted
 	) {
-		return MyRoutineReadListResponse.MyRoutineReadResponse.builder()
+		return MyRoutineRecordReadListResponse.MyRoutineReadResponse.builder()
 			.routineId(routine.getId())
 			.color(routine.getColorValue())
 			.time(routine.getTime())
 			.title(routine.getTitle())
 			.isCompleted(isCompleted)
+			.build();
+	}
+
+	public static RoutineDetailResponse toRoutineDetailResponse(final Routine routine) {
+		DaysOfWeekBitmask daysOfWeekBitmask = routine.getDaysOfWeekBitmask();
+		List<DayOfWeek> daysOfWeek = daysOfWeekBitmask.getDaysOfWeek().stream()
+			.sorted()
+			.toList();
+
+		return RoutineDetailResponse.builder()
+			.routineId(routine.getId())
+			.category(routine.getCategory())
+			.color(routine.getColorValue())
+			.title(routine.getTitle())
+			.time(routine.getTime())
+			.daysOfWeek(daysOfWeek)
+			.build();
+	}
+
+	public static MyRoutineAvailableListResponse toMyRoutineAvailableListResponse(final List<Routine> routines) {
+		List<MyRoutineAvailableListResponse.MyRoutineAvailableResponse> routineResponses = routines.stream()
+			.map(RoutineMapper::toMyRoutineRecordReadResponse)
+			.toList();
+
+		return MyRoutineAvailableListResponse.builder()
+			.routines(routineResponses)
+			.build();
+	}
+
+	private static MyRoutineAvailableListResponse.MyRoutineAvailableResponse toMyRoutineRecordReadResponse(
+		final Routine routine
+	) {
+		return MyRoutineAvailableListResponse.MyRoutineAvailableResponse.builder()
+			.routineId(routine.getId())
+			.category(routine.getCategory())
+			.title(routine.getTitle())
+			.memo(routine.getMemoValue())
 			.build();
 	}
 }
