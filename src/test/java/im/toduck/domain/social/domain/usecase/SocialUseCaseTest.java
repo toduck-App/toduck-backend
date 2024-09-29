@@ -39,6 +39,7 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.CommentDto;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
@@ -643,20 +644,27 @@ public class SocialUseCaseTest extends ServiceTest {
 	@DisplayName("게시글 단건 조회시")
 	class GetSocialDetail {
 		Social SOCIAL_BOARD;
+		Comment COMMENT;
 		Like LIKE;
 		List<SocialImageFile> IMAGE_FILES;
 		List<String> imageUrls = List.of("image1.jpg", "image2.jpg");
 		User BLOCK_USER;
 		Social BLOCKED_USER_SOCIAL;
+		Comment BLOCKED_USER_COMMENT;
 
 		@BeforeEach
 		void setUp() {
 			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
 			LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));
 			IMAGE_FILES = testFixtureBuilder.buildSocialImageFiles(
 				SocialImageFileFixtures.MULTIPLE_IMAGE_FILES(SOCIAL_BOARD, imageUrls)
 			);
 
+			BLOCK_USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+			testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
+			BLOCKED_USER_SOCIAL = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(BLOCK_USER, false));
+			BLOCKED_USER_COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(BLOCK_USER, SOCIAL_BOARD));
 		}
 
 		@Test
@@ -677,6 +685,14 @@ public class SocialUseCaseTest extends ServiceTest {
 					.containsExactlyInAnyOrderElementsOf(
 						IMAGE_FILES.stream().map(SocialImageFile::getUrl).toList()
 					);
+
+				softly.assertThat(response.comments())
+					.extracting(CommentDto::commentId)
+					.doesNotContain(BLOCKED_USER_COMMENT.getId());
+
+				softly.assertThat(response.comments())
+					.extracting(CommentDto::commentId)
+					.contains(COMMENT.getId());
 			});
 		}
 
@@ -704,11 +720,6 @@ public class SocialUseCaseTest extends ServiceTest {
 
 		@Test
 		void 차단된_사용자의_게시글을_조회하려_할_경우_예외를_발생시킨다() {
-			// given
-			BLOCK_USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
-			testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
-			BLOCKED_USER_SOCIAL = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(BLOCK_USER, false));
-
 			// when & then
 			assertThatThrownBy(() -> socialUseCase.getSocialDetail(USER.getId(), BLOCKED_USER_SOCIAL.getId()))
 				.isInstanceOf(CommonException.class)

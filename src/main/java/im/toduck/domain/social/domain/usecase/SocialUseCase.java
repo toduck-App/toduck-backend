@@ -142,7 +142,7 @@ public class SocialUseCase {
 		}
 
 		List<SocialImageFile> imageFiles = socialService.getSocialImagesBySocial(socialBoard);
-		List<Comment> comments = socialService.getCommentsBySocial(socialBoard);
+		List<Comment> comments = socialService.getCommentsBySocial(socialBoard, user.getId());
 		boolean isLiked = socialService.getIsLiked(user, socialBoard);
 
 		log.info("소셜 게시글 단건 상세 조회 - UserId: {}, SocialBoardId: {}", userId, socialId);
@@ -180,7 +180,7 @@ public class SocialUseCase {
 			.limit(actualLimit)
 			.map(sb -> {
 				List<SocialImageFile> imageFiles = socialService.getSocialImagesBySocial(sb);
-				List<Comment> comments = socialService.getCommentsBySocial(sb);
+				List<Comment> comments = socialService.getCommentsBySocial(sb, user.getId());
 				boolean isLiked = socialService.getIsLiked(user, sb);
 				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isLiked);
 			})

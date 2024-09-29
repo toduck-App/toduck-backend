@@ -222,8 +222,8 @@ public class SocialService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Comment> getCommentsBySocial(Social socialBoard) {
-		return commentRepository.findAllBySocial(socialBoard);
+	public List<Comment> getCommentsBySocial(Social socialBoard, Long userId) {
+		return commentRepository.findAllBySocialExcludingBlocked(socialBoard, userId);
 	}
 
 	@Transactional(readOnly = true)
