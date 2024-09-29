@@ -9,7 +9,7 @@ public class BlockMapper {
 	public static Block toBlock(User blocker, User blockedUser) {
 		return Block.builder()
 			.blocker(blocker)
-			.blockedUser(blockedUser)
+			.blocked(blockedUser)
 			.build();
 	}
 }

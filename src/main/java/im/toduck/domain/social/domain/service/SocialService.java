@@ -239,15 +239,15 @@ public class SocialService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Social> getSocials(Long cursor, Integer limit) {
+	public List<Social> getSocials(Long cursor, Integer limit, Long currentUserId) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.findByIdBeforeOrderByIdDesc(cursor, pageRequest);
+		return socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(cursor, currentUserId, pageRequest);
 	}
 
 	@Transactional(readOnly = true)
-	public List<Social> findLatestSocials(int limit) {
+	public List<Social> findLatestSocials(int limit, Long currentUserId) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.findLatestSocials(pageRequest);
+		return socialRepository.findLatestSocialsExcludingBlocked(currentUserId, pageRequest);
 	}
 
 	private boolean isBoardOwner(Social socialBoard, User user) {

@@ -32,8 +32,8 @@ public class Block extends BaseEntity {
 	private User blocked;
 
 	@Builder
-	private Block(User blocker, User blockedUser) {
+	private Block(User blocker, User blocked) {
 		this.blocker = blocker;
-		this.blocked = blockedUser;
+		this.blocked = blocked;
 	}
 }

@@ -151,7 +151,7 @@ public class SocialUseCase {
 		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
 		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
 
-		List<Social> socialBoards = fetchSocialBoards(cursor, fetchLimit);
+		List<Social> socialBoards = fetchSocialBoards(cursor, fetchLimit, user.getId());
 		boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
 		Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
 
@@ -161,12 +161,12 @@ public class SocialUseCase {
 		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
 	}
 
-	private List<Social> fetchSocialBoards(Long cursor, int fetchLimit) {
+	private List<Social> fetchSocialBoards(Long cursor, int fetchLimit, Long currentUserId) {
 		if (cursor == null) {
-			return socialService.findLatestSocials(fetchLimit);
+			return socialService.findLatestSocials(fetchLimit, currentUserId);
 		}
 
-		return socialService.getSocials(cursor, fetchLimit);
+		return socialService.getSocials(cursor, fetchLimit, currentUserId);
 	}
 
 	private List<SocialResponse> createSocialResponses(List<Social> socialBoards, User user, int actualLimit) {
