@@ -1,4 +1,4 @@
-package im.toduck.domain.social.mapper;
+package im.toduck.domain.social.common.mapper;
 
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.presentation.dto.response.SocialCategoryDto;

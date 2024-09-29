@@ -1,4 +1,4 @@
-package im.toduck.domain.social.mapper;
+package im.toduck.domain.social.common.mapper;
 
 import java.util.List;
 
