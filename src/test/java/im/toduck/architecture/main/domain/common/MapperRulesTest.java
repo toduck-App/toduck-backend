@@ -1,7 +1,7 @@
-package im.toduck.architecture.domain.common;
+package im.toduck.architecture.main.domain.common;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
-import static im.toduck.architecture.domain.ArchitectureConstants.Layer.*;
+import static im.toduck.architecture.main.domain.ArchitectureConstants.Layer.*;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;

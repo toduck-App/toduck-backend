@@ -1,4 +1,4 @@
-package im.toduck.architecture.domain;
+package im.toduck.architecture.main.domain;
 
 public final class ArchitectureConstants {
 

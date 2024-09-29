@@ -1,7 +1,7 @@
-package im.toduck.architecture.domain.presentation;
+package im.toduck.architecture.main.domain.presentation;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
-import static im.toduck.architecture.domain.ArchitectureConstants.Layer.*;
+import static im.toduck.architecture.main.domain.ArchitectureConstants.Layer.*;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

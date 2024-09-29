@@ -1,8 +1,8 @@
-package im.toduck.architecture.domain;
+package im.toduck.architecture.main.domain;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.Architectures.*;
-import static im.toduck.architecture.domain.ArchitectureConstants.Layer.*;
+import static im.toduck.architecture.main.domain.ArchitectureConstants.Layer.*;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.importer.ImportOption;
