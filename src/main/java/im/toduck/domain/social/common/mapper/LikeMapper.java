@@ -1,11 +1,14 @@
-package im.toduck.domain.social.mapper;
+package im.toduck.domain.social.common.mapper;
 
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeDto;
 import im.toduck.domain.user.persistence.entity.User;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LikeMapper {
 	public static Like toLike(User user, Social socialBoard) {
 		return Like.builder()

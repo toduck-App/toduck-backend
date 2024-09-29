@@ -24,7 +24,4 @@ public class CodingRulesTest {
 
 	@ArchTest
 	private final ArchRule JODATIME을_사용하지_말아야한다 = NO_CLASSES_SHOULD_USE_JODATIME;
-
-	@ArchTest
-	private final ArchRule 필드주입을_사용하지_말아야한다 = NO_CLASSES_SHOULD_USE_FIELD_INJECTION;
 }

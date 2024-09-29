@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
-import im.toduck.domain.person.PlanCategory;
+import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.global.serializer.DayOfWeekListSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

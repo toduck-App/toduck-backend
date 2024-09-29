@@ -2,7 +2,7 @@ package im.toduck.domain.routine.presentation.dto.response;
 
 import java.util.List;
 
-import im.toduck.domain.person.PlanCategory;
+import im.toduck.domain.person.persistence.entity.PlanCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 

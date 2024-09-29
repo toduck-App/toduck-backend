@@ -24,7 +24,7 @@ public class CoolSmsCodeUtil extends VerifiyCodeUtil {
 	@Value("${coolsms-api-caller-number}")
 	private String callerNumber;
 
-	private static final String SMS_MESSAGE_FORAMT = "[toduck] 아래의 인증번호를 입력해주세요\n";
+	private static final String SMS_MESSAGE_FORMAT = "[toduck] 아래의 인증번호를 입력해주세요\n";
 	private static final String SMS_DOMAIN = "https://api.coolsms.co.kr";
 
 	private DefaultMessageService messageService;
@@ -41,7 +41,7 @@ public class CoolSmsCodeUtil extends VerifiyCodeUtil {
 		Message message = new Message();
 		message.setFrom(callerNumber);
 		message.setTo(verifyCodeDto.getPhoneNumber());
-		message.setText(SMS_MESSAGE_FORAMT + verifyCodeDto.getCode());
+		message.setText(SMS_MESSAGE_FORMAT + verifyCodeDto.getCode());
 
 		SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
 		log.info("send message response: {}", response);

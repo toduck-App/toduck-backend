@@ -1,4 +1,4 @@
-package im.toduck.domain.social.mapper;
+package im.toduck.domain.social.common.mapper;
 
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
@@ -8,7 +8,10 @@ import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
 import im.toduck.domain.social.presentation.dto.response.OwnerDto;
 import im.toduck.domain.user.persistence.entity.User;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentMapper {
 	public static Comment toComment(User user, Social socialBoard, CommentCreateRequest request) {
 		return Comment.builder()

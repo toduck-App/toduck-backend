@@ -15,6 +15,6 @@ public class UseCaseRulesTest {
 	@ArchTest
 	static final ArchRule UseCase_클래스는_UseCase_어노테이션을_가진다 =
 		classes()
-			.that().resideInAPackage(ENTITY.getFullPackageName())
+			.that().resideInAPackage(USECASE.getFullPackageName())
 			.should().beAnnotatedWith(UseCase.class);
 }
