@@ -135,6 +135,12 @@ public class SocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+		boolean isBlockedUser = userService.isBlockedUser(user.getId(), socialBoard.getUser().getId());
+		if (isBlockedUser) {
+			throw CommonException.from(ExceptionCode.BLOCKED_USER_SOCIAL_ACCESS);
+		}
+
 		List<SocialImageFile> imageFiles = socialService.getSocialImagesBySocial(socialBoard);
 		List<Comment> comments = socialService.getCommentsBySocial(socialBoard);
 		boolean isLiked = socialService.getIsLiked(user, socialBoard);

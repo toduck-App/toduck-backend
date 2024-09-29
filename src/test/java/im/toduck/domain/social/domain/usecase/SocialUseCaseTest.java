@@ -4,6 +4,7 @@ import static im.toduck.fixtures.social.CommentFixtures.*;
 import static im.toduck.fixtures.social.LikeFixtures.*;
 import static im.toduck.fixtures.social.SocialCategoryFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
+import static im.toduck.fixtures.user.BlockFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -45,6 +46,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.social.SocialImageFileFixtures;
+import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
@@ -644,6 +646,8 @@ public class SocialUseCaseTest extends ServiceTest {
 		Like LIKE;
 		List<SocialImageFile> IMAGE_FILES;
 		List<String> imageUrls = List.of("image1.jpg", "image2.jpg");
+		User BLOCK_USER;
+		Social BLOCKED_USER_SOCIAL;
 
 		@BeforeEach
 		void setUp() {
@@ -696,6 +700,19 @@ public class SocialUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> socialUseCase.getSocialDetail(nonExistentUserId, SOCIAL_BOARD.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+
+		@Test
+		void 차단된_사용자의_게시글을_조회하려_할_경우_예외를_발생시킨다() {
+			// given
+			BLOCK_USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+			testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
+			BLOCKED_USER_SOCIAL = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(BLOCK_USER, false));
+
+			// when & then
+			assertThatThrownBy(() -> socialUseCase.getSocialDetail(USER.getId(), BLOCKED_USER_SOCIAL.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.BLOCKED_USER_SOCIAL_ACCESS.getMessage());
 		}
 	}
 

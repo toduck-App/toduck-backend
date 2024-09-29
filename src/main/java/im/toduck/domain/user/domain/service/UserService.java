@@ -78,4 +78,8 @@ public class UserService {
 
 		blockRepository.delete(block);
 	}
+
+	public boolean isBlockedUser(Long blockerId, Long blockedId) {
+		return blockRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId);
+	}
 }

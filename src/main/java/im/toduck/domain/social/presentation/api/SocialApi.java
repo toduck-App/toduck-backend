@@ -190,7 +190,8 @@ public interface SocialApi {
 			description = "게시글 조회 성공, 게시글의 세부 정보를 반환합니다."
 		),
 		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD)
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.BLOCKED_USER_SOCIAL_ACCESS),
 		}
 	)
 	ResponseEntity<ApiResponse<SocialDetailResponse>> getSocialDetail(
