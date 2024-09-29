@@ -183,3 +183,15 @@ VALUES ('CONCENTRATION', NOW(), NOW()),
  ('IMPULSE', NOW(), NOW()),
  ('ANXIETY', NOW(), NOW()),
  ('SLEEP', NOW(), NOW());
+
+CREATE TABLE block
+(
+ id	            BIGINT	PRIMARY KEY AUTO_INCREMENT,
+ blocker_id	    BIGINT	    NOT NULL,
+ blocked_id	    BIGINT	    NOT NULL,
+ created_at	    DATETIME	NOT NULL,
+ updated_at	    DATETIME	NOT NULL,
+ deleted_at	    DATETIME	NULL,
+ FOREIGN KEY (blocker_id) REFERENCES users (id),
+ FOREIGN KEY (blocked_id) REFERENCES users (id)
+);
