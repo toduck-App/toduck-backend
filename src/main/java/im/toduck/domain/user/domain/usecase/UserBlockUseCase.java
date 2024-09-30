@@ -24,6 +24,7 @@ public class UserBlockUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		if (blockerId.equals(blockedUserId)) {
+			log.warn("차단 실패 - 사용자가 자신을 차단하려고 시도했습니다. UserId: {}", blockerId);
 			throw CommonException.from(ExceptionCode.CANNOT_BLOCK_SELF);
 		}
 

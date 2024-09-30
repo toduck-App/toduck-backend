@@ -14,7 +14,9 @@ import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -63,6 +65,7 @@ public class UserService {
 	@Transactional
 	public void blockUser(User blocker, User blockedUser) {
 		if (blockRepository.existsByBlockerAndBlocked(blocker, blockedUser)) {
+			log.warn("차단 실패 - 이미 차단된 사용자입니다. BlockerId: {}, BlockedUserId: {}", blocker.getId(), blockedUser.getId());
 			throw CommonException.from(ExceptionCode.ALREADY_BLOCKED);
 		}
 
@@ -74,7 +77,11 @@ public class UserService {
 	@Transactional
 	public void unblockUser(User blocker, User blockedUser) {
 		Block block = blockRepository.findByBlockerAndBlocked(blocker, blockedUser)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_BLOCK));
+			.orElseThrow(() -> {
+				log.warn("차단 해제 실패 - 차단 내역을 찾을 수 없습니다. BlockerId: {}, BlockedUserId: {}", blocker.getId(),
+					blockedUser.getId());
+				return CommonException.from(ExceptionCode.NOT_FOUND_BLOCK);
+			});
 
 		blockRepository.delete(block);
 	}
