@@ -136,8 +136,10 @@ public class SocialUseCase {
 		Social socialBoard = socialService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
-		boolean isBlockedUser = userService.isBlockedUser(user.getId(), socialBoard.getUser().getId());
+		boolean isBlockedUser = userService.isBlockedUser(user, socialBoard.getUser());
 		if (isBlockedUser) {
+			log.warn("차단된 사용자에 대한 게시글 접근 시도 - UserId: {}, BlockedUserId: {}, SocialBoardId: {}", userId,
+				socialBoard.getUser().getId(), socialId);
 			throw CommonException.from(ExceptionCode.BLOCKED_USER_SOCIAL_ACCESS);
 		}
 

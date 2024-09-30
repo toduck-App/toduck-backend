@@ -64,7 +64,7 @@ public class UserService {
 
 	@Transactional
 	public void blockUser(User blocker, User blockedUser) {
-		if (blockRepository.existsByBlockerAndBlocked(blocker, blockedUser)) {
+		if (isBlockedUser(blocker, blockedUser)) {
 			log.warn("차단 실패 - 이미 차단된 사용자입니다. BlockerId: {}, BlockedUserId: {}", blocker.getId(), blockedUser.getId());
 			throw CommonException.from(ExceptionCode.ALREADY_BLOCKED);
 		}
@@ -86,7 +86,7 @@ public class UserService {
 		blockRepository.delete(block);
 	}
 
-	public boolean isBlockedUser(Long blockerId, Long blockedId) {
-		return blockRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId);
+	public boolean isBlockedUser(User blocker, User blockedUser) {
+		return blockRepository.existsByBlockerAndBlocked(blocker, blockedUser);
 	}
 }
