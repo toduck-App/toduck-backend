@@ -1,7 +1,6 @@
 package im.toduck.domain.auth.domain.usecase;
 
 import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.auth.common.helper.OAuthOidcHelper;
@@ -13,12 +12,13 @@ import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.annotation.UseCase;
 import im.toduck.infra.oauth.OidcProvider;
 import im.toduck.infra.oauth.oidc.dto.OidcPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+@UseCase
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2UseCase {

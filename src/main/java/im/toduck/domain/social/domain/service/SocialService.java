@@ -7,11 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import im.toduck.domain.social.mapper.CommentMapper;
-import im.toduck.domain.social.mapper.LikeMapper;
-import im.toduck.domain.social.mapper.SocialCategoryLinkMapper;
-import im.toduck.domain.social.mapper.SocialImageFileMapper;
-import im.toduck.domain.social.mapper.SocialMapper;
+import im.toduck.domain.social.common.mapper.CommentMapper;
+import im.toduck.domain.social.common.mapper.LikeMapper;
+import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
+import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
+import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
