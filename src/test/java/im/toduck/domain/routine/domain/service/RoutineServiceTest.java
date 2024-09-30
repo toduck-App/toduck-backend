@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
-import im.toduck.domain.person.PlanCategory;
+import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
