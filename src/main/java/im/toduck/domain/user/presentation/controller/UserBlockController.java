@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import im.toduck.domain.user.domain.usecase.UserBlockUseCase;
 import im.toduck.domain.user.presentation.api.UserBlockApi;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -20,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/v1/users")
 public class UserBlockController implements UserBlockApi {
-	// private final UserBlockService userBlockService;
+	private UserBlockUseCase userBlockUseCase;
 
 	@Override
 	@PostMapping("/{blockedUserId}/block")
@@ -29,7 +30,7 @@ public class UserBlockController implements UserBlockApi {
 		@PathVariable Long blockedUserId,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		// userBlockService.blockUser(user.getUserId(), blockedUserId);
+		userBlockUseCase.blockUser(user.getUserId(), blockedUserId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
@@ -41,7 +42,7 @@ public class UserBlockController implements UserBlockApi {
 		@PathVariable Long blockedUserId,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		// userBlockService.unblockUser(user.getUserId(), blockedUserId);
+		userBlockUseCase.unblockUser(user.getUserId(), blockedUserId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
