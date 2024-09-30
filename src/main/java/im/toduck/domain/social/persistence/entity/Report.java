@@ -1,11 +1,7 @@
 package im.toduck.domain.social.persistence.entity;
 
-import java.time.LocalDateTime;
-
-import im.toduck.domain.social.persistence.vo.CommentContent;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,16 +16,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "comment")
+@Table(name = "report")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseEntity {
+public class Report extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@Embedded
-	private CommentContent content;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
@@ -39,22 +32,12 @@ public class Comment extends BaseEntity {
 	@JoinColumn(name = "social_id", nullable = false)
 	private Social social;
 
+	private String reason;
+
 	@Builder
-	private Comment(User user, Social social, CommentContent content) {
+	public Report(User user, Social social, String reason) {
 		this.user = user;
 		this.social = social;
-		this.content = content;
-	}
-
-	public boolean isOwner(User requestingUser) {
-		return this.user.getId().equals(requestingUser.getId());
-	}
-
-	public boolean isInSocialBoard(Social socialBoard) {
-		return this.social.getId().equals(socialBoard.getId());
-	}
-
-	public void softDelete() {
-		this.deletedAt = LocalDateTime.now();
+		this.reason = reason;
 	}
 }

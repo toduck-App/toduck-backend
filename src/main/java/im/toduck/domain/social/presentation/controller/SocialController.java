@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import im.toduck.domain.social.domain.usecase.SocialUseCase;
 import im.toduck.domain.social.presentation.api.SocialApi;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
@@ -147,5 +148,18 @@ public class SocialController implements SocialApi {
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialUseCase.getSocials(user.getUserId(), cursor, limit)));
+	}
+
+	@Override
+	@PostMapping("/{socialId}/report")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> reportSocialBoard(
+		@RequestBody ReportCreateRequest request,
+		@PathVariable Long socialId,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		socialUseCase.reportSocial(user.getUserId(), socialId, request);
+
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
 }

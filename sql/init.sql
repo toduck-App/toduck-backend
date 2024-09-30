@@ -195,3 +195,16 @@ CREATE TABLE block
  FOREIGN KEY (blocker_id) REFERENCES users (id),
  FOREIGN KEY (blocked_id) REFERENCES users (id)
 );
+
+CREATE TABLE report
+(
+ id BIGINT PRIMARY KEY auto_increment,
+ user_id BIGINT      NOT NULL,
+ social_id BIGINT    NOT NULL,
+ reason VARCHAR(255) NULL,
+ created_at DATETIME NOT NULL,
+ updated_at DATETIME NOT NULL,
+ deleted_at DATETIME NULL,
+ FOREIGN KEY (user_id) REFERENCES users (id),
+ FOREIGN KEY (social_id) REFERENCES social (id)
+);

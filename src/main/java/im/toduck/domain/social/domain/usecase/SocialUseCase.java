@@ -10,10 +10,12 @@ import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialService;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
+import im.toduck.domain.social.persistence.entity.Report;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
@@ -187,6 +189,27 @@ public class SocialUseCase {
 				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isLiked);
 			})
 			.toList();
+	}
+
+	@Transactional
+	public void reportSocial(Long userId, Long socialId, ReportCreateRequest request) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+		boolean alreadyReported = socialService.existsByUserAndSocial(user, socialBoard);
+		if (alreadyReported) {
+			log.warn("이미 신고된 게시글 - UserId: {}, SocialBoardId: {}", userId, socialId);
+			throw CommonException.from(ExceptionCode.ALREADY_REPORTED);
+		}
+
+		if (request.isBlockAuthor()) {
+			userService.blockUser(user, socialBoard.getUser());
+		}
+
+		Report report = socialService.createReport(user, socialBoard, request.reason());
+		log.info("게시글 신고 - UserId: {}, SocialBoardId: {}, ReportId: {}", userId, socialId, report.getId());
 	}
 }
 
