@@ -5,6 +5,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import im.toduck.global.annotation.log.GeneralLogExplanation;
@@ -16,10 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 @Component
 @Slf4j
-public class InfoLogAspect {
-	@Before("im.toduck.global.aop.log.pointcut.LogPointCut.domainLoggingPointcut() "
-		+ "|| im.toduck.global.aop.log.pointcut.LogPointCut.globalLoggingPointcut()")
-	public void logBefore(JoinPoint joinPoint) throws Throwable {
+@Profile("local")
+public class LocalLogAspect {
+
+	@Before("im.toduck.global.aop.log.pointcut.LogPointCut.debugLogPointcut()")
+	public void controllerLogBefore(JoinPoint joinPoint) throws Throwable {
 		MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
 		LogProperty logProperty = InfoLogProperty.of(
 			getLogDescription(methodSignature),
@@ -29,17 +31,18 @@ public class InfoLogAspect {
 		log.info("호출 {}", logProperty);
 	}
 
-	@AfterReturning(pointcut = "im.toduck.global.aop.log.pointcut.LogPointCut.domainLoggingPointcut() "
-		+ "|| im.toduck.global.aop.log.pointcut.LogPointCut.globalLoggingPointcut()",
+	@AfterReturning(pointcut = "im.toduck.global.aop.log.pointcut.LogPointCut.debugLogPointcut()",
 		returning = "result")
 	public void logAfterReturning(JoinPoint joinPoint, Object result) {
+		MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
 		LogProperty logProperty = InfoLogProperty.of(
-			getLogDescription((MethodSignature)joinPoint.getSignature()),
+			getLogDescription(methodSignature),
 			joinPoint,
-			((MethodSignature)joinPoint.getSignature()).getName(),
+			methodSignature.getName(),
 			result
 		);
-		log.info("성공 {}", logProperty);
+
+		log.info("성공 {} ", logProperty);
 	}
 
 	private String getLogDescription(MethodSignature methodSignature) {
@@ -52,4 +55,5 @@ public class InfoLogAspect {
 		}
 		return description;
 	}
+
 }
