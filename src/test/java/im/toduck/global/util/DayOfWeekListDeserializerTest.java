@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
+import im.toduck.global.serializer.DayOfWeekListDeserializer;
+
 class DayOfWeekListDeserializerTest {
 
 	private ObjectMapper objectMapper;

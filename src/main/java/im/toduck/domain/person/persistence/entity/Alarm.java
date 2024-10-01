@@ -1,4 +1,4 @@
-package im.toduck.domain.person;
+package im.toduck.domain.person.persistence.entity;
 
 @Deprecated
 /*

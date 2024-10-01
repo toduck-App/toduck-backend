@@ -2,7 +2,7 @@ package im.toduck.domain.routine.persistence.entity;
 
 import java.time.LocalTime;
 
-import im.toduck.domain.person.PlanCategory;
+import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.common.converter.DaysOfWeekBitmaskConverter;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.routine.persistence.vo.RoutineMemo;
@@ -93,5 +93,9 @@ public class Routine extends BaseEntity {
 
 	public String getColorValue() {
 		return color.getValue();
+	}
+
+	public String getMemoValue() {
+		return memo.getValue();
 	}
 }

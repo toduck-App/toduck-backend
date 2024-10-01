@@ -1,13 +1,13 @@
 package im.toduck.domain.auth.domain.usecase;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.auth.domain.service.NickNameGenerateService;
 import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
 import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.domain.service.UserService;
+import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.infra.redis.phonenumber.PhoneNumber;
@@ -15,7 +15,7 @@ import im.toduck.infra.redis.phonenumber.PhoneNumberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+@UseCase
 @RequiredArgsConstructor
 @Slf4j
 public class GeneralSignUpUseCase {

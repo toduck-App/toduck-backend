@@ -1,4 +1,4 @@
-package im.toduck.domain.person;
+package im.toduck.domain.person.persistence.entity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

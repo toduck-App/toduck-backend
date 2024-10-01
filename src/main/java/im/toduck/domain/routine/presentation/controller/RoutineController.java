@@ -19,8 +19,10 @@ import im.toduck.domain.routine.domain.usecase.RoutineUseCase;
 import im.toduck.domain.routine.presentation.api.RoutineApi;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
-import im.toduck.domain.routine.presentation.dto.response.MyRoutineReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -48,12 +50,12 @@ public class RoutineController implements RoutineApi {
 	@Override
 	@GetMapping("/me")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<MyRoutineReadListResponse>> getMyRoutineList(
+	public ResponseEntity<ApiResponse<MyRoutineRecordReadListResponse>> getMyRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
 	) {
 		return ResponseEntity.ok(
-			ApiResponse.createSuccess(routineUseCase.readMyRoutineList(userDetails.getUserId(), date))
+			ApiResponse.createSuccess(routineUseCase.readMyRoutineRecordList(userDetails.getUserId(), date))
 		);
 	}
 
@@ -69,6 +71,29 @@ public class RoutineController implements RoutineApi {
 
 		return ResponseEntity.ok(
 			ApiResponse.createSuccessWithNoContent()
+		);
+	}
+
+	@Override
+	@GetMapping("/{routineId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<RoutineDetailResponse>> getMyRoutineDetail(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@PathVariable final Long routineId
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.createSuccess(routineUseCase.readDetail(userDetails.getUserId(), routineId))
+		);
+	}
+
+	@Override
+	@GetMapping("/me/available")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(
+		@AuthenticationPrincipal final CustomUserDetails userDetails
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.createSuccess(routineUseCase.readMyAvailableRoutineList(userDetails.getUserId()))
 		);
 	}
 }

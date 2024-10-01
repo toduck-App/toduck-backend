@@ -12,9 +12,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
-@Schema(description = "본인 루틴 목록 응답 DTO")
+@Schema(description = "날짜별 본인 루틴기록 목록 응답 DTO")
 @Builder
-public record MyRoutineReadListResponse(
+public record MyRoutineRecordReadListResponse(
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@Schema(description = "조회 날짜", example = "2024-08-31")
