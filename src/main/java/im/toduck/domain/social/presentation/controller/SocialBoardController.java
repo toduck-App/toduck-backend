@@ -14,14 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import im.toduck.domain.social.domain.usecase.SocialUseCase;
-import im.toduck.domain.social.presentation.api.SocialApi;
-import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
-import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
+import im.toduck.domain.social.domain.usecase.SocialBoardUseCase;
+import im.toduck.domain.social.presentation.api.SocialBoardApi;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
-import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -35,8 +31,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/socials")
-public class SocialController implements SocialApi {
-	private final SocialUseCase socialUseCase;
+public class SocialBoardController implements SocialBoardApi {
+	private final SocialBoardUseCase socialBoardUseCase;
 
 	@Override
 	@PostMapping
@@ -47,7 +43,7 @@ public class SocialController implements SocialApi {
 	) {
 
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialUseCase.createSocialBoard(user.getUserId(), request)));
+			.body(ApiResponse.createSuccess(socialBoardUseCase.createSocialBoard(user.getUserId(), request)));
 	}
 
 	@Override
@@ -57,7 +53,7 @@ public class SocialController implements SocialApi {
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		socialUseCase.deleteSocialBoard(user.getUserId(), socialId);
+		socialBoardUseCase.deleteSocialBoard(user.getUserId(), socialId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
@@ -70,57 +66,7 @@ public class SocialController implements SocialApi {
 		@RequestBody @Valid SocialUpdateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		socialUseCase.updateSocialBoard(user.getUserId(), socialId, request);
-
-		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
-	}
-
-	@Override
-	@PostMapping("/{socialId}/comments")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(
-		@PathVariable Long socialId,
-		@RequestBody @Valid CommentCreateRequest request,
-		CustomUserDetails user
-	) {
-
-		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialUseCase.createComment(user.getUserId(), socialId, request)));
-	}
-
-	@Override
-	@DeleteMapping("/{socialId}/comments/{commentId}")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteComment(
-		@PathVariable Long socialId,
-		@PathVariable Long commentId,
-		CustomUserDetails user
-	) {
-		socialUseCase.deleteComment(user.getUserId(), socialId, commentId);
-
-		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
-	}
-
-	@Override
-	@PostMapping("/{socialId}/likes")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
-		@PathVariable Long socialId,
-		CustomUserDetails user
-	) {
-
-		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialUseCase.createLike(user.getUserId(), socialId)));
-	}
-
-	@Override
-	@DeleteMapping("/{socialId}/likes")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
-		@PathVariable Long socialId,
-		CustomUserDetails user
-	) {
-		socialUseCase.deleteLike(user.getUserId(), socialId);
+		socialBoardUseCase.updateSocialBoard(user.getUserId(), socialId, request);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
@@ -134,7 +80,7 @@ public class SocialController implements SocialApi {
 	) {
 
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialUseCase.getSocialDetail(user.getUserId(), socialId)));
+			.body(ApiResponse.createSuccess(socialBoardUseCase.getSocialDetail(user.getUserId(), socialId)));
 	}
 
 	@Override
@@ -147,7 +93,7 @@ public class SocialController implements SocialApi {
 	) {
 
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialUseCase.getSocials(user.getUserId(), cursor, limit)));
+			.body(ApiResponse.createSuccess(socialBoardUseCase.getSocials(user.getUserId(), cursor, limit)));
 	}
 
 	@Override

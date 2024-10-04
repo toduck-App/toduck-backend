@@ -27,6 +27,7 @@ public class SocialRepositoryTest extends RepositoryTest {
 	private User BLOCK_USER;
 
 	private List<Social> SOCIAL_LIST;
+	private Social SOFT_DELETE_SOCIAL;
 
 	@BeforeEach
 	public void setUp() {
@@ -37,6 +38,9 @@ public class SocialRepositoryTest extends RepositoryTest {
 		SOCIAL_LIST = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, 5));
 
 		testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
+
+		SOFT_DELETE_SOCIAL = SOCIAL_LIST.get(0);
+		socialRepository.delete(SOFT_DELETE_SOCIAL);
 	}
 
 	@Test
@@ -47,10 +51,10 @@ public class SocialRepositoryTest extends RepositoryTest {
 	}
 
 	@Test
-	void 차단된_사용자의_게시물을_제외하고_요청받은_커서_이후의_게시물을_최신순으로_조회할_수_있다() {
+	void 차단된_사용자의_게시물과_Soft_Delete_된_게시글을_제외하고_요청받은_커서_이후의_게시물을_최신순으로_조회할_수_있다() {
 		// given
 		Pageable pageable = PageRequest.of(0, 6);
-		Long cursor = SOCIAL_LIST.get(2).getId();
+		Long cursor = SOCIAL_LIST.get(3).getId();
 
 		// when
 		List<Social> result = socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(cursor, USER.getId(),
@@ -59,6 +63,7 @@ public class SocialRepositoryTest extends RepositoryTest {
 		// then
 		assertSoftly(softly -> {
 			softly.assertThat(result).isNotEmpty();
+			softly.assertThat(result).doesNotContain(SOFT_DELETE_SOCIAL);
 			softly.assertThat(result).hasSize(2);
 
 			softly.assertThat(result.get(0).getId()).isLessThan(cursor);
@@ -89,7 +94,7 @@ public class SocialRepositoryTest extends RepositoryTest {
 	}
 
 	@Test
-	void 차단된_사용자의_게시물을_제외하고_최신_게시물을_조회할_수_있다() {
+	void 차단된_사용자의_게시물과_Soft_Delete_된_게시물을_제외하고_최신_게시물을_조회할_수_있다() {
 		// given
 		Pageable pageable = PageRequest.of(0, 6);
 
@@ -99,7 +104,8 @@ public class SocialRepositoryTest extends RepositoryTest {
 		// then
 		assertSoftly(softly -> {
 			softly.assertThat(result).isNotEmpty();
-			softly.assertThat(result).hasSize(5); // Block User의 게시글 개수를 뺀 5개만 조회
+			softly.assertThat(result).doesNotContain(SOFT_DELETE_SOCIAL);
+			softly.assertThat(result).hasSize(4); // Block User의 게시글과 Soft Delete된 게시글 개수를 뺀 4개만 조회
 
 			softly.assertThat(result.get(0).getId()).isGreaterThan(result.get(1).getId());
 			softly.assertThat(result.get(1).getId()).isGreaterThan(result.get(2).getId());
