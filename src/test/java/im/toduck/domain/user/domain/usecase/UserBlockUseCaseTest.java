@@ -4,7 +4,6 @@ import static im.toduck.global.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,23 +32,19 @@ class UserBlockUseCaseTest extends ServiceTest {
 	}
 
 	@Nested
-	@DisplayName("유저 차단시")
 	class BlockUserTest {
 
 		@Test
-		@DisplayName("유저 차단이 성공적으로 이루어진다")
-		void blockUser_success() {
+		void 유저_차단을_할_수_있다() {
 			// when
 			userBlockUseCase.blockUser(blocker.getId(), blockedUser.getId());
 
 			// then
 			assertThat(blockRepository.existsByBlockerAndBlocked(blocker, blockedUser)).isTrue();
-
 		}
 
 		@Test
-		@DisplayName("이미 차단된 유저를 차단 시도 시 예외가 발생한다")
-		void blockUser_alreadyBlocked() {
+		void 이미_차단된_유저_차단_시도시_차단에_실패한다() {
 			// given
 			userBlockUseCase.blockUser(blocker.getId(), blockedUser.getId());
 
@@ -60,8 +55,7 @@ class UserBlockUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		@DisplayName("자기 자신을 차단 시도 시 예외가 발생한다")
-		void blockUser_selfBlock() {
+		void 자기_자신을_차단_시도시_차단에_실패한다() {
 			// when & then
 			assertThatThrownBy(() -> userBlockUseCase.blockUser(blocker.getId(), blocker.getId()))
 				.isInstanceOf(CommonException.class)
@@ -70,7 +64,6 @@ class UserBlockUseCaseTest extends ServiceTest {
 	}
 
 	@Nested
-	@DisplayName("unblockUser 메서드 테스트")
 	class UnblockUserTest {
 		User anotherUser = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
 
@@ -80,8 +73,7 @@ class UserBlockUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		@DisplayName("유저 차단 해제가 성공적으로 이루어진다")
-		void unblockUser_success() {
+		void 유저_차단_해제를_할_수_있다() {
 			// when
 			userBlockUseCase.unblockUser(blocker.getId(), blockedUser.getId());
 
@@ -90,8 +82,7 @@ class UserBlockUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		@DisplayName("차단 관계가 존재하지 않을 시 예외가 발생한다")
-		void unblockUser_notFoundBlock() {
+		void 차단_관계가_존재하지_않을_시_차단_해제에_실패한다() {
 			// when & then
 			assertThatThrownBy(() -> userBlockUseCase.unblockUser(blocker.getId(), anotherUser.getId()))
 				.isInstanceOf(CommonException.class)
