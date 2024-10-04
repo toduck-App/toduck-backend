@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import im.toduck.domain.social.domain.usecase.SocialInteractionUseCase;
 import im.toduck.domain.social.presentation.api.SocialInteractionApi;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -74,6 +76,19 @@ public class SocialInteractionController implements SocialInteractionApi {
 		CustomUserDetails user
 	) {
 		socialInteractionUseCase.deleteLike(user.getUserId(), socialId);
+
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@Override
+	@PostMapping("/{socialId}/report")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> reportSocialBoard(
+		@RequestBody @Valid ReportCreateRequest request,
+		@PathVariable Long socialId,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		socialInteractionUseCase.reportSocial(user.getUserId(), socialId, request);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}

@@ -2,7 +2,10 @@ package im.toduck.domain.social.persistence.entity;
 
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,12 +35,17 @@ public class Report extends BaseEntity {
 	@JoinColumn(name = "social_id", nullable = false)
 	private Social social;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "report_type", nullable = false)
+	private ReportType reportType;
+
 	private String reason;
 
 	@Builder
-	public Report(User user, Social social, String reason) {
+	public Report(User user, Social social, ReportType reportType, String reason) {
 		this.user = user;
 		this.social = social;
+		this.reportType = reportType;
 		this.reason = reason;
 	}
 }

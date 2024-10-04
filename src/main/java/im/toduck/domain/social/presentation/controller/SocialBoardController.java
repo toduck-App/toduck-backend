@@ -95,17 +95,4 @@ public class SocialBoardController implements SocialBoardApi {
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialBoardUseCase.getSocials(user.getUserId(), cursor, limit)));
 	}
-
-	@Override
-	@PostMapping("/{socialId}/report")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> reportSocialBoard(
-		@RequestBody ReportCreateRequest request,
-		@PathVariable Long socialId,
-		@AuthenticationPrincipal CustomUserDetails user
-	) {
-		socialUseCase.reportSocial(user.getUserId(), socialId, request);
-
-		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
-	}
 }

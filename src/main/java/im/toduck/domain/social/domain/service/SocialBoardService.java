@@ -12,14 +12,12 @@ import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
-import im.toduck.domain.social.persistence.entity.Report;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
-import im.toduck.domain.social.persistence.repository.ReportRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
@@ -43,7 +41,6 @@ public class SocialBoardService {
 	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
 	private final CommentRepository commentRepository;
 	private final LikeRepository likeRepository;
-	private final ReportRepository reportRepository;
 
 	@Transactional(readOnly = true)
 	public Optional<Social> getSocialById(Long socialId) {
@@ -160,17 +157,6 @@ public class SocialBoardService {
 	public List<Social> findLatestSocials(int limit, Long currentUserId) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 		return socialRepository.findLatestSocialsExcludingBlocked(currentUserId, pageRequest);
-	}
-
-	@Transactional
-	public Report createReport(User user, Social social, String reason) {
-		Report report = ReportMapper.toReport(user, social, reason);
-		return reportRepository.save(report);
-	}
-
-	@Transactional(readOnly = true)
-	public boolean existsByUserAndSocial(User user, Social social) {
-		return reportRepository.existsByUserAndSocial(user, social);
 	}
 
 	private boolean isBoardOwner(Social socialBoard, User user) {

@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
-import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
@@ -132,24 +130,5 @@ public interface SocialBoardApi {
 		@AuthenticationPrincipal CustomUserDetails user,
 		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long cursor,
 		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
-	);
-
-	@Operation(
-		summary = "게시글 신고",
-		description = "지정된 게시글을 신고합니다."
-	)
-	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(
-			description = "게시글 신고 성공, 빈 content 객체를 반환합니다."
-		),
-		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.ALREADY_REPORTED)
-		}
-	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> reportSocialBoard(
-		@RequestBody ReportCreateRequest request,
-		@PathVariable Long socialId,
-		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

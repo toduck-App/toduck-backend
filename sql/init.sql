@@ -198,13 +198,14 @@ CREATE TABLE block
 
 CREATE TABLE report
 (
- id BIGINT PRIMARY KEY auto_increment,
- user_id BIGINT      NOT NULL,
- social_id BIGINT    NOT NULL,
- reason VARCHAR(255) NULL,
- created_at DATETIME NOT NULL,
- updated_at DATETIME NOT NULL,
- deleted_at DATETIME NULL,
- FOREIGN KEY (user_id) REFERENCES users (id),
- FOREIGN KEY (social_id) REFERENCES social (id)
+id          BIGINT PRIMARY KEY auto_increment,
+user_id     BIGINT       NOT NULL,
+social_id   BIGINT       NOT NULL,
+report_type ENUM('NOT_RELATED_TO_SERVICE', 'PRIVACY_RISK', 'COMMERCIAL_ADVERTISEMENT', 'INAPPROPRIATE_CONTENT', 'OTHER') NOT NULL,
+reason      VARCHAR(255) NULL,
+created_at  DATETIME     NOT NULL,
+updated_at  DATETIME     NOT NULL,
+deleted_at  DATETIME     NULL,
+FOREIGN KEY (user_id) REFERENCES users (id),
+FOREIGN KEY (social_id) REFERENCES social (id)
 );
