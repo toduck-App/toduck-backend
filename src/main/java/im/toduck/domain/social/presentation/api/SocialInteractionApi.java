@@ -11,6 +11,7 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -124,7 +125,7 @@ public interface SocialInteractionApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.CANNOT_REPORT_OWN_POST),
 		}
 	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> reportSocialBoard(
+	ResponseEntity<ApiResponse<ReportCreateResponse>> reportSocialBoard(
 		@RequestBody ReportCreateRequest request,
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user

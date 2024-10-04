@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.LikeMapper;
+import im.toduck.domain.social.common.mapper.ReportMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
@@ -14,6 +15,7 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -83,7 +85,7 @@ public class SocialInteractionUseCase {
 	}
 
 	@Transactional
-	public void reportSocial(Long userId, Long socialId, ReportCreateRequest request) {
+	public ReportCreateResponse reportSocial(Long userId, Long socialId, ReportCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -106,7 +108,9 @@ public class SocialInteractionUseCase {
 
 		Report report = socialInteractionService.createReport(user, socialBoard, request.reportType(),
 			request.reason());
+
 		log.info("게시글 신고 - UserId: {}, SocialBoardId: {}, ReportId: {}", userId, socialId, report.getId());
+		return ReportMapper.toReportCreateResponse(report);
 	}
 
 	private void blockAuthorIfNotAlreadyBlocked(User blocker, User blockedUser) {

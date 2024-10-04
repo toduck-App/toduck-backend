@@ -18,6 +18,7 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -83,13 +84,14 @@ public class SocialInteractionController implements SocialInteractionApi {
 	@Override
 	@PostMapping("/{socialId}/report")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> reportSocialBoard(
+	public ResponseEntity<ApiResponse<ReportCreateResponse>> reportSocialBoard(
 		@RequestBody @Valid ReportCreateRequest request,
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		socialInteractionUseCase.reportSocial(user.getUserId(), socialId, request);
 
-		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(
+				socialInteractionUseCase.reportSocial(user.getUserId(), socialId, request)));
 	}
 }
