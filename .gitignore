@@ -51,3 +51,6 @@ docker-infra/*
 
 ### QueryDSL Generated ###
 /src/main/generated/
+
+### log ###
+spy.log
