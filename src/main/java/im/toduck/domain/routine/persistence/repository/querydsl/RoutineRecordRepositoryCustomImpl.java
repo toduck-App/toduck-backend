@@ -28,7 +28,7 @@ public class RoutineRecordRepositoryCustomImpl implements RoutineRecordRepositor
 	public List<RoutineRecord> findRoutineRecordsForUserAndDate(User user, LocalDate date) {
 		return queryFactory
 			.selectFrom(qRecord)
-			.join(qRecord.routine, qRoutine)
+			.join(qRecord.routine, qRoutine).fetchJoin()
 			.where(
 				qRoutine.user.eq(user),
 				recordAtBetween(date)
