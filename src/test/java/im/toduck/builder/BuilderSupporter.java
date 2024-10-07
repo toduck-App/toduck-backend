@@ -10,6 +10,7 @@ import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
+import im.toduck.domain.user.persistence.repository.BlockRepository;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.infra.redis.phonenumber.PhoneNumberRepository;
 
@@ -42,6 +43,9 @@ public class BuilderSupporter {
 
 	@Autowired
 	private RoutineRecordRepository routineRecordRepository;
+
+	@Autowired
+	private BlockRepository blockRepository;
 
 	public UserRepository userRepository() {
 		return userRepository;
@@ -77,6 +81,10 @@ public class BuilderSupporter {
 
 	public RoutineRecordRepository routineRecord() {
 		return routineRecordRepository;
+	}
+
+	public BlockRepository blockRepository() {
+		return blockRepository;
 	}
 
 }
