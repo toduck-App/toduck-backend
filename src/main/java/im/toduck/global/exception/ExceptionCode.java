@@ -52,6 +52,12 @@ public enum ExceptionCode {
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),
 	INVALID_USER_FILED(HttpStatus.FORBIDDEN, 40202, "유효하지 않은 사용자 필드입니다.",
 		"Oauth 사용자 필드와 일반 사용자 필드가 중복되어 사용될 때 발생하는 오류입니다."),
+	CANNOT_BLOCK_SELF(HttpStatus.BAD_REQUEST, 40203, "자기 자신을 차단할 수 없습니다.",
+		"사용자가 자신의 계정을 차단하려고 시도할 때 발생하는 오류입니다."),
+	NOT_FOUND_BLOCK(HttpStatus.NOT_FOUND, 40204, "차단 정보를 찾을 수 없습니다.",
+		"차단 해제 시 차단 정보를 찾을 수 없을 때 발생하는 오류입니다."),
+	ALREADY_BLOCKED(HttpStatus.CONFLICT, 40205, "이미 차단된 사용자입니다.",
+		"해당 사용자를 이미 차단한 경우 발생하는 오류입니다."),
 
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
@@ -65,6 +71,7 @@ public enum ExceptionCode {
 	UNAUTHORIZED_ACCESS_LIKE(HttpStatus.FORBIDDEN, 40409, "해당 좋아요에 접근 권한이 없습니다."),
 	INVALID_LIKE_FOR_BOARD(HttpStatus.BAD_REQUEST, 40410, "해당 게시글에 좋아요가 속하지 않습니다."),
 	EMPTY_SOCIAL_CATEGORY_LIST(HttpStatus.BAD_REQUEST, 40411, "카테고리 목록은 최소 1개의 항목을 포함해야 합니다."),
+	BLOCKED_USER_SOCIAL_ACCESS(HttpStatus.BAD_REQUEST, 40412, "차단된 사용자의 게시글에 접근할 수 없습니다."),
 
 	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),

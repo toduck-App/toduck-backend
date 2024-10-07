@@ -8,11 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
-import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -29,8 +26,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "Social")
-public interface SocialApi {
+@Tag(name = "Social Board")
+public interface SocialBoardApi {
 	@Operation(
 		summary = "소셜 게시글 생성",
 		description = "소셜 게시글을 작성합니다."
@@ -101,86 +98,6 @@ public interface SocialApi {
 	);
 
 	@Operation(
-		summary = "게시글 댓글 생성",
-		description = "게시글 댓글을 작성합니다."
-	)
-	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(
-			responseClass = CommentCreateResponse.class,
-			description = "댓글 작성 성공, 생성된 댓글의 Id를 반환합니다."
-		),
-		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
-		}
-	)
-	ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(
-		@PathVariable Long socialId,
-		@RequestBody @Valid CommentCreateRequest request,
-		@AuthenticationPrincipal CustomUserDetails user
-	);
-
-	@Operation(
-		summary = "게시글 댓글 삭제",
-		description = "게시글 댓글을 삭제합니다."
-	)
-	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(
-			description = "댓글 삭제 성공, 빈 content 객체를 반환합니다."
-		),
-		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_COMMENT_FOR_BOARD),
-		}
-	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> deleteComment(
-		@PathVariable Long socialId,
-		@PathVariable Long commentId,
-		@AuthenticationPrincipal CustomUserDetails user
-	);
-
-	@Operation(
-		summary = "게시글 좋아요",
-		description = "게시글을 좋아요 합니다."
-	)
-	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(
-			responseClass = LikeCreateResponse.class,
-			description = "좋아요 성공, 생성된 좋아요의 Id를 반환합니다."
-		),
-		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_LIKE),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
-		}
-	)
-	ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
-		@PathVariable Long socialId,
-		@AuthenticationPrincipal CustomUserDetails user
-	);
-
-	@Operation(
-		summary = "게시글 좋아요 취소",
-		description = "게시글 좋아요를 취소합니다."
-	)
-	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(
-			description = "좋아요 취소 성공, 빈 content 객체를 반환합니다."
-		),
-		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_LIKE),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_LIKE),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_LIKE_FOR_BOARD),
-
-		}
-	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
-		@PathVariable Long socialId,
-		@AuthenticationPrincipal CustomUserDetails user
-	);
-
-	@Operation(
 		summary = "게시글 단건 조회",
 		description = "게시글 단건 세부사항을 조회합니다."
 	)
@@ -190,7 +107,8 @@ public interface SocialApi {
 			description = "게시글 조회 성공, 게시글의 세부 정보를 반환합니다."
 		),
 		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD)
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.BLOCKED_USER_SOCIAL_ACCESS),
 		}
 	)
 	ResponseEntity<ApiResponse<SocialDetailResponse>> getSocialDetail(
