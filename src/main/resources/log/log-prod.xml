@@ -1,0 +1,21 @@
+<configuration>
+    <!-- 기본 콘솔 로그 설정 (Spring Boot의 기본 로깅 방식 유지) -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="im.toduck.global.log.layout.MaskingPatternLayout">
+            <maskPattern>${PASSWORD_MASKING_PATTERN}</maskPattern> <!-- Phone pattern -->
+            <maskPattern>${EMAIL_MASKING_PATTERN}</maskPattern> <!-- Email pattern -->
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </layout>
+    </appender>
+    <!-- 마스킹 패턴을 적용한 파일 로그 설정 -->
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>logs/app.log</file>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="im.toduck.global.log.layout.MaskingPatternLayout">
+                <maskPattern>${PASSWORD_MASKING_PATTERN}</maskPattern>
+                <maskPattern>${EMAIL_MASKING_PATTERN}</maskPattern>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </layout>
+        </encoder>
+    </appender>
+</configuration>

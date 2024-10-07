@@ -13,8 +13,9 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
-
-
+  aop:
+    auto:
+      false # test 환경에서 aop 를 사용하지 않도록 설정
 jwt:
   secret-key:
     access-token: toduckAccessAccessAccessTokenSecretKeyForToduck
