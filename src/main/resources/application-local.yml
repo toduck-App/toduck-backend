@@ -17,6 +17,11 @@ spring:
         format_sql: true
     open-in-view: false
 
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
 jwt:
   secret-key:
     access-token: toduckAccessAccessAccessTokenSecretKeyForToduck
