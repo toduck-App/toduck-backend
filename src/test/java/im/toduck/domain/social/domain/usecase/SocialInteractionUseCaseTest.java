@@ -3,6 +3,7 @@ package im.toduck.domain.social.domain.usecase;
 import static im.toduck.fixtures.social.CommentFixtures.*;
 import static im.toduck.fixtures.social.LikeFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
+import static im.toduck.fixtures.user.BlockFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -18,14 +19,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import im.toduck.ServiceTest;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
+import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
@@ -311,6 +316,86 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> socialInteractionUseCase.deleteLike(USER.getId(), nonExistentSocialId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+	}
+
+	@Nested
+	class ReportSocialTest {
+
+		User OTHER_USER;
+		Social SOCIAL_BOARD;
+
+		@BeforeEach
+		void setUp() {
+			OTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(OTHER_USER, false));
+		}
+
+		@Test
+		void 게시글을_성공적으로_신고한다() {
+			// given
+			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+
+			// when
+			ReportCreateResponse response = socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(),
+				request);
+
+			// then
+			assertThat(response.reportId()).isNotNull();
+		}
+
+		@Test
+		void 자신의_게시글을_신고하려고_하면_예외를_발생시킨다() {
+			// given
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, true));
+
+			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.CANNOT_REPORT_OWN_POST.getMessage());
+		}
+
+		@Test
+		void 이미_신고된_게시글을_다시_신고하면_예외가_발생한다() {
+			// given
+			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+			socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request);
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.ALREADY_REPORTED.getMessage());
+		}
+
+		@Test
+		void 존재하지_않는_게시글을_신고하면_예외가_발생한다() {
+			// given
+			Long nonExistentSocialId = -1L;
+			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.reportSocial(USER.getId(), nonExistentSocialId, request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+
+		@Test
+		void 게시글_작성자가_이미_차단된_경우_예외를_발생시키지_않는다() {
+			// given
+			User BLOCK_USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+			testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
+			Social BLOCKED_USER_SOCIAL = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(BLOCK_USER, false));
+
+			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+
+			// when
+			ReportCreateResponse response =
+				socialInteractionUseCase.reportSocial(USER.getId(), BLOCKED_USER_SOCIAL.getId(), request);
+
+			// then
+			assertThat(response.reportId()).isNotNull();
 		}
 	}
 }
