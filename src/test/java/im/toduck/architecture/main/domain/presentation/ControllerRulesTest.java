@@ -41,4 +41,10 @@ public class ControllerRulesTest {
 		classes()
 			.that().resideInAPackage(CONTROLLER.getFullPackageName())
 			.should().beAnnotatedWith(RestController.class);
+
+	@ArchTest
+	static final ArchRule Controller_클래스는_Slf4j_어노테이션을_가지면_안된다 =
+		noClasses()
+			.that().resideInAPackage(CONTROLLER.getFullPackageName())
+			.should().beAnnotatedWith("Slf4j");
 }

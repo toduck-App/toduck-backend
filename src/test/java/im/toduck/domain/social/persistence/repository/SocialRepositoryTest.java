@@ -1,6 +1,7 @@
 package im.toduck.domain.social.persistence.repository;
 
 import static im.toduck.fixtures.social.SocialFixtures.*;
+import static im.toduck.fixtures.user.BlockFixtures.*;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
@@ -22,13 +23,24 @@ public class SocialRepositoryTest extends RepositoryTest {
 	@Autowired
 	private SocialRepository socialRepository;
 
-	private List<Social> socialList;
+	private User USER;
+	private User BLOCK_USER;
+
+	private List<Social> SOCIAL_LIST;
+	private Social SOFT_DELETE_SOCIAL;
 
 	@BeforeEach
 	public void setUp() {
-		User user = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+		USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+		BLOCK_USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
 
-		socialList = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(user, 5));
+		testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(BLOCK_USER, 3));
+		SOCIAL_LIST = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, 5));
+
+		testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
+
+		SOFT_DELETE_SOCIAL = SOCIAL_LIST.get(0);
+		socialRepository.delete(SOFT_DELETE_SOCIAL);
 	}
 
 	@Test
@@ -39,20 +51,27 @@ public class SocialRepositoryTest extends RepositoryTest {
 	}
 
 	@Test
-	void 요청받은_커서_이후의_게시물을_최신순으로_조회할_수_있다() {
+	void 차단된_사용자의_게시물과_Soft_Delete_된_게시글을_제외하고_요청받은_커서_이후의_게시물을_최신순으로_조회할_수_있다() {
 		// given
-		Pageable pageable = PageRequest.of(0, 2);
-		Long cursor = socialList.get(2).getId();
+		Pageable pageable = PageRequest.of(0, 6);
+		Long cursor = SOCIAL_LIST.get(3).getId();
 
 		// when
-		List<Social> result = socialRepository.findByIdBeforeOrderByIdDesc(cursor, pageable);
+		List<Social> result = socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(cursor, USER.getId(),
+			pageable);
 
 		// then
 		assertSoftly(softly -> {
 			softly.assertThat(result).isNotEmpty();
+			softly.assertThat(result).doesNotContain(SOFT_DELETE_SOCIAL);
 			softly.assertThat(result).hasSize(2);
-			softly.assertThat(result.get(0).getContent()).isEqualTo("Test post 2");
-			softly.assertThat(result.get(1).getContent()).isEqualTo("Test post 1");
+
+			softly.assertThat(result.get(0).getId()).isLessThan(cursor);
+			softly.assertThat(result.get(0).getId()).isGreaterThan(result.get(1).getId());
+
+			result.forEach(social -> {
+				assertThat(social.getUser().getId()).isNotEqualTo(BLOCK_USER.getId());
+			});
 		});
 	}
 
@@ -63,26 +82,37 @@ public class SocialRepositoryTest extends RepositoryTest {
 		Long invalidCursor = -1L;
 
 		// when
-		List<Social> result = socialRepository.findByIdBeforeOrderByIdDesc(invalidCursor, pageable);
-
-		// then
-		assertThat(result.size()).isEqualTo(0);
-	}
-
-	@Test
-	void 최신_게시물을_조회할_수_있다() {
-		// given
-		Pageable pageable = PageRequest.of(0, 3);
-
-		// when
-		List<Social> result = socialRepository.findLatestSocials(pageable);
+		List<Social> result = socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(invalidCursor, USER.getId(),
+			pageable);
 
 		// then
 		assertSoftly(softly -> {
-			softly.assertThat(result.size()).isEqualTo(3);
-			softly.assertThat(result.get(0).getContent()).isEqualTo("Test post 5");
-			softly.assertThat(result.get(1).getContent()).isEqualTo("Test post 4");
-			softly.assertThat(result.get(2).getContent()).isEqualTo("Test post 3");
+			softly.assertThat(result).isEmpty();
+
+			softly.assertThat(result.size()).isEqualTo(0);
+		});
+	}
+
+	@Test
+	void 차단된_사용자의_게시물과_Soft_Delete_된_게시물을_제외하고_최신_게시물을_조회할_수_있다() {
+		// given
+		Pageable pageable = PageRequest.of(0, 6);
+
+		// when
+		List<Social> result = socialRepository.findLatestSocialsExcludingBlocked(USER.getId(), pageable);
+
+		// then
+		assertSoftly(softly -> {
+			softly.assertThat(result).isNotEmpty();
+			softly.assertThat(result).doesNotContain(SOFT_DELETE_SOCIAL);
+			softly.assertThat(result).hasSize(4); // Block User의 게시글과 Soft Delete된 게시글 개수를 뺀 4개만 조회
+
+			softly.assertThat(result.get(0).getId()).isGreaterThan(result.get(1).getId());
+			softly.assertThat(result.get(1).getId()).isGreaterThan(result.get(2).getId());
+
+			result.forEach(social -> {
+				assertThat(social.getUser().getId()).isNotEqualTo(BLOCK_USER.getId());
+			});
 		});
 	}
 }

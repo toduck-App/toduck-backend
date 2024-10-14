@@ -1,0 +1,316 @@
+package im.toduck.domain.social.domain.usecase;
+
+import static im.toduck.fixtures.social.CommentFixtures.*;
+import static im.toduck.fixtures.social.LikeFixtures.*;
+import static im.toduck.fixtures.social.SocialFixtures.*;
+import static im.toduck.fixtures.user.UserFixtures.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.SoftAssertions.*;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import im.toduck.ServiceTest;
+import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.Like;
+import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.repository.CommentRepository;
+import im.toduck.domain.social.persistence.repository.LikeRepository;
+import im.toduck.domain.social.persistence.repository.SocialRepository;
+import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
+import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.exception.VoException;
+
+public class SocialInteractionUseCaseTest extends ServiceTest {
+
+	private User USER;
+
+	@Autowired
+	private SocialInteractionUseCase socialInteractionUseCase;
+
+	@Autowired
+	private SocialRepository socialRepository;
+
+	@Autowired
+	private CommentRepository commentRepository;
+
+	@Autowired
+	private LikeRepository likeRepository;
+
+	@BeforeEach
+	public void setUp() {
+		USER = testFixtureBuilder.buildUser(GENERAL_USER());
+	}
+
+	@Nested
+	@DisplayName("댓글 작성시")
+	class CreateComment {
+		Social SOCIAL_BOARD;
+		String commentContent = "This is a test comment.";
+
+		CommentCreateRequest request = new CommentCreateRequest(commentContent);
+
+		@BeforeEach
+		public void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+		}
+
+		@Test
+		void 주어진_요청에_따라_댓글을_생성할_수_있다() {
+			// when
+			CommentCreateResponse response = socialInteractionUseCase.createComment(USER.getId(), SOCIAL_BOARD.getId(),
+				request);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.commentId()).isNotNull();
+			});
+		}
+
+		@Test
+		void 사용자를_조회할_수_없는_경우_댓글_생성에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.createComment(nonExistentUserId, SOCIAL_BOARD.getId(), request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+
+		@Test
+		void 소셜_게시글이_존재하지_않는_경우_댓글_생성에_실패한다() {
+			// given
+			Long nonExistentSocialBoardId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.createComment(USER.getId(), nonExistentSocialBoardId, request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+
+		@Test
+		void 댓글_내용이_빈_경우_댓글_생성에_실패한다() {
+			// given
+			String emptyContent = "";
+			CommentCreateRequest emptyRequest = new CommentCreateRequest(emptyContent);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.createComment(USER.getId(), SOCIAL_BOARD.getId(), emptyRequest))
+				.isInstanceOf(VoException.class)
+				.hasMessage("댓글 내용은 비어 있을 수 없습니다.");
+		}
+
+		@Test
+		void 댓글_내용이_공백인_경우_댓글_생성에_실패한다() {
+			// given
+			String whitespaceContent = "   ";
+			CommentCreateRequest whitespaceRequest = new CommentCreateRequest(whitespaceContent);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.createComment(USER.getId(), SOCIAL_BOARD.getId(), whitespaceRequest))
+				.isInstanceOf(VoException.class)
+				.hasMessage("댓글 내용은 비어 있을 수 없습니다.");
+		}
+	}
+
+	@Nested
+	@DisplayName("게시글 댓글 삭제시")
+	class DeleteComment {
+		Social SOCIAL_BOARD;
+		Comment COMMENT;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
+		}
+
+		@Test
+		void 댓글이_직접_삭제되면_hard_delete_된다() {
+			// when
+			socialInteractionUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), COMMENT.getId());
+
+			// then
+			assertThat(commentRepository.findById(COMMENT.getId())).isNotPresent();
+		}
+
+		@Test
+		void 사용자를_조회할_수_없는_경우_댓글_삭제에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.deleteComment(nonExistentUserId, SOCIAL_BOARD.getId(), COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+
+		@Test
+		void 게시글이_존재하지_않는_경우_댓글_삭제에_실패한다() {
+			// given
+			Long nonExistentSocialBoardId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.deleteComment(USER.getId(), nonExistentSocialBoardId, COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+
+		@Test
+		void 댓글이_존재하지_않는_경우_댓글_삭제에_실패한다() {
+			// given
+			Long nonExistentCommentId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(), nonExistentCommentId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT.getMessage());
+		}
+
+		@Test
+		void 댓글의_소유자가_아닌_경우_삭제에_실패한다() {
+			// given
+			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
+			Comment ANOTHER_USER_COMMENT = testFixtureBuilder.buildComment(
+				SINGLE_COMMENT(ANOTHER_USER, SOCIAL_BOARD)
+			);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(),
+					ANOTHER_USER_COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT.getMessage());
+		}
+
+		@Test
+		void 댓글이_게시글에_속하지_않는_경우_삭제에_실패한다() {
+			// given
+			Social ANOTHER_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			Comment ANOTHER_BOARD_COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, ANOTHER_BOARD));
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.deleteComment(USER.getId(), SOCIAL_BOARD.getId(),
+					ANOTHER_BOARD_COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.INVALID_COMMENT_FOR_BOARD.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("게시글 좋아요 생성시")
+	class CreateLikeTest {
+		Social SOCIAL_BOARD;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+		}
+
+		@Test
+		void 게시글에_좋아요를_성공적으로_생성한다() {
+			// given
+			int beforeLikeCount = SOCIAL_BOARD.getLikeCount();
+
+			// when
+			LikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+
+			// then
+			Like createdLike = likeRepository.findByUserAndSocial(USER, SOCIAL_BOARD).orElseThrow();
+			Optional<Social> afterSocialBoard = socialRepository.findById(SOCIAL_BOARD.getId());
+			assertSoftly(softly -> {
+				assertThat(createdLike).isNotNull();
+				assertThat(response.likeId()).isNotNull();
+				afterSocialBoard.ifPresent(
+					social -> softly.assertThat(social.getLikeCount()).isEqualTo(beforeLikeCount + 1)
+				);
+
+			});
+		}
+
+		@Test
+		void 이미_좋아요를_누른_경우_예외를_발생시킨다() {
+			// given
+			LikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.EXISTS_LIKE.getMessage());
+		}
+
+		@Test
+		void 존재하지_않는_게시글에_좋아요를_누를_경우_예외를_발생시킨다() {
+			// given
+			Long nonExistentSocialId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.createLike(USER.getId(), nonExistentSocialId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("게시글 좋아요 취소시")
+	class DeleteLikeTest {
+		Social SOCIAL_BOARD;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+		}
+
+		@Test
+		void 게시글에_좋아요를_성공적으로_취소한다() {
+			// given
+			Like LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));
+
+			// when
+			socialInteractionUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId());
+
+			// then
+			assertThat(likeRepository.findByUserAndSocial(USER, SOCIAL_BOARD)).isNotPresent();
+			assertThat(SOCIAL_BOARD.getLikeCount()).isEqualTo(0);
+		}
+
+		@Test
+		void 좋아요가_존재하지_않는_경우_예외를_발생시킨다() {
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_LIKE.getMessage());
+		}
+
+		@Test
+		void 존재하지_않는_게시글에_좋아요_취소를_시도하면_예외를_발생시킨다() {
+			// given
+			Long nonExistentSocialId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteLike(USER.getId(), nonExistentSocialId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+	}
+}
