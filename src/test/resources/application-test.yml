@@ -16,6 +16,12 @@ spring:
   aop:
     auto:
       false # test 환경에서 aop 를 사용하지 않도록 설정
+      
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+      
 jwt:
   secret-key:
     access-token: toduckAccessAccessAccessTokenSecretKeyForToduck

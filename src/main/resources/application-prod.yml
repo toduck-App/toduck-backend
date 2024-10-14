@@ -1,3 +1,8 @@
 swagger:
   server-url: ${PROD_BASE_URL}
   description: "Prod 서버"
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
