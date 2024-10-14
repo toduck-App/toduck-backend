@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <!-- 로깅 패턴 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
+    <!-- 마스킹 패턴 -->
+    <property name="PASSWORD_MASKING_PATTERN" value="(01\d|02|0[3-9]\d|05\d\d)(-?)(\d{3,4})(-?)(\d{4})"/>
+    <property name="EMAIL_MASKING_PATTERN" value="(\w+@\w+\.\w+)"/>
+
+    <!--local-->
+    <springProfile name="local">
+        <include resource="log/log-local.xml"/>
+
+        <root level="INFO">
+            <appender-ref ref="console"/><!-- appender 참조 -->
+        </root>
+    </springProfile>
+
+    <!--prod-->
+    <springProfile name="prod">
+        <include resource="log/log-prod.xml"/>
+
+        <root level="INFO">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </root>
+    </springProfile>
+
+</configuration>
