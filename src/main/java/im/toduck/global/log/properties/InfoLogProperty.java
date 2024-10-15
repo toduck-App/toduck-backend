@@ -2,6 +2,7 @@ package im.toduck.global.log.properties;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -21,13 +22,14 @@ public class InfoLogProperty extends LogProperty {
 		);
 	}
 
-	public static InfoLogProperty of(String description, JoinPoint joinPoint, String methodName, Object result) {
+	public static InfoLogProperty of(String description, JoinPoint joinPoint, String methodName,
+		Optional<Object> result) {
 		return new InfoLogProperty(
 			description,
 			joinPoint.getSignature().getDeclaringTypeName(),
 			((MethodSignature)joinPoint.getSignature()).getName(),
 			new Map[] {Map.of(
-				"result", result
+				"result", result.orElseGet(() -> "void")
 			)}
 		);
 	}

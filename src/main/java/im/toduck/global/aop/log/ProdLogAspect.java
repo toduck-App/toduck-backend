@@ -1,5 +1,7 @@
 package im.toduck.global.aop.log;
 
+import java.util.Optional;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -81,7 +83,7 @@ public class ProdLogAspect {
 			getLogDescription(methodSignature),
 			joinPoint,
 			methodSignature.getName(),
-			result
+			Optional.ofNullable(result)
 		);
 
 		long elapsedTime = System.currentTimeMillis() - startTime.get();
