@@ -1,12 +1,11 @@
 package im.toduck.domain.social.presentation.dto.request;
 
 import im.toduck.domain.social.persistence.entity.ReportType;
-import im.toduck.global.annotation.valid.ValidReportReason;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-@ValidReportReason
 public record ReportCreateRequest(
 	@NotNull(message = "신고 유형은 필수 입력 항목입니다.")
 	@Schema(description = "신고 유형", example = "OTHER")
@@ -20,4 +19,19 @@ public record ReportCreateRequest(
 	boolean blockAuthor
 ) {
 
+	@AssertTrue(message = "신고 유형이 'OTHER'일 때 사유는 필수 입력 항목입니다.")
+	public boolean isReasonRequiredForOtherType() {
+		if (reportType == ReportType.OTHER) {
+			return reason != null && !reason.isBlank();
+		}
+		return true;
+	}
+
+	@AssertTrue(message = "신고 유형이 'OTHER'가 아닌 경우 사유는 입력할 수 없습니다.")
+	public boolean isReasonNotAllowedForNonOtherType() {
+		if (reportType != ReportType.OTHER) {
+			return reason == null || reason.isBlank();
+		}
+		return true;
+	}
 }
