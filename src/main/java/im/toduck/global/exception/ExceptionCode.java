@@ -72,6 +72,9 @@ public enum ExceptionCode {
 	INVALID_LIKE_FOR_BOARD(HttpStatus.BAD_REQUEST, 40410, "해당 게시글에 좋아요가 속하지 않습니다."),
 	EMPTY_SOCIAL_CATEGORY_LIST(HttpStatus.BAD_REQUEST, 40411, "카테고리 목록은 최소 1개의 항목을 포함해야 합니다."),
 	BLOCKED_USER_SOCIAL_ACCESS(HttpStatus.BAD_REQUEST, 40412, "차단된 사용자의 게시글에 접근할 수 없습니다."),
+	ALREADY_REPORTED(HttpStatus.CONFLICT, 40413, "이미 신고된 게시글입니다.",
+		"이미 신고한 게시글에 대해 다시 신고를 시도할 때 발생하는 오류입니다."),
+	CANNOT_REPORT_OWN_POST(HttpStatus.FORBIDDEN, 40414, "자신의 게시글은 신고할 수 없습니다."),
 
 	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),

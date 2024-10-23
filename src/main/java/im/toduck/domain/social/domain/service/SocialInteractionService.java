@@ -8,11 +8,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.LikeMapper;
+import im.toduck.domain.social.common.mapper.ReportMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
+import im.toduck.domain.social.persistence.entity.Report;
+import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
+import im.toduck.domain.social.persistence.repository.ReportRepository;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -26,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SocialInteractionService {
 	private final CommentRepository commentRepository;
 	private final LikeRepository likeRepository;
+	private final ReportRepository reportRepository;
 
 	@Transactional
 	public Comment createComment(User user, Social socialBoard, CommentCreateRequest request) {
@@ -95,6 +100,17 @@ public class SocialInteractionService {
 	public boolean getIsLiked(User user, Social socialBoard) {
 		Optional<Like> like = likeRepository.findByUserAndSocial(user, socialBoard);
 		return like.isPresent();
+	}
+
+	@Transactional
+	public Report createReport(User user, Social social, ReportType reportType, String reason) {
+		Report report = ReportMapper.toReport(user, social, reportType, reason);
+		return reportRepository.save(report);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean existsByUserAndSocial(User user, Social social) {
+		return reportRepository.existsByUserAndSocial(user, social);
 	}
 
 	private boolean isCommentOwner(Comment comment, User user) {
