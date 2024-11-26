@@ -2,7 +2,9 @@ package im.toduck.domain.social.common.mapper;
 
 import java.util.List;
 
+import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
@@ -51,6 +53,7 @@ public class SocialMapper {
 			.owner(getOwner(socialBoard.getUser()))
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
+			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
 			.content(socialBoard.getContent())
 			.likeInfo(getLikeDto(socialBoard, isLiked))
 			.comments(getCommentDtos(comments))
@@ -71,10 +74,18 @@ public class SocialMapper {
 			.content(socialBoard.getContent())
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
+			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
 			.likeInfo(getLikeDto(socialBoard, isLiked))
 			.commentCount(commentCount)
 			.createdAt(socialBoard.getCreatedAt())
 			.build();
+	}
+
+	private static RoutineDetailResponse getSocialRoutineDto(final Routine routine) {
+		if (routine == null) {
+			return null;
+		}
+		return RoutineMapper.toRoutineDetailResponse(routine);
 	}
 
 	private static LikeDto getLikeDto(Social socialBoard, boolean isLiked) {

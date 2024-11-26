@@ -99,7 +99,8 @@ public interface SocialBoardApi {
 
 	@Operation(
 		summary = "게시글 단건 조회",
-		description = "게시글 단건 세부사항을 조회합니다."
+		description = "게시글 단건 세부사항을 조회합니다. </br></br>"
+			+ "공유할 루틴이 존재하지 않는 경우 routine 필드에 null이 반환 됩니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -118,7 +119,9 @@ public interface SocialBoardApi {
 
 	@Operation(
 		summary = "게시글 목록 조회",
-		description = "게시글을 커서 기반 페이지네이션으로 조회합니다.</br></br>커서 페이지네이션 사용법은 Notion > API 개요 > 페이지네이션을 확인해주세요."
+		description = "게시글을 커서 기반 페이지네이션으로 조회합니다.</br></br>"
+			+ "커서 페이지네이션 사용법은 Notion > API 개요 > 페이지네이션을 확인해주세요.</br></br>"
+			+ "공유할 루틴이 존재하지 않는 경우 routine 필드에 null이 반환 됩니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
