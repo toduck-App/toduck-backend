@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
 import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
@@ -48,8 +49,12 @@ public class SocialBoardService {
 	}
 
 	@Transactional
-	public Social createSocialBoard(User user, SocialCreateRequest request) {
-		Social socialBoard = SocialMapper.toSocial(user, request.content(), request.isAnonymous());
+	public Social createSocialBoard(
+		final User user,
+		final Routine routine,
+		final SocialCreateRequest request
+	) {
+		Social socialBoard = SocialMapper.toSocial(user, routine, request.content(), request.isAnonymous());
 		return socialRepository.save(socialBoard);
 	}
 

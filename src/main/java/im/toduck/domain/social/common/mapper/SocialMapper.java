@@ -2,6 +2,7 @@ package im.toduck.domain.social.common.mapper;
 
 import java.util.List;
 
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
@@ -20,9 +21,15 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SocialMapper {
-	public static Social toSocial(User user, String content, Boolean isAnonymous) {
+	public static Social toSocial(
+		final User user,
+		final Routine routine,
+		final String content,
+		final Boolean isAnonymous
+	) {
 		return Social.builder()
 			.user(user)
+			.routine(routine)
 			.content(content)
 			.isAnonymous(isAnonymous)
 			.build();

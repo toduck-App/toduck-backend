@@ -84,6 +84,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 		SocialCreateRequest request = new SocialCreateRequest(
 			content,
+			null,
 			isAnonymous,
 			categoryIds,
 			imageUrls
@@ -99,7 +100,6 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 				softly.assertThat(response).isNotNull();
 				softly.assertThat(response.socialId()).isNotNull();
 			});
-
 		}
 
 		@Test
@@ -118,7 +118,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			List<Long> invalidCategoryIds = List.of(1L, -1L);
 			SocialCreateRequest invalidRequest = new SocialCreateRequest(
-				content, isAnonymous, invalidCategoryIds, imageUrls
+				content,
+				null,
+				isAnonymous,
+				invalidCategoryIds,
+				imageUrls
 			);
 
 			// when & then

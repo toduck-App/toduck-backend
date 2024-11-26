@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.routine.domain.service.RoutineService;
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
@@ -35,13 +37,20 @@ public class SocialBoardUseCase {
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
 	private final UserService userService;
+	private final RoutineService routineService;
 
 	@Transactional
-	public SocialCreateResponse createSocialBoard(Long userId, SocialCreateRequest request) {
+	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		Social socialBoard = socialBoardService.createSocialBoard(user, request);
+		Routine routine = null;
+		if (request.routineId() != null) {
+			routine = routineService.getUserRoutine(user, request.routineId())
+				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+		}
+
+		Social socialBoard = socialBoardService.createSocialBoard(user, routine, request);
 		List<SocialCategory> socialCategories = socialBoardService.findAllSocialCategories(request.socialCategoryIds());
 		socialBoardService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		socialBoardService.addSocialImageFiles(request.socialImageUrls(), socialBoard);

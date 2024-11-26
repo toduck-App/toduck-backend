@@ -14,6 +14,9 @@ public record SocialCreateRequest(
 	@Schema(description = "게시글 내용", example = "어제 잠들기 전 새로운 루틴을 추가했다👀")
 	String content,
 
+	@Schema(description = "공유할 루틴 ID (공유할 루틴이 없으면 필드 제거)", example = "1")
+	Long routineId,
+
 	@NotNull(message = "익명 여부는 필수 입력 항목입니다.")
 	@Schema(description = "익명 여부", example = "false")
 	Boolean isAnonymous,
