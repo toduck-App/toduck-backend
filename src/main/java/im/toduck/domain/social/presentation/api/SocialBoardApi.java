@@ -30,7 +30,7 @@ import jakarta.validation.Valid;
 public interface SocialBoardApi {
 	@Operation(
 		summary = "소셜 게시글 생성",
-		description = "소셜 게시글을 작성합니다."
+		description = "소셜 게시글을 작성합니다. 공유할 루틴이 존재하지 않는 경우 routineId 필드에 null을 입력합니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
