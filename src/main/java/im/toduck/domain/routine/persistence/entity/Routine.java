@@ -98,4 +98,8 @@ public class Routine extends BaseEntity {
 	public String getMemoValue() {
 		return memo.getValue();
 	}
+
+	public Boolean isInDeletedState() {
+		return deletedAt != null;
+	}
 }

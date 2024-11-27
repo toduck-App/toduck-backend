@@ -93,6 +93,8 @@ public class RoutineMapper {
 			.color(routine.getColorValue())
 			.title(routine.getTitle())
 			.time(routine.getTime())
+			.isPublic(routine.getIsPublic())
+			.isInDeletedState(routine.isInDeletedState())
 			.daysOfWeek(daysOfWeek)
 			.build();
 	}
