@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.TimePath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import im.toduck.domain.routine.persistence.entity.QRoutine;
@@ -36,32 +37,12 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 				qRoutine.user.eq(user),
 				routineCreatedOnOrBeforeDate(date),
 				routineNotRecorded(routineRecords),
-				routineMatchesDate(date)
-			)
+				routineMatchesDate(date),
+				routineNotDeletedOrDeletedAfterDate(qRoutine.time, date))
 			.fetch();
 	}
 
-	@Override
-	public boolean isActiveForDate(Routine routine, LocalDate date) {
-		Integer fetchOne = queryFactory
-			.selectOne()
-			.from(qRoutine)
-			.where(
-				qRoutine.eq(routine),
-				routineCreatedOnOrBeforeDate(date),
-				routineMatchesDate(date)
-			)
-			.fetchFirst();
-
-		return fetchOne != null;
-	}
-
-	private BooleanExpression routineCreatedOnOrBeforeDate(LocalDate date) {
-		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-		return qRoutine.createdAt.loe(endOfDay);
-	}
-
-	private BooleanExpression routineNotRecorded(List<RoutineRecord> recordedRoutines) {
+	private BooleanExpression routineNotRecorded(final List<RoutineRecord> recordedRoutines) {
 		if (recordedRoutines == null || recordedRoutines.isEmpty()) {
 			return null;
 		}
@@ -72,7 +53,53 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			.toList());
 	}
 
-	private BooleanExpression routineMatchesDate(LocalDate date) {
+	@Override
+	public boolean isActiveForDate(final Routine routine, final LocalDate date) {
+		Integer fetchOne = queryFactory
+			.selectOne()
+			.from(qRoutine)
+			.where(
+				qRoutine.eq(routine),
+				routineCreatedOnOrBeforeDate(date),
+				routineMatchesDate(date),
+				routineNotDeletedOrDeletedAfterDate(qRoutine.time, date)
+			)
+			.fetchFirst();
+
+		return fetchOne != null;
+	}
+
+	@Override
+	public void softDelete(final Routine routine) {
+		queryFactory
+			.update(qRoutine)
+			.set(qRoutine.deletedAt, LocalDateTime.now())
+			.where(
+				qRoutine.eq(routine)
+			)
+			.execute();
+	}
+
+	private BooleanExpression routineNotDeletedOrDeletedAfterDate(
+		final TimePath<LocalTime> timePath,
+		final LocalDate date
+	) {
+		return qRoutine.deletedAt.isNull().or(
+			Expressions.booleanTemplate(
+				"cast(concat({0}, ' ', cast({1} as time)) as timestamp) < {2}",
+				date,
+				timePath,
+				qRoutine.deletedAt
+			)
+		);
+	}
+
+	private BooleanExpression routineCreatedOnOrBeforeDate(final LocalDate date) {
+		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+		return qRoutine.createdAt.loe(endOfDay);
+	}
+
+	private BooleanExpression routineMatchesDate(final LocalDate date) {
 		byte dayBitmask = DaysOfWeekBitmask.getDayBitmask(date.getDayOfWeek());
 		return Expressions.numberTemplate(
 			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, dayBitmask

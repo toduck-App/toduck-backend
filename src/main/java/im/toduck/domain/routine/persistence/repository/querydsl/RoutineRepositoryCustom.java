@@ -15,4 +15,6 @@ public interface RoutineRepositoryCustom {
 	);
 
 	boolean isActiveForDate(final Routine routine, final LocalDate date);
+
+	void softDelete(final Routine routine);
 }
