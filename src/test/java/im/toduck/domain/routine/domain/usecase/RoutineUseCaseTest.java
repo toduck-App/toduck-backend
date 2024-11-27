@@ -34,8 +34,6 @@ import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadLis
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 
 ;
 
@@ -43,9 +41,6 @@ import jakarta.persistence.PersistenceContext;
 class RoutineUseCaseTest extends ServiceTest {
 
 	private User USER;
-
-	@PersistenceContext
-	private EntityManager entityManager;
 
 	@Autowired
 	private RoutineUseCase routineUseCase;
@@ -286,7 +281,6 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			// when
 			routineUseCase.deleteRoutine(USER.getId(), routine.getId(), false);
-			entityManager.clear();
 
 			// then
 			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
@@ -322,7 +316,6 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			// when
 			routineUseCase.deleteRoutine(USER.getId(), routine.getId(), true);
-			entityManager.clear();
 
 			// then
 			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();

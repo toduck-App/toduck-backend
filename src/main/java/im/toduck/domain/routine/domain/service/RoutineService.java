@@ -53,7 +53,9 @@ public class RoutineService {
 		return routineRepository.findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByUpdatedAtDesc(user);
 	}
 
+	@Transactional
 	public void remove(final Routine routine) {
-		routineRepository.softDelete(routine);
+		routine.delete();
+		routineRepository.save(routine);
 	}
 }

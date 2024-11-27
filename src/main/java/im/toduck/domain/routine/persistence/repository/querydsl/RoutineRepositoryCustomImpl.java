@@ -69,17 +69,6 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 		return fetchOne != null;
 	}
 
-	@Override
-	public void softDelete(final Routine routine) {
-		queryFactory
-			.update(qRoutine)
-			.set(qRoutine.deletedAt, LocalDateTime.now())
-			.where(
-				qRoutine.eq(routine)
-			)
-			.execute();
-	}
-
 	private BooleanExpression routineNotDeletedOrDeletedAfterDate(
 		final TimePath<LocalTime> timePath,
 		final LocalDate date
