@@ -116,10 +116,31 @@ class RoutineUseCaseTest extends ServiceTest {
 
 		}
 
-		@Disabled("추후 테스트 필요")
 		@Test
 		void 모_루틴이_Soft_DELETE_된_경우에도_루틴_기록이_존재한다면_정상적으로_조회할_수_있다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
+				getNextDayOfWeek(DayOfWeek.MONDAY).plusDays(7).atTime(7, 59, 59))
+			);
 
+			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_SYNCED_RECORD(ROUTINE)
+			);
+			LocalDate queryDate = RECORD.getRecordAt().toLocalDate();
+
+			// when
+			MyRoutineRecordReadListResponse responses = routineUseCase.readMyRoutineRecordList(USER.getId(), queryDate);
+
+			// then
+			assertSoftly(softly -> {
+				assertThat(responses.queryDate()).isEqualTo(queryDate);
+				assertThat(responses.routines()).hasSize(1);
+
+				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
+				assertThat(response.routineId()).isEqualTo(ROUTINE.getId());
+				assertThat(response.isCompleted()).isEqualTo(RECORD.getIsCompleted());
+				assertThat(response.time()).isEqualTo(RECORD.getRecordAt().toLocalTime());
+			});
 		}
 	}
 

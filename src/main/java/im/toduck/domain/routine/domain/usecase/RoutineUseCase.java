@@ -49,7 +49,6 @@ public class RoutineUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		List<RoutineRecord> routineRecords = routineRecordService.getRecords(user, date);
-		// TODO: 여기에선 삭제되면 조회되면 안됨, 근데 삭제 시점 미래 기준으로는 조회가 안되는거고 과거 시점이면 조회가 되어야함
 		List<Routine> routines = routineService.getUnrecordedRoutinesForDate(user, date, routineRecords);
 
 		log.info("본인 루틴 기록 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
@@ -64,7 +63,6 @@ public class RoutineUseCase {
 	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		// TODO: 여기에선 삭제되었어도 조회되야함
 		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
@@ -96,7 +94,6 @@ public class RoutineUseCase {
 	public RoutineDetailResponse readDetail(final Long userId, final Long routineId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		// TODO: 여기에선 삭제되었어도 조회되야함
 		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
@@ -107,7 +104,6 @@ public class RoutineUseCase {
 	public MyRoutineAvailableListResponse readMyAvailableRoutineList(final Long userId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		// TODO: 여기에선 삭제되면 조회되면 안됨
 		List<Routine> routines = routineService.getAvailableRoutine(user);
 
 		log.info("사용가능한 본인 루틴 목록 조회 - 사용자 Id: {}", userId);
@@ -118,7 +114,6 @@ public class RoutineUseCase {
 	public void deleteRoutine(final Long userId, final Long routineId, final boolean keepRecords) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		// TODO: 여기에선 삭제되었어도 조회되야함
 		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
