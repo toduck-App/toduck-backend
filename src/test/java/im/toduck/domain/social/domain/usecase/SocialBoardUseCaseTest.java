@@ -260,6 +260,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updatedContent,
+				null,
 				updatedIsAnonymous,
 				updatedCategoryIds,
 				updatedImageUrls
@@ -319,6 +320,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			Long nonExistentSocialBoardId = -1L;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				null,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -337,6 +339,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				null,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -354,6 +357,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				null,
 				isAnonymous,
 				invalidCategoryIds,
 				imageUrls
@@ -371,6 +375,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				null,
 				isAnonymous,
 				List.of(),
 				imageUrls

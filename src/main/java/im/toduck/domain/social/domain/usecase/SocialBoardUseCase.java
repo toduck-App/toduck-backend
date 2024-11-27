@@ -71,14 +71,27 @@ public class SocialBoardUseCase {
 	}
 
 	@Transactional
-	public void updateSocialBoard(Long userId, Long socialId, SocialUpdateRequest request) {
+	public void updateSocialBoard(
+		final Long userId,
+		final Long socialId,
+		final SocialUpdateRequest request
+	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+		Routine routine = resolveRoutine(user, request.routineId());
 
+		socialBoardService.updateSocialBoard(user, socialBoard, routine, request);
 		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
-		socialBoardService.updateSocialBoard(user, socialBoard, request);
+	}
+
+	private Routine resolveRoutine(User user, Long routineId) {
+		if (routineId == null || routineId == 0) {
+			return null;
+		}
+		return routineService.getUserRoutine(user, routineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 	}
 
 	@Transactional(readOnly = true)

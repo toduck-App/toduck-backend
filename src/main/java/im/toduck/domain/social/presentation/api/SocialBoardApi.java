@@ -39,6 +39,7 @@ public interface SocialBoardApi {
 		),
 		errors = {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
 		}
 	)
 	ResponseEntity<ApiResponse<SocialCreateResponse>> createSocialBoard(
@@ -76,6 +77,7 @@ public interface SocialBoardApi {
 				}<br/><br/>
 				<p>위 예시는 게시글의 내용과 이미지를 변경하는 경우입니다. 익명 여부나 다른 필드를 수정하지 않으려면 해당 필드를 생략할 수 있습니다.</p><br/>
 				<b>주의사항:</b><br/>
+				<p>- 공유할 루틴을 제거하고 싶다면 routineId를 0으로 전송하면 됩니다.</p>
 				<p>- 이미지를 모두 지우고 싶다면 socialImageUrls를 빈 배열( [ ] )로 전송하면 됩니다.</p>
 				<p>- socialCategoryIds는 최소한 하나의 카테고리 ID가 존재해야 합니다. 빈 배열로 전송할 경우 에러가 발생합니다.</p>
 				"""
@@ -89,6 +91,7 @@ public interface SocialBoardApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
 		}
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateSocialBoard(

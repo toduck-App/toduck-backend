@@ -81,7 +81,12 @@ public class SocialBoardService {
 	}
 
 	@Transactional
-	public void updateSocialBoard(User user, Social socialBoard, SocialUpdateRequest request) {
+	public void updateSocialBoard(
+		final User user,
+		final Social socialBoard,
+		final Routine routine,
+		final SocialUpdateRequest request
+	) {
 		if (!isBoardOwner(socialBoard, user)) {
 			log.warn("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
@@ -104,6 +109,10 @@ public class SocialBoardService {
 
 			socialCategoryLinkRepository.deleteAllBySocial(socialBoard);
 			addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
+		}
+
+		if (request.routineId() != null) {
+			socialBoard.updateRoutine(routine);
 		}
 
 		if (request.content() != null) {

@@ -69,6 +69,10 @@ public class Social extends BaseEntity {
 		this.isAnonymous = isAnonymous;
 	}
 
+	public void updateRoutine(final Routine routine) {
+		this.routine = routine;
+	}
+
 	public void incrementLikeCount() {
 		this.likeCount++;
 	}
@@ -78,4 +82,5 @@ public class Social extends BaseEntity {
 			this.likeCount--;
 		}
 	}
+
 }

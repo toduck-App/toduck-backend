@@ -14,6 +14,10 @@ public record SocialUpdateRequest(
 	String content,
 
 	@Nullable
+	@Schema(description = "공유할 루틴 ID", example = "1")
+	Long routineId,
+
+	@Nullable
 	@Schema(description = "익명 여부 수정", example = "true")
 	Boolean isAnonymous,
 
