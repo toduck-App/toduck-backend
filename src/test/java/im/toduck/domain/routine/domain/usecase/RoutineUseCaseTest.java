@@ -28,11 +28,14 @@ import im.toduck.ServiceTest;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
+import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 ;
 
@@ -41,8 +44,14 @@ class RoutineUseCaseTest extends ServiceTest {
 
 	private User USER;
 
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	@Autowired
 	private RoutineUseCase routineUseCase;
+
+	@Autowired
+	private RoutineRepository routineRepository;
 
 	@Autowired
 	private RoutineRecordRepository routineRecordRepository;
@@ -245,6 +254,94 @@ class RoutineUseCaseTest extends ServiceTest {
 		@Test
 		void 모_루틴이_Soft_DELETE_된_경우에도_상태_변경이_가능하다() {
 
+		}
+	}
+
+	@Nested
+	@DisplayName("루틴 삭제시")
+	class DeleteRoutineTest {
+
+		@BeforeEach
+		void setUp() {
+			given(userService.getUserById(any(Long.class))).willReturn(Optional.ofNullable(USER));
+		}
+
+		@Test
+		void 모든_기록을_포함하여_삭제할_수_있다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+
+			testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_SYNCED_RECORD(routine)
+			);
+			testFixtureBuilder.buildRoutineRecord(
+				INCOMPLETED_SYNCED_RECORD(routine)
+			);
+			testFixtureBuilder.buildRoutineRecord(
+				OFFSET_COMPLETED_SYNCED_RECORD(routine, 1L)
+			);
+			testFixtureBuilder.buildRoutineRecord(
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 1L)
+			);
+
+			// when
+			routineUseCase.deleteRoutine(USER.getId(), routine.getId(), false);
+			entityManager.clear();
+
+			// then
+			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
+			Routine removedRoutine = routineRepository.findById(routine.getId()).get();
+			assertSoftly(softly -> {
+				softly.assertThat(remainingRecords).isEmpty();
+
+				softly.assertThat(removedRoutine.isInDeletedState()).isTrue();
+			});
+		}
+
+		@Test
+		void 미래의_미완료_기록만_삭제하고_나머지는_유지할_수_있다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+
+			// 미래의 미완료 기록 (삭제 대상)
+			RoutineRecord futureIncomplete1 = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 4L)
+			);
+			RoutineRecord futureIncomplete2 = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 5L)
+			);
+
+			// 미래의 완료 기록 (유지되어야 함)
+			RoutineRecord futureComplete = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_COMPLETED_SYNCED_RECORD(routine, 4L)
+			);
+			// 과거의 미완료 기록 (유지되어야 함)
+			RoutineRecord pastIncomplete = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_COMPLETED_SYNCED_RECORD(routine, -3L)
+			);
+
+			// when
+			routineUseCase.deleteRoutine(USER.getId(), routine.getId(), true);
+			entityManager.clear();
+
+			// then
+			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
+			Routine removedRoutine = routineRepository.findById(routine.getId()).get();
+
+			assertSoftly(softly -> {
+				softly.assertThat(remainingRecords).hasSize(2);
+
+				List<Long> remainingIds = remainingRecords.stream()
+					.map(RoutineRecord::getId)
+					.toList();
+
+				softly.assertThat(remainingIds)
+					.contains(futureComplete.getId(), pastIncomplete.getId());
+				softly.assertThat(remainingIds)
+					.doesNotContain(futureIncomplete1.getId(), futureIncomplete2.getId());
+
+				softly.assertThat(removedRoutine.isInDeletedState()).isTrue();
+			});
 		}
 	}
 
