@@ -37,10 +37,11 @@ public class RoutineService {
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
 	) {
+		// TODO: 여기에선 삭제되면 조회되면 안됨, 근데 삭제 시점 미래 기준으로는 조회가 안되는거고 과거 시점이면 조회가 되어야함
 		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
 	}
 
-	public Optional<Routine> getUserRoutine(final User user, final Long id) {
+	public Optional<Routine> getUserRoutineIncludingDeleted(final User user, final Long id) {
 		return routineRepository.findByIdAndUser(id, user);
 	}
 
@@ -49,6 +50,12 @@ public class RoutineService {
 	}
 
 	public List<Routine> getAvailableRoutine(final User user) {
-		return routineRepository.findAllByUserAndIsPublicTrueOrderByUpdatedAtDesc(user);
+		return routineRepository.findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByUpdatedAtDesc(user);
+	}
+
+	@Transactional
+	public void remove(final Routine routine) {
+		routine.delete();
+		routineRepository.save(routine);
 	}
 }

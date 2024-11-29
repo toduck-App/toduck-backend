@@ -63,8 +63,7 @@ public class RoutineUseCase {
 	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-
-		Routine routine = routineService.getUserRoutine(user, routineId)
+		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
 		LocalDate date = request.routineDate();
@@ -78,6 +77,7 @@ public class RoutineUseCase {
 			return;
 		}
 
+		// TODO: 이때는 루틴이 삭제 상태인 경우 삭제시점 이전 데이터만 반복 가능
 		if (!routineService.canCreateRecordForDate(routine, date)) {
 			log.info("루틴 상태 변경 실패 - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
 			throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
@@ -94,11 +94,9 @@ public class RoutineUseCase {
 	public RoutineDetailResponse readDetail(final Long userId, final Long routineId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-
-		Routine routine = routineService.getUserRoutine(user, routineId)
+		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
-		log.info("본인 루틴 상세조회 - UserId: {}, RoutineId: {}", userId, routineId);
 		return RoutineMapper.toRoutineDetailResponse(routine);
 	}
 
@@ -106,10 +104,30 @@ public class RoutineUseCase {
 	public MyRoutineAvailableListResponse readMyAvailableRoutineList(final Long userId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-
 		List<Routine> routines = routineService.getAvailableRoutine(user);
 
 		log.info("사용가능한 본인 루틴 목록 조회 - 사용자 Id: {}", userId);
 		return RoutineMapper.toMyRoutineAvailableListResponse(routines);
 	}
+
+	@Transactional
+	public void deleteRoutine(final Long userId, final Long routineId, final boolean keepRecords) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		if (keepRecords) {
+			routineRecordService.removeIncompletedFuturesByRoutine(routine);
+			routineService.remove(routine);
+			log.info("루틴 삭제 성공(기록 유지) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
+			return;
+		}
+
+		routineRecordService.removeAllByRoutine(routine);
+		routineService.remove(routine);
+		log.info("루틴 삭제 성공(기록 포함 삭제) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
+	}
+
+	// TODO: 삭제된 루틴에 대해서는 루틴 수정 금지 필요
 }

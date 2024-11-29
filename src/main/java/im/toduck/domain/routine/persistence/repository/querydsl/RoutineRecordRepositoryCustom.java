@@ -15,4 +15,6 @@ public interface RoutineRecordRepositoryCustom {
 		final Routine routine,
 		final LocalDate date
 	);
+
+	void deleteIncompletedFuturesByRoutine(final Routine routine);
 }

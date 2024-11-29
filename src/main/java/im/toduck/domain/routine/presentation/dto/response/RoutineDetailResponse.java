@@ -33,6 +33,12 @@ public record RoutineDetailResponse(
 	@Schema(description = "루틴 시간(null 이면 종일 루틴)", example = "14:30")
 	LocalTime time,
 
+	@Schema(description = "루틴 공개/비공개 여부", example = "true")
+	Boolean isPublic,
+
+	@Schema(description = "이미 삭제된 루틴인지 여부, true 일 경우 이미 모 루틴이 삭제된 상태임", example = "true")
+	Boolean isInDeletedState,
+
 	@JsonSerialize(using = DayOfWeekListSerializer.class)
 	@Schema(description = "반복 요일", example = "[\"MONDAY\",\"TUESDAY\"]")
 	List<DayOfWeek> daysOfWeek,

@@ -13,23 +13,37 @@ public class RoutineRecordFixtures {
 	private static final Random random = new Random();
 
 	public static RoutineRecord COMPLETED_SYNCED_RECORD(Routine routine) {
-		return createRoutineRecord(routine, true, false);
+		return createRoutineRecord(routine, true, false, 0L);
 	}
 
 	public static RoutineRecord INCOMPLETED_SYNCED_RECORD(Routine routine) {
-		return createRoutineRecord(routine, false, false);
+		return createRoutineRecord(routine, false, false, 0L);
 	}
 
 	public static RoutineRecord COMPLETED_MODIFIED_RECORD(Routine routine) {
-		return createRoutineRecord(routine, true, true);
+		return createRoutineRecord(routine, true, true, 0L);
 	}
 
 	public static RoutineRecord INCOMPLETED_MODIFIED_RECORD(Routine routine) {
-		return createRoutineRecord(routine, false, true);
+		return createRoutineRecord(routine, false, true, 0L);
 	}
 
-	private static RoutineRecord createRoutineRecord(Routine routine, boolean isCompleted, boolean isModified) {
-		LocalDateTime recordedAt = isModified ? calculateModifiedRecordAt(routine) : calculateSyncedRecordAt(routine);
+	public static RoutineRecord OFFSET_COMPLETED_SYNCED_RECORD(Routine routine, Long weekOffset) {
+		return createRoutineRecord(routine, true, false, weekOffset);
+	}
+
+	public static RoutineRecord OFFSET_INCOMPLETED_SYNCED_RECORD(Routine routine, Long weekOffset) {
+		return createRoutineRecord(routine, false, false, weekOffset);
+	}
+
+	private static RoutineRecord createRoutineRecord(
+		Routine routine,
+		boolean isCompleted,
+		boolean isModified,
+		Long weekOffset
+	) {
+		LocalDateTime recordedAt =
+			isModified ? calculateModifiedRecordAt(routine, weekOffset) : calculateSyncedRecordAt(routine, weekOffset);
 
 		return RoutineRecord.builder()
 			.routine(routine)
@@ -39,22 +53,29 @@ public class RoutineRecordFixtures {
 			.build();
 	}
 
-	private static LocalDateTime calculateSyncedRecordAt(Routine routine) {
-		return calculateRecordAt(routine, routine.getTime(), true);
+	private static LocalDateTime calculateSyncedRecordAt(Routine routine, Long weekOffset) {
+		return calculateRecordAt(routine, routine.getTime(), true, weekOffset);
 	}
 
-	private static LocalDateTime calculateModifiedRecordAt(Routine routine) {
-		return calculateRecordAt(routine, generateDifferentTime(routine.getTime()), false);
+	private static LocalDateTime calculateModifiedRecordAt(Routine routine, Long weekOffset) {
+		return calculateRecordAt(routine, generateDifferentTime(routine.getTime()), false, weekOffset);
 	}
 
-	private static LocalDateTime calculateRecordAt(Routine routine, LocalTime time, boolean shouldIncludeDay) {
+	private static LocalDateTime calculateRecordAt(
+		Routine routine, LocalTime time,
+		boolean shouldIncludeDay,
+		long weekOffset
+	) {
 		LocalDate startDate = routine.getCreatedAt().toLocalDate();
 		LocalTime routineTime = time != null ? time : LocalTime.MIDNIGHT;
+
+		startDate = startDate.plusDays(weekOffset * 7);
 
 		while (true) {
 			if (routine.getDaysOfWeekBitmask().includesDayOf(startDate) == shouldIncludeDay) {
 				return LocalDateTime.of(startDate, routineTime);
 			}
+
 			startDate = startDate.plusDays(1);
 		}
 	}

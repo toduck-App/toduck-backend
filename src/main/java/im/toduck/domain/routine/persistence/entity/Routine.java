@@ -1,5 +1,6 @@
 package im.toduck.domain.routine.persistence.entity;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
@@ -97,5 +98,13 @@ public class Routine extends BaseEntity {
 
 	public String getMemoValue() {
 		return memo.getValue();
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	public Boolean isInDeletedState() {
+		return deletedAt != null;
 	}
 }
