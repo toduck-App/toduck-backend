@@ -1,5 +1,6 @@
 package im.toduck.domain.social.domain.usecase;
 
+import static im.toduck.fixtures.RoutineFixtures.*;
 import static im.toduck.fixtures.social.CommentFixtures.*;
 import static im.toduck.fixtures.social.LikeFixtures.*;
 import static im.toduck.fixtures.social.SocialCategoryFixtures.*;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
@@ -331,6 +333,87 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 				() -> socialBoardUseCase.updateSocialBoard(USER.getId(), nonExistentSocialBoardId, updateRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
+		}
+
+		@Test
+		void 존재하지_않거나_권한이_없는_루틴_ID인_경우_수정에_실패한다() {
+			// given
+			Long invalidRoutineId = -1L;
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				updateContent,
+				invalidRoutineId,
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialBoardUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_ROUTINE.getMessage());
+		}
+
+		@Test
+		void 루틴_ID가_0인_경우_해당_게시글의_공유_루틴을_제거한다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
+				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
+			);
+
+			Long removeRoutineId = 0L;
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				updateContent,
+				removeRoutineId,
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when
+			socialBoardUseCase.updateSocialBoard(USER.getId(), SOCIAL_WITH_ROUTINE.getId(), updateRequest);
+
+			// then
+			Social socialBoard = socialRepository.findById(SOCIAL_WITH_ROUTINE.getId())
+				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+			assertSoftly(softly -> {
+				softly.assertThat(socialBoard.getContent()).isEqualTo(updateRequest.content());
+				softly.assertThat(socialBoard.getRoutine()).isNull();
+				softly.assertThat(socialBoard.getIsAnonymous()).isEqualTo(updateRequest.isAnonymous());
+			});
+		}
+
+		@Test
+		void 루틴_ID가_null인_경우_해당_게시글의_공유_루틴을_변경하지_않는다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
+				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
+			);
+
+			Long unchangedRoutineId = null;
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				updateContent,
+				unchangedRoutineId,
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when
+			socialBoardUseCase.updateSocialBoard(USER.getId(), SOCIAL_WITH_ROUTINE.getId(), updateRequest);
+
+			// then
+			Social socialBoard = socialRepository.findById(SOCIAL_WITH_ROUTINE.getId())
+				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+			assertSoftly(softly -> {
+				softly.assertThat(socialBoard.getContent()).isEqualTo(updateRequest.content());
+				softly.assertThat(socialBoard.getRoutine().getId()).isEqualTo(ROUTINE.getId());
+				softly.assertThat(socialBoard.getIsAnonymous()).isEqualTo(updateRequest.isAnonymous());
+			});
 		}
 
 		@Test
