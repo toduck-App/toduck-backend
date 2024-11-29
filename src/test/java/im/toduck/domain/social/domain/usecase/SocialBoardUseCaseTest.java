@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
@@ -67,6 +68,9 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private CommentRepository commentRepository;
+
+	@Autowired
+	private RoutineRepository routineRepository;
 
 	@BeforeEach
 	public void setUp() {
@@ -158,6 +162,22 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		}
 
 		@Test
+		void 게시글이_삭제되어도_루틴은_삭제되지_않는다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
+				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
+			);
+
+			// when
+			socialBoardUseCase.deleteSocialBoard(USER.getId(), SOCIAL_WITH_ROUTINE.getId());
+
+			// then
+			Optional<Routine> existingRoutine = routineRepository.findById(ROUTINE.getId());
+			assertThat(existingRoutine).isPresent();
+		}
+
+		@Test
 		void 사용자를_조회할_수_없는_경우_게시글_삭제에_실패한다() {
 			// given
 			Long nonExistentUserId = -1L;
@@ -205,6 +225,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 			});
 		}
+
 	}
 
 	@Nested
