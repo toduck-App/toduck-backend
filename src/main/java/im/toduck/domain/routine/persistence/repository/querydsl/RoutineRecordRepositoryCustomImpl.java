@@ -1,6 +1,7 @@
 package im.toduck.domain.routine.persistence.repository.querydsl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,5 +58,17 @@ public class RoutineRecordRepositoryCustomImpl implements RoutineRecordRepositor
 			date.atStartOfDay(),
 			date.plusDays(1).atStartOfDay().minusNanos(1)
 		);
+	}
+
+	@Override
+	public void deleteIncompletedFuturesByRoutine(final Routine routine) {
+		queryFactory
+			.delete(qRecord)
+			.where(
+				qRecord.routine.eq(routine),
+				qRecord.recordAt.after(LocalDateTime.now()),
+				qRecord.isCompleted.isFalse()
+			)
+			.execute();
 	}
 }

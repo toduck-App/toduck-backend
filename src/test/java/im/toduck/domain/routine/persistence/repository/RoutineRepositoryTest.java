@@ -13,7 +13,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -133,16 +132,36 @@ class RoutineRepositoryTest extends RepositoryTest {
 			assertThat(unrecordedRoutines).contains(WEEKDAY_MORNING_ROUTINE1, WEEKDAY_MORNING_ROUTINE2);
 		}
 
-		@Disabled("삭제된 루틴에 대한 테스트 케이스 아직 구현되지 않음")
 		@Test
-		void 삭제된_루틴이_조회되지_않는다() {
-			// TODO: 삭제된 루틴에 대한 테스트 케이스 구현
+		void 루틴이_삭제되었더라면_삭제시점_이후_날짜로_조회시_조회되지_않는다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(
+				DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
+					getNextDayOfWeek(DayOfWeek.MONDAY).minusDays(1).atTime(23, 59, 59))
+			);
+			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
+
+			// when
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, monday, List.of());
+
+			// then
+			assertThat(unrecordedRoutines).doesNotContain(ROUTINE);
 		}
 
-		@Disabled("특정 기간 동안 유효한 루틴에 대한 테스트 케이스 아직 구현되지 않음")
 		@Test
 		void 특정_기간_동안만_유효한_루틴이_해당_기간_내에서_올바르게_조회된다() {
-			// TODO: 특정 기간 동안 유효한 루틴에 대한 테스트 케이스 구현
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(
+				DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
+					getNextDayOfWeek(DayOfWeek.MONDAY).plusDays(7).atTime(7, 59, 59))
+			);
+			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
+
+			// when
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, monday, List.of());
+
+			// then
+			assertThat(unrecordedRoutines).contains(ROUTINE);
 		}
 	}
 
@@ -188,16 +207,36 @@ class RoutineRepositoryTest extends RepositoryTest {
 			assertThat(isActive).isFalse();
 		}
 
-		@Disabled
 		@Test
-		void 모_루틴이_삭제된_경우에도_정상적으로_확인한다() {
-			// TODO: 삭제된 루틴에 대한 테스트 케이스 구현
+		void 루틴이_삭제되었더라면_삭제시점_이후_날짜에_대해_정상적으로_확인된다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(
+				DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
+					getNextDayOfWeek(DayOfWeek.MONDAY).minusDays(1).atTime(23, 59, 59))
+			);
+			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
+
+			// when
+			boolean isActive = routineRepository.isActiveForDate(ROUTINE, monday);
+
+			// then
+			assertThat(isActive).isFalse();
 		}
 
-		@Disabled
 		@Test
-		void 특정_기간_동안만_유효한_루틴이_해당_기간_내에서_확인된다() {
-			// TODO: 특정 기간 동안 유효한 루틴에 대한 테스트 케이스 구현
+		void 특정_기간_동안만_유효한_루틴이_해당_기간_내에서_정상적으로_확인된다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutine(
+				DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
+					getNextDayOfWeek(DayOfWeek.MONDAY).plusDays(7).atTime(7, 59, 59))
+			);
+			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
+
+			// when
+			boolean isActive = routineRepository.isActiveForDate(ROUTINE, monday);
+
+			// then
+			assertThat(isActive).isTrue();
 		}
 	}
 
@@ -208,5 +247,4 @@ class RoutineRepositoryTest extends RepositoryTest {
 	private LocalDate getPreviousDayOfWeek(DayOfWeek dayOfWeek) {
 		return LocalDate.now().with(TemporalAdjusters.previous(dayOfWeek));
 	}
-
 }

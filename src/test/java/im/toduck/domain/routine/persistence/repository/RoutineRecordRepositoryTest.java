@@ -153,4 +153,87 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 			});
 		}
 	}
+
+	@Nested
+	@DisplayName("미래의 미완료 루틴 기록 삭제시")
+	class DeleteIncompletedFuturesByRoutineTest {
+
+		@Test
+		void 미래의_미완료_루틴_기록만_삭제된다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+
+			// 미래의 미완료 기록 (삭제 대상)
+			RoutineRecord futureIncomplete1 = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 4L)
+			);
+			RoutineRecord futureIncomplete2 = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 5L)
+			);
+
+			// 미래의 완료 기록 (유지되어야 함)
+			RoutineRecord futureComplete = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_COMPLETED_SYNCED_RECORD(routine, 4L)
+			);
+
+			// 과거의 미완료 기록 (유지되어야 함)
+			RoutineRecord pastIncomplete = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_COMPLETED_SYNCED_RECORD(routine, -3L)
+			);
+
+			// when
+			routineRecordRepository.deleteIncompletedFuturesByRoutine(routine);
+
+			// then
+			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
+
+			assertSoftly(softly -> {
+				softly.assertThat(remainingRecords).hasSize(2);
+				softly.assertThat(remainingRecords).contains(futureComplete);
+				softly.assertThat(remainingRecords).contains(pastIncomplete);
+				softly.assertThat(remainingRecords).doesNotContain(futureIncomplete1);
+				softly.assertThat(remainingRecords).doesNotContain(futureIncomplete2);
+			});
+		}
+
+		@Test
+		void 다른_루틴의_기록은_영향받지_않는다() {
+			// given
+			Routine routine1 = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			Routine routine2 = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+
+			// routine1의 미래 미완료 기록 (삭제 대상)
+			RoutineRecord routine1Future = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine1, 0L)
+			);
+
+			// routine2의 미래 미완료 기록 (유지되어야 함)
+			RoutineRecord routine2Future = testFixtureBuilder.buildRoutineRecord(
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine2, 0L)
+			);
+
+			// when
+			routineRecordRepository.deleteIncompletedFuturesByRoutine(routine1);
+
+			// then
+			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
+
+			assertSoftly(softly -> {
+				softly.assertThat(remainingRecords).hasSize(1);
+				softly.assertThat(remainingRecords).contains(routine2Future);
+				softly.assertThat(remainingRecords).doesNotContain(routine1Future);
+			});
+		}
+
+		@Test
+		void 루틴_기록이_없는_경우_정상_동작한다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+
+			// when & then
+			assertThatCode(() ->
+				routineRecordRepository.deleteIncompletedFuturesByRoutine(routine)
+			).doesNotThrowAnyException();
+		}
+	}
 }
