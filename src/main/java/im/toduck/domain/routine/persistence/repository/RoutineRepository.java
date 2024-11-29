@@ -15,4 +15,6 @@ public interface RoutineRepository extends JpaRepository<Routine, Long>, Routine
 	Optional<Routine> findByIdAndUser(Long id, User user);
 
 	List<Routine> findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByUpdatedAtDesc(User user);
+
+	Optional<Routine> findByIdAndUserAndDeletedAtIsNull(Long id, User user);
 }

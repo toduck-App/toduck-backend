@@ -41,6 +41,10 @@ public class RoutineService {
 		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
 	}
 
+	public Optional<Routine> getUserRoutine(final User user, final Long id) {
+		return routineRepository.findByIdAndUserAndDeletedAtIsNull(id, user);
+	}
+
 	public Optional<Routine> getUserRoutineIncludingDeleted(final User user, final Long id) {
 		return routineRepository.findByIdAndUser(id, user);
 	}
