@@ -106,4 +106,15 @@ public class SocialInteractionController implements SocialInteractionApi {
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialInteractionUseCase.createCommentLike(user.getUserId(), commentId)));
 	}
+
+	@Override
+	@DeleteMapping("/comments/{commentId}/likes")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteCommentLike(
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		socialInteractionUseCase.deleteCommentLike(user.getUserId(), commentId);
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+	}
 }

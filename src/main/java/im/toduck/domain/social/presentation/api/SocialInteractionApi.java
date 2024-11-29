@@ -142,11 +142,29 @@ public interface SocialInteractionApi {
 			description = "댓글 좋아요 성공, 생성된 좋아요의 Id를 반환합니다."
 		),
 		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_LIKE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_COMMENT_LIKE),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
 		}
 	)
 	ResponseEntity<ApiResponse<CommentLikeCreateResponse>> createCommentLike(
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "댓글 좋아요 취소",
+		description = "지정된 댓글의 좋아요를 취소합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "댓글 좋아요 취소 성공, 빈 content 객체를 반환합니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT_LIKE),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteCommentLike(
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);

@@ -135,4 +135,17 @@ public class SocialInteractionUseCase {
 		return CommentLikeMapper.toCommentLikeCreateResponse(commentLike);
 	}
 
+	@Transactional
+	public void deleteCommentLike(Long userId, Long commentId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Comment comment = socialInteractionService.getCommentById(commentId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT));
+		CommentLike commentLike = socialInteractionService.getCommentLikeByUserAndComment(user, comment)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT_LIKE));
+		comment.decrementLikeCount();
+
+		socialInteractionService.deleteCommentLike(user, comment, commentLike);
+		log.info("댓글 좋아요 삭제 - UserId: {}, CommentId: {}, LikeId: {}", userId, commentId, commentLike.getId());
+	}
 }

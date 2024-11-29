@@ -1,6 +1,7 @@
 package im.toduck.domain.social.domain.usecase;
 
 import static im.toduck.fixtures.social.CommentFixtures.*;
+import static im.toduck.fixtures.social.CommentLikeFixtures.*;
 import static im.toduck.fixtures.social.LikeFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
 import static im.toduck.fixtures.user.BlockFixtures.*;
@@ -466,6 +467,66 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 
 			// when & then
 			assertThatThrownBy(() -> socialInteractionUseCase.createCommentLike(nonExistentUserId, COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("댓글 좋아요 삭제시")
+	class DeleteCommentLikeTest {
+
+		Social SOCIAL_BOARD;
+		Comment COMMENT;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
+		}
+
+		@Test
+		void 댓글에_좋아요를_성공적으로_삭제한다() {
+			// given
+			CommentLike commentLike = testFixtureBuilder.buildCommentLike(COMMENT_LIKE(USER, COMMENT));
+
+			// when
+			socialInteractionUseCase.deleteCommentLike(USER.getId(), COMMENT.getId());
+
+			// then
+			Comment afterComment = commentRepository.findById(COMMENT.getId()).orElseThrow();
+			assertSoftly(softly -> {
+				softly.assertThat(commentLikeRepository.findCommentLikeByUserAndComment(USER, COMMENT)).isNotPresent();
+				softly.assertThat(afterComment.getLikeCount()).isEqualTo(0);
+			});
+		}
+
+		@Test
+		void 댓글에_좋아요가_존재하지_않는_경우_예외를_발생시킨다() {
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteCommentLike(USER.getId(), COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT_LIKE.getMessage());
+		}
+
+		@Test
+		void 존재하지_않는_댓글에_좋아요를_삭제하려고_하면_예외를_발생시킨다() {
+			// given
+			Long nonExistentCommentId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteCommentLike(USER.getId(), nonExistentCommentId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT.getMessage());
+		}
+
+		@Test
+		void 사용자를_조회할_수_없는_경우_댓글_좋아요_삭제에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteCommentLike(nonExistentUserId, COMMENT.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
 		}

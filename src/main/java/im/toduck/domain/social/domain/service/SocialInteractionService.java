@@ -150,5 +150,16 @@ public class SocialInteractionService {
 
 		return commentLikeRepository.save(commentLike);
 	}
+
+	@Transactional(readOnly = true)
+	public Optional<CommentLike> getCommentLikeByUserAndComment(final User user, final Comment comment) {
+		return commentLikeRepository.findCommentLikeByUserAndComment(user, comment);
+	}
+
+	@Transactional
+	public void deleteCommentLike(final User user, final Comment comment, final CommentLike commentLike) {
+		commentLikeRepository.delete(commentLike);
+	}
+
 }
 

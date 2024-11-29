@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
@@ -64,6 +65,10 @@ public class TestFixtureBuilder {
 
 	public Block buildBlock(final Block block) {
 		return bs.blockRepository().save(block);
+	}
+
+	public CommentLike buildCommentLike(final CommentLike commentLike) {
+		return bs.commentLikeRepository().save(commentLike);
 	}
 
 }
