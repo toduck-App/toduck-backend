@@ -516,6 +516,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 	@DisplayName("게시글 단건 조회시")
 	class GetSocialDetail {
 		Social SOCIAL_BOARD;
+		Routine ROUTINE;
 		Comment COMMENT;
 		Like LIKE;
 		List<SocialImageFile> IMAGE_FILES;
@@ -526,7 +527,8 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false));
 			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
 			LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));
 			IMAGE_FILES = testFixtureBuilder.buildSocialImageFiles(
@@ -548,6 +550,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
 				softly.assertThat(response.id()).isEqualTo(SOCIAL_BOARD.getId());
+				softly.assertThat(response.routine().routineId()).isEqualTo(ROUTINE.getId());
 				softly.assertThat(response.content()).isEqualTo(SOCIAL_BOARD.getContent());
 				softly.assertThat(response.hasImages()).isTrue();
 				softly.assertThat(response.likeInfo().isLiked()).isTrue();
