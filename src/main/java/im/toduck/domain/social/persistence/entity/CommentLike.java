@@ -40,14 +40,6 @@ public class CommentLike extends BaseEntity {
 		this.comment = comment;
 	}
 
-	public boolean isOwner(final User requestingUser) {
-		return this.user.getId().equals(requestingUser.getId());
-	}
-
-	public boolean isForComment(final Comment comment) {
-		return this.comment.getId().equals(comment.getId());
-	}
-
 	public void softDelete() {
 		this.deletedAt = LocalDateTime.now();
 	}

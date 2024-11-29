@@ -59,6 +59,9 @@ public class SocialInteractionService {
 			throw CommonException.from(ExceptionCode.INVALID_COMMENT_FOR_BOARD);
 		}
 
+		List<CommentLike> commentLikes = commentLikeRepository.findAllByComment(comment);
+		commentLikes.forEach(CommentLike::softDelete);
+
 		commentRepository.delete(comment);
 	}
 

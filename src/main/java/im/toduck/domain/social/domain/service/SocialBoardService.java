@@ -11,11 +11,13 @@ import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
 import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
@@ -40,6 +42,7 @@ public class SocialBoardService {
 	private final SocialImageFileRepository socialImageFileRepository;
 	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
 	private final CommentRepository commentRepository;
+	private final CommentLikeRepository commentLikeRepository;
 	private final LikeRepository likeRepository;
 
 	@Transactional(readOnly = true)
@@ -67,6 +70,10 @@ public class SocialBoardService {
 		socialCategoryLinks.forEach(SocialCategoryLink::softDelete);
 
 		List<Comment> comments = commentRepository.findAllBySocial(socialBoard);
+		comments.forEach(comment -> {
+			List<CommentLike> commentLikes = commentLikeRepository.findAllByComment(comment);
+			commentLikeRepository.deleteAll(commentLikes);
+		});
 		comments.forEach(Comment::softDelete);
 
 		List<Like> likes = likeRepository.findAllBySocial(socialBoard);

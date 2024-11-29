@@ -30,6 +30,7 @@ import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
@@ -65,6 +66,9 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private CommentRepository commentRepository;
+
+	@Autowired
+	private CommentLikeRepository commentLikeRepository;
 
 	@BeforeEach
 	public void setUp() {
