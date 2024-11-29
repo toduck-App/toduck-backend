@@ -137,6 +137,25 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY.getMessage());
 		}
 
+		@Test
+		void 루틴이_자신의_소유가_아닌_경우_게시글_생성에_실패한다() {
+			// given
+			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
+			Routine ANOTHER_USER_ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(ANOTHER_USER));
+			SocialCreateRequest requestWithAnotherUserRoutine = new SocialCreateRequest(
+				content,
+				ANOTHER_USER_ROUTINE.getId(),
+				isAnonymous,
+				categoryIds,
+				imageUrls
+			);
+
+			// when & then
+			assertThatThrownBy(() -> socialBoardUseCase.createSocialBoard(USER.getId(), requestWithAnotherUserRoutine))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_ROUTINE.getMessage());
+		}
+
 	}
 
 	@Nested
