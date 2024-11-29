@@ -6,14 +6,17 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.LikeMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Report;
 import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.ReportRepository;
@@ -31,6 +34,7 @@ public class SocialInteractionService {
 	private final CommentRepository commentRepository;
 	private final LikeRepository likeRepository;
 	private final ReportRepository reportRepository;
+	private final CommentLikeRepository commentLikeRepository;
 
 	@Transactional
 	public Comment createComment(User user, Social socialBoard, CommentCreateRequest request) {
@@ -127,6 +131,24 @@ public class SocialInteractionService {
 
 	private boolean isLikeOwner(Like like, User user) {
 		return like.isOwner(user);
+	}
+
+	@Transactional
+	public CommentLike createCommentLike(final User user, final Comment comment) {
+		Optional<CommentLike> existingCommentLike = commentLikeRepository.findCommentLikeByUserAndComment(
+			user,
+			comment
+		);
+
+		if (existingCommentLike.isPresent()) {
+			log.warn("이미 댓글에 좋아요가 존재 - UserId: {}, CommentId: {}", user.getId(), comment.getId());
+			throw CommonException.from(ExceptionCode.EXISTS_COMMENT_LIKE);
+		}
+
+		CommentLike commentLike = CommentLikeMapper.toCommentLike(user, comment);
+		comment.incrementLikeCount();
+
+		return commentLikeRepository.save(commentLike);
 	}
 }
 

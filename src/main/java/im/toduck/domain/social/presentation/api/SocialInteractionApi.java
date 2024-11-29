@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
@@ -128,6 +129,25 @@ public interface SocialInteractionApi {
 	ResponseEntity<ApiResponse<ReportCreateResponse>> reportSocialBoard(
 		@RequestBody ReportCreateRequest request,
 		@PathVariable Long socialId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "댓글 좋아요",
+		description = "지정된 댓글을 좋아요 합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = CommentCreateResponse.class,
+			description = "댓글 좋아요 성공, 생성된 좋아요의 Id를 반환합니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_LIKE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
+		}
+	)
+	ResponseEntity<ApiResponse<CommentLikeCreateResponse>> createCommentLike(
+		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

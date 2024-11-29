@@ -2,18 +2,21 @@ package im.toduck.domain.social.domain.usecase;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.LikeMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Report;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.domain.user.domain.service.UserService;
@@ -118,4 +121,18 @@ public class SocialInteractionUseCase {
 			userService.blockUser(blocker, blockedUser);
 		}
 	}
+
+	@Transactional
+	public CommentLikeCreateResponse createCommentLike(Long userId, Long commentId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Comment comment = socialInteractionService.getCommentById(commentId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT));
+
+		CommentLike commentLike = socialInteractionService.createCommentLike(user, comment);
+
+		log.info("댓글 좋아요 생성 - UserId: {}, CommentId: {}, LikeId: {}", userId, commentId, commentLike.getId());
+		return CommentLikeMapper.toCommentLikeCreateResponse(commentLike);
+	}
+
 }

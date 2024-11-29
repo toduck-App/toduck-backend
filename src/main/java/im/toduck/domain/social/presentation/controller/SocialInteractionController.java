@@ -17,6 +17,7 @@ import im.toduck.domain.social.presentation.api.SocialInteractionApi;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -93,5 +94,16 @@ public class SocialInteractionController implements SocialInteractionApi {
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(
 				socialInteractionUseCase.reportSocial(user.getUserId(), socialId, request)));
+	}
+
+	@Override
+	@PostMapping("/comments/{commentId}/likes")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CommentLikeCreateResponse>> createCommentLike(
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(socialInteractionUseCase.createCommentLike(user.getUserId(), commentId)));
 	}
 }
