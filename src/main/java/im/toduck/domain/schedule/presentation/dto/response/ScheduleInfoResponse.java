@@ -1,4 +1,4 @@
-package im.toduck.domain.user.persistence.entity;
+package im.toduck.domain.schedule.presentation.dto.response;
 
 import lombok.Builder;
 

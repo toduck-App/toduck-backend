@@ -1,4 +1,4 @@
-package im.toduck.domain.schedule.presentation.dto;
+package im.toduck.domain.schedule.presentation.dto.request;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

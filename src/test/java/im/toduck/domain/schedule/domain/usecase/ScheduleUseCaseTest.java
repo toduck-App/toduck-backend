@@ -14,15 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import im.toduck.UseCaseTest;
 import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
-import im.toduck.domain.schedule.presentation.dto.ScheduleCreateRequest;
-import im.toduck.domain.user.persistence.entity.ScheduleInfoResponse;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.security.authentication.CustomUserDetails;
 
-class ScheduleUsecaseTest extends UseCaseTest {
+class ScheduleUseCaseTest extends UseCaseTest {
 
 	@Autowired
-	private ScheduleUsecase scheduleUsecase;
+	private ScheduleUseCase scheduleUsecase;
 
 	@Nested
 	@DisplayName("<일정생성>")
