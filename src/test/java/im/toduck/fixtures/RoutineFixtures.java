@@ -1,9 +1,12 @@
 package im.toduck.fixtures;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+
+import org.springframework.test.util.ReflectionTestUtils;
 
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
@@ -130,5 +133,13 @@ public class RoutineFixtures {
 			.color(PlanCategoryColor.from("#006400"))
 			.isPublic(false)
 			.build();
+
+	}
+
+	public static Routine DELETED_MONDAY_ONLY_MORNING_ROUTINE(User user, LocalDateTime dateTime) {
+		Routine routine = MONDAY_ONLY_MORNING_ROUTINE(user);
+		ReflectionTestUtils.setField(routine, "deletedAt", dateTime);
+
+		return routine;
 	}
 }

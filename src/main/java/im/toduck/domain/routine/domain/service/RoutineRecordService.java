@@ -47,4 +47,12 @@ public class RoutineRecordService {
 			})
 			.orElse(false);
 	}
+
+	public void removeIncompletedFuturesByRoutine(final Routine routine) {
+		routineRecordRepository.deleteIncompletedFuturesByRoutine(routine);
+	}
+
+	public void removeAllByRoutine(final Routine routine) {
+		routineRecordRepository.deleteAllByRoutine(routine);
+	}
 }

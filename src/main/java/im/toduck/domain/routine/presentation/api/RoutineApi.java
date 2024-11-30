@@ -95,7 +95,7 @@ public interface RoutineApi {
 	ResponseEntity<ApiResponse<RoutineDetailResponse>> getMyRoutineDetail(
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
 		@Parameter(description = "상세 조회할 루틴의 Id", required = true, example = "1")
-		@PathVariable Long routineId
+		@PathVariable final Long routineId
 	);
 
 	@Operation(
@@ -110,5 +110,25 @@ public interface RoutineApi {
 	)
 	ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails
+	);
+
+	@Operation(
+		summary = "루틴 삭제",
+		description = "루틴을 삭제합니다. keepRecords 파라미터를 통해 이전 기록 유지 여부를 결정할 수 있습니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "루틴 삭제 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE)
+		}
+	)
+	ResponseEntity<ApiResponse<?>> deleteRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "삭제할 루틴의 Id", required = true, example = "1")
+		@PathVariable final Long routineId,
+		@Parameter(description = "기록 유지 여부 (true: 기록 유지, false: 모두 삭제)", required = true)
+		@RequestParam final Boolean keepRecords
 	);
 }
