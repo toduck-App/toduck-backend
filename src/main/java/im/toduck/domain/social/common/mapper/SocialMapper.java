@@ -2,7 +2,6 @@ package im.toduck.domain.social.common.mapper;
 
 import java.util.List;
 
-import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
@@ -37,16 +36,17 @@ public class SocialMapper {
 	public static SocialDetailResponse toSocialDetailResponse(
 		Social socialBoard,
 		List<SocialImageFile> imageFiles,
-		List<Comment> comments,
-		boolean isLiked) {
+		List<CommentDto> comments,
+		boolean isSocialBoardLiked
+	) {
 		return SocialDetailResponse.builder()
 			.id(socialBoard.getId())
 			.owner(getOwner(socialBoard.getUser()))
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
 			.content(socialBoard.getContent())
-			.likeInfo(getLikeDto(socialBoard, isLiked))
-			.comments(getCommentDtos(comments))
+			.likeInfo(getLikeDto(socialBoard, isSocialBoardLiked))
+			.comments(comments)
 			.createdAt(socialBoard.getCreatedAt())
 			.build();
 
@@ -77,12 +77,6 @@ public class SocialMapper {
 	private static List<SocialImageDto> getImageDtos(List<SocialImageFile> imageFiles) {
 		return imageFiles.stream()
 			.map(SocialImageFileMapper::toSocialImageDto)
-			.toList();
-	}
-
-	private static List<CommentDto> getCommentDtos(List<Comment> comments) {
-		return comments.stream()
-			.map(CommentMapper::toCommentDto)
 			.toList();
 	}
 

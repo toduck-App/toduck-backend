@@ -104,9 +104,15 @@ public class SocialInteractionService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean getIsLiked(User user, Social socialBoard) {
+	public boolean getSocialBoardIsLiked(User user, Social socialBoard) {
 		Optional<Like> like = likeRepository.findByUserAndSocial(user, socialBoard);
 		return like.isPresent();
+	}
+
+	@Transactional(readOnly = true)
+	public boolean getCommentIsLiked(final User user, final Comment comment) {
+		Optional<CommentLike> commentLike = commentLikeRepository.findCommentLikeByUserAndComment(user, comment);
+		return commentLike.isPresent();
 	}
 
 	@Transactional

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
@@ -13,6 +14,7 @@ import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.CommentDto;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -88,10 +90,17 @@ public class SocialBoardUseCase {
 
 		List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(socialBoard);
 		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard, user.getId());
-		boolean isLiked = socialInteractionService.getIsLiked(user, socialBoard);
+		boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, socialBoard);
+
+		List<CommentDto> commentDtos = comments.stream()
+			.map((comment) -> {
+				boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
+				return CommentMapper.toCommentDto(comment, isCommentLike);
+			})
+			.toList();
 
 		log.info("소셜 게시글 단건 상세 조회 - UserId: {}, SocialBoardId: {}", userId, socialId);
-		return SocialMapper.toSocialDetailResponse(socialBoard, imageFiles, comments, isLiked);
+		return SocialMapper.toSocialDetailResponse(socialBoard, imageFiles, commentDtos, isSocialBoardLiked);
 	}
 
 	@Transactional(readOnly = true)
@@ -125,8 +134,8 @@ public class SocialBoardUseCase {
 			.map(sb -> {
 				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(sb);
 				List<Comment> comments = socialInteractionService.getCommentsBySocial(sb, user.getId());
-				boolean isLiked = socialInteractionService.getIsLiked(user, sb);
-				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isLiked);
+				boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, sb);
+				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isSocialBoardLiked);
 			})
 			.toList();
 	}
