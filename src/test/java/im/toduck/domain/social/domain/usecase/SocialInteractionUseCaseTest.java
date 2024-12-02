@@ -31,8 +31,8 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
@@ -244,14 +244,14 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			int beforeLikeCount = SOCIAL_BOARD.getLikeCount();
 
 			// when
-			LikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+			SocialLikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
 
 			// then
 			Like createdLike = likeRepository.findByUserAndSocial(USER, SOCIAL_BOARD).orElseThrow();
 			Optional<Social> afterSocialBoard = socialRepository.findById(SOCIAL_BOARD.getId());
 			assertSoftly(softly -> {
 				assertThat(createdLike).isNotNull();
-				assertThat(response.likeId()).isNotNull();
+				assertThat(response.socialLikeId()).isNotNull();
 				afterSocialBoard.ifPresent(
 					social -> softly.assertThat(social.getLikeCount()).isEqualTo(beforeLikeCount + 1)
 				);
@@ -262,7 +262,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		@Test
 		void 이미_좋아요를_누른_경우_예외를_발생시킨다() {
 			// given
-			LikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+			SocialLikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
 
 			// when & then
 			assertThatThrownBy(() -> socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId()))

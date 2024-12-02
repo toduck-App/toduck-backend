@@ -13,7 +13,7 @@ import lombok.Builder;
 @Builder
 public record SocialDetailResponse(
 	@Schema(description = "소셜 게시글 ID", example = "1")
-	Long id,
+	Long socialId,
 
 	@Schema(description = "작성자 정보")
 	OwnerDto owner,
@@ -28,7 +28,7 @@ public record SocialDetailResponse(
 	List<SocialImageDto> images,
 
 	@Schema(description = "좋아요 정보")
-	LikeDto likeInfo,
+	SocialLikeDto socialLikeInfo,
 
 	@Schema(description = "댓글 목록")
 	List<CommentDto> comments,

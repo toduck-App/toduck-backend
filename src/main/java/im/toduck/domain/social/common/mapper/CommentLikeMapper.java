@@ -24,9 +24,9 @@ public class CommentLikeMapper {
 			.build();
 	}
 
-	public static CommentLikeDto toCommentLikeDto(final Comment comment, final boolean isLiked) {
+	public static CommentLikeDto toCommentLikeDto(final Comment comment, final boolean isLikedByMe) {
 		return CommentLikeDto.builder()
-			.isLiked(isLiked)
+			.isLikedByMe(isLikedByMe)
 			.likeCount(comment.getLikeCount())
 			.build();
 	}

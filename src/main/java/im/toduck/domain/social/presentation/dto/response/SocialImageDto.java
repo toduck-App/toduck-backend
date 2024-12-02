@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record SocialImageDto(
 	@Schema(description = "이미지 Id", example = "1")
-	Long id,
+	Long socialImageId,
 
 	@Schema(description = "이미지 URL", example = "https://cdn.toduck.app/image1.jpg")
 	String url

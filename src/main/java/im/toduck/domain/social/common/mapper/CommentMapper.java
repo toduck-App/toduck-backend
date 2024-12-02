@@ -44,7 +44,7 @@ public class CommentMapper {
 
 	private static OwnerDto getOwner(User user) {
 		return OwnerDto.builder()
-			.id(user.getId())
+			.ownerId(user.getId())
 			.nickname(user.getNickname())
 			.build();
 	}

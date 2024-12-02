@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record SocialCategoryDto(
 	@Schema(description = "소셜 카테고리 ID", example = "1")
-	Long id,
+	Long socialCategoryId,
 
 	@Schema(description = "소셜 카테고리 이름", example = "집중력")
 	String name

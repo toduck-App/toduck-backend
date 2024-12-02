@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
-import im.toduck.domain.social.common.mapper.LikeMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
+import im.toduck.domain.social.common.mapper.SocialLikeMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
@@ -74,7 +74,7 @@ public class SocialInteractionService {
 			throw CommonException.from(ExceptionCode.EXISTS_LIKE);
 		}
 
-		Like like = LikeMapper.toLike(user, socialBoard);
+		Like like = SocialLikeMapper.toLike(user, socialBoard);
 		return likeRepository.save(like);
 	}
 

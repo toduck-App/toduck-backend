@@ -4,8 +4,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
-import im.toduck.domain.social.common.mapper.LikeMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
+import im.toduck.domain.social.common.mapper.SocialLikeMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
@@ -17,8 +17,8 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -61,7 +61,7 @@ public class SocialInteractionUseCase {
 	}
 
 	@Transactional
-	public LikeCreateResponse createLike(Long userId, Long socialId) {
+	public SocialLikeCreateResponse createLike(Long userId, Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -70,7 +70,7 @@ public class SocialInteractionUseCase {
 		socialBoard.incrementLikeCount();
 
 		log.info("소셜 게시글 좋아요 생성 - UserId: {}, SocialBoardId: {}, LikeId: {}", userId, socialId, like.getId());
-		return LikeMapper.toLikeCreateResponse(like);
+		return SocialLikeMapper.toSocialLikeCreateResponse(like);
 	}
 
 	@Transactional

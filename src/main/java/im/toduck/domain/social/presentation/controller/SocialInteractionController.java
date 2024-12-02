@@ -18,8 +18,8 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -61,7 +61,7 @@ public class SocialInteractionController implements SocialInteractionApi {
 	@Override
 	@PostMapping("/{socialId}/likes")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
+	public ResponseEntity<ApiResponse<SocialLikeCreateResponse>> createLike(
 		@PathVariable Long socialId,
 		CustomUserDetails user
 	) {

@@ -419,10 +419,10 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
-				softly.assertThat(response.id()).isEqualTo(SOCIAL_BOARD.getId());
+				softly.assertThat(response.socialId()).isEqualTo(SOCIAL_BOARD.getId());
 				softly.assertThat(response.content()).isEqualTo(SOCIAL_BOARD.getContent());
 				softly.assertThat(response.hasImages()).isTrue();
-				softly.assertThat(response.likeInfo().isLiked()).isTrue();
+				softly.assertThat(response.socialLikeInfo().isLikedByMe()).isTrue();
 				softly.assertThat(response.images())
 					.hasSize(IMAGE_FILES.size())
 					.extracting(SocialImageDto::url)
