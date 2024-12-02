@@ -119,26 +119,37 @@ CREATE TABLE social_image_file
  FOREIGN KEY (social_id) REFERENCES social (id)
 );
 
-CREATE TABLE schedule
-(
- id          BIGINT PRIMARY KEY auto_increment,
- user_id     BIGINT         NOT NULL,
- -- TODO: 8. routine 의 이모지 필드 enum 값 필요
- emoji       ENUM ('SMILE') NOT NULL,
- -- TODO: 4. routine 테이블의 color enum 값 필요
- color       ENUM ('RED')   NOT NULL,
- is_complete BOOLEAN        NOT NULL,
- time        TIME           NULL,
- title       CHAR(100)      NOT NULL,
- location    VARCHAR(255)   NOT NULL,
- routine_day DATE           NULL,
- alarm       ENUM ('10', '30', '60', 'OFF')   NOT NULL,
- memo        CHAR(255)      NOT NULL,
- created_at  DATETIME       NOT NULL,
- updated_at  DATETIME       NOT NULL,
- deleted_at  DATETIME       NULL,
- FOREIGN KEY (user_id) REFERENCES users (id)
+-- Schedule 테이블
+CREATE TABLE schedule (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100) NOT NULL,
+    category ENUM('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY') DEFAULT NULL,
+    category_color VARCHAR(100) DEFAULT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    time TIME DEFAULT NULL,
+    days_of_week INT DEFAULT NULL,
+    alarm ENUM('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY') DEFAULT NULL,
+    location VARCHAR(255) DEFAULT NULL,
+    memo VARCHAR(255) DEFAULT NULL,
+    user_id BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+
+CREATE TABLE schedule_record (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    is_completed BOOLEAN NOT NULL,
+    schedule_id BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME NULL,
+    FOREIGN KEY (schedule_id) REFERENCES schedule (id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE record
 (
