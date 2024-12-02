@@ -185,8 +185,8 @@ public class SocialInteractionService {
 
 	@Transactional
 	public void deleteCommentLike(final Comment comment, final CommentLike commentLike) {
-		comment.decrementLikeCount();
 		commentLikeRepository.delete(commentLike);
+		comment.decrementLikeCount();
 	}
 
 }
