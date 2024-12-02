@@ -37,18 +37,26 @@ public class SocialInteractionService {
 	private final CommentLikeRepository commentLikeRepository;
 
 	@Transactional
-	public Comment createComment(User user, Social socialBoard, CommentCreateRequest request) {
+	public Comment createComment(
+		final User user,
+		final Social socialBoard,
+		final CommentCreateRequest request
+	) {
 		Comment comment = CommentMapper.toComment(user, socialBoard, request);
 		return commentRepository.save(comment);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Comment> getCommentById(Long commentId) {
+	public Optional<Comment> getCommentById(final Long commentId) {
 		return commentRepository.findById(commentId);
 	}
 
 	@Transactional
-	public void deleteComment(User user, Social socialBoard, Comment comment) {
+	public void deleteComment(
+		final User user,
+		final Social socialBoard,
+		final Comment comment
+	) {
 		if (!isCommentOwner(comment, user)) {
 			log.warn("권한이 없는 유저가 댓글 삭제 시도 - UserId: {}, CommentId: {}", user.getId(), comment.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_COMMENT);
@@ -66,25 +74,30 @@ public class SocialInteractionService {
 	}
 
 	@Transactional
-	public Like createLike(User user, Social socialBoard) {
+	public Like createSocialLike(final User user, final Social socialBoard) {
 		Optional<Like> existedLike = likeRepository.findByUserAndSocial(user, socialBoard);
 
 		if (existedLike.isPresent()) {
 			log.warn("이미 좋아요가 존재 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
 			throw CommonException.from(ExceptionCode.EXISTS_LIKE);
 		}
-
 		Like like = SocialLikeMapper.toLike(user, socialBoard);
+		socialBoard.incrementLikeCount();
+
 		return likeRepository.save(like);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Like> getLikeByUserAndSocial(User user, Social socialBoard) {
+	public Optional<Like> getLikeByUserAndSocial(final User user, final Social socialBoard) {
 		return likeRepository.findByUserAndSocial(user, socialBoard);
 	}
 
 	@Transactional
-	public void deleteLike(User user, Social socialBoard, Like like) {
+	public void deleteSocialLike(
+		final User user,
+		final Social socialBoard,
+		final Like like
+	) {
 		if (!isLikeOwner(like, user)) {
 			log.warn("권한이 없는 유저가 좋아요 삭제 시도 - UserId: {}, LikeId: {}", user.getId(), like.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_LIKE);
@@ -96,15 +109,16 @@ public class SocialInteractionService {
 		}
 
 		likeRepository.delete(like);
+		socialBoard.decrementLikeCount();
 	}
 
 	@Transactional(readOnly = true)
-	public List<Comment> getCommentsBySocial(Social socialBoard, Long userId) {
+	public List<Comment> getCommentsBySocial(final Social socialBoard, final Long userId) {
 		return commentRepository.findAllBySocialExcludingBlocked(socialBoard, userId);
 	}
 
 	@Transactional(readOnly = true)
-	public boolean getSocialBoardIsLiked(User user, Social socialBoard) {
+	public boolean getSocialBoardIsLiked(final User user, final Social socialBoard) {
 		Optional<Like> like = likeRepository.findByUserAndSocial(user, socialBoard);
 		return like.isPresent();
 	}
@@ -116,29 +130,34 @@ public class SocialInteractionService {
 	}
 
 	@Transactional
-	public Report createReport(User user, Social social, ReportType reportType, String reason) {
+	public Report createReport(
+		final User user,
+		final Social social,
+		final ReportType reportType,
+		final String reason
+	) {
 		Report report = ReportMapper.toReport(user, social, reportType, reason);
 		return reportRepository.save(report);
 	}
 
 	@Transactional(readOnly = true)
-	public boolean existsByUserAndSocial(User user, Social social) {
+	public boolean existsByUserAndSocial(final User user, final Social social) {
 		return reportRepository.existsByUserAndSocial(user, social);
 	}
 
-	private boolean isCommentOwner(Comment comment, User user) {
+	private boolean isCommentOwner(final Comment comment, final User user) {
 		return comment.isOwner(user);
 	}
 
-	private boolean isCommentInSocialBoard(Social socialBoard, Comment comment) {
+	private boolean isCommentInSocialBoard(final Social socialBoard, final Comment comment) {
 		return comment.isInSocialBoard(socialBoard);
 	}
 
-	private boolean isLikeInSocialBoard(Social socialBoard, Like like) {
+	private boolean isLikeInSocialBoard(final Social socialBoard, final Like like) {
 		return like.isInSocialBoard(socialBoard);
 	}
 
-	private boolean isLikeOwner(Like like, User user) {
+	private boolean isLikeOwner(final Like like, final User user) {
 		return like.isOwner(user);
 	}
 
@@ -166,7 +185,8 @@ public class SocialInteractionService {
 	}
 
 	@Transactional
-	public void deleteCommentLike(final User user, final Comment comment, final CommentLike commentLike) {
+	public void deleteCommentLike(final Comment comment, final CommentLike commentLike) {
+		comment.decrementLikeCount();
 		commentLikeRepository.delete(commentLike);
 	}
 

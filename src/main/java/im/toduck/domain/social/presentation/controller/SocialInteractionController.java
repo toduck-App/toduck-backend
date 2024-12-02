@@ -61,23 +61,23 @@ public class SocialInteractionController implements SocialInteractionApi {
 	@Override
 	@PostMapping("/{socialId}/likes")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<SocialLikeCreateResponse>> createLike(
+	public ResponseEntity<ApiResponse<SocialLikeCreateResponse>> createSocialLike(
 		@PathVariable Long socialId,
 		CustomUserDetails user
 	) {
 
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialInteractionUseCase.createLike(user.getUserId(), socialId)));
+			.body(ApiResponse.createSuccess(socialInteractionUseCase.createSocialLike(user.getUserId(), socialId)));
 	}
 
 	@Override
 	@DeleteMapping("/{socialId}/likes")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
+	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteSocialLike(
 		@PathVariable Long socialId,
 		CustomUserDetails user
 	) {
-		socialInteractionUseCase.deleteLike(user.getUserId(), socialId);
+		socialInteractionUseCase.deleteSocialLike(user.getUserId(), socialId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}

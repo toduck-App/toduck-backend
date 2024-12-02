@@ -36,7 +36,11 @@ public class SocialInteractionUseCase {
 	private final UserService userService;
 
 	@Transactional
-	public CommentCreateResponse createComment(Long userId, Long socialId, CommentCreateRequest request) {
+	public CommentCreateResponse createComment(
+		final Long userId,
+		final Long socialId,
+		final CommentCreateRequest request
+	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -48,7 +52,11 @@ public class SocialInteractionUseCase {
 	}
 
 	@Transactional
-	public void deleteComment(Long userId, Long socialId, Long commentId) {
+	public void deleteComment(
+		final Long userId,
+		final Long socialId,
+		final Long commentId
+	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -61,34 +69,37 @@ public class SocialInteractionUseCase {
 	}
 
 	@Transactional
-	public SocialLikeCreateResponse createLike(Long userId, Long socialId) {
+	public SocialLikeCreateResponse createSocialLike(final Long userId, final Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Like like = socialInteractionService.createLike(user, socialBoard);
-		socialBoard.incrementLikeCount();
+		Like like = socialInteractionService.createSocialLike(user, socialBoard);
 
 		log.info("소셜 게시글 좋아요 생성 - UserId: {}, SocialBoardId: {}, LikeId: {}", userId, socialId, like.getId());
 		return SocialLikeMapper.toSocialLikeCreateResponse(like);
 	}
 
 	@Transactional
-	public void deleteLike(Long userId, Long socialId) {
+	public void deleteSocialLike(final Long userId, final Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 		Like like = socialInteractionService.getLikeByUserAndSocial(user, socialBoard)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_LIKE));
-		socialBoard.decrementLikeCount();
+
+		socialInteractionService.deleteSocialLike(user, socialBoard, like);
 
 		log.info("소셜 게시글 좋아요 삭제 - UserId: {}, SocialBoardId: {}, LikeId: {}", userId, socialId, like.getId());
-		socialInteractionService.deleteLike(user, socialBoard, like);
 	}
 
 	@Transactional
-	public ReportCreateResponse reportSocial(Long userId, Long socialId, ReportCreateRequest request) {
+	public ReportCreateResponse reportSocial(
+		final Long userId,
+		final Long socialId,
+		final ReportCreateRequest request
+	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -116,14 +127,14 @@ public class SocialInteractionUseCase {
 		return ReportMapper.toReportCreateResponse(report);
 	}
 
-	private void blockAuthorIfNotAlreadyBlocked(User blocker, User blockedUser) {
+	private void blockAuthorIfNotAlreadyBlocked(final User blocker, final User blockedUser) {
 		if (!userService.isBlockedUser(blocker, blockedUser)) {
 			userService.blockUser(blocker, blockedUser);
 		}
 	}
 
 	@Transactional
-	public CommentLikeCreateResponse createCommentLike(Long userId, Long commentId) {
+	public CommentLikeCreateResponse createCommentLike(final Long userId, final Long commentId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Comment comment = socialInteractionService.getCommentById(commentId)
@@ -136,16 +147,15 @@ public class SocialInteractionUseCase {
 	}
 
 	@Transactional
-	public void deleteCommentLike(Long userId, Long commentId) {
+	public void deleteCommentLike(final Long userId, final Long commentId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Comment comment = socialInteractionService.getCommentById(commentId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT));
 		CommentLike commentLike = socialInteractionService.getCommentLikeByUserAndComment(user, comment)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT_LIKE));
-		comment.decrementLikeCount();
 
-		socialInteractionService.deleteCommentLike(user, comment, commentLike);
+		socialInteractionService.deleteCommentLike(comment, commentLike);
 		log.info("댓글 좋아요 삭제 - UserId: {}, CommentId: {}, LikeId: {}", userId, commentId, commentLike.getId());
 	}
 }

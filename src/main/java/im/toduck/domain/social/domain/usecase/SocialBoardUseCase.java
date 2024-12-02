@@ -39,7 +39,7 @@ public class SocialBoardUseCase {
 	private final UserService userService;
 
 	@Transactional
-	public SocialCreateResponse createSocialBoard(Long userId, SocialCreateRequest request) {
+	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
@@ -53,7 +53,7 @@ public class SocialBoardUseCase {
 	}
 
 	@Transactional
-	public void deleteSocialBoard(Long userId, Long socialId) {
+	public void deleteSocialBoard(final Long userId, final Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -64,7 +64,11 @@ public class SocialBoardUseCase {
 	}
 
 	@Transactional
-	public void updateSocialBoard(Long userId, Long socialId, SocialUpdateRequest request) {
+	public void updateSocialBoard(
+		final Long userId,
+		final Long socialId,
+		final SocialUpdateRequest request
+	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -75,7 +79,7 @@ public class SocialBoardUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public SocialDetailResponse getSocialDetail(Long userId, Long socialId) {
+	public SocialDetailResponse getSocialDetail(final Long userId, final Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
@@ -104,7 +108,11 @@ public class SocialBoardUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public CursorPaginationResponse<SocialResponse> getSocials(Long userId, Long cursor, Integer limit) {
+	public CursorPaginationResponse<SocialResponse> getSocials(
+		final Long userId,
+		final Long cursor,
+		final Integer limit
+	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
@@ -121,14 +129,22 @@ public class SocialBoardUseCase {
 		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
 	}
 
-	private List<Social> fetchSocialBoards(Long cursor, int fetchLimit, Long currentUserId) {
+	private List<Social> fetchSocialBoards(
+		final Long cursor,
+		final int fetchLimit,
+		final Long currentUserId
+	) {
 		if (cursor == null) {
 			return socialBoardService.findLatestSocials(fetchLimit, currentUserId);
 		}
 		return socialBoardService.getSocials(cursor, fetchLimit, currentUserId);
 	}
 
-	private List<SocialResponse> createSocialResponses(List<Social> socialBoards, User user, int actualLimit) {
+	private List<SocialResponse> createSocialResponses(
+		final List<Social> socialBoards,
+		final User user,
+		final int actualLimit
+	) {
 		return socialBoards.stream()
 			.limit(actualLimit)
 			.map(sb -> {

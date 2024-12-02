@@ -79,7 +79,7 @@ public interface SocialInteractionApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
 		}
 	)
-	ResponseEntity<ApiResponse<SocialLikeCreateResponse>> createLike(
+	ResponseEntity<ApiResponse<SocialLikeCreateResponse>> createSocialLike(
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
@@ -100,7 +100,7 @@ public interface SocialInteractionApi {
 
 		}
 	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteSocialLike(
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);

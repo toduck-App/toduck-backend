@@ -244,7 +244,8 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			int beforeLikeCount = SOCIAL_BOARD.getLikeCount();
 
 			// when
-			SocialLikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+			SocialLikeCreateResponse response = socialInteractionUseCase.createSocialLike(USER.getId(),
+				SOCIAL_BOARD.getId());
 
 			// then
 			Like createdLike = likeRepository.findByUserAndSocial(USER, SOCIAL_BOARD).orElseThrow();
@@ -262,10 +263,11 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		@Test
 		void 이미_좋아요를_누른_경우_예외를_발생시킨다() {
 			// given
-			SocialLikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+			SocialLikeCreateResponse response = socialInteractionUseCase.createSocialLike(USER.getId(),
+				SOCIAL_BOARD.getId());
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId()))
+			assertThatThrownBy(() -> socialInteractionUseCase.createSocialLike(USER.getId(), SOCIAL_BOARD.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.EXISTS_LIKE.getMessage());
 		}
@@ -276,7 +278,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			Long nonExistentSocialId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.createLike(USER.getId(), nonExistentSocialId))
+			assertThatThrownBy(() -> socialInteractionUseCase.createSocialLike(USER.getId(), nonExistentSocialId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
@@ -298,7 +300,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			Like LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));
 
 			// when
-			socialInteractionUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId());
+			socialInteractionUseCase.deleteSocialLike(USER.getId(), SOCIAL_BOARD.getId());
 
 			// then
 			assertThat(likeRepository.findByUserAndSocial(USER, SOCIAL_BOARD)).isNotPresent();
@@ -309,7 +311,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		void 좋아요가_존재하지_않는_경우_예외를_발생시킨다() {
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId()))
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteSocialLike(USER.getId(), SOCIAL_BOARD.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_LIKE.getMessage());
 		}
@@ -320,7 +322,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			Long nonExistentSocialId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.deleteLike(USER.getId(), nonExistentSocialId))
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteSocialLike(USER.getId(), nonExistentSocialId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
