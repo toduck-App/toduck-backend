@@ -68,8 +68,7 @@ public class SocialInteractionService {
 		}
 
 		List<CommentLike> commentLikes = commentLikeRepository.findAllByComment(comment);
-		commentLikes.forEach(CommentLike::softDelete);
-
+		commentLikeRepository.deleteAll(commentLikes);
 		commentRepository.delete(comment);
 	}
 

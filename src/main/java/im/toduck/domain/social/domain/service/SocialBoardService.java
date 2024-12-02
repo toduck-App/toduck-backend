@@ -71,8 +71,7 @@ public class SocialBoardService {
 
 		List<Comment> comments = commentRepository.findAllBySocial(socialBoard);
 		comments.forEach(comment -> {
-			List<CommentLike> commentLikes = commentLikeRepository.findAllByComment(comment);
-			commentLikeRepository.deleteAll(commentLikes);
+			commentLikeRepository.findAllByComment(comment).forEach(CommentLike::softDelete);
 		});
 		comments.forEach(Comment::softDelete);
 
