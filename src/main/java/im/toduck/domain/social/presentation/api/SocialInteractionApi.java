@@ -147,6 +147,7 @@ public interface SocialInteractionApi {
 		}
 	)
 	ResponseEntity<ApiResponse<CommentLikeCreateResponse>> createCommentLike(
+		@PathVariable Long socialId,
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
@@ -165,6 +166,7 @@ public interface SocialInteractionApi {
 		}
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> deleteCommentLike(
+		@PathVariable Long socialId,
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);

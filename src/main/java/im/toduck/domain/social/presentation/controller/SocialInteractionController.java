@@ -97,9 +97,10 @@ public class SocialInteractionController implements SocialInteractionApi {
 	}
 
 	@Override
-	@PostMapping("/comments/{commentId}/likes")
+	@PostMapping("/{socialId}/comments/{commentId}/likes")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<CommentLikeCreateResponse>> createCommentLike(
+		@PathVariable Long socialId,
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
@@ -108,9 +109,10 @@ public class SocialInteractionController implements SocialInteractionApi {
 	}
 
 	@Override
-	@DeleteMapping("/comments/{commentId}/likes")
+	@DeleteMapping("/{socialId}/comments/{commentId}/likes")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteCommentLike(
+		@PathVariable Long socialId,
 		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
