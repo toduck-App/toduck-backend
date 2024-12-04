@@ -9,6 +9,7 @@ import static im.toduck.fixtures.user.BlockFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -154,6 +155,24 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> socialBoardUseCase.createSocialBoard(USER.getId(), requestWithAnotherUserRoutine))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_ROUTINE.getMessage());
+		}
+
+		@Test
+		void 비공개_루틴으로_게시글_작성시_실패한다() {
+			// given
+			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(USER));
+			SocialCreateRequest requestWithPrivateRoutine = new SocialCreateRequest(
+				content,
+				PRIVATE_ROUTINE.getId(),
+				isAnonymous,
+				categoryIds,
+				imageUrls
+			);
+
+			// when & then
+			assertThatThrownBy(() -> socialBoardUseCase.createSocialBoard(USER.getId(), requestWithPrivateRoutine))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.PRIVATE_ROUTINE.getMessage());
 		}
 
 	}
@@ -302,6 +321,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updatedContent,
+				true,
 				null,
 				updatedIsAnonymous,
 				updatedCategoryIds,
@@ -362,6 +382,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			Long nonExistentSocialBoardId = -1L;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				true,
 				null,
 				isAnonymous,
 				validCategoryIds,
@@ -381,6 +402,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			Long invalidRoutineId = -1L;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				false,
 				invalidRoutineId,
 				isAnonymous,
 				validCategoryIds,
@@ -395,17 +417,17 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 루틴_ID가_0인_경우_해당_게시글의_공유_루틴을_제거한다() {
+		void isRomoved가_true인_경우_해당_게시글의_공유_루틴을_제거한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
 			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
 				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
 			);
 
-			Long removeRoutineId = 0L;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
-				removeRoutineId,
+				true,
+				null,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -426,6 +448,22 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		}
 
 		@Test
+		void isRemoveRoutine이_true이고_routineId가_null이_아닌_경우_validation에_실패한다() {
+			// given
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				updateContent,
+				true,
+				1L,
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when & then
+			assertFalse(updateRequest.isValidRoutineIdWhenRemoved());
+		}
+
+		@Test
 		void 루틴_ID가_null인_경우_해당_게시글의_공유_루틴을_변경하지_않는다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
@@ -436,6 +474,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			Long unchangedRoutineId = null;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				false,
 				unchangedRoutineId,
 				isAnonymous,
 				validCategoryIds,
@@ -462,6 +501,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				false,
 				null,
 				isAnonymous,
 				validCategoryIds,
@@ -480,6 +520,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				false,
 				null,
 				isAnonymous,
 				invalidCategoryIds,
@@ -498,6 +539,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				updateContent,
+				false,
 				null,
 				isAnonymous,
 				List.of(),
@@ -509,6 +551,26 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 				() -> socialBoardUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST.getMessage());
+		}
+
+		@Test
+		void 비공개_루틴으로_게시글_수정시_실패한다() {
+			// given
+			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(USER));
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				updateContent,
+				false,
+				PRIVATE_ROUTINE.getId(),
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialBoardUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.PRIVATE_ROUTINE.getMessage());
 		}
 	}
 

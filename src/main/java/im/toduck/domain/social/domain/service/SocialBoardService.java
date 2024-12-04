@@ -111,7 +111,7 @@ public class SocialBoardService {
 			addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		}
 
-		if (request.routineId() != null) {
+		if (request.isRemoveRoutine() || request.routineId() != null) {
 			socialBoard.updateRoutine(routine);
 		}
 

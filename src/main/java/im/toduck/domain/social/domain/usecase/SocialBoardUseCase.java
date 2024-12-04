@@ -43,12 +43,7 @@ public class SocialBoardUseCase {
 	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-
-		Routine routine = null;
-		if (request.routineId() != null) {
-			routine = routineService.getUserRoutine(user, request.routineId())
-				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
-		}
+		Routine routine = findRoutineForCreate(user, request.routineId());
 
 		Social socialBoard = socialBoardService.createSocialBoard(user, routine, request);
 		List<SocialCategory> socialCategories = socialBoardService.findAllSocialCategories(request.socialCategoryIds());
@@ -59,15 +54,12 @@ public class SocialBoardUseCase {
 		return SocialMapper.toSocialCreateResponse(socialBoard);
 	}
 
-	@Transactional
-	public void deleteSocialBoard(Long userId, Long socialId) {
-		User user = userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		Social socialBoard = socialBoardService.getSocialById(socialId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+	private Routine findRoutineForCreate(final User user, final Long routineId) {
+		if (routineId == null) {
+			return null;
+		}
 
-		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
-		socialBoardService.deleteSocialBoard(user, socialBoard);
+		return findAndValidateRoutine(user, routineId);
 	}
 
 	@Transactional
@@ -80,18 +72,43 @@ public class SocialBoardUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Routine routine = resolveRoutine(user, request.routineId());
+		Routine routine = findRoutineForUpdate(user, request.routineId(), request.isRemoveRoutine());
 
 		socialBoardService.updateSocialBoard(user, socialBoard, routine, request);
 		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
 	}
 
-	private Routine resolveRoutine(User user, Long routineId) {
-		if (routineId == null || routineId == 0) {
+	private Routine findRoutineForUpdate(
+		final User user,
+		final Long routineId,
+		final boolean isRemoveRoutine
+	) {
+		if (isRemoveRoutine || routineId == null) {
 			return null;
 		}
-		return routineService.getUserRoutine(user, routineId)
+
+		return findAndValidateRoutine(user, routineId);
+	}
+
+	private Routine findAndValidateRoutine(final User user, final Long routineId) {
+		Routine routine = routineService.getUserRoutine(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		if (!routine.getIsPublic()) {
+			throw CommonException.from(ExceptionCode.PRIVATE_ROUTINE);
+		}
+		return routine;
+	}
+
+	@Transactional
+	public void deleteSocialBoard(Long userId, Long socialId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialBoardService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
+		socialBoardService.deleteSocialBoard(user, socialBoard);
 	}
 
 	@Transactional(readOnly = true)
