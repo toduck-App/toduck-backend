@@ -12,7 +12,7 @@ import jakarta.validation.constraints.Size;
 public record SocialUpdateRequest(
 	@Nullable
 	@Size(min = 1, max = 255, message = "내용은 공백일 수 없으며 255자 이하여야 합니다.")
-	@Schema(description = "게시글 수정 내용", example = "덕분에 오늘은 까먹 일 없이 챙김!")
+	@Schema(description = "게시글 수정 내용", example = "덕분에 오늘은 까먹을 일 없이 챙김!")
 	String content,
 
 	@NotNull
