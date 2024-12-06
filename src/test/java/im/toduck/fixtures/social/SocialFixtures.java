@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.user.persistence.entity.User;
 
@@ -40,6 +41,15 @@ public class SocialFixtures {
 	public static Social SINGLE_SOCIAL(User user, boolean isAnonymous) {
 		return Social.builder()
 			.user(user)
+			.content(DEFAULT_CONTENT)
+			.isAnonymous(isAnonymous)
+			.build();
+	}
+
+	public static Social SINGLE_SOCIAL_WITH_ROUTINE(User user, Routine routine, boolean isAnonymous) {
+		return Social.builder()
+			.user(user)
+			.routine(routine)
 			.content(DEFAULT_CONTENT)
 			.isAnonymous(isAnonymous)
 			.build();

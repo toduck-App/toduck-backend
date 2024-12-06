@@ -30,7 +30,11 @@ import jakarta.validation.Valid;
 public interface SocialBoardApi {
 	@Operation(
 		summary = "소셜 게시글 생성",
-		description = "소셜 게시글을 작성합니다."
+		description = """
+			소셜 게시글을 작성합니다.
+			- 공유할 루틴이 없는 경우: routineId = null
+			- 비공개 루틴은 게시글에 공유할 수 없습니다. (PRIVATE_ROUTINE 예외 발생)
+			"""
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -39,6 +43,8 @@ public interface SocialBoardApi {
 		),
 		errors = {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.PRIVATE_ROUTINE),
 		}
 	)
 	ResponseEntity<ApiResponse<SocialCreateResponse>> createSocialBoard(
@@ -68,16 +74,29 @@ public interface SocialBoardApi {
 		summary = "소셜 게시글 수정",
 		description =
 			"""
-				<b>게시글 수정 API는 모든 필드를 전송할 필요가 없습니다.</b><br/><br/>
-				<p>소셜 게시글의 특정 필드만 선택적으로 수정할 수 있습니다. 요청 시 수정하고자 하는 필드만 포함하면 됩니다.</p><br/>
+				<b>게시글 수정 API는 변경이 필요한 필드만 포함하여 요청할 수 있습니다.</b><br/><br/>
+				<p>예시 요청:</p><br/>
 				{<br/>
-					"content": "수정된 게시글 내용입니다.",<br/>
-					"socialImageUrls": ["https://cdn.toduck.app/new-image.jpg"]<br/>
+				"content": "수정된 게시글 내용입니다.",<br/>
+				"isRemoveRoutine": false,<br/>
+				"routineId": null,<br/>
+				"isAnonymous": null,<br/>
+				"socialCategoryIds": null,<br/>
+				"socialImageUrls": ["https://cdn.toduck.app/new-image.jpg"]<br/>
 				}<br/><br/>
-				<p>위 예시는 게시글의 내용과 이미지를 변경하는 경우입니다. 익명 여부나 다른 필드를 수정하지 않으려면 해당 필드를 생략할 수 있습니다.</p><br/>
-				<b>주의사항:</b><br/>
-				<p>- 이미지를 모두 지우고 싶다면 socialImageUrls를 빈 배열( [ ] )로 전송하면 됩니다.</p>
-				<p>- socialCategoryIds는 최소한 하나의 카테고리 ID가 존재해야 합니다. 빈 배열로 전송할 경우 에러가 발생합니다.</p>
+				<p>위 예시는 게시글의 내용과 이미지만 변경하는 경우입니다.</p><br/>
+				<b>필드별 주의사항:</b><br/>
+				<p>- content가 null인 경우 내용을 수정하지 않습니다</p>
+				<p>- isAnonymous가 null인 경우 익명 여부를 수정하지 않습니다</p>
+				<p>- socialCategoryIds가 null인 경우 카테고리를 수정하지 않습니다</p>
+				<p>- socialImageUrls가 null인 경우 이미지를 수정하지 않습니다</p>
+				<p>- 이미지 모두 제거: socialImageUrls를 빈 배열( [ ] )로 전송</p>
+				<p>- 카테고리 수정 시 최소 1개 이상 필수 (빈 배열 불가)</p>
+				<p>- 비공개 루틴은 게시글에 공유할 수 없음</p><br/>
+				<b>루틴 공유 관련 (isRemoveRoutine은 필수값):</b><br/>
+				<p>1. 공유 루틴 제거: isRemoveRoutine = true, routineId = null (routineId가 null이 아닐 경우 예외 발생)</p>
+				<p>2. 공유 루틴 유지: isRemoveRoutine = false, routineId = null</p>
+				<p>3. 공유 루틴 변경: isRemoveRoutine = false, routineId = 변경할 루틴 ID</p>
 				"""
 	)
 	@ApiResponseExplanations(
@@ -89,6 +108,8 @@ public interface SocialBoardApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.PRIVATE_ROUTINE),
 		}
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateSocialBoard(
@@ -99,7 +120,8 @@ public interface SocialBoardApi {
 
 	@Operation(
 		summary = "게시글 단건 조회",
-		description = "게시글 단건 세부사항을 조회합니다."
+		description = "게시글 단건 세부사항을 조회합니다. </br></br>"
+			+ "공유할 루틴이 존재하지 않는 경우 routine 필드에 null이 반환 됩니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -118,7 +140,9 @@ public interface SocialBoardApi {
 
 	@Operation(
 		summary = "게시글 목록 조회",
-		description = "게시글을 커서 기반 페이지네이션으로 조회합니다.</br></br>커서 페이지네이션 사용법은 Notion > API 개요 > 페이지네이션을 확인해주세요."
+		description = "게시글을 커서 기반 페이지네이션으로 조회합니다.</br></br>"
+			+ "커서 페이지네이션 사용법은 Notion > API 개요 > 페이지네이션을 확인해주세요.</br></br>"
+			+ "공유할 루틴이 존재하지 않는 경우 routine 필드에 null이 반환 됩니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(

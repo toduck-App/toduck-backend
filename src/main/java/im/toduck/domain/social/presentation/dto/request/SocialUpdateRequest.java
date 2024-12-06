@@ -5,13 +5,23 @@ import java.util.List;
 import im.toduck.global.annotation.valid.ValidCategoryIds;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record SocialUpdateRequest(
 	@Nullable
 	@Size(min = 1, max = 255, message = "내용은 공백일 수 없으며 255자 이하여야 합니다.")
-	@Schema(description = "게시글 수정 내용", example = "덕분에 오늘은 까먹 일 없이 챙김!")
+	@Schema(description = "게시글 수정 내용", example = "덕분에 오늘은 까먹을 일 없이 챙김!")
 	String content,
+
+	@NotNull
+	@Schema(description = "공유할 루틴 삭제 여부", example = "true")
+	boolean isRemoveRoutine,
+
+	@Nullable
+	@Schema(description = "공유할 루틴 ID", example = "1")
+	Long routineId,
 
 	@Nullable
 	@Schema(description = "익명 여부 수정", example = "true")
@@ -26,4 +36,8 @@ public record SocialUpdateRequest(
 	@Schema(description = "수정된 이미지 URL 목록", example = "[\"https://cdn.toduck.app/image2.jpg\"]")
 	List<String> socialImageUrls
 ) {
+	@AssertTrue(message = "루틴 삭제 시에는 routineId가 null이어야 합니다")
+	public boolean isValidRoutineIdWhenRemoved() {
+		return !isRemoveRoutine || routineId == null;
+	}
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.routine.domain.service.RoutineService;
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
@@ -35,19 +37,67 @@ public class SocialBoardUseCase {
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
 	private final UserService userService;
+	private final RoutineService routineService;
 
 	@Transactional
-	public SocialCreateResponse createSocialBoard(Long userId, SocialCreateRequest request) {
+	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Routine routine = findRoutineForCreate(user, request.routineId());
 
-		Social socialBoard = socialBoardService.createSocialBoard(user, request);
+		Social socialBoard = socialBoardService.createSocialBoard(user, routine, request);
 		List<SocialCategory> socialCategories = socialBoardService.findAllSocialCategories(request.socialCategoryIds());
 		socialBoardService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		socialBoardService.addSocialImageFiles(request.socialImageUrls(), socialBoard);
 
 		log.info("소셜 게시글 생성 - UserId: {}, SocialBoardId: {}", userId, socialBoard.getId());
 		return SocialMapper.toSocialCreateResponse(socialBoard);
+	}
+
+	private Routine findRoutineForCreate(final User user, final Long routineId) {
+		if (routineId == null) {
+			return null;
+		}
+
+		return findAndValidateRoutine(user, routineId);
+	}
+
+	@Transactional
+	public void updateSocialBoard(
+		final Long userId,
+		final Long socialId,
+		final SocialUpdateRequest request
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Social socialBoard = socialBoardService.getSocialById(socialId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+		Routine routine = findRoutineForUpdate(user, request.routineId(), request.isRemoveRoutine());
+
+		socialBoardService.updateSocialBoard(user, socialBoard, routine, request);
+		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
+	}
+
+	private Routine findRoutineForUpdate(
+		final User user,
+		final Long routineId,
+		final boolean isRemoveRoutine
+	) {
+		if (isRemoveRoutine || routineId == null) {
+			return null;
+		}
+
+		return findAndValidateRoutine(user, routineId);
+	}
+
+	private Routine findAndValidateRoutine(final User user, final Long routineId) {
+		Routine routine = routineService.getUserRoutine(user, routineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		if (!routine.getIsPublic()) {
+			throw CommonException.from(ExceptionCode.PRIVATE_ROUTINE);
+		}
+		return routine;
 	}
 
 	@Transactional
@@ -59,17 +109,6 @@ public class SocialBoardUseCase {
 
 		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
 		socialBoardService.deleteSocialBoard(user, socialBoard);
-	}
-
-	@Transactional
-	public void updateSocialBoard(Long userId, Long socialId, SocialUpdateRequest request) {
-		User user = userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		Social socialBoard = socialBoardService.getSocialById(socialId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-
-		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
-		socialBoardService.updateSocialBoard(user, socialBoard, request);
 	}
 
 	@Transactional(readOnly = true)

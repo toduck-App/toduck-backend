@@ -142,4 +142,17 @@ public class RoutineFixtures {
 
 		return routine;
 	}
+
+	public static Routine PRIVATE_ROUTINE(User user) {
+		return Routine.builder()
+			.user(user)
+			.title("비공개 루틴")
+			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.SUNDAY)))
+			.time(NIGHT_TIME)
+			.color(PlanCategoryColor.from("#006400"))
+			.isPublic(false)
+			.build();
+
+	}
+
 }
