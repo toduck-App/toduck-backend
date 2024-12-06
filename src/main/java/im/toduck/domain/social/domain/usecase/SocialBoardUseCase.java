@@ -65,7 +65,6 @@ public class SocialBoardUseCase {
 	}
 
 	@Transactional
-	public void deleteSocialBoard(final Long userId, final Long socialId) {
 	public void updateSocialBoard(
 		final Long userId,
 		final Long socialId,
