@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
+import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -17,6 +18,9 @@ public record SocialResponse(
 
 	@Schema(description = "작성자 정보")
 	OwnerDto owner,
+
+	@Schema(description = "공유할 루틴 정보")
+	RoutineDetailResponse routine,
 
 	@Schema(description = "게시글 내용", example = "어제 잠들기 전 새로운 루틴을 추가했다👀")
 	String content,

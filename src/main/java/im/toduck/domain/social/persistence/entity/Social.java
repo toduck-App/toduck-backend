@@ -3,6 +3,7 @@ package im.toduck.domain.social.persistence.entity;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -35,7 +36,9 @@ public class Social extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	// TODO: Routine 추가 (생성자, 정적 팩터리 메소드에도 추가 필요)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "routine_id")
+	private Routine routine;
 
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private int likeCount;
@@ -47,8 +50,9 @@ public class Social extends BaseEntity {
 	private Boolean isAnonymous;
 
 	@Builder
-	private Social(User user, String content, Boolean isAnonymous) {
+	private Social(User user, Routine routine, String content, Boolean isAnonymous) {
 		this.user = user;
+		this.routine = routine;
 		this.content = content;
 		this.isAnonymous = isAnonymous;
 	}
@@ -65,6 +69,10 @@ public class Social extends BaseEntity {
 		this.isAnonymous = isAnonymous;
 	}
 
+	public void updateRoutine(final Routine routine) {
+		this.routine = routine;
+	}
+
 	public void incrementLikeCount() {
 		this.likeCount++;
 	}
@@ -74,4 +82,5 @@ public class Social extends BaseEntity {
 			this.likeCount--;
 		}
 	}
+
 }
