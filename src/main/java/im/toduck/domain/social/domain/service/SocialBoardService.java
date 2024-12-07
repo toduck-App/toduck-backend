@@ -174,16 +174,22 @@ public class SocialBoardService {
 	public List<Social> getSocials(
 		final Long cursor,
 		final Integer limit,
-		final Long currentUserId
+		final Long currentUserId,
+		final List<Long> categoryIds
 	) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(cursor, currentUserId, pageRequest);
-	}
 
-	@Transactional(readOnly = true)
-	public List<Social> findLatestSocials(final int limit, final Long currentUserId) {
-		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.findLatestSocialsExcludingBlocked(currentUserId, pageRequest);
+		if (categoryIds == null || categoryIds.isEmpty()) {
+			return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, null, pageRequest);
+		}
+
+		List<SocialCategory> socialCategories = findAllSocialCategories(categoryIds);
+
+		if (isInvalidCategoryIncluded(categoryIds, socialCategories)) {
+			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
+		}
+
+		return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, categoryIds, pageRequest);
 	}
 
 	private boolean isBoardOwner(final Social socialBoard, final User user) {

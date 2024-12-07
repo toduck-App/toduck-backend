@@ -146,7 +146,8 @@ public class SocialBoardUseCase {
 	public CursorPaginationResponse<SocialResponse> getSocials(
 		final Long userId,
 		final Long cursor,
-		final Integer limit
+		final Integer limit,
+		final List<Long> categoryIds
 	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
@@ -154,25 +155,19 @@ public class SocialBoardUseCase {
 		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
 		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
 
-		List<Social> socialBoards = fetchSocialBoards(cursor, fetchLimit, user.getId());
-		boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
-		Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
+		try {
+			List<Social> socialBoards = socialBoardService.getSocials(cursor, fetchLimit, user.getId(), categoryIds);
+			boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
+			Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
 
-		List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
+			List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
 
-		log.info("소셜 게시글 목록 조회 - UserId: {}, HasMore: {}, NextCursor: {}", userId, hasMore, nextCursor);
-		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
-	}
-
-	private List<Social> fetchSocialBoards(
-		final Long cursor,
-		final int fetchLimit,
-		final Long currentUserId
-	) {
-		if (cursor == null) {
-			return socialBoardService.findLatestSocials(fetchLimit, currentUserId);
+			log.info("소셜 게시글 목록 조회 성공 - UserId: {}, HasMore: {}, NextCursor: {}", userId, hasMore, nextCursor);
+			return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
+		} catch (CommonException ex) {
+			log.warn("유효하지 않은 카테고리 포함 - UserId: {}, 요청된 카테고리 IDs: {}", userId, categoryIds);
+			throw ex;
 		}
-		return socialBoardService.getSocials(cursor, fetchLimit, currentUserId);
 	}
 
 	private List<SocialResponse> createSocialResponses(

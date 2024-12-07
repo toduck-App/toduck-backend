@@ -1,5 +1,6 @@
 package im.toduck.domain.social.presentation.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -89,10 +90,13 @@ public class SocialBoardController implements SocialBoardApi {
 	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		CustomUserDetails user,
 		Long cursor,
-		@PaginationLimit Integer limit
+		@PaginationLimit Integer limit,
+		List<Long> categoryIds
 	) {
-
-		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialBoardUseCase.getSocials(user.getUserId(), cursor, limit)));
+		return ResponseEntity.ok().body(
+			ApiResponse.createSuccess(
+				socialBoardUseCase.getSocials(user.getUserId(), cursor, limit, categoryIds)
+			)
+		);
 	}
 }

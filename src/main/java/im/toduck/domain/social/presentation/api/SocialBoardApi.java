@@ -1,5 +1,6 @@
 package im.toduck.domain.social.presentation.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -139,8 +140,9 @@ public interface SocialBoardApi {
 	);
 
 	@Operation(
-		summary = "게시글 목록 조회",
+		summary = "게시글 목록 조회 (카테고리 필터 가능)",
 		description = "게시글을 커서 기반 페이지네이션으로 조회합니다.</br></br>"
+			+ "카테고리를 기준으로 필터링할 수 있습니다.</br></br>"
 			+ "커서 페이지네이션 사용법은 Notion > API 개요 > 페이지네이션을 확인해주세요.</br></br>"
 			+ "공유할 루틴이 존재하지 않는 경우 routine 필드에 null이 반환 됩니다."
 	)
@@ -153,6 +155,7 @@ public interface SocialBoardApi {
 	ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		@AuthenticationPrincipal CustomUserDetails user,
 		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long cursor,
-		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
+		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit,
+		@Parameter(description = "카테고리 ID 목록") @RequestParam(required = false) List<Long> categoryIds
 	);
 }
