@@ -105,7 +105,7 @@ public class SocialBoardService {
 				throw CommonException.from(ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST);
 			}
 
-			List<SocialCategory> socialCategories = findAllSocialCategories(request.socialCategoryIds());
+			List<SocialCategory> socialCategories = findSocialCategoriesByIds(request.socialCategoryIds());
 
 			if (isInvalidCategoryIncluded(request.socialCategoryIds(), socialCategories)) {
 				log.warn("게시글 업데이트시 유효하지 않은 카테고리가 포함됨 - UserId: {}, SocialBoardId: {}, CategoryIds: {}", user.getId(),
@@ -136,7 +136,7 @@ public class SocialBoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SocialCategory> findAllSocialCategories(final List<Long> socialCategoryIds) {
+	public List<SocialCategory> findSocialCategoriesByIds(final List<Long> socialCategoryIds) {
 		return socialCategoryRepository.findAllById(socialCategoryIds);
 	}
 
@@ -183,7 +183,7 @@ public class SocialBoardService {
 			return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, null, pageRequest);
 		}
 
-		List<SocialCategory> socialCategories = findAllSocialCategories(categoryIds);
+		List<SocialCategory> socialCategories = findSocialCategoriesByIds(categoryIds);
 
 		if (isInvalidCategoryIncluded(categoryIds, socialCategories)) {
 			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
@@ -201,6 +201,11 @@ public class SocialBoardService {
 		final List<SocialCategory> socialCategories
 	) {
 		return socialCategories.size() != socialCategoryIds.size();
+	}
+
+	@Transactional(readOnly = true)
+	public List<SocialCategory> findAllSocialCategories() {
+		return socialCategoryRepository.findAll();
 	}
 }
 

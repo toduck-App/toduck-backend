@@ -43,6 +43,8 @@ import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
@@ -791,5 +793,36 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 				softly.assertThat(response.results()).hasSize(numberOfPosts);
 			});
 		}
+	}
+
+	@Nested
+	@DisplayName("카테고리 전체 조회시")
+	class GetAllCategories {
+
+		@Test
+		void 모든_카테고리를_조회한다() {
+			// given
+			List<SocialCategory> categories = testFixtureBuilder.buildCategories(MULTIPLE_CATEGORIES(5));
+
+			// when
+			SocialCategoryResponse response = socialBoardUseCase.getAllCategories();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.categories()).hasSize(categories.size());
+				softly.assertThat(response.categories())
+					.extracting(SocialCategoryDto::socialCategoryId)
+					.containsExactlyInAnyOrderElementsOf(
+						categories.stream().map(SocialCategory::getId).toList()
+					);
+				softly.assertThat(response.categories())
+					.extracting(SocialCategoryDto::name)
+					.containsExactlyInAnyOrderElementsOf(
+						categories.stream().map(SocialCategory::getName).toList()
+					);
+			});
+		}
+
 	}
 }

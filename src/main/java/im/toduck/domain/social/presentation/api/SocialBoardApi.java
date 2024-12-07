@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -158,4 +159,17 @@ public interface SocialBoardApi {
 		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit,
 		@Parameter(description = "카테고리 ID 목록") @RequestParam(required = false) List<Long> categoryIds
 	);
+
+	@Operation(
+		summary = "모든 카테고리 조회",
+		description = "모든 소셜 카테고리의 ID와 이름을 조회합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = SocialCategoryResponse.class,
+			description = "모든 카테고리 조회 성공, 카테고리 목록 반환"
+		)
+	)
+	ResponseEntity<ApiResponse<SocialCategoryResponse>> getAllCategories();
+
 }

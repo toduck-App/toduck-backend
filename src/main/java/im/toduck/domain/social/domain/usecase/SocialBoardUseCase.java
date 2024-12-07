@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.routine.domain.service.RoutineService;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.CommentMapper;
+import im.toduck.domain.social.common.mapper.SocialCategoryMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
@@ -17,6 +18,8 @@ import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -48,7 +51,8 @@ public class SocialBoardUseCase {
 		Routine routine = findRoutineForCreate(user, request.routineId());
 
 		Social socialBoard = socialBoardService.createSocialBoard(user, routine, request);
-		List<SocialCategory> socialCategories = socialBoardService.findAllSocialCategories(request.socialCategoryIds());
+		List<SocialCategory> socialCategories = socialBoardService.findSocialCategoriesByIds(
+			request.socialCategoryIds());
 		socialBoardService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		socialBoardService.addSocialImageFiles(request.socialImageUrls(), socialBoard);
 
@@ -184,5 +188,16 @@ public class SocialBoardUseCase {
 				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isSocialBoardLiked);
 			})
 			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public SocialCategoryResponse getAllCategories() {
+		List<SocialCategory> socialCategories = socialBoardService.findAllSocialCategories();
+
+		List<SocialCategoryDto> socialCategoryDtos = socialCategories.stream()
+			.map(SocialCategoryMapper::toSocialCategoryDto)
+			.toList();
+
+		return SocialCategoryMapper.toSocialCategoryResponse(socialCategoryDtos);
 	}
 }
