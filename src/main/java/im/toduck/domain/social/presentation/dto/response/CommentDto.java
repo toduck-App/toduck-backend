@@ -20,6 +20,9 @@ public record CommentDto(
 	@Schema(description = "댓글 내용", example = "루틴 너무 좋네요!")
 	String content,
 
+	@Schema(description = "댓글 좋아요 정보")
+	CommentLikeDto commentLikeInfo,
+
 	@Schema(description = "댓글 작성 시간", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-09-11 10:30")
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")

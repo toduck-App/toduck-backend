@@ -17,8 +17,9 @@ import im.toduck.domain.social.presentation.api.SocialInteractionApi;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -60,23 +61,23 @@ public class SocialInteractionController implements SocialInteractionApi {
 	@Override
 	@PostMapping("/{socialId}/likes")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
+	public ResponseEntity<ApiResponse<SocialLikeCreateResponse>> createSocialLike(
 		@PathVariable Long socialId,
 		CustomUserDetails user
 	) {
 
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialInteractionUseCase.createLike(user.getUserId(), socialId)));
+			.body(ApiResponse.createSuccess(socialInteractionUseCase.createSocialLike(user.getUserId(), socialId)));
 	}
 
 	@Override
 	@DeleteMapping("/{socialId}/likes")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
+	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteSocialLike(
 		@PathVariable Long socialId,
 		CustomUserDetails user
 	) {
-		socialInteractionUseCase.deleteLike(user.getUserId(), socialId);
+		socialInteractionUseCase.deleteSocialLike(user.getUserId(), socialId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
@@ -93,5 +94,29 @@ public class SocialInteractionController implements SocialInteractionApi {
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(
 				socialInteractionUseCase.reportSocial(user.getUserId(), socialId, request)));
+	}
+
+	@Override
+	@PostMapping("/{socialId}/comments/{commentId}/likes")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CommentLikeCreateResponse>> createCommentLike(
+		@PathVariable Long socialId,
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(socialInteractionUseCase.createCommentLike(user.getUserId(), commentId)));
+	}
+
+	@Override
+	@DeleteMapping("/{socialId}/comments/{commentId}/likes")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteCommentLike(
+		@PathVariable Long socialId,
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		socialInteractionUseCase.deleteCommentLike(user.getUserId(), commentId);
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
 }

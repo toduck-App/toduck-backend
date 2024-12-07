@@ -1,6 +1,7 @@
 package im.toduck.domain.social.domain.usecase;
 
 import static im.toduck.fixtures.social.CommentFixtures.*;
+import static im.toduck.fixtures.social.CommentLikeFixtures.*;
 import static im.toduck.fixtures.social.LikeFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
 import static im.toduck.fixtures.user.BlockFixtures.*;
@@ -18,17 +19,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
@@ -50,6 +54,9 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private LikeRepository likeRepository;
+
+	@Autowired
+	private CommentLikeRepository commentLikeRepository;
 
 	@BeforeEach
 	public void setUp() {
@@ -237,14 +244,15 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			int beforeLikeCount = SOCIAL_BOARD.getLikeCount();
 
 			// when
-			LikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+			SocialLikeCreateResponse response = socialInteractionUseCase.createSocialLike(USER.getId(),
+				SOCIAL_BOARD.getId());
 
 			// then
 			Like createdLike = likeRepository.findByUserAndSocial(USER, SOCIAL_BOARD).orElseThrow();
 			Optional<Social> afterSocialBoard = socialRepository.findById(SOCIAL_BOARD.getId());
 			assertSoftly(softly -> {
 				assertThat(createdLike).isNotNull();
-				assertThat(response.likeId()).isNotNull();
+				assertThat(response.socialLikeId()).isNotNull();
 				afterSocialBoard.ifPresent(
 					social -> softly.assertThat(social.getLikeCount()).isEqualTo(beforeLikeCount + 1)
 				);
@@ -255,10 +263,11 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		@Test
 		void 이미_좋아요를_누른_경우_예외를_발생시킨다() {
 			// given
-			LikeCreateResponse response = socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId());
+			SocialLikeCreateResponse response = socialInteractionUseCase.createSocialLike(USER.getId(),
+				SOCIAL_BOARD.getId());
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.createLike(USER.getId(), SOCIAL_BOARD.getId()))
+			assertThatThrownBy(() -> socialInteractionUseCase.createSocialLike(USER.getId(), SOCIAL_BOARD.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.EXISTS_LIKE.getMessage());
 		}
@@ -269,7 +278,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			Long nonExistentSocialId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.createLike(USER.getId(), nonExistentSocialId))
+			assertThatThrownBy(() -> socialInteractionUseCase.createSocialLike(USER.getId(), nonExistentSocialId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
@@ -291,7 +300,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			Like LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));
 
 			// when
-			socialInteractionUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId());
+			socialInteractionUseCase.deleteSocialLike(USER.getId(), SOCIAL_BOARD.getId());
 
 			// then
 			assertThat(likeRepository.findByUserAndSocial(USER, SOCIAL_BOARD)).isNotPresent();
@@ -302,7 +311,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		void 좋아요가_존재하지_않는_경우_예외를_발생시킨다() {
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.deleteLike(USER.getId(), SOCIAL_BOARD.getId()))
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteSocialLike(USER.getId(), SOCIAL_BOARD.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_LIKE.getMessage());
 		}
@@ -313,7 +322,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			Long nonExistentSocialId = -1L;
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.deleteLike(USER.getId(), nonExistentSocialId))
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteSocialLike(USER.getId(), nonExistentSocialId))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_BOARD.getMessage());
 		}
@@ -398,4 +407,131 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			assertThat(response.reportId()).isNotNull();
 		}
 	}
+
+	@Nested
+	@DisplayName("댓글 좋아요 생성시")
+	class CreateCommentLikeTest {
+
+		Social SOCIAL_BOARD;
+		Comment COMMENT;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
+		}
+
+		@Test
+		void 댓글에_좋아요를_성공적으로_생성한다() {
+			// when
+			CommentLikeCreateResponse response = socialInteractionUseCase.createCommentLike(USER.getId(),
+				COMMENT.getId());
+
+			// then
+			CommentLike createdLike = commentLikeRepository.findCommentLikeByUserAndComment(USER, COMMENT)
+				.orElseThrow();
+			Comment afterComment = commentRepository.findById(COMMENT.getId()).orElseThrow();
+
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.commentLikeId()).isNotNull();
+				softly.assertThat(afterComment.getLikeCount()).isEqualTo(1);
+				softly.assertThat(createdLike.getComment().getId()).isEqualTo(COMMENT.getId());
+			});
+		}
+
+		@Test
+		void 이미_댓글에_좋아요를_누른_경우_예외를_발생시킨다() {
+			// given
+			socialInteractionUseCase.createCommentLike(USER.getId(), COMMENT.getId());
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.createCommentLike(USER.getId(), COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.EXISTS_COMMENT_LIKE.getMessage());
+		}
+
+		@Test
+		void 존재하지_않는_댓글에_좋아요를_누를_경우_예외를_발생시킨다() {
+			// given
+			Long nonExistentCommentId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.createCommentLike(USER.getId(), nonExistentCommentId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT.getMessage());
+		}
+
+		@Test
+		void 사용자를_조회할_수_없는_경우_댓글_좋아요에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.createCommentLike(nonExistentUserId, COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("댓글 좋아요 삭제시")
+	class DeleteCommentLikeTest {
+
+		Social SOCIAL_BOARD;
+		Comment COMMENT;
+
+		@BeforeEach
+		void setUp() {
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
+		}
+
+		@Test
+		void 댓글에_좋아요를_성공적으로_삭제한다() {
+			// given
+			CommentLike commentLike = testFixtureBuilder.buildCommentLike(COMMENT_LIKE(USER, COMMENT));
+
+			// when
+			socialInteractionUseCase.deleteCommentLike(USER.getId(), COMMENT.getId());
+
+			// then
+			Comment afterComment = commentRepository.findById(COMMENT.getId()).orElseThrow();
+			assertSoftly(softly -> {
+				softly.assertThat(commentLikeRepository.findCommentLikeByUserAndComment(USER, COMMENT)).isNotPresent();
+				softly.assertThat(afterComment.getLikeCount()).isEqualTo(0);
+			});
+		}
+
+		@Test
+		void 댓글에_좋아요가_존재하지_않는_경우_예외를_발생시킨다() {
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteCommentLike(USER.getId(), COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT_LIKE.getMessage());
+		}
+
+		@Test
+		void 존재하지_않는_댓글에_좋아요를_삭제하려고_하면_예외를_발생시킨다() {
+			// given
+			Long nonExistentCommentId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteCommentLike(USER.getId(), nonExistentCommentId))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT.getMessage());
+		}
+
+		@Test
+		void 사용자를_조회할_수_없는_경우_댓글_좋아요_삭제에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.deleteCommentLike(nonExistentUserId, COMMENT.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+	}
+
 }

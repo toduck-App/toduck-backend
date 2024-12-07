@@ -6,6 +6,7 @@ import im.toduck.domain.social.persistence.vo.CommentContent;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
+import im.toduck.domain.social.presentation.dto.response.CommentLikeDto;
 import im.toduck.domain.social.presentation.dto.response.OwnerDto;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
@@ -27,18 +28,23 @@ public class CommentMapper {
 			.build();
 	}
 
-	public static CommentDto toCommentDto(Comment comment) {
+	public static CommentDto toCommentDto(Comment comment, boolean isCommentLiked) {
 		return CommentDto.builder()
 			.commentId(comment.getId())
 			.owner(getOwner(comment.getUser()))
 			.content(comment.getContent().getValue())
+			.commentLikeInfo(getCommentLikeDto(comment, isCommentLiked))
 			.createdAt(comment.getCreatedAt())
 			.build();
 	}
 
+	private static CommentLikeDto getCommentLikeDto(Comment comment, boolean isCommentLiked) {
+		return CommentLikeMapper.toCommentLikeDto(comment, isCommentLiked);
+	}
+
 	private static OwnerDto getOwner(User user) {
 		return OwnerDto.builder()
-			.id(user.getId())
+			.ownerId(user.getId())
 			.nickname(user.getNickname())
 			.build();
 	}

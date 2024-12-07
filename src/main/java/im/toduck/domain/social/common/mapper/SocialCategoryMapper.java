@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class SocialCategoryMapper {
 	public static SocialCategoryDto toSocialCategoryDto(SocialCategory socialCategory) {
 		return SocialCategoryDto.builder()
-			.id(socialCategory.getId())
+			.socialCategoryId(socialCategory.getId())
 			.name(socialCategory.getName())
 			.build();
 	}

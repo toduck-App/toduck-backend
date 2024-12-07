@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
-public record LikeCreateResponse(
+public record SocialLikeCreateResponse(
 	@Schema(description = "생성된 좋아요 ID", example = "1")
-	Long likeId
+	Long socialLikeId
 ) {
 }

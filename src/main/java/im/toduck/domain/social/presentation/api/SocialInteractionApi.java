@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.LikeCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -70,7 +71,7 @@ public interface SocialInteractionApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = LikeCreateResponse.class,
+			responseClass = SocialLikeCreateResponse.class,
 			description = "좋아요 성공, 생성된 좋아요의 Id를 반환합니다."
 		),
 		errors = {
@@ -78,7 +79,7 @@ public interface SocialInteractionApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
 		}
 	)
-	ResponseEntity<ApiResponse<LikeCreateResponse>> createLike(
+	ResponseEntity<ApiResponse<SocialLikeCreateResponse>> createSocialLike(
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
@@ -99,7 +100,7 @@ public interface SocialInteractionApi {
 
 		}
 	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> deleteLike(
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteSocialLike(
 		@PathVariable Long socialId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
@@ -128,6 +129,45 @@ public interface SocialInteractionApi {
 	ResponseEntity<ApiResponse<ReportCreateResponse>> reportSocialBoard(
 		@RequestBody ReportCreateRequest request,
 		@PathVariable Long socialId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "댓글 좋아요",
+		description = "지정된 댓글을 좋아요 합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = CommentCreateResponse.class,
+			description = "댓글 좋아요 성공, 생성된 좋아요의 Id를 반환합니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EXISTS_COMMENT_LIKE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
+		}
+	)
+	ResponseEntity<ApiResponse<CommentLikeCreateResponse>> createCommentLike(
+		@PathVariable Long socialId,
+		@PathVariable Long commentId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "댓글 좋아요 취소",
+		description = "지정된 댓글의 좋아요를 취소합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "댓글 좋아요 취소 성공, 빈 content 객체를 반환합니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT_LIKE),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteCommentLike(
+		@PathVariable Long socialId,
+		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

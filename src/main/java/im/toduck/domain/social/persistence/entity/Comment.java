@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import im.toduck.domain.social.persistence.vo.CommentContent;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,6 +40,9 @@ public class Comment extends BaseEntity {
 	@JoinColumn(name = "social_id", nullable = false)
 	private Social social;
 
+	@Column(nullable = false, columnDefinition = "int default 0")
+	private int likeCount;
+
 	@Builder
 	private Comment(User user, Social social, CommentContent content) {
 		this.user = user;
@@ -56,5 +60,15 @@ public class Comment extends BaseEntity {
 
 	public void softDelete() {
 		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void incrementLikeCount() {
+		this.likeCount++;
+	}
+
+	public void decrementLikeCount() {
+		if (this.likeCount > 0) {
+			this.likeCount--;
+		}
 	}
 }

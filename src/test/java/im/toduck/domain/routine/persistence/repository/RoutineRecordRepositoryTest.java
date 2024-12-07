@@ -204,12 +204,12 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 
 			// routine1의 미래 미완료 기록 (삭제 대상)
 			RoutineRecord routine1Future = testFixtureBuilder.buildRoutineRecord(
-				OFFSET_INCOMPLETED_SYNCED_RECORD(routine1, 0L)
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine1, 1L)
 			);
 
 			// routine2의 미래 미완료 기록 (유지되어야 함)
 			RoutineRecord routine2Future = testFixtureBuilder.buildRoutineRecord(
-				OFFSET_INCOMPLETED_SYNCED_RECORD(routine2, 0L)
+				OFFSET_INCOMPLETED_SYNCED_RECORD(routine2, 1L)
 			);
 
 			// when

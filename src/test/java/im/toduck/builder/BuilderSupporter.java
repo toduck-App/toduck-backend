@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
+import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
@@ -47,6 +48,9 @@ public class BuilderSupporter {
 	@Autowired
 	private BlockRepository blockRepository;
 
+	@Autowired
+	private CommentLikeRepository commentLikeRepository;
+
 	public UserRepository userRepository() {
 		return userRepository;
 	}
@@ -85,6 +89,10 @@ public class BuilderSupporter {
 
 	public BlockRepository blockRepository() {
 		return blockRepository;
+	}
+
+	public CommentLikeRepository commentLikeRepository() {
+		return commentLikeRepository;
 	}
 
 }

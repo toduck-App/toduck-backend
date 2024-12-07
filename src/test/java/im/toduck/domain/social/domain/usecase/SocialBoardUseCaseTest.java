@@ -34,6 +34,7 @@ import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
@@ -72,6 +73,9 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private RoutineRepository routineRepository;
+
+	@Autowired
+	private CommentLikeRepository commentLikeRepository;
 
 	@BeforeEach
 	public void setUp() {
@@ -611,11 +615,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
-				softly.assertThat(response.id()).isEqualTo(SOCIAL_BOARD.getId());
 				softly.assertThat(response.routine().routineId()).isEqualTo(ROUTINE.getId());
+				softly.assertThat(response.socialId()).isEqualTo(SOCIAL_BOARD.getId());
 				softly.assertThat(response.content()).isEqualTo(SOCIAL_BOARD.getContent());
 				softly.assertThat(response.hasImages()).isTrue();
-				softly.assertThat(response.likeInfo().isLiked()).isTrue();
+				softly.assertThat(response.socialLikeInfo().isLikedByMe()).isTrue();
 				softly.assertThat(response.images())
 					.hasSize(IMAGE_FILES.size())
 					.extracting(SocialImageDto::url)

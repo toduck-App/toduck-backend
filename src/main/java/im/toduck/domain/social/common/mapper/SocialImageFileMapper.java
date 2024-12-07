@@ -17,7 +17,7 @@ public class SocialImageFileMapper {
 
 	public static SocialImageDto toSocialImageDto(SocialImageFile socialImageFile) {
 		return SocialImageDto.builder()
-			.id(socialImageFile.getId())
+			.socialImageId(socialImageFile.getId())
 			.url(socialImageFile.getUrl())
 			.build();
 	}

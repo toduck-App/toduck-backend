@@ -70,12 +70,26 @@ CREATE TABLE comment
     user_id    BIGINT   NOT NULL,
     social_id  BIGINT   NOT NULL,
     content    TEXT     NOT NULL,
+    like_count int      NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     deleted_at DATETIME NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (social_id) REFERENCES social (id)
 );
+
+CREATE TABLE comment_likes
+(
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id    BIGINT   NOT NULL,
+    comment_id BIGINT   NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (comment_id) REFERENCES comment (id)
+);
+
 
 CREATE TABLE likes
 (

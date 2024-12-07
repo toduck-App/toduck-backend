@@ -12,11 +12,13 @@ import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
 import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
@@ -41,10 +43,11 @@ public class SocialBoardService {
 	private final SocialImageFileRepository socialImageFileRepository;
 	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
 	private final CommentRepository commentRepository;
+	private final CommentLikeRepository commentLikeRepository;
 	private final LikeRepository likeRepository;
 
 	@Transactional(readOnly = true)
-	public Optional<Social> getSocialById(Long socialId) {
+	public Optional<Social> getSocialById(final Long socialId) {
 		return socialRepository.findById(socialId);
 	}
 
@@ -59,7 +62,7 @@ public class SocialBoardService {
 	}
 
 	@Transactional
-	public void deleteSocialBoard(User user, Social socialBoard) {
+	public void deleteSocialBoard(final User user, final Social socialBoard) {
 		if (!isBoardOwner(socialBoard, user)) {
 			log.warn("권한이 없는 유저가 게시글 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
@@ -72,6 +75,9 @@ public class SocialBoardService {
 		socialCategoryLinks.forEach(SocialCategoryLink::softDelete);
 
 		List<Comment> comments = commentRepository.findAllBySocial(socialBoard);
+		comments.forEach(comment -> {
+			commentLikeRepository.findAllByComment(comment).forEach(CommentLike::softDelete);
+		});
 		comments.forEach(Comment::softDelete);
 
 		List<Like> likes = likeRepository.findAllBySocial(socialBoard);
@@ -130,12 +136,12 @@ public class SocialBoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SocialCategory> findAllSocialCategories(List<Long> socialCategoryIds) {
+	public List<SocialCategory> findAllSocialCategories(final List<Long> socialCategoryIds) {
 		return socialCategoryRepository.findAllById(socialCategoryIds);
 	}
 
 	@Transactional
-	public void addSocialImageFiles(List<String> imageUrls, Social socialBoard) {
+	public void addSocialImageFiles(final List<String> imageUrls, final Social socialBoard) {
 		List<SocialImageFile> socialImageFiles = imageUrls.stream()
 			.map(url -> SocialImageFileMapper.toSocialImageFile(socialBoard, url))
 			.toList();
@@ -143,8 +149,11 @@ public class SocialBoardService {
 	}
 
 	@Transactional
-	public void addSocialCategoryLinks(List<Long> categoryIds, List<SocialCategory> socialCategories,
-		Social socialBoard) {
+	public void addSocialCategoryLinks(
+		final List<Long> categoryIds,
+		final List<SocialCategory> socialCategories,
+		final Social socialBoard
+	) {
 		if (isInvalidCategoryIncluded(categoryIds, socialCategories)) {
 			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
 		}
@@ -157,27 +166,34 @@ public class SocialBoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SocialImageFile> getSocialImagesBySocial(Social socialBoard) {
+	public List<SocialImageFile> getSocialImagesBySocial(final Social socialBoard) {
 		return socialImageFileRepository.findAllBySocial(socialBoard);
 	}
 
 	@Transactional(readOnly = true)
-	public List<Social> getSocials(Long cursor, Integer limit, Long currentUserId) {
+	public List<Social> getSocials(
+		final Long cursor,
+		final Integer limit,
+		final Long currentUserId
+	) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 		return socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(cursor, currentUserId, pageRequest);
 	}
 
 	@Transactional(readOnly = true)
-	public List<Social> findLatestSocials(int limit, Long currentUserId) {
+	public List<Social> findLatestSocials(final int limit, final Long currentUserId) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 		return socialRepository.findLatestSocialsExcludingBlocked(currentUserId, pageRequest);
 	}
 
-	private boolean isBoardOwner(Social socialBoard, User user) {
+	private boolean isBoardOwner(final Social socialBoard, final User user) {
 		return socialBoard.isOwner(user);
 	}
 
-	private boolean isInvalidCategoryIncluded(List<Long> socialCategoryIds, List<SocialCategory> socialCategories) {
+	private boolean isInvalidCategoryIncluded(
+		final List<Long> socialCategoryIds,
+		final List<SocialCategory> socialCategories
+	) {
 		return socialCategories.size() != socialCategoryIds.size();
 	}
 }
