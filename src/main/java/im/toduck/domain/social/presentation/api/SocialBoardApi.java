@@ -142,10 +142,19 @@ public interface SocialBoardApi {
 
 	@Operation(
 		summary = "게시글 목록 조회 (카테고리 필터 가능)",
-		description = "게시글을 커서 기반 페이지네이션으로 조회합니다.</br></br>"
-			+ "카테고리를 기준으로 필터링할 수 있습니다.</br></br>"
-			+ "커서 페이지네이션 사용법은 Notion > API 개요 > 페이지네이션을 확인해주세요.</br></br>"
-			+ "공유할 루틴이 존재하지 않는 경우 routine 필드에 null이 반환 됩니다."
+		description =
+			"""
+				<b>게시글을 커서 기반 페이지네이션으로 조회합니다.</b><br/><br/>
+				<p><b>카테고리 필터를 적용하는 방법:</b></p>
+				<p>예시: /v1/socials?cursor=100&limit=10&categoryIds=1,2,3</p><br/>
+				<p><b>커서 페이지네이션 사용법:</b></p>
+				<p>Notion > API 개요 > 페이지네이션을 확인해주세요.</p><br/>
+				<p><b>필터링 파라미터:</b><br/>
+				<p>- <b>cursor:</b> 조회를 시작할 커서 값 (게시글 ID)</p>
+				<p>- <b>limit:</b> 한 페이지에 표시할 게시글 수</p>
+				<p>- <b>categoryIds:</b> 필터링할 카테고리 ID 목록 (쉼표로 구분하여 지정)</p><br/>
+				<p>공유할 루틴이 존재하지 않는 경우 <b>routine</b> 필드에 <b>null</b>이 반환됩니다.</p>
+				"""
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
