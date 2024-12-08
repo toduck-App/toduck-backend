@@ -105,7 +105,7 @@ public class SocialBoardService {
 				throw CommonException.from(ExceptionCode.EMPTY_SOCIAL_CATEGORY_LIST);
 			}
 
-			List<SocialCategory> socialCategories = findAllSocialCategories(request.socialCategoryIds());
+			List<SocialCategory> socialCategories = findSocialCategoriesByIds(request.socialCategoryIds());
 
 			if (isInvalidCategoryIncluded(request.socialCategoryIds(), socialCategories)) {
 				log.warn("게시글 업데이트시 유효하지 않은 카테고리가 포함됨 - UserId: {}, SocialBoardId: {}, CategoryIds: {}", user.getId(),
@@ -136,7 +136,7 @@ public class SocialBoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SocialCategory> findAllSocialCategories(final List<Long> socialCategoryIds) {
+	public List<SocialCategory> findSocialCategoriesByIds(final List<Long> socialCategoryIds) {
 		return socialCategoryRepository.findAllById(socialCategoryIds);
 	}
 
@@ -174,16 +174,11 @@ public class SocialBoardService {
 	public List<Social> getSocials(
 		final Long cursor,
 		final Integer limit,
-		final Long currentUserId
+		final Long currentUserId,
+		final List<Long> categoryIds
 	) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(cursor, currentUserId, pageRequest);
-	}
-
-	@Transactional(readOnly = true)
-	public List<Social> findLatestSocials(final int limit, final Long currentUserId) {
-		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.findLatestSocialsExcludingBlocked(currentUserId, pageRequest);
+		return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, categoryIds, pageRequest);
 	}
 
 	private boolean isBoardOwner(final Social socialBoard, final User user) {
@@ -195,6 +190,11 @@ public class SocialBoardService {
 		final List<SocialCategory> socialCategories
 	) {
 		return socialCategories.size() != socialCategoryIds.size();
+	}
+
+	@Transactional(readOnly = true)
+	public List<SocialCategory> findAllSocialCategories() {
+		return socialCategoryRepository.findAll();
 	}
 }
 

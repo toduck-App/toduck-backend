@@ -12,6 +12,7 @@ import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
+import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.user.persistence.entity.Block;
 import im.toduck.domain.user.persistence.entity.User;
@@ -69,6 +70,15 @@ public class TestFixtureBuilder {
 
 	public CommentLike buildCommentLike(final CommentLike commentLike) {
 		return bs.commentLikeRepository().save(commentLike);
+	}
+
+	public void buildSocialCategoryLinks(final SocialCategory socialCategory, final Social social) {
+		SocialCategoryLink link = SocialCategoryLink.builder()
+			.social(social)
+			.socialCategory(socialCategory)
+			.build();
+
+		bs.socialCategoryLinkRepository().save(link);
 	}
 
 }

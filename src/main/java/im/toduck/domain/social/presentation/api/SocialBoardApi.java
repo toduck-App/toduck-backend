@@ -1,5 +1,6 @@
 package im.toduck.domain.social.presentation.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -139,10 +141,20 @@ public interface SocialBoardApi {
 	);
 
 	@Operation(
-		summary = "게시글 목록 조회",
-		description = "게시글을 커서 기반 페이지네이션으로 조회합니다.</br></br>"
-			+ "커서 페이지네이션 사용법은 Notion > API 개요 > 페이지네이션을 확인해주세요.</br></br>"
-			+ "공유할 루틴이 존재하지 않는 경우 routine 필드에 null이 반환 됩니다."
+		summary = "게시글 목록 조회 (카테고리 필터 가능)",
+		description =
+			"""
+				<b>게시글을 커서 기반 페이지네이션으로 조회합니다.</b><br/><br/>
+				<p><b>카테고리 필터를 적용하는 방법:</b></p>
+				<p>예시: /v1/socials?cursor=100&limit=10&categoryIds=1,2,3</p><br/>
+				<p><b>커서 페이지네이션 사용법:</b></p>
+				<p>Notion > API 개요 > 페이지네이션을 확인해주세요.</p><br/>
+				<p><b>필터링 파라미터:</b><br/>
+				<p>- <b>cursor:</b> 조회를 시작할 커서 값 (게시글 ID)</p>
+				<p>- <b>limit:</b> 한 페이지에 표시할 게시글 수</p>
+				<p>- <b>categoryIds:</b> 필터링할 카테고리 ID 목록 (쉼표로 구분하여 지정)</p><br/>
+				<p>공유할 루틴이 존재하지 않는 경우 <b>routine</b> 필드에 <b>null</b>이 반환됩니다.</p>
+				"""
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -153,6 +165,20 @@ public interface SocialBoardApi {
 	ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		@AuthenticationPrincipal CustomUserDetails user,
 		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long cursor,
-		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
+		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit,
+		@Parameter(description = "카테고리 ID 목록") @RequestParam(required = false) List<Long> categoryIds
 	);
+
+	@Operation(
+		summary = "모든 카테고리 조회",
+		description = "모든 소셜 카테고리의 ID와 이름을 조회합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = SocialCategoryResponse.class,
+			description = "모든 카테고리 조회 성공, 카테고리 목록 반환"
+		)
+	)
+	ResponseEntity<ApiResponse<SocialCategoryResponse>> getAllCategories();
+
 }

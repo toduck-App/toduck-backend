@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -42,6 +43,8 @@ import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
@@ -671,28 +674,6 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 목록 조회시")
 	class GetSocials {
-
-		@Test
-		void 게시글_목록을_성공적으로_조회한다() {
-			// given
-			int numberOfPosts = 15;
-			List<Social> socials = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, numberOfPosts));
-			Long cursor = null;
-			Integer limit = 10;
-
-			// when
-			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.getSocials(USER.getId(), cursor,
-				limit);
-
-			// then
-			assertSoftly(softly -> {
-				softly.assertThat(response).isNotNull();
-				softly.assertThat(response.results()).hasSize(limit);
-				softly.assertThat(response.hasMore()).isTrue();
-				softly.assertThat(response.nextCursor()).isNotNull();
-			});
-		}
-
 		@Test
 		void 존재하지_않는_사용자일_경우_조회에_실패한다() {
 			// given
@@ -701,9 +682,147 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			Integer limit = 10;
 
 			// when & then
-			assertThatThrownBy(() -> socialBoardUseCase.getSocials(nonExistentUserId, cursor, limit))
+			assertThatThrownBy(() -> socialBoardUseCase.getSocials(nonExistentUserId, cursor, limit, null))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
 		}
+
+		@Test
+		void 커서가_존재할_경우_해당_커서_이후의_게시글을_조회한다() {
+			// given
+			int totalPosts = 15;
+			List<Social> socials = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, totalPosts));
+
+			Long cursor = socials.get(10).getId();
+			int limit = 5;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.getSocials(
+				USER.getId(),
+				cursor,
+				limit,
+				null
+			);
+
+			List<Long> expectedIds = socials.stream()
+				.filter(social -> social.getId() < cursor)
+				.sorted(Comparator.comparing(Social::getId).reversed())
+				.limit(limit)
+				.map(Social::getId)
+				.toList();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results()).hasSize(expectedIds.size());
+				softly.assertThat(response.results())
+					.extracting(SocialResponse::socialId)
+					.containsExactlyElementsOf(expectedIds);
+				softly.assertThat(response.hasMore()).isTrue();
+				softly.assertThat(response.nextCursor()).isNotNull();
+			});
+		}
+
+		@Test
+		void 특정_카테고리_필터를_적용하여_게시글을_조회한다() {
+			// given
+			List<SocialCategory> categories = testFixtureBuilder.buildCategories(MULTIPLE_CATEGORIES(2));
+
+			// 카테고리 1에 속한 게시글 4개 생성
+			List<Social> category1Socials = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, 4));
+			category1Socials.forEach(social ->
+				testFixtureBuilder.buildSocialCategoryLinks(categories.get(0), social)
+			);
+
+			// 카테고리 2에 속한 게시글 5개 생성
+			List<Social> category2Socials = testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, 5));
+			category2Socials.forEach(social ->
+				testFixtureBuilder.buildSocialCategoryLinks(categories.get(1), social)
+			);
+
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.getSocials(
+				USER.getId(),
+				cursor,
+				limit,
+				List.of(categories.get(0).getId()) // 카테고리 1 필터
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results()).hasSize(4);
+			});
+		}
+
+		@Test
+		void 존재하지_않는_카테고리를_포함하면_예외가_발생한다() {
+			// given
+			Long cursor = null;
+			Integer limit = 10;
+			List<Long> invalidCategoryIds = List.of(1L, -1L);
+
+			// when & then
+			assertThatThrownBy(() -> socialBoardUseCase.getSocials(USER.getId(), cursor, limit, invalidCategoryIds))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY.getMessage());
+		}
+
+		@Test
+		void 카테고리없이_전체_게시글을_조회한다() {
+			// given
+			int numberOfPosts = 10;
+			testFixtureBuilder.buildSocials(MULTIPLE_SOCIALS(USER, numberOfPosts));
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.getSocials(
+				USER.getId(),
+				cursor,
+				limit,
+				null
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results()).hasSize(numberOfPosts);
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("카테고리 전체 조회시")
+	class GetAllCategories {
+
+		@Test
+		void 모든_카테고리를_조회한다() {
+			// given
+			List<SocialCategory> categories = testFixtureBuilder.buildCategories(MULTIPLE_CATEGORIES(5));
+
+			// when
+			SocialCategoryResponse response = socialBoardUseCase.getAllCategories();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.categories()).hasSize(categories.size());
+				softly.assertThat(response.categories())
+					.extracting(SocialCategoryDto::socialCategoryId)
+					.containsExactlyInAnyOrderElementsOf(
+						categories.stream().map(SocialCategory::getId).toList()
+					);
+				softly.assertThat(response.categories())
+					.extracting(SocialCategoryDto::name)
+					.containsExactlyInAnyOrderElementsOf(
+						categories.stream().map(SocialCategory::getName).toList()
+					);
+			});
+		}
+
 	}
 }
