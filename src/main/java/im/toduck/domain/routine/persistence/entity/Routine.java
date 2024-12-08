@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "routine")
 @NoArgsConstructor
-// TODO: SQLRestriction 등 Soft delete 를 위한 설정 및 어노테이션 필요
 public class Routine extends BaseEntity {
 
 	@Id
@@ -62,6 +61,9 @@ public class Routine extends BaseEntity {
 
 	@Column
 	private LocalTime time;
+
+	@Column(name = "schedule_modified_at")
+	private LocalDateTime scheduleModifiedAt;
 
 	@Convert(converter = DaysOfWeekBitmaskConverter.class)
 	@Column(name = "days_of_week", nullable = false)
@@ -96,6 +98,7 @@ public class Routine extends BaseEntity {
 		this.time = time;
 		this.daysOfWeekBitmask = daysOfWeekBitmask;
 		this.user = user;
+		this.scheduleModifiedAt = LocalDateTime.now();
 	}
 
 	public String getColorValue() {
@@ -105,6 +108,20 @@ public class Routine extends BaseEntity {
 	public String getMemoValue() {
 		return memo.getValue();
 	}
+
+	// public void updateTime(LocalTime newTime) {
+	// 	if (!newTime.equals(this.time)) {
+	// 		this.time = newTime;
+	// 		this.scheduleModifiedAt = LocalDateTime.now();
+	// 	}
+	// }
+	//
+	// public void updateDaysOfWeek(DaysOfWeekBitmask newDaysOfWeek) {
+	// 	if (!newDaysOfWeek.equals(this.daysOfWeekBitmask)) {
+	// 		this.daysOfWeekBitmask = newDaysOfWeek;
+	// 		this.scheduleModifiedAt = LocalDateTime.now();
+	// 	}
+	// }
 
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();
