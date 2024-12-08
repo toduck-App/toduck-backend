@@ -178,17 +178,6 @@ public class SocialBoardService {
 		final List<Long> categoryIds
 	) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-
-		if (categoryIds == null || categoryIds.isEmpty()) {
-			return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, null, pageRequest);
-		}
-
-		List<SocialCategory> socialCategories = findSocialCategoriesByIds(categoryIds);
-
-		if (isInvalidCategoryIncluded(categoryIds, socialCategories)) {
-			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
-		}
-
 		return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, categoryIds, pageRequest);
 	}
 

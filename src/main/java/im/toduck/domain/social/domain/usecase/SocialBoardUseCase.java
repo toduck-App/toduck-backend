@@ -3,6 +3,7 @@ package im.toduck.domain.social.domain.usecase;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import im.toduck.domain.routine.domain.service.RoutineService;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -159,19 +160,35 @@ public class SocialBoardUseCase {
 		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
 		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
 
-		try {
-			List<Social> socialBoards = socialBoardService.getSocials(cursor, fetchLimit, user.getId(), categoryIds);
-			boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
-			Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
+		validateCategories(userId, categoryIds);
 
-			List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
+		List<Social> socialBoards = socialBoardService.getSocials(cursor, fetchLimit, user.getId(), categoryIds);
+		boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
+		Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
 
-			log.info("소셜 게시글 목록 조회 성공 - UserId: {}, HasMore: {}, NextCursor: {}", userId, hasMore, nextCursor);
-			return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
-		} catch (CommonException ex) {
-			log.warn("유효하지 않은 카테고리 포함 - UserId: {}, 요청된 카테고리 IDs: {}", userId, categoryIds);
-			throw ex;
+		List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
+
+		log.info("소셜 게시글 목록 조회 성공 - UserId: {}, HasMore: {}, NextCursor: {}", userId, hasMore, nextCursor);
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
+	}
+
+	private void validateCategories(Long userId, List<Long> categoryIds) {
+		if (CollectionUtils.isEmpty(categoryIds)) {
+			return;
 		}
+
+		List<SocialCategory> socialCategories = socialBoardService.findSocialCategoriesByIds(categoryIds);
+		if (isInvalidCategoryIncluded(categoryIds, socialCategories)) {
+			log.warn("유효하지 않은 카테고리 포함 - UserId: {}, 요청된 카테고리 IDs: {}", userId, categoryIds);
+			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
+		}
+	}
+
+	private boolean isInvalidCategoryIncluded(
+		final List<Long> socialCategoryIds,
+		final List<SocialCategory> socialCategories
+	) {
+		return socialCategories.size() != socialCategoryIds.size();
 	}
 
 	private List<SocialResponse> createSocialResponses(
