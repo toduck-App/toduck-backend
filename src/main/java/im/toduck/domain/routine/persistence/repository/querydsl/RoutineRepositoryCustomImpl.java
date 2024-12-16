@@ -35,10 +35,11 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			.selectFrom(qRoutine)
 			.where(
 				qRoutine.user.eq(user),
-				routineCreatedOnOrBeforeDate(date),
+				scheduleModifiedOnOrBeforeDate(date),
 				routineNotRecorded(routineRecords),
 				routineMatchesDate(date),
-				routineNotDeletedOrDeletedAfterDate(qRoutine.time, date))
+				routineNotDeleted()
+			)
 			.fetch();
 	}
 
@@ -69,6 +70,10 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 		return fetchOne != null;
 	}
 
+	private BooleanExpression routineNotDeleted() {
+		return qRoutine.deletedAt.isNull();
+	}
+
 	private BooleanExpression routineNotDeletedOrDeletedAfterDate(
 		final TimePath<LocalTime> timePath,
 		final LocalDate date
@@ -86,6 +91,11 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 	private BooleanExpression routineCreatedOnOrBeforeDate(final LocalDate date) {
 		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 		return qRoutine.createdAt.loe(endOfDay);
+	}
+
+	private BooleanExpression scheduleModifiedOnOrBeforeDate(final LocalDate date) {
+		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+		return qRoutine.scheduleModifiedAt.loe(endOfDay);
 	}
 
 	private BooleanExpression routineMatchesDate(final LocalDate date) {

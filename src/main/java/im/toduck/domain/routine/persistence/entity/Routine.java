@@ -124,4 +124,8 @@ public class Routine extends BaseEntity {
 	public Boolean isInDeletedState() {
 		return deletedAt != null;
 	}
+
+	public Boolean isAllDay() {
+		return time == null;
+	}
 }

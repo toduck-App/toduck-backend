@@ -1,7 +1,7 @@
 package im.toduck.domain.routine.domain.usecase;
 
-import static im.toduck.fixtures.RoutineFixtures.*;
-import static im.toduck.fixtures.RoutineRecordFixtures.*;
+import static im.toduck.fixtures.routine.RoutineFixtures.*;
+import static im.toduck.fixtures.routine.RoutineRecordFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static im.toduck.global.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
@@ -72,11 +72,15 @@ class RoutineUseCaseTest extends ServiceTest {
 		@Test
 		void 루틴_기록이_존재하는_경우에는_해당_기록을_그대로_사용한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
-			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(
-				COMPLETED_SYNCED_RECORD(ROUTINE)
+			Routine WEEKDAY_MORNING_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
 			);
-			LocalDate queryDate = RECORD.getRecordAt().toLocalDate();
+			RoutineRecord ROUTINE_RECORD = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(WEEKDAY_MORNING_ROUTINE).recordAt("2024-12-02 07:00:00").build() // 월요일
+			);
+			LocalDate queryDate = ROUTINE_RECORD.getRecordAt().toLocalDate();
 
 			// when
 			MyRoutineRecordReadListResponse responses = routineUseCase.readMyRoutineRecordList(USER.getId(), queryDate);
@@ -87,17 +91,21 @@ class RoutineUseCaseTest extends ServiceTest {
 				assertThat(responses.routines()).hasSize(1);
 
 				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
-				assertThat(response.routineId()).isEqualTo(ROUTINE.getId());
-				assertThat(response.isCompleted()).isEqualTo(RECORD.getIsCompleted());
-				assertThat(response.time()).isEqualTo(RECORD.getRecordAt().toLocalTime());
+				assertThat(response.routineId()).isEqualTo(WEEKDAY_MORNING_ROUTINE.getId());
+				assertThat(response.isCompleted()).isEqualTo(ROUTINE_RECORD.getIsCompleted());
+				assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
 			});
 		}
 
 		@Test
 		void 루틴_기록이_존재하지_않는_경우에도_모_루틴을_통해_해당_기록을_조회할_수_있다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
-			LocalDate queryDate = getNextDayOfWeek(DayOfWeek.MONDAY);
+			Routine WEEKDAY_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+			LocalDate queryDate = LocalDate.parse("2024-12-02");
 
 			// when
 			MyRoutineRecordReadListResponse responses = routineUseCase.readMyRoutineRecordList(USER.getId(), queryDate);
@@ -108,29 +116,56 @@ class RoutineUseCaseTest extends ServiceTest {
 				assertThat(responses.routines()).hasSize(1);
 
 				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
-				assertThat(response.routineId()).isEqualTo(ROUTINE.getId());
+				assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
 				assertThat(response.isCompleted()).isFalse();
-				assertThat(response.time()).isEqualTo(ROUTINE.getTime());
+				assertThat(response.time()).isEqualTo(WEEKDAY_ROUTINE.getTime());
 			});
 		}
 
-		@Disabled("추후 테스트 필요")
 		@Test
 		void 루틴_수정으로_인해_동기화되지_않은_루틴_기록을_정상적으로_조회할_수_있다() {
+			// given
+			Routine WEEKDAY_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER) // 월요일
+					.createdAt("2024-11-29 01:00:00")
+					.scheduleModifiedAt("2024-12-05 00:01:00")
+					.build()
+			);
+			RoutineRecord ROUTINE_RECORD = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(WEEKDAY_ROUTINE).recordAt("2024-12-14 07:00:00").build() // 주말
+			);
 
+			LocalDate queryDate = LocalDate.parse("2024-12-14");
+
+			// when
+			MyRoutineRecordReadListResponse responses = routineUseCase.readMyRoutineRecordList(USER.getId(), queryDate);
+
+			// then
+			assertSoftly(softly -> {
+				assertThat(responses.queryDate()).isEqualTo(queryDate);
+				assertThat(responses.routines()).hasSize(1);
+
+				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
+				assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
+				assertThat(response.isCompleted()).isTrue();
+				assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
+			});
 		}
 
 		@Test
 		void 모_루틴이_Soft_DELETE_된_경우에도_루틴_기록이_존재한다면_정상적으로_조회할_수_있다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
-				getNextDayOfWeek(DayOfWeek.MONDAY).plusDays(7).atTime(7, 59, 59))
+			Routine WEEKDAY_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER) // 월요일
+					.createdAt("2024-11-29 01:00:00")
+					.scheduleModifiedAt("2024-12-05 00:01:00")
+					.deletedAt("2024-12-06 00:01:00")
+					.build()
 			);
-
-			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(
-				COMPLETED_SYNCED_RECORD(ROUTINE)
+			RoutineRecord ROUTINE_RECORD = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(WEEKDAY_ROUTINE).recordAt("2024-12-14 07:00:00").build()
 			);
-			LocalDate queryDate = RECORD.getRecordAt().toLocalDate();
+			LocalDate queryDate = ROUTINE_RECORD.getRecordAt().toLocalDate();
 
 			// when
 			MyRoutineRecordReadListResponse responses = routineUseCase.readMyRoutineRecordList(USER.getId(), queryDate);
@@ -141,9 +176,9 @@ class RoutineUseCaseTest extends ServiceTest {
 				assertThat(responses.routines()).hasSize(1);
 
 				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
-				assertThat(response.routineId()).isEqualTo(ROUTINE.getId());
-				assertThat(response.isCompleted()).isEqualTo(RECORD.getIsCompleted());
-				assertThat(response.time()).isEqualTo(RECORD.getRecordAt().toLocalTime());
+				assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
+				assertThat(response.isCompleted()).isEqualTo(ROUTINE_RECORD.getIsCompleted());
+				assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
 			});
 		}
 	}

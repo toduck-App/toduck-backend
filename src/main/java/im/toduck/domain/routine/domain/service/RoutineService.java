@@ -1,6 +1,8 @@
 package im.toduck.domain.routine.domain.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +39,15 @@ public class RoutineService {
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
 	) {
-		// TODO: 여기에선 삭제되면 조회되면 안됨, 근데 삭제 시점 미래 기준으로는 조회가 안되는거고 과거 시점이면 조회가 되어야함
-		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
+		List<Routine> routines = routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
+
+		return routines.stream().filter(routine -> {
+			LocalDateTime compareTime = routine.isAllDay()
+				? date.minusDays(1).atTime(LocalTime.MAX)
+				: date.atTime(routine.getTime());
+
+			return !routine.getScheduleModifiedAt().isAfter(compareTime);
+		}).toList();
 	}
 
 	public Optional<Routine> getUserRoutine(final User user, final Long id) {
