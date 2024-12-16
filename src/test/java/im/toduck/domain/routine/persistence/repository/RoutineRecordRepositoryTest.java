@@ -1,7 +1,7 @@
 package im.toduck.domain.routine.persistence.repository;
 
-import static im.toduck.fixtures.RoutineFixtures.*;
-import static im.toduck.fixtures.RoutineRecordFixtures.*;
+import static im.toduck.fixtures.routine.RoutineFixtures.*;
+import static im.toduck.fixtures.routine.RoutineRecordFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;

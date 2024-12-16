@@ -69,10 +69,6 @@ public class Routine extends BaseEntity {
 	@Column(name = "days_of_week", nullable = false)
 	private DaysOfWeekBitmask daysOfWeekBitmask;
 
-	@Column(name = "shared_count", nullable = false)
-	@ColumnDefault("0")
-	private Integer sharedCount = 0;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
@@ -131,4 +127,7 @@ public class Routine extends BaseEntity {
 		return deletedAt != null;
 	}
 
+	public Boolean isAllDay() {
+		return time == null;
+	}
 }

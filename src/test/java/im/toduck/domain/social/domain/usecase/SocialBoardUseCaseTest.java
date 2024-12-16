@@ -1,6 +1,6 @@
 package im.toduck.domain.social.domain.usecase;
 
-import static im.toduck.fixtures.RoutineFixtures.*;
+import static im.toduck.fixtures.routine.RoutineFixtures.*;
 import static im.toduck.fixtures.social.CommentFixtures.*;
 import static im.toduck.fixtures.social.LikeFixtures.*;
 import static im.toduck.fixtures.social.SocialCategoryFixtures.*;
