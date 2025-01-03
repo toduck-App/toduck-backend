@@ -10,6 +10,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import im.toduck.domain.social.persistence.entity.QSocial;
+import im.toduck.domain.social.persistence.entity.QSocialCategory;
+import im.toduck.domain.social.persistence.entity.QSocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.user.persistence.entity.QBlock;
 import lombok.RequiredArgsConstructor;
@@ -20,40 +22,48 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 	private final QSocial qSocial = QSocial.social;
 	private final QBlock qBlock = QBlock.block;
+	private final QSocialCategoryLink qSocialCategoryLink = QSocialCategoryLink.socialCategoryLink;
+	private final QSocialCategory qSocialCategory = QSocialCategory.socialCategory;
 
 	@Override
-	public List<Social> findByIdBeforeOrderByIdDescExcludingBlocked(Long cursor, Long currentUserId,
+	public List<Social> findSocialsExcludingBlocked(Long cursor, Long currentUserId, List<Long> categoryIds,
 		Pageable pageable) {
 		JPAQuery<Social> query = queryFactory
 			.selectFrom(qSocial)
 			.where(
-				qSocial.id.lt(cursor),
 				qSocial.deletedAt.isNull(),
-				excludeBlockedUsers(currentUserId)
+				excludeBlockedUsers(currentUserId),
+				cursorCondition(cursor)
 			);
 
-		return applyPagination(query, pageable).fetch();
-	}
-
-	@Override
-	public List<Social> findLatestSocialsExcludingBlocked(Long currentUserId, Pageable pageable) {
-		JPAQuery<Social> query = queryFactory
-			.selectFrom(qSocial)
-			.where(
-				qSocial.deletedAt.isNull(),
-				excludeBlockedUsers(currentUserId)
-			);
+		if (categoryIds != null && !categoryIds.isEmpty()) {
+			query.join(qSocialCategoryLink).on(qSocialCategoryLink.social.eq(qSocial))
+				.join(qSocialCategory).on(qSocialCategoryLink.socialCategory.eq(qSocialCategory))
+				.where(qSocialCategory.id.in(categoryIds));
+			query.distinct();
+		}
 
 		return applyPagination(query, pageable).fetch();
 	}
 
 	private BooleanExpression excludeBlockedUsers(Long currentUserId) {
+		if (currentUserId == null) {
+			return null;
+		}
+
 		return qSocial.user.id.notIn(
 			queryFactory
 				.select(qBlock.blocked.id)
 				.from(qBlock)
 				.where(qBlock.blocker.id.eq(currentUserId))
 		);
+	}
+
+	private BooleanExpression cursorCondition(Long cursor) {
+		if (cursor == null) {
+			return null;
+		}
+		return qSocial.id.lt(cursor);
 	}
 
 	private JPAQuery<Social> applyPagination(JPAQuery<Social> query, Pageable pageable) {

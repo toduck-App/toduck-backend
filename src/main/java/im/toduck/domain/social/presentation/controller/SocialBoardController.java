@@ -1,5 +1,6 @@
 package im.toduck.domain.social.presentation.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import im.toduck.domain.social.domain.usecase.SocialBoardUseCase;
 import im.toduck.domain.social.presentation.api.SocialBoardApi;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -89,10 +91,22 @@ public class SocialBoardController implements SocialBoardApi {
 	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		CustomUserDetails user,
 		Long cursor,
-		@PaginationLimit Integer limit
+		@PaginationLimit Integer limit,
+		List<Long> categoryIds
 	) {
+		return ResponseEntity.ok().body(
+			ApiResponse.createSuccess(
+				socialBoardUseCase.getSocials(user.getUserId(), cursor, limit, categoryIds)
+			)
+		);
+	}
+
+	@Override
+	@GetMapping("/categories")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<SocialCategoryResponse>> getAllCategories() {
 
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(socialBoardUseCase.getSocials(user.getUserId(), cursor, limit)));
+			.body(ApiResponse.createSuccess(socialBoardUseCase.getAllCategories()));
 	}
 }

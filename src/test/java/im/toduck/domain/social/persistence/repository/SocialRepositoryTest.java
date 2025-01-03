@@ -56,9 +56,9 @@ public class SocialRepositoryTest extends RepositoryTest {
 		Pageable pageable = PageRequest.of(0, 6);
 		Long cursor = SOCIAL_LIST.get(3).getId();
 
-		// when
-		List<Social> result = socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(cursor, USER.getId(),
-			pageable);
+		// categoryIds 파라미터를 추가(여기서는 필터링 없음)
+		List<Social> result = socialRepository.findSocialsExcludingBlocked(cursor, USER.getId(),
+			null, pageable);
 
 		// then
 		assertSoftly(softly -> {
@@ -81,14 +81,13 @@ public class SocialRepositoryTest extends RepositoryTest {
 		Pageable pageable = PageRequest.of(0, 2);
 		Long invalidCursor = -1L;
 
-		// when
-		List<Social> result = socialRepository.findByIdBeforeOrderByIdDescExcludingBlocked(invalidCursor, USER.getId(),
-			pageable);
+		// categoryIds 파라미터를 null로 전달
+		List<Social> result = socialRepository.findSocialsExcludingBlocked(invalidCursor, USER.getId(),
+			null, pageable);
 
 		// then
 		assertSoftly(softly -> {
 			softly.assertThat(result).isEmpty();
-
 			softly.assertThat(result.size()).isEqualTo(0);
 		});
 	}
@@ -98,14 +97,15 @@ public class SocialRepositoryTest extends RepositoryTest {
 		// given
 		Pageable pageable = PageRequest.of(0, 6);
 
-		// when
-		List<Social> result = socialRepository.findLatestSocialsExcludingBlocked(USER.getId(), pageable);
+		// 커서 없이 최신 게시물을 조회하는 경우 cursor를 null로 전달
+		List<Social> result = socialRepository.findSocialsExcludingBlocked(null, USER.getId(),
+			null, pageable);
 
 		// then
 		assertSoftly(softly -> {
 			softly.assertThat(result).isNotEmpty();
 			softly.assertThat(result).doesNotContain(SOFT_DELETE_SOCIAL);
-			softly.assertThat(result).hasSize(4); // Block User의 게시글과 Soft Delete된 게시글 개수를 뺀 4개만 조회
+			softly.assertThat(result).hasSize(4);
 
 			softly.assertThat(result.get(0).getId()).isGreaterThan(result.get(1).getId());
 			softly.assertThat(result.get(1).getId()).isGreaterThan(result.get(2).getId());
