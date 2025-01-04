@@ -26,8 +26,12 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 	private final QSocialCategory qSocialCategory = QSocialCategory.socialCategory;
 
 	@Override
-	public List<Social> findSocialsExcludingBlocked(Long cursor, Long currentUserId, List<Long> categoryIds,
-		Pageable pageable) {
+	public List<Social> findSocialsExcludingBlocked(
+		Long cursor,
+		Long currentUserId,
+		List<Long> categoryIds,
+		Pageable pageable
+	) {
 		JPAQuery<Social> query = queryFactory
 			.selectFrom(qSocial)
 			.where(
@@ -42,6 +46,27 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 				.where(qSocialCategory.id.in(categoryIds));
 			query.distinct();
 		}
+
+		return applyPagination(query, pageable).fetch();
+	}
+
+	@Override
+	public List<Social> searchSocialsExcludingBlocked(
+		Long cursor,
+		Long currentUserId,
+		String keyword,
+		Pageable pageable
+
+	) {
+		JPAQuery<Social> query = queryFactory
+			.selectFrom(qSocial)
+			.where(
+				qSocial.deletedAt.isNull(),
+				excludeBlockedUsers(currentUserId),
+				cursorCondition(cursor),
+				qSocial.content.containsIgnoreCase(keyword)
+
+			);
 
 		return applyPagination(query, pageable).fetch();
 	}

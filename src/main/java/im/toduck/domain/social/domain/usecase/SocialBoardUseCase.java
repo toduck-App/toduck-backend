@@ -217,4 +217,33 @@ public class SocialBoardUseCase {
 
 		return SocialCategoryMapper.toSocialCategoryResponse(socialCategoryDtos);
 	}
+
+	@Transactional(readOnly = true)
+	public CursorPaginationResponse<SocialResponse> searchSocials(
+		final Long userId,
+		final String keyword,
+		final Long cursor,
+		final Integer limit
+	) {
+
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
+		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
+
+		List<Social> searchResults = socialBoardService.searchSocialsWithFilters(
+			userId,
+			keyword,
+			cursor,
+			fetchLimit
+		);
+
+		boolean hasMore = PaginationUtil.hasMore(searchResults, actualLimit);
+		Long nextCursor = PaginationUtil.getNextCursor(hasMore, searchResults, actualLimit, Social::getId);
+
+		List<SocialResponse> searchResponses = createSocialResponses(searchResults, user, actualLimit);
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, searchResponses);
+	}
+
 }

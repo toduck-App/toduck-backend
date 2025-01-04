@@ -196,5 +196,15 @@ public class SocialBoardService {
 	public List<SocialCategory> findAllSocialCategories() {
 		return socialCategoryRepository.findAll();
 	}
+
+	public List<Social> searchSocialsWithFilters(
+		final Long userId,
+		final String keyword,
+		final Long cursor,
+		final int limit
+	) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+		return socialRepository.searchSocialsExcludingBlocked(cursor, userId, keyword, pageRequest);
+	}
 }
 
