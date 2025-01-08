@@ -56,7 +56,6 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 		Long currentUserId,
 		String keyword,
 		Pageable pageable
-
 	) {
 		JPAQuery<Social> query = queryFactory
 			.selectFrom(qSocial)
@@ -64,11 +63,18 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 				qSocial.deletedAt.isNull(),
 				excludeBlockedUsers(currentUserId),
 				cursorCondition(cursor),
-				qSocial.content.containsIgnoreCase(keyword)
-
+				keywordCondition(keyword)
 			);
 
 		return applyPagination(query, pageable).fetch();
+	}
+
+	private BooleanExpression keywordCondition(String keyword) {
+		if (keyword == null || keyword.isEmpty()) {
+			return null;
+		}
+		return qSocial.content.containsIgnoreCase(keyword)
+			.or(qSocial.title.containsIgnoreCase(keyword));
 	}
 
 	private BooleanExpression excludeBlockedUsers(Long currentUserId) {
