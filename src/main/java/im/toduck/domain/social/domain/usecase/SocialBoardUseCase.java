@@ -79,18 +79,27 @@ public class SocialBoardUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Routine routine = findRoutineForUpdate(user, request.routineId(), request.isRemoveRoutine());
+
+		if (!isBoardOwner(socialBoard, user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		Routine routine = findRoutineForUpdate(user, request.routineId());
 
 		socialBoardService.updateSocialBoard(user, socialBoard, routine, request);
 		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
 	}
 
+	private boolean isBoardOwner(final Social socialBoard, final User user) {
+		return socialBoard.isOwner(user);
+	}
+
 	private Routine findRoutineForUpdate(
 		final User user,
-		final Long routineId,
-		final boolean isRemoveRoutine
+		final Long routineId
 	) {
-		if (isRemoveRoutine || routineId == null) {
+		if (routineId == null) {
 			return null;
 		}
 
@@ -114,8 +123,13 @@ public class SocialBoardUseCase {
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
+		if (!isBoardOwner(socialBoard, user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		socialBoardService.deleteSocialBoard(socialBoard);
 		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
-		socialBoardService.deleteSocialBoard(user, socialBoard);
 	}
 
 	@Transactional(readOnly = true)

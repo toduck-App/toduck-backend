@@ -68,12 +68,7 @@ public class SocialBoardService {
 	}
 
 	@Transactional
-	public void deleteSocialBoard(final User user, final Social socialBoard) {
-		if (!isBoardOwner(socialBoard, user)) {
-			log.warn("권한이 없는 유저가 게시글 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
-			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
-		}
-
+	public void deleteSocialBoard(final Social socialBoard) {
 		List<SocialImageFile> imageFiles = socialImageFileRepository.findAllBySocial(socialBoard);
 		imageFiles.forEach(SocialImageFile::softDelete);
 
@@ -99,11 +94,6 @@ public class SocialBoardService {
 		final Routine routine,
 		final SocialUpdateRequest request
 	) {
-		if (!isBoardOwner(socialBoard, user)) {
-			log.warn("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
-			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
-		}
-
 		if (request.socialCategoryIds() != null) {
 			if (request.socialCategoryIds().isEmpty()) {
 				log.warn("게시글 업데이트시 빈 카테고리 리스트로 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(),
@@ -123,7 +113,11 @@ public class SocialBoardService {
 			addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		}
 
-		if (request.isRemoveRoutine() || request.routineId() != null) {
+		if (request.isChangeTitle()) {
+			socialBoard.updateTitle(request.title());
+		}
+
+		if (request.isChangeRoutine()) {
 			socialBoard.updateRoutine(routine);
 		}
 
@@ -185,10 +179,6 @@ public class SocialBoardService {
 	) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 		return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, categoryIds, pageRequest);
-	}
-
-	private boolean isBoardOwner(final Social socialBoard, final User user) {
-		return socialBoard.isOwner(user);
 	}
 
 	private boolean isInvalidCategoryIncluded(

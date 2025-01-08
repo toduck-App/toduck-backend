@@ -65,6 +65,10 @@ public class Social extends BaseEntity {
 		return this.user.getId().equals(requestingUser.getId());
 	}
 
+	public void updateTitle(String title) {
+		this.title = title;
+	}
+
 	public void updateContent(String content) {
 		this.content = content;
 	}
