@@ -60,8 +60,8 @@ public class SocialBoardService {
 		Social socialBoard = SocialMapper.toSocial(
 			user,
 			routine,
-			request.content(),
 			request.title(),
+			request.content(),
 			request.isAnonymous()
 		);
 		return socialRepository.save(socialBoard);
