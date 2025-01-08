@@ -16,8 +16,13 @@ public record SocialCreateRequest(
 	String content,
 
 	@Nullable
-	@Schema(description = "공유할 루틴 ID (공유할 루틴이 없으면 필드 제거)", example = "1")
+	@Schema(description = "공유할 루틴 ID (공유할 루틴이 없으면 null)", example = "1")
 	Long routineId,
+
+	@Nullable
+	@Size(max = 100, message = "제목은 100자 이하여야 합니다.")
+	@Schema(description = "게시글 제목 (제목이 없으면 null)", example = "오늘의 루틴 공유")
+	String title,
 
 	@NotNull(message = "익명 여부는 필수 입력 항목입니다.")
 	@Schema(description = "익명 여부", example = "false")

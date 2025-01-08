@@ -23,11 +23,13 @@ public class SocialMapper {
 	public static Social toSocial(
 		final User user,
 		final Routine routine,
+		final String title,
 		final String content,
 		final Boolean isAnonymous
 	) {
 		return Social.builder()
 			.user(user)
+			.title(title)
 			.routine(routine)
 			.content(content)
 			.isAnonymous(isAnonymous)

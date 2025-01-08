@@ -57,7 +57,13 @@ public class SocialBoardService {
 		final Routine routine,
 		final SocialCreateRequest request
 	) {
-		Social socialBoard = SocialMapper.toSocial(user, routine, request.content(), request.isAnonymous());
+		Social socialBoard = SocialMapper.toSocial(
+			user,
+			routine,
+			request.content(),
+			request.title(),
+			request.isAnonymous()
+		);
 		return socialRepository.save(socialBoard);
 	}
 
