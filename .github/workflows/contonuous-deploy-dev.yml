@@ -82,7 +82,6 @@ jobs:
 
       - name: Run the Docker container
         run: |
-          docker ps -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | xargs -r docker stop
-          docker ps -a | grep ${{ env.CONTAINER_NAME }} | awk '{print $1}' | xargs -r docker rm
-          docker images | grep ${{ env.IMAGE_NAME }} | awk '{print $3}' | xargs -r docker rmi
+          docker stop ${{ env.CONTAINER_NAME }} || true
+          docker rm $(docker ps -a -q) && docker rmi $(docker images -q)
           docker run -d --name ${{ env.CONTAINER_NAME }} -p 8080:8080 -e TZ=Asia/Seoul ${{ needs.build-and-upload.outputs.image-tag }}
