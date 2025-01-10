@@ -19,6 +19,14 @@
             <appender-ref ref="console"/><!-- appender 참조 -->
         </root>
     </springProfile>
+    <!--local-->
+    <springProfile name="dev">
+        <include resource="log/log-dev.xml"/>
+
+        <root level="INFO">
+            <appender-ref ref="console"/><!-- appender 참조 -->
+        </root>
+    </springProfile>
 
     <!--prod-->
     <springProfile name="prod">
