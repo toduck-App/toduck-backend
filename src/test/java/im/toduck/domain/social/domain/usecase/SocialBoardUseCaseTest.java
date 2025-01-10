@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +52,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.fixtures.social.SocialFixtures;
 import im.toduck.fixtures.social.SocialImageFileFixtures;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
@@ -920,6 +923,93 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 					);
 			});
 		}
-
 	}
+
+	@Nested
+	@DisplayName("소셜 게시글 검색시")
+	class SearchSocials {
+		@Test
+		void 키워드가_제목에_포함된_게시글을_조회한다() {
+			// given
+			String keyword = "루틴";
+			List<Social> socials = testFixtureBuilder.buildSocials(List.of(
+				SocialFixtures.SINGLE_SOCIAL_WITH_TITLE(USER, "루틴 관리하기"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_TITLE(USER, "운동 계획"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_TITLE(USER, "루틴을 꾸준히!")
+			));
+
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.searchSocials(
+				USER.getId(),
+				keyword,
+				cursor,
+				limit
+			);
+
+			List<Long> expectedIds = socials.stream()
+				.filter(social -> social.getTitle() != null && social.getTitle().contains(keyword))
+				.map(Social::getId)
+				.toList();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results())
+					.extracting(SocialResponse::socialId)
+					.containsExactlyInAnyOrderElementsOf(expectedIds);
+			});
+		}
+
+		@Test
+		void 키워드가_내용에_포함된_게시글을_조회한다() {
+			// given
+			String keyword = "운동";
+			List<Social> socials = testFixtureBuilder.buildSocials(List.of(
+				SocialFixtures.SINGLE_SOCIAL_WITH_CONTENT(USER, "운동 계획 세우기"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_CONTENT(USER, "오늘의 운동"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_CONTENT(USER, "건강이 가장 중요")
+			));
+
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.searchSocials(
+				USER.getId(),
+				keyword,
+				cursor,
+				limit
+			);
+
+			// then
+			List<Long> expectedIds = socials.stream()
+				.filter(social -> social.getContent() != null && social.getContent().contains(keyword))
+				.map(Social::getId)
+				.toList();
+
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results())
+					.extracting(SocialResponse::socialId)
+					.containsExactlyInAnyOrderElementsOf(expectedIds);
+			});
+		}
+
+		@ParameterizedTest
+		@NullAndEmptySource
+		@ValueSource(strings = {" "})
+		void 키워드가_null_빈_문자열_혹은_공백인_경우_예외를_발생시킨다(String keyword) {
+			// given
+			Long userId = USER.getId();
+
+			// when & then
+			assertThatThrownBy(() -> socialBoardUseCase.searchSocials(userId, keyword, null, 10))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.INVALID_SEARCH_KEYWORD.getMessage());
+		}
+	}
+
 }

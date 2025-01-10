@@ -57,4 +57,32 @@ public class SocialFixtures {
 			.isAnonymous(isAnonymous)
 			.build();
 	}
+
+	public static Social SINGLE_SOCIAL_WITH_TITLE(User user, String title) {
+		return Social.builder()
+			.user(user)
+			.title(title)
+			.content(DEFAULT_CONTENT)
+			.isAnonymous(false)
+			.build();
+	}
+
+	public static Social SINGLE_SOCIAL_WITH_CONTENT(User user, String content) {
+		return Social.builder()
+			.user(user)
+			.title(DEFAULT_TITLE)
+			.content(content)
+			.isAnonymous(false)
+			.build();
+	}
+
+	public static Social SINGLE_SOCIAL_WITH_TITLE_AND_CONTENT(User user, String title, String content) {
+		return Social.builder()
+			.user(user)
+			.title(title)
+			.content(content)
+			.isAnonymous(false)
+			.build();
+	}
+
 }
