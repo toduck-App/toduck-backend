@@ -1,0 +1,50 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3308/toduck?allowPublicKeyRetrieval=true&useSSL=false
+    username: user
+    password: abcd1234@
+  data.redis:
+    host: localhost
+    port: 6380
+    password: abcd1234@
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    open-in-view: false
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+jwt:
+  secret-key:
+    access-token: toduckAccessAccessAccessTokenSecretKeyForToduck
+    refresh-token: toduckRefreshRefreshRefreshTokenSecretKeyForToduck
+  expiration-time:
+    access-token: 1_800_000 # 30m (30 * 60 * 1000)
+    refresh-token: 604_800_000 # 7d (7 * 24 * 60 * 60 * 1000)
+
+swagger:
+  server-url: ${DEV_BASE_URL}
+  description: "개발용 서버"
+
+oauth2:
+  client:
+    provider:
+      apple:
+        jwks-uri: https://appleid.apple.com/auth/keys
+        secret: appleSecret
+      google:
+        jwks-uri: https://www.googleapis.com
+        secret: googleSecret
+        issuer: https://accounts.google.com
+      kakao:
+        jwks-uri: https://kauth.kakao.com
+        secret: kakaoSecret
+

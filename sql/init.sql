@@ -137,23 +137,22 @@ CREATE TABLE social_image_file
 );
 
 -- Schedule 테이블
-CREATE TABLE schedule
-(
-    id             BIGINT PRIMARY KEY AUTO_INCREMENT,
-    title          VARCHAR(100) NOT NULL,
-    category       ENUM ('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY') DEFAULT NULL,
-    category_color VARCHAR(100)                                        DEFAULT NULL,
-    start_date     DATE         NOT NULL,
-    end_date       DATE         NOT NULL,
-    time           TIME                                                DEFAULT NULL,
-    days_of_week   TINYINT                                             DEFAULT NULL,
-    alarm          ENUM ('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY')          DEFAULT NULL,
-    location       VARCHAR(255)                                        DEFAULT NULL,
-    memo           VARCHAR(255)                                        DEFAULT NULL,
-    user_id        BIGINT       NOT NULL,
-    created_at     DATETIME     NOT NULL,
-    updated_at     DATETIME     NOT NULL,
-    deleted_at     DATETIME                                            DEFAULT NULL,
+CREATE TABLE schedule (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100) NOT NULL,
+    category ENUM('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY') DEFAULT NULL,
+    category_color VARCHAR(100) DEFAULT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    time TIME DEFAULT NULL,
+    days_of_week TINYINT  DEFAULT NULL,
+    alarm ENUM('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY') DEFAULT NULL,
+    location VARCHAR(255) DEFAULT NULL,
+    memo VARCHAR(255) DEFAULT NULL,
+    user_id BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
