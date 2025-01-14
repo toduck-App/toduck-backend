@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -996,19 +994,6 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 					.extracting(SocialResponse::socialId)
 					.containsExactlyInAnyOrderElementsOf(expectedIds);
 			});
-		}
-
-		@ParameterizedTest
-		@NullAndEmptySource
-		@ValueSource(strings = {" "})
-		void 키워드가_null_빈_문자열_혹은_공백인_경우_예외를_발생시킨다(String keyword) {
-			// given
-			Long userId = USER.getId();
-
-			// when & then
-			assertThatThrownBy(() -> socialBoardUseCase.searchSocials(userId, keyword, null, 10))
-				.isInstanceOf(CommonException.class)
-				.hasMessage(ExceptionCode.INVALID_SEARCH_KEYWORD.getMessage());
 		}
 	}
 

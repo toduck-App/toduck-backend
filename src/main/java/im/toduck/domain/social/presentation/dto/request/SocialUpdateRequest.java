@@ -24,7 +24,7 @@ public record SocialUpdateRequest(
 	boolean isChangeRoutine,
 
 	@Nullable
-	@Schema(description = "공유할 루틴 ID", example = "1")
+	@Schema(description = "공유할 루틴 ID", example = "null")
 	Long routineId,
 
 	@Nullable

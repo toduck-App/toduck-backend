@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @Tag(name = "Social Board")
 public interface SocialBoardApi {
@@ -207,7 +208,7 @@ public interface SocialBoardApi {
 	)
 	ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> searchSocials(
 		@AuthenticationPrincipal CustomUserDetails user,
-		@RequestParam(name = "keyword") String keyword,
+		@RequestParam(name = "keyword") @NotBlank String keyword,
 		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long cursor,
 		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
 	);

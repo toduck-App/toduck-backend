@@ -31,7 +31,6 @@ import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import im.toduck.global.util.PaginationUtil;
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -240,11 +239,6 @@ public class SocialBoardUseCase {
 		final Long cursor,
 		final Integer limit
 	) {
-
-		if (StringUtils.isBlank(keyword)) {
-			throw CommonException.from(ExceptionCode.INVALID_SEARCH_KEYWORD);
-		}
-
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
