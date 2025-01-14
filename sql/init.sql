@@ -41,6 +41,7 @@ CREATE TABLE social
     id           BIGINT PRIMARY KEY auto_increment,
     user_id      BIGINT       NOT NULL,
     routine_id   BIGINT       NULL,
+    title        VARCHAR(100) NULL,
     content      VARCHAR(255) NOT NULL,
     is_anonymous BOOLEAN      NOT NULL,
     like_count   int          NOT NULL DEFAULT 0,
@@ -156,13 +157,14 @@ CREATE TABLE schedule (
 );
 
 
-CREATE TABLE schedule_record (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    is_completed BOOLEAN NOT NULL,
-    schedule_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    deleted_at DATETIME NULL,
+CREATE TABLE schedule_record
+(
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+    is_completed BOOLEAN  NOT NULL,
+    schedule_id  BIGINT   NOT NULL,
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    deleted_at   DATETIME NULL,
     FOREIGN KEY (schedule_id) REFERENCES schedule (id) ON DELETE CASCADE
 );
 

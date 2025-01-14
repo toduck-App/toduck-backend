@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.social.domain.usecase.SocialBoardUseCase;
@@ -108,5 +109,18 @@ public class SocialBoardController implements SocialBoardApi {
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialBoardUseCase.getAllCategories()));
+	}
+
+	@Override
+	@GetMapping("/search")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> searchSocials(
+		CustomUserDetails user,
+		@RequestParam(name = "keyword") String keyword,
+		Long cursor,
+		@PaginationLimit Integer limit
+	) {
+		return ResponseEntity.ok().body(ApiResponse.createSuccess(
+			socialBoardUseCase.searchSocials(user.getUserId(), keyword, cursor, limit)));
 	}
 }

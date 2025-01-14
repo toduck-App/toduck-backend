@@ -13,4 +13,11 @@ public interface SocialRepositoryCustom {
 		List<Long> categoryIds,
 		Pageable pageable
 	);
+
+	List<Social> searchSocialsExcludingBlocked(
+		Long cursor,
+		Long currentUserId,
+		String keyword,
+		Pageable pageable
+	);
 }

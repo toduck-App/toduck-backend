@@ -22,6 +22,9 @@ public record SocialDetailResponse(
 	@Schema(description = "공유할 루틴 정보")
 	RoutineDetailResponse routine,
 
+	@Schema(description = "게시글 제목", example = "새로운 루틴 추가!")
+	String title,
+
 	@Schema(description = "게시글 내용", example = "어제 잠들기 전 새로운 루틴을 추가했다👀")
 	String content,
 

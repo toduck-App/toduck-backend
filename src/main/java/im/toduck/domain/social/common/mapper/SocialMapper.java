@@ -23,11 +23,13 @@ public class SocialMapper {
 	public static Social toSocial(
 		final User user,
 		final Routine routine,
+		final String title,
 		final String content,
 		final Boolean isAnonymous
 	) {
 		return Social.builder()
 			.user(user)
+			.title(title)
 			.routine(routine)
 			.content(content)
 			.isAnonymous(isAnonymous)
@@ -49,10 +51,11 @@ public class SocialMapper {
 		return SocialDetailResponse.builder()
 			.socialId(socialBoard.getId())
 			.owner(getOwner(socialBoard.getUser()))
+			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
+			.title(socialBoard.getTitle())
+			.content(socialBoard.getContent())
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
-			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
-			.content(socialBoard.getContent())
 			.socialLikeInfo(getSocialLikeDto(socialBoard, isSocialBoardLiked))
 			.comments(comments)
 			.createdAt(socialBoard.getCreatedAt())
@@ -69,10 +72,11 @@ public class SocialMapper {
 		return SocialResponse.builder()
 			.socialId(socialBoard.getId())
 			.owner(getOwner(socialBoard.getUser()))
+			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
+			.title(socialBoard.getTitle())
 			.content(socialBoard.getContent())
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
-			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
 			.socialLikeInfo(getSocialLikeDto(socialBoard, isLiked))
 			.commentCount(commentCount)
 			.createdAt(socialBoard.getCreatedAt())

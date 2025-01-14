@@ -77,6 +77,7 @@ public enum ExceptionCode {
 	CANNOT_REPORT_OWN_POST(HttpStatus.FORBIDDEN, 40414, "자신의 게시글은 신고할 수 없습니다."),
 	EXISTS_COMMENT_LIKE(HttpStatus.CONFLICT, 40415, "이미 댓글에 좋아요를 눌렀습니다."),
 	NOT_FOUND_COMMENT_LIKE(HttpStatus.NOT_FOUND, 40416, "해당 댓글 좋아요를 찾을 수 없습니다."),
+	INVALID_SEARCH_KEYWORD(HttpStatus.BAD_REQUEST, 40417, "검색 키워드는 null일 수 없습니다."),
 
 	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),
