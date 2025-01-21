@@ -16,6 +16,7 @@ import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
+import im.toduck.infra.s3.presentation.dto.ImageExtension;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -57,15 +58,14 @@ public class S3Service {
 		return String.join(PATH_DELIMITER, endPoint, objectKey);
 	}
 
-	public URL generatePresignedUrl(final String objectKey) {
+	public URL generatePresignedUrl(final String objectKey, final String extension) {
+		String mimeType = ImageExtension.findMimeType(extension.toLowerCase());
+
 		GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, objectKey)
 			.withMethod(HttpMethod.PUT)
-			.withExpiration(calculateExpirationDate());
-
-		request.addRequestParameter(
-			Headers.S3_CANNED_ACL,
-			CannedAccessControlList.PublicRead.toString()
-		);
+			.withExpiration(calculateExpirationDate())
+			.withContentType(mimeType);
+		request.addRequestParameter(Headers.S3_CANNED_ACL, CannedAccessControlList.PublicRead.toString());
 
 		return amazonS3.generatePresignedUrl(request);
 	}

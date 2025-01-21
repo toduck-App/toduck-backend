@@ -17,13 +17,13 @@ import im.toduck.infra.s3.presentation.dto.response.PreSignedUrlResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/v1/presigned")
 @RequiredArgsConstructor
 public class S3Controller implements S3ControllerApi {
 	private final S3UseCase s3UseCase;
 
 	@Override
-	@PostMapping("/presigned")
+	@PostMapping
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<PreSignedUrlResponse>> getPresignedUrl(
 		CustomUserDetails userDetails,
