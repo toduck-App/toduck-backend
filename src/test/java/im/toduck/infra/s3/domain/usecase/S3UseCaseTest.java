@@ -2,7 +2,9 @@ package im.toduck.infra.s3.domain.usecase;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
+import static org.mockito.BDDMockito.*;
 
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,44 +12,56 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.user.UserFixtures;
+import im.toduck.infra.s3.domain.service.S3Service;
 import im.toduck.infra.s3.presentation.dto.request.FileNameDto;
 import im.toduck.infra.s3.presentation.dto.request.PreSignedUrlRequest;
 import im.toduck.infra.s3.presentation.dto.response.PreSignedUrlResponse;
 
 class S3UseCaseTest extends ServiceTest {
+	@MockBean
+	private S3Service s3Service;
 
 	@Autowired
 	private S3UseCase s3UseCase;
 
 	private User USER;
 	private LocalDate currentDate;
-	private String fileName1;
-	private String fileName2;
+	private String fileName;
+	private URL presignedUrl;
 
 	@BeforeEach
 	void setUp() {
 		USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
 		currentDate = LocalDate.now();
-		fileName1 = "test1.jpg";
-		fileName2 = "test2.png";
+		fileName = "test.jpg";
 
+		given(s3Service.createObjectKey(anyString(), anyLong(), any(LocalDate.class)))
+			.willCallRealMethod();
+		given(s3Service.generateFileUrl(anyString()))
+			.willCallRealMethod();
 	}
 
 	@Nested
 	class GeneratePresignedUrlTest {
 
+		@BeforeEach
+		void setUp() throws Exception {
+			presignedUrl = new URL("https://www.testPresignedUrl.com");
+
+			given(s3Service.generatePresignedUrl(anyString()))
+				.willReturn(presignedUrl);
+		}
+
 		@Test
 		void 파일_이름으로_PreSigned_URL을_생성할_수_있다() {
 			// given
 			PreSignedUrlRequest request = new PreSignedUrlRequest(
-				List.of(
-					new FileNameDto(fileName1),
-					new FileNameDto(fileName2)
-				)
+				List.of(new FileNameDto(fileName))
 			);
 
 			// when
@@ -55,13 +69,10 @@ class S3UseCaseTest extends ServiceTest {
 
 			// then
 			assertSoftly(softly -> {
-				softly.assertThat(response.fileUrlsDtos()).hasSize(2);
-				response.fileUrlsDtos().forEach(fileUrlDto -> {
-					softly.assertThat(fileUrlDto.presignedUrl()).isNotNull();
-					softly.assertThat(fileUrlDto.fileUrl())
-						.isNotNull()
-						.startsWith("https://cdn.toduck.app");
-				});
+				softly.assertThat(response.fileUrlsDtos()).hasSize(1);
+				softly.assertThat(response.fileUrlsDtos().get(0).presignedUrl()).isEqualTo(presignedUrl);
+				softly.assertThat(response.fileUrlsDtos().get(0).fileUrl())
+					.endsWith(fileName);
 			});
 		}
 
@@ -77,5 +88,4 @@ class S3UseCaseTest extends ServiceTest {
 			assertThat(response.fileUrlsDtos()).isEmpty();
 		}
 	}
-
 }

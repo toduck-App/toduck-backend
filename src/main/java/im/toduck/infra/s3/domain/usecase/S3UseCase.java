@@ -30,7 +30,7 @@ public class S3UseCase {
 			.toList();
 
 		log.info("presigned URL 생성 - UserId: {}, File 개수: {}", userId, request.fileNameDtos().size());
-		return new PreSignedUrlResponse(fileUrlDtos);
+		return PreSignedUrlResponse.from(fileUrlDtos);
 	}
 
 	private FileUrlDto generateFileUrl(final String fileName, final Long userId, final LocalDate currentDate) {
