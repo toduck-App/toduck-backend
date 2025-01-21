@@ -16,18 +16,18 @@ public class ScheduleMapper {
 	public static Schedule toSchedule(final User user, final ScheduleCreateRequest request) {
 		DaysOfWeekBitmask daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
 		PlanCategoryColor planCategoryColor = PlanCategoryColor.from(request.color());
-		ScheduleTime scheduleTime = ScheduleTime.from(request.isAllDay(), request.time());
+		ScheduleTime scheduleTime = ScheduleTime.from(request.isAllDay(), request.time(), request.alarm());
 
-		return Schedule.builder()
-			.user(user)
-			.title(request.title())
-			.category(request.category())
-			.color(planCategoryColor)
-			.startDate(request.startDate())
-			.endDate(request.endDate())
-			.scheduleTime(scheduleTime)
-			.daysOfWeekBitmask(daysOfWeekBitmask)
-			.build();
+		return new Schedule(
+			request.title(),
+			request.category(),
+			planCategoryColor,
+			request.startDate(),
+			request.endDate(),
+			scheduleTime, daysOfWeekBitmask,
+			request.location(),
+			request.memo(),
+			user);
 	}
 
 	public static ScheduleCreateResponse toScheduleCreateResponse(final Schedule schedule) {

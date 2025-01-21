@@ -8,7 +8,6 @@ import org.hibernate.annotations.SQLRestriction;
 import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.common.converter.DaysOfWeekBitmaskConverter;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
-import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
 import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
@@ -64,10 +63,6 @@ public class Schedule extends BaseEntity {
 	@Column(name = "days_of_week", nullable = true)
 	private DaysOfWeekBitmask daysOfWeekBitmask;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = true)
-	private ScheduleAlram alarm;
-
 	@Column(nullable = true, length = 255)
 	private String location;
 
@@ -81,7 +76,7 @@ public class Schedule extends BaseEntity {
 	@Builder
 	public Schedule(String title, PlanCategory category, PlanCategoryColor color, LocalDate startDate,
 		LocalDate endDate,
-		ScheduleTime scheduleTime, DaysOfWeekBitmask daysOfWeekBitmask, ScheduleAlram alarm, String location,
+		ScheduleTime scheduleTime, DaysOfWeekBitmask daysOfWeekBitmask, String location,
 		String memo, User user) {
 		this.title = title;
 		this.category = category;
@@ -90,7 +85,6 @@ public class Schedule extends BaseEntity {
 		this.endDate = endDate;
 		this.scheduleTime = scheduleTime;
 		this.daysOfWeekBitmask = daysOfWeekBitmask;
-		this.alarm = alarm;
 		this.location = location;
 		this.memo = memo;
 		this.user = user;

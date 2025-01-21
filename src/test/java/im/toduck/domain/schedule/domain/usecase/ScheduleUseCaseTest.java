@@ -135,6 +135,31 @@ class ScheduleUseCaseTest extends ServiceTest {
 						.isInstanceOf(VoException.class);
 				});
 			}
+
+			@Test
+			void 종일_여부가_true인데_알람이_null이_아니면_실패한다() {
+				// given
+				ScheduleCreateRequest isAllDayTrueAlarmNonNULLRequest = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(true)
+					.color("#FFFFFF")
+					.time(null)
+					.daysOfWeek(List.of(DayOfWeek.MONDAY))
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				//when -> then
+				assertSoftly(softly -> {
+					softly.assertThatThrownBy(
+							() -> scheduleUsecase.createSchedule(savedUser.getId(), isAllDayTrueAlarmNonNULLRequest))
+						.isInstanceOf(VoException.class);
+				});
+			}
 		}
 	}
 
