@@ -40,9 +40,10 @@ public class SocialInteractionService {
 	public Comment createComment(
 		final User user,
 		final Social socialBoard,
+		final Comment parentComment,
 		final CommentCreateRequest request
 	) {
-		Comment comment = CommentMapper.toComment(user, socialBoard, request);
+		Comment comment = CommentMapper.toComment(user, socialBoard, parentComment, request);
 		return commentRepository.save(comment);
 	}
 

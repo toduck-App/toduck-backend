@@ -45,10 +45,21 @@ public class SocialInteractionUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Comment comment = socialInteractionService.createComment(user, socialBoard, request);
+		Comment parentComment = getParentComment(request.parentId());
+
+		Comment comment = socialInteractionService.createComment(user, socialBoard, parentComment, request);
 
 		log.info("소셜 게시글 댓글 생성 - UserId: {}, SocialBoardId: {}, CommentId: {}", userId, socialId, comment.getId());
 		return CommentMapper.toCommentCreateResponse(comment);
+	}
+
+	private Comment getParentComment(final Long parentId) {
+		if (parentId == null) {
+			return null;
+		}
+
+		return socialInteractionService.getCommentById(parentId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_PARENT_COMMENT));
 	}
 
 	@Transactional

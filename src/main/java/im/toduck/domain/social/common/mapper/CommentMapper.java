@@ -14,10 +14,16 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentMapper {
-	public static Comment toComment(User user, Social socialBoard, CommentCreateRequest request) {
+	public static Comment toComment(
+		final User user,
+		final Social socialBoard,
+		final Comment parentComment,
+		final CommentCreateRequest request
+	) {
 		return Comment.builder()
 			.user(user)
 			.social(socialBoard)
+			.parent(parentComment)
 			.content(CommentContent.from(request.content()))
 			.build();
 	}
