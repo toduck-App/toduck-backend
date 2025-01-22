@@ -18,6 +18,7 @@ import im.toduck.ServiceTest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.infra.s3.domain.service.S3Service;
+import im.toduck.infra.s3.presentation.dto.ImageExtension;
 import im.toduck.infra.s3.presentation.dto.request.FileNameDto;
 import im.toduck.infra.s3.presentation.dto.request.PreSignedUrlRequest;
 import im.toduck.infra.s3.presentation.dto.response.PreSignedUrlResponse;
@@ -53,7 +54,7 @@ class S3UseCaseTest extends ServiceTest {
 		void setUp() throws Exception {
 			presignedUrl = new URL("https://www.testPresignedUrl.com");
 
-			given(s3Service.generatePresignedUrl(anyString()))
+			given(s3Service.generatePresignedUrl(anyString(), eq(ImageExtension.JPG.getExtension())))
 				.willReturn(presignedUrl);
 		}
 
