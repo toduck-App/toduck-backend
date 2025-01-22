@@ -4,8 +4,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
-import im.toduck.domain.routine.common.converter.DaysOfWeekBitmaskConverter;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
+import im.toduck.domain.schedule.common.converter.ScheduleDaysOfWeekBitmaskConverter;
 import im.toduck.domain.schedule.persistence.vo.ScheduleDate;
 import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
 import im.toduck.domain.user.persistence.entity.User;
@@ -55,7 +55,7 @@ public class Schedule extends BaseEntity {
 	@Embedded
 	private ScheduleTime scheduleTime;
 
-	@Convert(converter = DaysOfWeekBitmaskConverter.class)
+	@Convert(converter = ScheduleDaysOfWeekBitmaskConverter.class)
 	@Column(name = "days_of_week", nullable = true)
 	private DaysOfWeekBitmask daysOfWeekBitmask;
 

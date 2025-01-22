@@ -1,5 +1,6 @@
 package im.toduck.domain.schedule.domain.usecase;
 
+import static im.toduck.fixtures.schedule.ScheduleCreateRequestFixtures.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.DayOfWeek;
@@ -67,6 +68,20 @@ class ScheduleUseCaseTest extends ServiceTest {
 			});
 		}
 
+		@Test
+		void 반복_요일이_NULL이어도_성공적으로_생성한다() {
+			//given
+			ScheduleCreateRequest request = DAYS_OF_WEEK_NULL_REQUEST();
+
+			//when
+			ScheduleCreateResponse response = scheduleUsecase.createSchedule(savedUser.getId(), request);
+
+			//then
+			assertSoftly(softly -> {
+				softly.assertThat(response.scheduleId()).isNotNull();
+			});
+		}
+
 		@Nested
 		@DisplayName("실패")
 		class failPostSchedule {
@@ -91,19 +106,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			@Test
 			void 종일_여부가_true인데_시간은_null이_아니면_실패한다() {
 				// given
-				ScheduleCreateRequest isAllDayTrueTimeNonNULLRequest = ScheduleCreateRequest.builder()
-					.title("일정 제목")
-					.category(PlanCategory.COMPUTER)
-					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
-					.endDate(LocalDate.of(2025, 1, 1))
-					.isAllDay(true)
-					.color("#FFFFFF")
-					.time(LocalTime.of(10, 30))
-					.daysOfWeek(List.of(DayOfWeek.MONDAY))
-					.alarm(ScheduleAlram.TEN_MINUTE)
-					.location("일정 장소")
-					.memo("일정 메모")
-					.build();
+				ScheduleCreateRequest isAllDayTrueTimeNonNULLRequest = ERROR_TRUE_IS_ALL_DAY_TIME_NON_NULL_REQUEST();
 
 				//when -> then
 				assertSoftly(softly -> {
@@ -116,19 +119,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			@Test
 			void 종일_여부가_false인데_시간이_null이면_실패한다() {
 				// given
-				ScheduleCreateRequest isAllDayFalseTimeNULLRequest = ScheduleCreateRequest.builder()
-					.title("일정 제목")
-					.category(PlanCategory.COMPUTER)
-					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
-					.endDate(LocalDate.of(2025, 1, 1))
-					.isAllDay(false)
-					.time(null)
-					.color("#FFFFFF")
-					.daysOfWeek(List.of(DayOfWeek.MONDAY))
-					.alarm(ScheduleAlram.TEN_MINUTE)
-					.location("일정 장소")
-					.memo("일정 메모")
-					.build();
+				ScheduleCreateRequest isAllDayFalseTimeNULLRequest = ERROR_FALSE_IS_ALL_DAY_TIME_NULL_REQUEST();
 
 				//when -> then
 				assertSoftly(softly -> {
@@ -141,19 +132,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			@Test
 			void 종일_여부가_true인데_알람이_null이_아니면_실패한다() {
 				// given
-				ScheduleCreateRequest isAllDayTrueAlarmNonNULLRequest = ScheduleCreateRequest.builder()
-					.title("일정 제목")
-					.category(PlanCategory.COMPUTER)
-					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
-					.endDate(LocalDate.of(2025, 1, 1))
-					.isAllDay(true)
-					.color("#FFFFFF")
-					.time(null)
-					.daysOfWeek(List.of(DayOfWeek.MONDAY))
-					.alarm(ScheduleAlram.TEN_MINUTE)
-					.location("일정 장소")
-					.memo("일정 메모")
-					.build();
+				ScheduleCreateRequest isAllDayTrueAlarmNonNULLRequest = ERROR_TRUE_IS_ALL_DAY_ALARM_NON_NULL_REQUEST();
 
 				//when -> then
 				assertSoftly(softly -> {
@@ -166,19 +145,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			@Test
 			void 시작_날짜가_종료_날짜보다_크다면_실패한다() {
 				// given
-				ScheduleCreateRequest startDateGreaterThanEndDateRequest = ScheduleCreateRequest.builder()
-					.title("일정 제목")
-					.category(PlanCategory.COMPUTER)
-					.startDate(LocalDate.of(2025, 1, 2))
-					.endDate(LocalDate.of(2025, 1, 1))
-					.isAllDay(false)
-					.color("#FFFFFF")
-					.time(LocalTime.of(10, 30))
-					.daysOfWeek(List.of(DayOfWeek.MONDAY))
-					.alarm(ScheduleAlram.TEN_MINUTE)
-					.location("일정 장소")
-					.memo("일정 메모")
-					.build();
+				ScheduleCreateRequest startDateGreaterThanEndDateRequest = ERROR_START_DATE_GREATER_THAN_END_DATE_REQUEST();
 
 				//when -> then
 				assertSoftly(softly -> {
