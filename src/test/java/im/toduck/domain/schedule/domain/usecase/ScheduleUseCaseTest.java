@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
@@ -160,6 +162,57 @@ class ScheduleUseCaseTest extends ServiceTest {
 						.isInstanceOf(VoException.class);
 				});
 			}
+
+			@Test
+			void 시작_날짜가_종료_날짜보다_크다면_실패한다() {
+				// given
+				ScheduleCreateRequest startDateGreaterThanEndDateRequest = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 2))
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(List.of(DayOfWeek.MONDAY))
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				//when -> then
+				assertSoftly(softly -> {
+					softly.assertThatThrownBy(
+							() -> scheduleUsecase.createSchedule(savedUser.getId(), startDateGreaterThanEndDateRequest))
+						.isInstanceOf(VoException.class);
+				});
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("일정 기간 조회시")
+	class getSchedule {
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+		}
+
+		@Test
+		@Disabled
+		void 성공적으로_조회한다() {
+			// given
+			LocalDate startDate = LocalDate.of(2025, 1, 1);
+			LocalDate endDate = LocalDate.of(2025, 1, 1);
+
+			// when
+			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+				startDate, endDate);
+
+			// then
+
 		}
 	}
 

@@ -2,6 +2,7 @@ package im.toduck.domain.schedule.common.mapper;
 
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
+import im.toduck.domain.schedule.persistence.vo.ScheduleDate;
 import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
@@ -17,13 +18,13 @@ public class ScheduleMapper {
 		DaysOfWeekBitmask daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
 		PlanCategoryColor planCategoryColor = PlanCategoryColor.from(request.color());
 		ScheduleTime scheduleTime = ScheduleTime.from(request.isAllDay(), request.time(), request.alarm());
+		ScheduleDate scheduleDate = ScheduleDate.from(request.startDate(), request.endDate());
 
 		return new Schedule(
 			request.title(),
 			request.category(),
 			planCategoryColor,
-			request.startDate(),
-			request.endDate(),
+			scheduleDate,
 			scheduleTime, daysOfWeekBitmask,
 			request.location(),
 			request.memo(),

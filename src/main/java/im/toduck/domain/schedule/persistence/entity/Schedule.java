@@ -1,13 +1,12 @@
 package im.toduck.domain.schedule.persistence.entity;
 
-import java.time.LocalDate;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.common.converter.DaysOfWeekBitmaskConverter;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
+import im.toduck.domain.schedule.persistence.vo.ScheduleDate;
 import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
@@ -51,10 +50,7 @@ public class Schedule extends BaseEntity {
 	private PlanCategoryColor color;
 
 	@Column(nullable = false)
-	private LocalDate startDate;
-
-	@Column(nullable = false)
-	private LocalDate endDate;
+	private ScheduleDate scheduleDate;
 
 	@Embedded
 	private ScheduleTime scheduleTime;
@@ -74,16 +70,20 @@ public class Schedule extends BaseEntity {
 	private User user;
 
 	@Builder
-	public Schedule(String title, PlanCategory category, PlanCategoryColor color, LocalDate startDate,
-		LocalDate endDate,
-		ScheduleTime scheduleTime, DaysOfWeekBitmask daysOfWeekBitmask, String location,
-		String memo, User user) {
+	public Schedule(String title,
+		PlanCategory category,
+		PlanCategoryColor color,
+		ScheduleDate scheduleDate,
+		ScheduleTime scheduleTime,
+		DaysOfWeekBitmask daysOfWeekBitmask,
+		String location,
+		String memo,
+		User user) {
 		this.title = title;
 		this.category = category;
 		this.color = color;
-		this.startDate = startDate;
-		this.endDate = endDate;
 		this.scheduleTime = scheduleTime;
+		this.scheduleDate = scheduleDate;
 		this.daysOfWeekBitmask = daysOfWeekBitmask;
 		this.location = location;
 		this.memo = memo;
