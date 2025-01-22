@@ -15,7 +15,10 @@ import lombok.NoArgsConstructor;
 public class ScheduleMapper {
 
 	public static Schedule toSchedule(final User user, final ScheduleCreateRequest request) {
-		DaysOfWeekBitmask daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
+		DaysOfWeekBitmask daysOfWeekBitmask = null;
+		if (request.daysOfWeek() != null) {
+			daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
+		}
 		PlanCategoryColor planCategoryColor = PlanCategoryColor.from(request.color());
 		ScheduleTime scheduleTime = ScheduleTime.from(request.isAllDay(), request.time(), request.alarm());
 		ScheduleDate scheduleDate = ScheduleDate.from(request.startDate(), request.endDate());

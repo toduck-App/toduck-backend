@@ -49,7 +49,7 @@ public class Schedule extends BaseEntity {
 	@Embedded
 	private PlanCategoryColor color;
 
-	@Column(nullable = false)
+	@Embedded
 	private ScheduleDate scheduleDate;
 
 	@Embedded

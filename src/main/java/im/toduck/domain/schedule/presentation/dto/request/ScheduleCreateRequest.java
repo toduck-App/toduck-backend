@@ -15,6 +15,7 @@ import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
 import im.toduck.global.serializer.DayOfWeekListDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -56,7 +57,7 @@ public record ScheduleCreateRequest(
 	ScheduleAlram alarm,
 
 	@JsonDeserialize(using = DayOfWeekListDeserializer.class)
-	@NotNull(message = "반복 요일은 null 일 수 없습니다.")
+	@NotEmpty(message = "반	복 요일은 최소 하나 이상 선택되어야 합니다.")
 	@Schema(description = "반복 요일", example = "[\"MONDAY\",\"TUESDAY\"]")
 	List<DayOfWeek> daysOfWeek,
 
