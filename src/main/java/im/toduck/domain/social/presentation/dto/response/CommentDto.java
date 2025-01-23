@@ -11,8 +11,11 @@ import lombok.Builder;
 
 @Builder
 public record CommentDto(
-	@Schema(description = "댓글 ID", example = "1")
+	@Schema(description = "댓글 ID", example = "2")
 	Long commentId,
+
+	@Schema(description = "부모 댓글 ID, 대댓글이 아닐시 null", example = "1")
+	Long parentCommentId,
 
 	@Schema(description = "작성자 정보")
 	OwnerDto owner,
@@ -22,6 +25,9 @@ public record CommentDto(
 
 	@Schema(description = "댓글 좋아요 정보")
 	CommentLikeDto commentLikeInfo,
+
+	@Schema(description = "답글 여부", example = "true")
+	boolean isReply,
 
 	@Schema(description = "댓글 작성 시간", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-09-11 10:30")
 	@JsonSerialize(using = LocalDateTimeSerializer.class)

@@ -113,8 +113,8 @@ public class SocialInteractionService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Comment> getCommentsBySocial(final Social socialBoard, final Long userId) {
-		return commentRepository.findAllBySocialExcludingBlocked(socialBoard, userId);
+	public List<Comment> getCommentsBySocial(final Social socialBoard) {
+		return commentRepository.findCommentsBySocial(socialBoard);
 	}
 
 	@Transactional(readOnly = true)
