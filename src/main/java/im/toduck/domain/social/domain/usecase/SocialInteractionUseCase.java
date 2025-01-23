@@ -57,9 +57,14 @@ public class SocialInteractionUseCase {
 		if (parentId == null) {
 			return null;
 		}
-
-		return socialInteractionService.getCommentById(parentId)
+		Comment parentComment = socialInteractionService.getCommentById(parentId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_PARENT_COMMENT));
+
+		if (parentComment.isReply()) {
+			throw CommonException.from(ExceptionCode.INVALID_PARENT_COMMENT);
+		}
+
+		return parentComment;
 	}
 
 	@Transactional

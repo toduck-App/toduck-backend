@@ -68,6 +68,10 @@ public class Comment extends BaseEntity {
 		return this.social.getId().equals(socialBoard.getId());
 	}
 
+	public boolean isReply() {
+		return this.parent != null;
+	}
+
 	public void softDelete() {
 		this.deletedAt = LocalDateTime.now();
 	}
