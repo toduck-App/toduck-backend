@@ -729,12 +729,10 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 					);
 
 				softly.assertThat(response.comments())
+					.hasSize(2)
 					.extracting(CommentDto::commentId)
-					.doesNotContain(BLOCKED_USER_COMMENT.getId());
+					.containsExactly(COMMENT.getId(), BLOCKED_USER_COMMENT.getId());
 
-				softly.assertThat(response.comments())
-					.extracting(CommentDto::commentId)
-					.contains(COMMENT.getId());
 			});
 		}
 
