@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentMapper {
-	private static final long BLOCKED_USER_ID = 0L;
+	private static final Long BLOCKED_USER_ID = 0L;
 	private static final String BLOCKED_USER_NICKNAME = "차단된 사용자";
 	private static final String BLOCKED_MESSAGE_CONTENT = "차단한 작성자의 댓글입니다.";
 
