@@ -45,7 +45,11 @@ class RoutineRecordServiceTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 		}
 
 		@Test
@@ -100,7 +104,7 @@ class RoutineRecordServiceTest extends ServiceTest {
 
 		@Test
 		void 기록이_존재하지_않는_경우에_변경이_이루어지지_않는다() {
-			// when
+			// when2
 			LocalDate unrecordedDate = LocalDate.now();
 			final boolean isUpdated = routineRecordService.updateIfPresent(ROUTINE, unrecordedDate, true);
 

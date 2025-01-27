@@ -40,8 +40,15 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 		@Test
 		void 유효한_루틴_기록을_조회할_수_있다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
-			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(COMPLETED_SYNCED_RECORD(ROUTINE));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+
+			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(ROUTINE).recordAt("2024-12-02 01:00:00").build() // 월요일
+			);
 
 			// when
 			List<RoutineRecord> records = routineRecordRepository.findRoutineRecordsForUserAndDate(
@@ -60,20 +67,29 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 		@Test
 		void 여러_루틴_기록을_한번에_조회할_수_있다() {
 			// given
-			Routine ROUTINE_WEEKLY1 = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
-			Routine ROUTINE_WEEKLY2 = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE_WEEKLY1 = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+			// given
+			Routine ROUTINE_WEEKLY2 = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 
 			RoutineRecord RECORD_WEEKLY1_1 = testFixtureBuilder.buildRoutineRecord(
-				COMPLETED_SYNCED_RECORD(ROUTINE_WEEKLY1)
+				COMPLETED_RECORD(ROUTINE_WEEKLY1).recordAt("2024-12-02 01:00:00").build() // 월요일
 			);
 			RoutineRecord RECORD_WEEKLY1_2 = testFixtureBuilder.buildRoutineRecord(
-				INCOMPLETED_SYNCED_RECORD(ROUTINE_WEEKLY1)
+				INCOMPLETED_RECORD(ROUTINE_WEEKLY1).recordAt("2024-12-02 01:00:00").build() // 화요일
 			);
 			RoutineRecord RECORD_WEEKLY2_1 = testFixtureBuilder.buildRoutineRecord(
-				COMPLETED_SYNCED_RECORD(ROUTINE_WEEKLY2)
+				INCOMPLETED_RECORD(ROUTINE_WEEKLY2).recordAt("2024-12-02 01:00:00").build() // 월요일
 			);
 			RoutineRecord RECORD_WEEKLY2_2 = testFixtureBuilder.buildRoutineRecord(
-				INCOMPLETED_SYNCED_RECORD(ROUTINE_WEEKLY2)
+				COMPLETED_RECORD(ROUTINE_WEEKLY2).recordAt("2024-12-02 01:00:00").build() // 화요일
 			);
 
 			// when

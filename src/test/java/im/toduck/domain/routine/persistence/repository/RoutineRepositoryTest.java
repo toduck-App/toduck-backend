@@ -6,9 +6,7 @@ import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -207,8 +205,12 @@ class RoutineRepositoryTest extends RepositoryTest {
 		@Test
 		void 날짜가_유효한_경우를_정상적으로_확인한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
-			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-12-01 01:00:00")
+					.build()
+			);
+			LocalDate monday = LocalDate.parse("2024-12-02");
 
 			// when
 			boolean isActive = routineRepository.isActiveForDate(ROUTINE, monday);
@@ -218,10 +220,32 @@ class RoutineRepositoryTest extends RepositoryTest {
 		}
 
 		@Test
-		void 루틴_생성_날짜가_검증_날짜보다_이후인_경우를_정상적으로_확인한다() {
+		void 날짜가_루틴_생성_시점_이전인_경우를_정상적으로_확인한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
-			LocalDate previousMonday = getPreviousDayOfWeek(DayOfWeek.MONDAY);
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-12-03 01:00:00")
+					.build()
+			);
+			LocalDate monday = LocalDate.parse("2024-12-02");
+
+			// when
+			boolean isActive = routineRepository.isActiveForDate(ROUTINE, monday);
+
+			// then
+			assertThat(isActive).isFalse();
+		}
+
+		@Test
+		void 반복요일및시간_변경일시가_조회_날짜보다_이후인_경우를_정상적으로_확인한다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-12-01 01:00:00")
+					.scheduleModifiedAt("2024-12-06 01:00:00")
+					.build()
+			);
+			LocalDate previousMonday = LocalDate.parse("2024-12-02");
 
 			// when
 			boolean isActive = routineRepository.isActiveForDate(ROUTINE, previousMonday);
@@ -233,8 +257,12 @@ class RoutineRepositoryTest extends RepositoryTest {
 		@Test
 		void 루틴의_반복_요일이_날짜의_요일과_일치하지_않는_경우를_정상적으로_확인한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
-			LocalDate tuesday = getNextDayOfWeek(DayOfWeek.TUESDAY);
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-12-01 01:00:00")
+					.build()
+			);
+			LocalDate tuesday = LocalDate.parse("2024-12-03");
 
 			// when
 			boolean isActive = routineRepository.isActiveForDate(ROUTINE, tuesday);
@@ -244,13 +272,16 @@ class RoutineRepositoryTest extends RepositoryTest {
 		}
 
 		@Test
-		void 루틴이_삭제되었더라면_삭제시점_이후_날짜에_대해_정상적으로_확인된다() {
+		void 루틴이_삭제된_경우를_정상적으로_확인한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(
-				DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
-					getNextDayOfWeek(DayOfWeek.MONDAY).minusDays(1).atTime(23, 59, 59))
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.scheduleModifiedAt("2024-12-01 01:00:00")
+					.deletedAt("2024-12-02 02:00:00")
+					.build()
 			);
-			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
+			LocalDate monday = LocalDate.parse("2024-12-02");
 
 			// when
 			boolean isActive = routineRepository.isActiveForDate(ROUTINE, monday);
@@ -258,29 +289,5 @@ class RoutineRepositoryTest extends RepositoryTest {
 			// then
 			assertThat(isActive).isFalse();
 		}
-
-		@Test
-		void 특정_기간_동안만_유효한_루틴이_해당_기간_내에서_정상적으로_확인된다() {
-			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(
-				DELETED_MONDAY_ONLY_MORNING_ROUTINE(USER,
-					getNextDayOfWeek(DayOfWeek.MONDAY).plusDays(7).atTime(7, 59, 59))
-			);
-			LocalDate monday = getNextDayOfWeek(DayOfWeek.MONDAY);
-
-			// when
-			boolean isActive = routineRepository.isActiveForDate(ROUTINE, monday);
-
-			// then
-			assertThat(isActive).isTrue();
-		}
-	}
-
-	private LocalDate getNextDayOfWeek(DayOfWeek dayOfWeek) {
-		return LocalDate.now().with(TemporalAdjusters.next(dayOfWeek));
-	}
-
-	private LocalDate getPreviousDayOfWeek(DayOfWeek dayOfWeek) {
-		return LocalDate.now().with(TemporalAdjusters.previous(dayOfWeek));
 	}
 }

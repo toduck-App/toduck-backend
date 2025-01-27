@@ -59,7 +59,15 @@ public class RoutineService {
 	}
 
 	public boolean canCreateRecordForDate(final Routine routine, final LocalDate date) {
-		return routineRepository.isActiveForDate(routine, date);
+		if (routineRepository.isActiveForDate(routine, date)) {
+			LocalDateTime compareTime = routine.isAllDay()
+				? date.minusDays(1).atTime(LocalTime.MAX)
+				: date.atTime(routine.getTime());
+
+			return !routine.getScheduleModifiedAt().isAfter(compareTime);
+		}
+
+		return false;
 	}
 
 	public List<Routine> getAvailableRoutine(final User user) {

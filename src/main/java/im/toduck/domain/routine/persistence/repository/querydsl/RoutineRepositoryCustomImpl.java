@@ -61,9 +61,9 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			.from(qRoutine)
 			.where(
 				qRoutine.eq(routine),
-				routineCreatedOnOrBeforeDate(date),
+				scheduleModifiedOnOrBeforeDate(date),
 				routineMatchesDate(date),
-				routineNotDeletedOrDeletedAfterDate(qRoutine.time, date)
+				routineNotDeleted()
 			)
 			.fetchFirst();
 

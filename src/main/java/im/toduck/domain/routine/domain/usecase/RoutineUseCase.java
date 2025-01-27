@@ -77,7 +77,6 @@ public class RoutineUseCase {
 			return;
 		}
 
-		// TODO: 이때는 루틴이 삭제 상태인 경우 삭제시점 이전 데이터만 반복 가능
 		if (!routineService.canCreateRecordForDate(routine, date)) {
 			log.info("루틴 상태 변경 실패 - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
 			throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
@@ -110,6 +109,7 @@ public class RoutineUseCase {
 		return RoutineMapper.toMyRoutineAvailableListResponse(routines);
 	}
 
+	// TODO: 수정 필요
 	@Transactional
 	public void deleteRoutine(final Long userId, final Long routineId, final boolean keepRecords) {
 		User user = userService.getUserById(userId)
