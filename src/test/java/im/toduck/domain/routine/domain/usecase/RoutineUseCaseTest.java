@@ -11,15 +11,18 @@ import static org.mockito.BDDMockito.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -290,28 +293,43 @@ class RoutineUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("루틴 삭제시")
 	class DeleteRoutineTest {
+		private MockedStatic<LocalDateTime> mockedStatic;
 
 		@BeforeEach
 		void setUp() {
+			LocalDateTime fixedNow = LocalDateTime.parse("2024-12-15T10:00:00");
+			mockedStatic = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS);
+			mockedStatic.when(LocalDateTime::now).thenReturn(fixedNow);
+
 			given(userService.getUserById(any(Long.class))).willReturn(Optional.ofNullable(USER));
+		}
+
+		@AfterEach
+		void tearDown() {
+			mockedStatic.close();
 		}
 
 		@Test
 		void 모든_기록을_포함하여_삭제할_수_있다() {
 			// given
-			Routine routine = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-01 01:00:00")
+					.scheduleModifiedAt("2024-12-02 01:00:00")
+					.build()
+			);
 
 			testFixtureBuilder.buildRoutineRecord(
-				COMPLETED_SYNCED_RECORD(routine)
+				COMPLETED_RECORD(routine).recordAt("2024-12-02 07:00:00").build()
 			);
 			testFixtureBuilder.buildRoutineRecord(
-				INCOMPLETED_SYNCED_RECORD(routine)
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-03 07:00:00").build()
 			);
 			testFixtureBuilder.buildRoutineRecord(
-				OFFSET_COMPLETED_SYNCED_RECORD(routine, 1L)
+				COMPLETED_RECORD(routine).recordAt("2024-12-09 07:00:00").build()
 			);
 			testFixtureBuilder.buildRoutineRecord(
-				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 1L)
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-10 07:00:00").build()
 			);
 
 			// when
@@ -322,31 +340,38 @@ class RoutineUseCaseTest extends ServiceTest {
 			Routine removedRoutine = routineRepository.findById(routine.getId()).get();
 			assertSoftly(softly -> {
 				softly.assertThat(remainingRecords).isEmpty();
-
 				softly.assertThat(removedRoutine.isInDeletedState()).isTrue();
 			});
 		}
 
 		@Test
-		void 미래의_미완료_기록만_삭제하고_나머지는_유지할_수_있다() {
+		void 미래의_미완료_기록만_삭제하고_스케쥴변경일시_이후의_미완료기록이_일괄_저장된다() {
 			// given
-			Routine routine = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
-
-			// 미래의 미완료 기록 (삭제 대상)
-			RoutineRecord futureIncomplete1 = testFixtureBuilder.buildRoutineRecord(
-				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 4L)
-			);
-			RoutineRecord futureIncomplete2 = testFixtureBuilder.buildRoutineRecord(
-				OFFSET_INCOMPLETED_SYNCED_RECORD(routine, 5L)
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.scheduleModifiedAt("2024-12-02 01:00:00")
+					.build()
 			);
 
-			// 미래의 완료 기록 (유지되어야 함)
-			RoutineRecord futureComplete = testFixtureBuilder.buildRoutineRecord(
-				OFFSET_COMPLETED_SYNCED_RECORD(routine, 4L)
+			// 현재 시간: 2024-12-15T10:00:00
+
+			// 과거 완료 기록 (유지되어야 함)
+			RoutineRecord pastComplete = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(routine).recordAt("2024-12-12 07:00:00").build()
 			);
-			// 과거의 미완료 기록 (유지되어야 함)
+			// 과거 미완료 기록 (유지되어야 함)
 			RoutineRecord pastIncomplete = testFixtureBuilder.buildRoutineRecord(
-				OFFSET_COMPLETED_SYNCED_RECORD(routine, -3L)
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-13 07:00:00").build()
+			);
+
+			// 미래 미완료 (삭제 되어야 함)
+			RoutineRecord futureIncomplete = testFixtureBuilder.buildRoutineRecord(
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-30 07:00:00").build()
+			);
+			// 미래 완료 (유지되어야 함)
+			RoutineRecord futureComplete = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(routine).recordAt("2024-12-31 07:00:00").build()
 			);
 
 			// when
@@ -356,17 +381,18 @@ class RoutineUseCaseTest extends ServiceTest {
 			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
 			Routine removedRoutine = routineRepository.findById(routine.getId()).get();
 
+			// 12월 2일 ~ 12월 13일 (10개), 12월 31일 (1개)
 			assertSoftly(softly -> {
-				softly.assertThat(remainingRecords).hasSize(2);
+				softly.assertThat(remainingRecords).hasSize(11);
 
 				List<Long> remainingIds = remainingRecords.stream()
 					.map(RoutineRecord::getId)
 					.toList();
 
 				softly.assertThat(remainingIds)
-					.contains(futureComplete.getId(), pastIncomplete.getId());
+					.contains(pastComplete.getId(), pastIncomplete.getId(), futureComplete.getId());
 				softly.assertThat(remainingIds)
-					.doesNotContain(futureIncomplete1.getId(), futureIncomplete2.getId());
+					.doesNotContain(futureIncomplete.getId());
 
 				softly.assertThat(removedRoutine.isInDeletedState()).isTrue();
 			});

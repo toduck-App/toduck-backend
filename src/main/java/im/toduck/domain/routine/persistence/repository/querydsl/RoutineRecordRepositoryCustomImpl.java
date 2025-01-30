@@ -61,14 +61,30 @@ public class RoutineRecordRepositoryCustomImpl implements RoutineRecordRepositor
 	}
 
 	@Override
-	public void deleteIncompletedFuturesByRoutine(final Routine routine) {
+	public void deleteIncompletedFuturesByRoutine(final Routine routine, final LocalDateTime targetDateTime) {
 		queryFactory
 			.delete(qRecord)
 			.where(
 				qRecord.routine.eq(routine),
-				qRecord.recordAt.after(LocalDateTime.now()),
+				qRecord.recordAt.after(targetDateTime),
 				qRecord.isCompleted.isFalse()
 			)
 			.execute();
+	}
+
+	@Override
+	public List<RoutineRecord> findAllByRoutineAndRecordAtBetween(
+		final Routine routine,
+		final LocalDateTime startTime,
+		final LocalDateTime endTime
+	) {
+		return queryFactory
+			.selectFrom(qRecord)
+			.where(
+				qRecord.routine.eq(routine),
+				qRecord.recordAt.after(startTime),
+				qRecord.recordAt.before(endTime)
+			)
+			.fetch();
 	}
 }

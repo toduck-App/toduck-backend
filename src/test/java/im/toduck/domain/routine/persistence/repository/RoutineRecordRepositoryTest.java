@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -198,7 +199,7 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 			);
 
 			// when
-			routineRecordRepository.deleteIncompletedFuturesByRoutine(routine);
+			routineRecordRepository.deleteIncompletedFuturesByRoutine(routine, LocalDateTime.now());
 
 			// then
 			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
@@ -229,7 +230,7 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 			);
 
 			// when
-			routineRecordRepository.deleteIncompletedFuturesByRoutine(routine1);
+			routineRecordRepository.deleteIncompletedFuturesByRoutine(routine1, LocalDateTime.now());
 
 			// then
 			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
@@ -248,7 +249,7 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 
 			// when & then
 			assertThatCode(() ->
-				routineRecordRepository.deleteIncompletedFuturesByRoutine(routine)
+				routineRecordRepository.deleteIncompletedFuturesByRoutine(routine, LocalDateTime.now())
 			).doesNotThrowAnyException();
 		}
 	}

@@ -1,11 +1,16 @@
 package im.toduck.domain.routine.domain.usecase;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
+import im.toduck.domain.routine.common.mapper.RoutineRecordMapper;
 import im.toduck.domain.routine.domain.service.RoutineRecordService;
 import im.toduck.domain.routine.domain.service.RoutineService;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -118,7 +123,9 @@ public class RoutineUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
 		if (keepRecords) {
-			routineRecordService.removeIncompletedFuturesByRoutine(routine);
+			LocalDateTime deletionTime = LocalDateTime.now();
+			routineRecordService.removeIncompletedFuturesByRoutine(routine, deletionTime);
+			createMissingIncompleteRecordsInBulk(routine, routine.getScheduleModifiedAt(), deletionTime);
 			routineService.remove(routine);
 			log.info("루틴 삭제 성공(기록 유지) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 			return;
@@ -129,5 +136,51 @@ public class RoutineUseCase {
 		log.info("루틴 삭제 성공(기록 포함 삭제) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 	}
 
-	// TODO: 삭제된 루틴에 대해서는 루틴 수정 금지 필요
+	private void createMissingIncompleteRecordsInBulk(
+		final Routine routine,
+		final LocalDateTime startTime,
+		final LocalDateTime endTime
+	) {
+		Set<LocalDate> existingDates = routineRecordService.getExistingRecordDates(routine, startTime, endTime);
+
+		List<RoutineRecord> newRecords = new ArrayList<>();
+		LocalDate startDate = startTime.toLocalDate();
+		LocalDate endDate = endTime.toLocalDate();
+
+		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+			if (existingDates.contains(date)) {
+				continue;
+			}
+
+			if (!routine.getDaysOfWeekBitmask().includesDayOf(date)) {
+				continue;
+			}
+
+			if (date.equals(startDate)) {
+				LocalDateTime compareTime = routine.isAllDay()
+					? date.atTime(LocalTime.MIN)
+					: date.atTime(routine.getTime());
+				if (compareTime.isBefore(startTime)) {
+					continue;
+				}
+			}
+
+			if (date.equals(endDate)) {
+				LocalDateTime compareTime = routine.isAllDay()
+					? date.atTime(LocalTime.MAX)
+					: date.atTime(routine.getTime());
+				if (compareTime.isAfter(endTime)) {
+					continue;
+				}
+			}
+
+			newRecords.add(
+				RoutineRecordMapper.toRoutineRecord(routine, date, false)
+			);
+		}
+
+		if (!newRecords.isEmpty()) {
+			routineRecordService.saveAll(newRecords);
+		}
+	}
 }
