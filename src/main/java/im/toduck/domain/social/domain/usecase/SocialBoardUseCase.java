@@ -147,13 +147,14 @@ public class SocialBoardUseCase {
 		}
 
 		List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(socialBoard);
-		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard, user.getId());
+		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard);
 		boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, socialBoard);
 
 		List<CommentDto> commentDtos = comments.stream()
 			.map((comment) -> {
 				boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
-				return CommentMapper.toCommentDto(comment, isCommentLike);
+				boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
+				return CommentMapper.toCommentDto(comment, isCommentLike, isBlocked);
 			})
 			.toList();
 
@@ -214,7 +215,7 @@ public class SocialBoardUseCase {
 			.limit(actualLimit)
 			.map(sb -> {
 				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(sb);
-				List<Comment> comments = socialInteractionService.getCommentsBySocial(sb, user.getId());
+				List<Comment> comments = socialInteractionService.getCommentsBySocial(sb);
 				boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, sb);
 				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isSocialBoardLiked);
 			})

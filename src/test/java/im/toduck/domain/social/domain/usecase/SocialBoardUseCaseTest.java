@@ -50,6 +50,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.fixtures.social.CommentFixtures;
 import im.toduck.fixtures.social.SocialFixtures;
 import im.toduck.fixtures.social.SocialImageFileFixtures;
 import im.toduck.fixtures.user.UserFixtures;
@@ -701,7 +702,6 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			IMAGE_FILES = testFixtureBuilder.buildSocialImageFiles(
 				SocialImageFileFixtures.MULTIPLE_IMAGE_FILES(SOCIAL_BOARD, imageUrls)
 			);
-
 			BLOCK_USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
 			testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
 			BLOCKED_USER_SOCIAL = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(BLOCK_USER, false));
@@ -729,12 +729,57 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 					);
 
 				softly.assertThat(response.comments())
+					.hasSize(2)
 					.extracting(CommentDto::commentId)
-					.doesNotContain(BLOCKED_USER_COMMENT.getId());
+					.containsExactly(COMMENT.getId(), BLOCKED_USER_COMMENT.getId());
 
+			});
+		}
+
+		@Test
+		void 댓글_정렬_테스트() {
+			Social SOCIAL_BOARD_FOR_COMMENT = testFixtureBuilder.buildSocial(
+				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
+			);
+
+			Comment parent1 = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT));
+			Comment parent2 = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT));
+
+			Comment replyToParent1_1 = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, parent1));
+			Comment replyToParent1_2 = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, parent1));
+
+			Comment blockParent = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(BLOCK_USER, SOCIAL_BOARD_FOR_COMMENT));
+
+			Comment replyToBlockParent = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, blockParent));
+
+			Comment parent3 = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT));
+
+			Comment replyToParent3 = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, parent3));
+
+			SocialDetailResponse response = socialBoardUseCase.getSocialDetail(
+				USER.getId(),
+				SOCIAL_BOARD_FOR_COMMENT.getId()
+			);
+
+			assertSoftly(softly -> {
 				softly.assertThat(response.comments())
 					.extracting(CommentDto::commentId)
-					.contains(COMMENT.getId());
+					.containsExactly(
+						parent1.getId(), replyToParent1_1.getId(), replyToParent1_2.getId(),
+						parent2.getId(),
+						blockParent.getId(), replyToBlockParent.getId(),
+						parent3.getId(), replyToParent3.getId());
+				softly.assertThat(response.comments().get(4).owner().ownerId()).isEqualTo(0L);
+				softly.assertThat(response.comments().get(4).owner().nickname()).isEqualTo("차단된 사용자");
+				softly.assertThat(response.comments().get(4).content()).isEqualTo("차단한 작성자의 댓글입니다.");
 			});
 		}
 

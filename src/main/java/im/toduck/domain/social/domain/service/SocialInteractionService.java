@@ -40,9 +40,10 @@ public class SocialInteractionService {
 	public Comment createComment(
 		final User user,
 		final Social socialBoard,
+		final Comment parentComment,
 		final CommentCreateRequest request
 	) {
-		Comment comment = CommentMapper.toComment(user, socialBoard, request);
+		Comment comment = CommentMapper.toComment(user, socialBoard, parentComment, request);
 		return commentRepository.save(comment);
 	}
 
@@ -112,8 +113,8 @@ public class SocialInteractionService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Comment> getCommentsBySocial(final Social socialBoard, final Long userId) {
-		return commentRepository.findAllBySocialExcludingBlocked(socialBoard, userId);
+	public List<Comment> getCommentsBySocial(final Social socialBoard) {
+		return commentRepository.findCommentsBySocial(socialBoard);
 	}
 
 	@Transactional(readOnly = true)

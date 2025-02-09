@@ -26,4 +26,21 @@ public class CommentFixtures {
 			.content(CommentContent.from(DEFAULT_COMMENT_CONTENT))
 			.build();
 	}
+
+	/**
+	 * 답글 Comment 엔티티를 생성
+	 *
+	 * @param user    답글 작성자
+	 * @param social  댓글이 속한 게시글
+	 * @param parent  부모 댓글
+	 * @return 생성된 답글 Comment 엔티티
+	 */
+	public static Comment REPLY_COMMENT(User user, Social social, Comment parent) {
+		return Comment.builder()
+			.user(user)
+			.social(social)
+			.parent(parent)
+			.content(CommentContent.from(DEFAULT_COMMENT_CONTENT))
+			.build();
+	}
 }

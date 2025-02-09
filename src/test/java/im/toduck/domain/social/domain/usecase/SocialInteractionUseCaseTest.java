@@ -34,6 +34,7 @@ import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateRespon
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.fixtures.social.CommentFixtures;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -42,6 +43,8 @@ import im.toduck.global.exception.VoException;
 public class SocialInteractionUseCaseTest extends ServiceTest {
 
 	private User USER;
+	private Social SOCIAL_BOARD;
+	private Comment PARENT_COMMENT;
 
 	@Autowired
 	private SocialInteractionUseCase socialInteractionUseCase;
@@ -61,6 +64,8 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 	@BeforeEach
 	public void setUp() {
 		USER = testFixtureBuilder.buildUser(GENERAL_USER());
+		SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, false));
+		PARENT_COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
 	}
 
 	@Nested
@@ -69,7 +74,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		Social SOCIAL_BOARD;
 		String commentContent = "This is a test comment.";
 
-		CommentCreateRequest request = new CommentCreateRequest(commentContent);
+		CommentCreateRequest request = new CommentCreateRequest(commentContent, null);
 
 		@BeforeEach
 		public void setUp() {
@@ -86,6 +91,27 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
 				softly.assertThat(response.commentId()).isNotNull();
+			});
+		}
+
+		@Test
+		void 주어진_요청에_따라_대댓글을_생성할_수_있다() {
+			// given
+			CommentCreateRequest replyCommentRequest = new CommentCreateRequest(commentContent, PARENT_COMMENT.getId());
+
+			// when
+			CommentCreateResponse response = socialInteractionUseCase.createComment(
+				USER.getId(),
+				SOCIAL_BOARD.getId(),
+				replyCommentRequest
+			);
+
+			// then
+			Comment savedReplyComment = commentRepository.findById(response.commentId()).orElseThrow();
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.commentId()).isNotNull();
+				softly.assertThat(savedReplyComment.getParent().getId()).isEqualTo(PARENT_COMMENT.getId());
 			});
 		}
 
@@ -117,7 +143,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		void 댓글_내용이_빈_경우_댓글_생성에_실패한다() {
 			// given
 			String emptyContent = "";
-			CommentCreateRequest emptyRequest = new CommentCreateRequest(emptyContent);
+			CommentCreateRequest emptyRequest = new CommentCreateRequest(emptyContent, null);
 
 			// when & then
 			assertThatThrownBy(
@@ -130,13 +156,33 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		void 댓글_내용이_공백인_경우_댓글_생성에_실패한다() {
 			// given
 			String whitespaceContent = "   ";
-			CommentCreateRequest whitespaceRequest = new CommentCreateRequest(whitespaceContent);
+			CommentCreateRequest whitespaceRequest = new CommentCreateRequest(whitespaceContent, null);
 
 			// when & then
 			assertThatThrownBy(
 				() -> socialInteractionUseCase.createComment(USER.getId(), SOCIAL_BOARD.getId(), whitespaceRequest))
 				.isInstanceOf(VoException.class)
 				.hasMessage("댓글 내용은 비어 있을 수 없습니다.");
+		}
+
+		@Test
+		void 대댓글을_부모_댓글로_사용하려는_경우_댓글_생성에_실패한다() {
+			// given
+			Comment parentComment = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(USER, SOCIAL_BOARD));
+			Comment replyToParent = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD, parentComment));
+
+			CommentCreateRequest invalidParentRequest = new CommentCreateRequest(commentContent, replyToParent.getId());
+
+			// when & then
+			assertThatThrownBy(() -> socialInteractionUseCase.createComment(
+				USER.getId(),
+				SOCIAL_BOARD.getId(),
+				invalidParentRequest
+			))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.INVALID_PARENT_COMMENT.getMessage());
 		}
 	}
 
