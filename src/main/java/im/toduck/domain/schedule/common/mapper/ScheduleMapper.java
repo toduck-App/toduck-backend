@@ -11,6 +11,7 @@ import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
 import lombok.AccessLevel;
@@ -70,6 +71,25 @@ public class ScheduleMapper {
 			.endDate(schedule.getScheduleDate().getEndDate())
 			.time(schedule.getScheduleTime().getTime())
 			.location(schedule.getLocation())
+			.build();
+	}
+
+	public static ScheduleInfoResponse toScheduleInfoResponse(ScheduleRecord scheduleRecord) {
+		Schedule schedule = scheduleRecord.getSchedule();
+		return ScheduleInfoResponse.builder()
+			.scheduleId(schedule.getId())
+			.title(schedule.getTitle())
+			.color(schedule.getColor().getValue())
+			.category(schedule.getCategory())
+			.isAllDay(schedule.getScheduleTime().getIsAllDay())
+			.startDate(schedule.getScheduleDate().getStartDate())
+			.endDate(schedule.getScheduleDate().getEndDate())
+			.time(schedule.getScheduleTime().getTime())
+			.location(schedule.getLocation())
+			.memo(schedule.getMemo())
+			.scheduleRecordId(scheduleRecord.getId())
+			.isComplete(scheduleRecord.getIsCompleted())
+			.recordDate(scheduleRecord.getRecordDate())
 			.build();
 	}
 }

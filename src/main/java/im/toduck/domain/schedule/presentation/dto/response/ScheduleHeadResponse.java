@@ -70,6 +70,8 @@ public record ScheduleHeadResponse(
 		String location
 	) {
 		public record ScheduleRecordDto(
+			@Schema(description = "일정 고유 id", example = "1")
+			Long scheduleRecordId,
 			@Schema(description = "일정 완료 여부", example = "false")
 			Boolean isComplete,
 			@Schema(description = "일정 기록 날짜", example = "2024-08-31")
@@ -78,7 +80,8 @@ public record ScheduleHeadResponse(
 			LocalDate recordDate
 		) {
 			public static ScheduleRecordDto from(ScheduleRecord scheduleRecord) {
-				return new ScheduleRecordDto(scheduleRecord.getIsCompleted(), scheduleRecord.getRecordDate());
+				return new ScheduleRecordDto(scheduleRecord.getId(), scheduleRecord.getIsCompleted(),
+					scheduleRecord.getRecordDate());
 			}
 		}
 	}

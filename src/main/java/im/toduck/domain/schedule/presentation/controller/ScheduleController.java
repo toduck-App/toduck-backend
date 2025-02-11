@@ -48,4 +48,14 @@ public class ScheduleController implements ScheduleApi {
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(scheduleUseCase.getRangeSchedule(user.getUserId(), startDate, endDate)));
 	}
+
+	@GetMapping("/{scheduleRecordId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<?>> getSchedule(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@RequestParam Long scheduleRecordId
+	) {
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(scheduleUseCase.getSchedule(user.getUserId(), scheduleRecordId)));
+	}
 }

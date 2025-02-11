@@ -15,7 +15,10 @@ import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -41,5 +44,12 @@ public class ScheduleService {
 				scheduleHeadDtos.add(ScheduleMapper.toScheduleHeadDto(schedule, scheduleRecordList));
 			});
 		return ScheduleMapper.toScheduleHeadResponse(startDate, endDate, scheduleHeadDtos);
+	}
+
+	@Transactional(readOnly = true)
+	public ScheduleInfoResponse getSchedule(Long scheduleRecordId) {
+		return scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(scheduleRecordId)
+			.map(ScheduleMapper::toScheduleInfoResponse)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE_RECORD));
 	}
 }

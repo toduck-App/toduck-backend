@@ -8,6 +8,7 @@ import im.toduck.domain.schedule.domain.service.ScheduleService;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -34,5 +35,12 @@ public class ScheduleUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		return scheduleService.getRangeSchedule(user, startDate, endDate);
+	}
+
+	@Transactional(readOnly = true)
+	public ScheduleInfoResponse getSchedule(Long userId, Long scheduleRecordId) {
+		userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		return scheduleService.getSchedule(scheduleRecordId);
 	}
 }
