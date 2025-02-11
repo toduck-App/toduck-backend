@@ -1,6 +1,7 @@
 package im.toduck.domain.schedule.presentation.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,11 +24,11 @@ public class ScheduleController implements ScheduleApi {
 	private final ScheduleUseCase scheduleUseCase;
 
 	@PostMapping
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<ScheduleCreateResponse>> createSchedule(
 		@RequestBody @Valid ScheduleCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(scheduleUseCase.createSchedule(user.getUserId(), request)));
 	}

@@ -1,5 +1,7 @@
 package im.toduck.domain.schedule.persistence.entity;
 
+import java.time.LocalDate;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -29,6 +31,9 @@ public class ScheduleRecord extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean isCompleted;
+
+	@Column(nullable = false)
+	private LocalDate recordDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "schedule_id", nullable = false)

@@ -160,6 +160,7 @@ CREATE TABLE schedule (
 CREATE TABLE schedule_record (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     is_completed BOOLEAN NOT NULL,
+    record_date DATE NOT NULL,
     schedule_id BIGINT NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
