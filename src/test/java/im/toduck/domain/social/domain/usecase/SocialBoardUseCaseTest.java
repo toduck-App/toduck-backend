@@ -50,6 +50,8 @@ import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.fixtures.social.CommentFixtures;
+import im.toduck.fixtures.social.SocialFixtures;
 import im.toduck.fixtures.social.SocialImageFileFixtures;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
@@ -97,6 +99,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			.toList();
 
 		SocialCreateRequest request = new SocialCreateRequest(
+			null,
 			content,
 			null,
 			isAnonymous,
@@ -132,6 +135,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			List<Long> invalidCategoryIds = List.of(1L, -1L);
 			SocialCreateRequest invalidRequest = new SocialCreateRequest(
+				null,
 				content,
 				null,
 				isAnonymous,
@@ -151,6 +155,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
 			Routine ANOTHER_USER_ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(ANOTHER_USER));
 			SocialCreateRequest requestWithAnotherUserRoutine = new SocialCreateRequest(
+				null,
 				content,
 				ANOTHER_USER_ROUTINE.getId(),
 				isAnonymous,
@@ -169,6 +174,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(USER));
 			SocialCreateRequest requestWithPrivateRoutine = new SocialCreateRequest(
+				null,
 				content,
 				PRIVATE_ROUTINE.getId(),
 				isAnonymous,
@@ -327,9 +333,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			List<SocialCategoryLink> originalCategories = socialCategoryLinkRepository.findAllBySocial(SOCIAL_BOARD);
 
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updatedContent,
 				true,
 				null,
+				true,
+				null,
+				updatedContent,
 				updatedIsAnonymous,
 				updatedCategoryIds,
 				updatedImageUrls
@@ -388,9 +396,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			Long nonExistentSocialBoardId = -1L;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
 				true,
 				null,
+				true,
+				null,
+				updateContent,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -408,9 +418,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			Long invalidRoutineId = -1L;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
+				true,
+				null,
 				false,
 				invalidRoutineId,
+				updateContent,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -424,7 +436,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void isRomoved가_true인_경우_해당_게시글의_공유_루틴을_제거한다() {
+		void isChangeRoutine이_true이고_routineId가_null인_경우_해당_게시글의_공유_루틴을_제거한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
 			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
@@ -432,9 +444,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			);
 
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
 				true,
 				null,
+				true,
+				null,
+				updateContent,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -455,12 +469,14 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void isRemoveRoutine이_true이고_routineId가_null이_아닌_경우_validation에_실패한다() {
+		void isChangeRoutine이_false이고_routineId가_null이_아닌_경우_validation에_실패한다() {
 			// given
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
 				true,
+				null,
+				false,
 				1L,
+				updateContent,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -471,18 +487,19 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 루틴_ID가_null인_경우_해당_게시글의_공유_루틴을_변경하지_않는다() {
+		void isChangeRoutine이_false인_경우_해당_게시글의_공유_루틴을_변경하지_않는다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
 			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
 				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
 			);
 
-			Long unchangedRoutineId = null;
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
+				true,
+				null,
 				false,
-				unchangedRoutineId,
+				null,
+				updateContent,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -503,13 +520,89 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		}
 
 		@Test
+		void isChangeTitle이_true이고_title이_유효한_경우_제목을_변경한다() {
+			// given
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				true,
+				"새로운 제목",
+				false,
+				null,
+				updateContent,
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when
+			socialBoardUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest);
+
+			// then
+			Social socialBoard = socialRepository.findById(SOCIAL_BOARD.getId())
+				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+			assertSoftly(softly -> {
+				softly.assertThat(socialBoard.getTitle()).isEqualTo(updateRequest.title());
+				softly.assertThat(socialBoard.getContent()).isEqualTo(updateRequest.content());
+				softly.assertThat(socialBoard.getIsAnonymous()).isEqualTo(updateRequest.isAnonymous());
+			});
+		}
+
+		@Test
+		void isChangeTitle이_false이고_title이_null인_경우_제목을_변경하지_않는다() {
+			// given
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				false,
+				null,
+				false,
+				null,
+				updateContent,
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when
+			socialBoardUseCase.updateSocialBoard(USER.getId(), SOCIAL_BOARD.getId(), updateRequest);
+
+			// then
+			Social socialBoard = socialRepository.findById(SOCIAL_BOARD.getId())
+				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+			assertSoftly(softly -> {
+				softly.assertThat(socialBoard.getTitle()).isEqualTo(SOCIAL_BOARD.getTitle());
+				softly.assertThat(socialBoard.getContent()).isEqualTo(updateRequest.content());
+				softly.assertThat(socialBoard.getIsAnonymous()).isEqualTo(updateRequest.isAnonymous());
+			});
+		}
+
+		@Test
+		void isChangeTitle이_false이고_title이_null이_아닌_경우_validation에_실패한다() {
+			// given
+			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
+				false,
+				"제목이 없어야 합니다",
+				false,
+				null,
+				updateContent,
+				isAnonymous,
+				validCategoryIds,
+				imageUrls
+			);
+
+			// when & then
+			assertFalse(updateRequest.isValidTitleWhenRemoved());
+		}
+
+		@Test
 		void 게시글_소유자가_아닌_경우_수정에_실패한다() {
 			// given
 			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
+				true,
+				null,
 				false,
 				null,
+				updateContent,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -526,9 +619,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		void 유효하지_않은_카테고리_ID가_포함된_경우_수정에_실패한다() {
 			// given
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
+				true,
+				null,
 				false,
 				null,
+				updateContent,
 				isAnonymous,
 				invalidCategoryIds,
 				imageUrls
@@ -545,9 +640,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		void 카테고리_ID_리스트가_빈_경우_수정에_실패한다() {
 			// given
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
+				true,
+				null,
 				false,
 				null,
+				updateContent,
 				isAnonymous,
 				List.of(),
 				imageUrls
@@ -565,9 +662,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			// given
 			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(USER));
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
-				updateContent,
+				true,
+				null,
 				false,
 				PRIVATE_ROUTINE.getId(),
+				updateContent,
 				isAnonymous,
 				validCategoryIds,
 				imageUrls
@@ -603,7 +702,6 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			IMAGE_FILES = testFixtureBuilder.buildSocialImageFiles(
 				SocialImageFileFixtures.MULTIPLE_IMAGE_FILES(SOCIAL_BOARD, imageUrls)
 			);
-
 			BLOCK_USER = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
 			testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
 			BLOCKED_USER_SOCIAL = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(BLOCK_USER, false));
@@ -631,12 +729,57 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 					);
 
 				softly.assertThat(response.comments())
+					.hasSize(2)
 					.extracting(CommentDto::commentId)
-					.doesNotContain(BLOCKED_USER_COMMENT.getId());
+					.containsExactly(COMMENT.getId(), BLOCKED_USER_COMMENT.getId());
 
+			});
+		}
+
+		@Test
+		void 댓글_정렬_테스트() {
+			Social SOCIAL_BOARD_FOR_COMMENT = testFixtureBuilder.buildSocial(
+				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
+			);
+
+			Comment parent1 = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT));
+			Comment parent2 = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT));
+
+			Comment replyToParent1_1 = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, parent1));
+			Comment replyToParent1_2 = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, parent1));
+
+			Comment blockParent = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(BLOCK_USER, SOCIAL_BOARD_FOR_COMMENT));
+
+			Comment replyToBlockParent = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, blockParent));
+
+			Comment parent3 = testFixtureBuilder.buildComment(
+				CommentFixtures.SINGLE_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT));
+
+			Comment replyToParent3 = testFixtureBuilder.buildComment(
+				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD_FOR_COMMENT, parent3));
+
+			SocialDetailResponse response = socialBoardUseCase.getSocialDetail(
+				USER.getId(),
+				SOCIAL_BOARD_FOR_COMMENT.getId()
+			);
+
+			assertSoftly(softly -> {
 				softly.assertThat(response.comments())
 					.extracting(CommentDto::commentId)
-					.contains(COMMENT.getId());
+					.containsExactly(
+						parent1.getId(), replyToParent1_1.getId(), replyToParent1_2.getId(),
+						parent2.getId(),
+						blockParent.getId(), replyToBlockParent.getId(),
+						parent3.getId(), replyToParent3.getId());
+				softly.assertThat(response.comments().get(4).owner().ownerId()).isEqualTo(0L);
+				softly.assertThat(response.comments().get(4).owner().nickname()).isEqualTo("차단된 사용자");
+				softly.assertThat(response.comments().get(4).content()).isEqualTo("차단한 작성자의 댓글입니다.");
 			});
 		}
 
@@ -823,6 +966,80 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 					);
 			});
 		}
-
 	}
+
+	@Nested
+	@DisplayName("소셜 게시글 검색시")
+	class SearchSocials {
+		@Test
+		void 키워드가_제목에_포함된_게시글을_조회한다() {
+			// given
+			String keyword = "루틴";
+			List<Social> socials = testFixtureBuilder.buildSocials(List.of(
+				SocialFixtures.SINGLE_SOCIAL_WITH_TITLE(USER, "루틴 관리하기"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_TITLE(USER, "운동 계획"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_TITLE(USER, "루틴을 꾸준히!")
+			));
+
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.searchSocials(
+				USER.getId(),
+				keyword,
+				cursor,
+				limit
+			);
+
+			List<Long> expectedIds = socials.stream()
+				.filter(social -> social.getTitle() != null && social.getTitle().contains(keyword))
+				.map(Social::getId)
+				.toList();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results())
+					.extracting(SocialResponse::socialId)
+					.containsExactlyInAnyOrderElementsOf(expectedIds);
+			});
+		}
+
+		@Test
+		void 키워드가_내용에_포함된_게시글을_조회한다() {
+			// given
+			String keyword = "운동";
+			List<Social> socials = testFixtureBuilder.buildSocials(List.of(
+				SocialFixtures.SINGLE_SOCIAL_WITH_CONTENT(USER, "운동 계획 세우기"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_CONTENT(USER, "오늘의 운동"),
+				SocialFixtures.SINGLE_SOCIAL_WITH_CONTENT(USER, "건강이 가장 중요")
+			));
+
+			Long cursor = null;
+			Integer limit = 10;
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.searchSocials(
+				USER.getId(),
+				keyword,
+				cursor,
+				limit
+			);
+
+			// then
+			List<Long> expectedIds = socials.stream()
+				.filter(social -> social.getContent() != null && social.getContent().contains(keyword))
+				.map(Social::getId)
+				.toList();
+
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results())
+					.extracting(SocialResponse::socialId)
+					.containsExactlyInAnyOrderElementsOf(expectedIds);
+			});
+		}
+	}
+
 }

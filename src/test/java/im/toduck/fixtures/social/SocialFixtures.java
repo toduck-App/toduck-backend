@@ -13,6 +13,7 @@ public class SocialFixtures {
 	/**
 	 * 기본 content 값
 	 */
+	public static final String DEFAULT_TITLE = "Test title";
 	public static final String DEFAULT_CONTENT = "Test post";
 
 	/**
@@ -41,6 +42,7 @@ public class SocialFixtures {
 	public static Social SINGLE_SOCIAL(User user, boolean isAnonymous) {
 		return Social.builder()
 			.user(user)
+			.title(DEFAULT_TITLE)
 			.content(DEFAULT_CONTENT)
 			.isAnonymous(isAnonymous)
 			.build();
@@ -50,8 +52,37 @@ public class SocialFixtures {
 		return Social.builder()
 			.user(user)
 			.routine(routine)
+			.title(DEFAULT_TITLE)
 			.content(DEFAULT_CONTENT)
 			.isAnonymous(isAnonymous)
 			.build();
 	}
+
+	public static Social SINGLE_SOCIAL_WITH_TITLE(User user, String title) {
+		return Social.builder()
+			.user(user)
+			.title(title)
+			.content(DEFAULT_CONTENT)
+			.isAnonymous(false)
+			.build();
+	}
+
+	public static Social SINGLE_SOCIAL_WITH_CONTENT(User user, String content) {
+		return Social.builder()
+			.user(user)
+			.title(DEFAULT_TITLE)
+			.content(content)
+			.isAnonymous(false)
+			.build();
+	}
+
+	public static Social SINGLE_SOCIAL_WITH_TITLE_AND_CONTENT(User user, String title, String content) {
+		return Social.builder()
+			.user(user)
+			.title(title)
+			.content(content)
+			.isAnonymous(false)
+			.build();
+	}
+
 }

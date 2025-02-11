@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/v1/users")
 public class UserBlockController implements UserBlockApi {
-	private UserBlockUseCase userBlockUseCase;
+	private final UserBlockUseCase userBlockUseCase;
 
 	@Override
 	@PostMapping("/{blockedUserId}/block")

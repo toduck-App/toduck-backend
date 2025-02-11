@@ -80,6 +80,9 @@ public enum ExceptionCode {
 	CANNOT_REPORT_OWN_POST(HttpStatus.FORBIDDEN, 40414, "자신의 게시글은 신고할 수 없습니다."),
 	EXISTS_COMMENT_LIKE(HttpStatus.CONFLICT, 40415, "이미 댓글에 좋아요를 눌렀습니다."),
 	NOT_FOUND_COMMENT_LIKE(HttpStatus.NOT_FOUND, 40416, "해당 댓글 좋아요를 찾을 수 없습니다."),
+	INVALID_SEARCH_KEYWORD(HttpStatus.BAD_REQUEST, 40417, "검색 키워드는 null일 수 없습니다."),
+	NOT_FOUND_PARENT_COMMENT(HttpStatus.NOT_FOUND, 40418, "부모 댓글을 찾을 수 없습니다."),
+	INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, 40419, "답글은 부모 댓글이 될 수 없습니다."),
 
 	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),
@@ -90,7 +93,9 @@ public enum ExceptionCode {
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
-	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다.");
+	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다."),
+	INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, 49903, "지원되지 않는 이미지 파일 확장자입니다.",
+		"이미지 파일 업로드에 허용되지 않는 파일 형식입니다.");
 
 	private final HttpStatus httpStatus;
 	private final int errorCode;

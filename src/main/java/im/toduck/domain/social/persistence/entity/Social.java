@@ -40,6 +40,9 @@ public class Social extends BaseEntity {
 	@JoinColumn(name = "routine_id")
 	private Routine routine;
 
+	@Column(nullable = true, length = 100)
+	private String title;
+
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private int likeCount;
 
@@ -50,15 +53,20 @@ public class Social extends BaseEntity {
 	private Boolean isAnonymous;
 
 	@Builder
-	private Social(User user, Routine routine, String content, Boolean isAnonymous) {
+	private Social(User user, Routine routine, String title, String content, Boolean isAnonymous) {
 		this.user = user;
 		this.routine = routine;
+		this.title = title;
 		this.content = content;
 		this.isAnonymous = isAnonymous;
 	}
 
 	public boolean isOwner(User requestingUser) {
 		return this.user.getId().equals(requestingUser.getId());
+	}
+
+	public void updateTitle(String title) {
+		this.title = title;
 	}
 
 	public void updateContent(String content) {

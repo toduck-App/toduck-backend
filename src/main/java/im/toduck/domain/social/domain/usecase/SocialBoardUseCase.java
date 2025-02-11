@@ -79,18 +79,27 @@ public class SocialBoardUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Routine routine = findRoutineForUpdate(user, request.routineId(), request.isRemoveRoutine());
+
+		if (!isBoardOwner(socialBoard, user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		Routine routine = findRoutineForUpdate(user, request.routineId());
 
 		socialBoardService.updateSocialBoard(user, socialBoard, routine, request);
 		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
 	}
 
+	private boolean isBoardOwner(final Social socialBoard, final User user) {
+		return socialBoard.isOwner(user);
+	}
+
 	private Routine findRoutineForUpdate(
 		final User user,
-		final Long routineId,
-		final boolean isRemoveRoutine
+		final Long routineId
 	) {
-		if (isRemoveRoutine || routineId == null) {
+		if (routineId == null) {
 			return null;
 		}
 
@@ -114,8 +123,13 @@ public class SocialBoardUseCase {
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
+		if (!isBoardOwner(socialBoard, user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		socialBoardService.deleteSocialBoard(socialBoard);
 		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
-		socialBoardService.deleteSocialBoard(user, socialBoard);
 	}
 
 	@Transactional(readOnly = true)
@@ -133,13 +147,14 @@ public class SocialBoardUseCase {
 		}
 
 		List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(socialBoard);
-		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard, user.getId());
+		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard);
 		boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, socialBoard);
 
 		List<CommentDto> commentDtos = comments.stream()
 			.map((comment) -> {
 				boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
-				return CommentMapper.toCommentDto(comment, isCommentLike);
+				boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
+				return CommentMapper.toCommentDto(comment, isCommentLike, isBlocked);
 			})
 			.toList();
 
@@ -200,7 +215,7 @@ public class SocialBoardUseCase {
 			.limit(actualLimit)
 			.map(sb -> {
 				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(sb);
-				List<Comment> comments = socialInteractionService.getCommentsBySocial(sb, user.getId());
+				List<Comment> comments = socialInteractionService.getCommentsBySocial(sb);
 				boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, sb);
 				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isSocialBoardLiked);
 			})
@@ -217,4 +232,32 @@ public class SocialBoardUseCase {
 
 		return SocialCategoryMapper.toSocialCategoryResponse(socialCategoryDtos);
 	}
+
+	@Transactional(readOnly = true)
+	public CursorPaginationResponse<SocialResponse> searchSocials(
+		final Long userId,
+		final String keyword,
+		final Long cursor,
+		final Integer limit
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
+		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
+
+		List<Social> searchResults = socialBoardService.searchSocialsWithFilters(
+			userId,
+			keyword,
+			cursor,
+			fetchLimit
+		);
+
+		boolean hasMore = PaginationUtil.hasMore(searchResults, actualLimit);
+		Long nextCursor = PaginationUtil.getNextCursor(hasMore, searchResults, actualLimit, Social::getId);
+
+		List<SocialResponse> searchResponses = createSocialResponses(searchResults, user, actualLimit);
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, searchResponses);
+	}
+
 }
