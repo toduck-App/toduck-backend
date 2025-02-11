@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
+import im.toduck.domain.schedule.persistence.entity.Schedule;
+import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
@@ -79,6 +81,14 @@ public class TestFixtureBuilder {
 			.build();
 
 		bs.socialCategoryLinkRepository().save(link);
+	}
+
+	public Schedule buildSchedule(final Schedule schedule) {
+		return bs.scheduleRepository().save(schedule);
+	}
+
+	public ScheduleRecord buildScheduleRecord(final ScheduleRecord scheduleRecord) {
+		return bs.scheduleRecordRepository().save(scheduleRecord);
 	}
 
 }

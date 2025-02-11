@@ -1,6 +1,8 @@
 package im.toduck.domain.schedule.domain.usecase;
 
 import static im.toduck.fixtures.schedule.ScheduleCreateRequestFixtures.*;
+import static im.toduck.fixtures.schedule.ScheduleFixtures.*;
+import static im.toduck.fixtures.schedule.ScheduleRecordFixtures.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.DayOfWeek;
@@ -9,7 +11,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.person.persistence.entity.PlanCategory;
+import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
@@ -160,6 +162,16 @@ class ScheduleUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("일정 기간 조회시")
 	class getSchedule {
+		private final LocalDate QUERY_START_DATE = LocalDate.of(2025, 1, 10);
+		private final LocalDate QUERY_END_DATE = LocalDate.of(2025, 1, 25);
+
+		// 기간 밖
+		private final LocalDate LESS_THAN_QUERY_START_DATE = LocalDate.of(2025, 1, 1);
+		private final LocalDate GREATER_THAN_QUERY_END_DATE = LocalDate.of(2025, 1, 30);
+
+		//기간 사이
+		private final LocalDate GREATER_THAN_QUERY_START_DATE = LocalDate.of(2025, 1, 15);
+		private final LocalDate LESS_THAN_QUERY_END_DATE = LocalDate.of(2025, 1, 20);
 		private User savedUser;
 
 		@BeforeEach
@@ -168,18 +180,106 @@ class ScheduleUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		@Disabled
-		void 성공적으로_조회한다() {
+		void 성공적으로_일정을_조회한다() {
 			// given
-			LocalDate startDate = LocalDate.of(2025, 1, 1);
-			LocalDate endDate = LocalDate.of(2025, 1, 1);
+			testFixtureBuilder.buildSchedule(
+				(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, GREATER_THAN_QUERY_START_DATE,
+					GREATER_THAN_QUERY_START_DATE))); // 반복 없는 하루 일정
+			testFixtureBuilder.buildSchedule(
+				testFixtureBuilder.buildSchedule((DEFAULT_REPEATABLE_SCHEDULE(savedUser, LESS_THAN_QUERY_START_DATE,
+					LESS_THAN_QUERY_START_DATE)))); // 반복 있는 하루 일정
+			testFixtureBuilder.buildSchedule(
+				testFixtureBuilder.buildSchedule(
+					(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, GREATER_THAN_QUERY_START_DATE,
+						LESS_THAN_QUERY_END_DATE)))); // 반복 없는 기간 일정
+			testFixtureBuilder.buildSchedule(
+				testFixtureBuilder.buildSchedule(
+					(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, GREATER_THAN_QUERY_START_DATE,
+						LESS_THAN_QUERY_END_DATE)))); // 반복 있는 기간 일정
 
 			// when
 			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
-				startDate, endDate);
+				QUERY_START_DATE, QUERY_END_DATE);
 
 			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleHeadResponse.queryStartDate()).isEqualTo(QUERY_START_DATE);
+				softly.assertThat(scheduleHeadResponse.queryEndDate()).isEqualTo(QUERY_END_DATE);
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos()).hasSize(4);
+			});
+		}
 
+		@Test
+		void 성공_조회_기간에_해당하는_일정_기록을_조회한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(
+					DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, GREATER_THAN_QUERY_START_DATE,
+						GREATER_THAN_QUERY_START_DATE));
+
+			testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(GREATER_THAN_QUERY_START_DATE, savedSchedule));
+			testFixtureBuilder
+				.buildScheduleRecord(IS_NOT_COMPLETE_SCHEDULE_RECORD(LESS_THAN_QUERY_END_DATE, savedSchedule));
+
+			// when
+			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+				QUERY_START_DATE, QUERY_END_DATE);
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos()).hasSize(1);
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos().get(0).scheduleId())
+					.isEqualTo(savedSchedule.getId());
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos().get(0).scheduleRecordDto()).hasSize(2);
+				softly.assertThat(
+						scheduleHeadResponse.scheduleHeadDtos().get(0).scheduleRecordDto().get(0).isComplete())
+					.isEqualTo(true);
+			});
+		}
+
+		@Test
+		void 실패_기간에_해당하지_않는_일정은_조회되지_않는다() {
+			// given
+			testFixtureBuilder
+				.buildSchedule(
+					DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, LESS_THAN_QUERY_START_DATE,
+						LESS_THAN_QUERY_START_DATE));
+			testFixtureBuilder
+				.buildSchedule(
+					DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, GREATER_THAN_QUERY_END_DATE,
+						GREATER_THAN_QUERY_END_DATE));
+			// when
+			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+				QUERY_START_DATE, QUERY_END_DATE);
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos()).hasSize(0);
+			});
+		}
+
+		@Test
+		void 실패_기간에_해당하지_않는_일정_기록은_조회되지_않는다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(
+					DEFAULT_REPEATABLE_SCHEDULE(savedUser, LESS_THAN_QUERY_START_DATE,
+						LESS_THAN_QUERY_START_DATE));
+
+			testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LESS_THAN_QUERY_START_DATE, savedSchedule));
+			testFixtureBuilder
+				.buildScheduleRecord(IS_NOT_COMPLETE_SCHEDULE_RECORD(GREATER_THAN_QUERY_END_DATE, savedSchedule));
+
+			// when
+			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+				QUERY_START_DATE, QUERY_END_DATE);
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos()).hasSize(1);
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos().get(0).scheduleId())
+					.isEqualTo(savedSchedule.getId());
+				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos().get(0).scheduleRecordDto()).hasSize(0);
+			});
 		}
 	}
 
