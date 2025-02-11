@@ -19,10 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import im.toduck.ServiceTest;
 import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
+import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
+import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
 import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
@@ -33,6 +36,9 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private ScheduleUseCase scheduleUsecase;
+
+	@Autowired
+	private ScheduleRepository scheduleRepository;
 
 	@Nested
 	@DisplayName("일정 생성시")
@@ -279,6 +285,54 @@ class ScheduleUseCaseTest extends ServiceTest {
 				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos().get(0).scheduleId())
 					.isEqualTo(savedSchedule.getId());
 				softly.assertThat(scheduleHeadResponse.scheduleHeadDtos().get(0).scheduleRecordDto()).hasSize(0);
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("일정 상세 조회시")
+	class findScheduleTest {
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+		}
+
+		@Test
+		void 성공적으로_일정을_조회한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, LocalDate.of(2025, 1, 1),
+					LocalDate.of(2025, 1, 1)));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 1), savedSchedule));
+
+			// when
+			ScheduleInfoResponse scheduleInfoResponse = scheduleUsecase.getSchedule(savedUser.getId(),
+				savedScheduleRecord.getId());
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleInfoResponse.scheduleId()).isEqualTo(savedSchedule.getId());
+				softly.assertThat(scheduleInfoResponse.scheduleRecordId()).isEqualTo(savedScheduleRecord.getId());
+			});
+		}
+
+		@Test
+		void 실패_일정_기록이_없을_경우_실패한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, LocalDate.of(2025, 1, 1),
+					LocalDate.of(2025, 1, 1)));
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> scheduleUsecase.getSchedule(savedUser.getId(), 9999L))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE_RECORD.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE_RECORD.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_SCHEDULE_RECORD.getMessage());
 			});
 		}
 	}

@@ -7,6 +7,7 @@ import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,6 +83,45 @@ class ScheduleRecordRepositoryTest extends RepositoryTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(scheduleRecords).isEmpty();
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("일정 기록 일정 fetch join 조회시")
+	class findScheduleRecordFetchJoinScheduleTest {
+		private User savedUser;
+		private Schedule savedSchedule;
+		private ScheduleRecord savedScheduleRecord;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+			savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				LocalDate.now(), LocalDate.now()));
+			savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(LocalDate.now(), savedSchedule));
+		}
+
+		@Test
+		void 성공_일정_기록_일정_fetch_join_조회한다() {
+			// when
+			ScheduleRecord scheduleRecord = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(
+				savedScheduleRecord.getId()).get();
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord).isNotNull();
+				softly.assertThat(scheduleRecord.getSchedule()).isNotNull();
+			});
+		}
+
+		@Test
+		void 실패_존재하지_않는_일정_기록_일정은_조회되지_않는다() {
+			// when
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(0L);
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord.orElse(null)).isNull();
 			});
 		}
 	}
