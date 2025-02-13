@@ -11,4 +11,7 @@ public interface ScheduleRecordRepositoryCustom {
 		LocalDate endDate);
 
 	Optional<ScheduleRecord> findScheduleRecordFetchJoinSchedule(Long scheduleRecordId);
+
+	Optional<ScheduleRecord> findScheduleRecordByUserIdAndRecordDateAndScheduleId(Long userId, LocalDate localDate,
+		Long aLong);
 }

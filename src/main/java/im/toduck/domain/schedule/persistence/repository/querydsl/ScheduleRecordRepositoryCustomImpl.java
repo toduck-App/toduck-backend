@@ -21,6 +21,23 @@ public class ScheduleRecordRepositoryCustomImpl implements ScheduleRecordReposit
 	private final QSchedule schedule = QSchedule.schedule;
 
 	@Override
+	public Optional<ScheduleRecord> findScheduleRecordByUserIdAndRecordDateAndScheduleId(Long userId,
+		LocalDate localDate,
+		Long aLong) {
+		return Optional.ofNullable(
+			queryFactory
+				.select(scheduleRecord)
+				.from(scheduleRecord)
+				.leftJoin(scheduleRecord.schedule, schedule).fetchJoin()
+				.where(
+					scheduleRecord.schedule.id.eq(aLong)
+						.and(scheduleRecord.recordDate.eq(localDate))
+						.and(scheduleRecord.schedule.user.id.eq(userId))
+				)
+				.fetchOne());
+	}
+
+	@Override
 	public List<ScheduleRecord> findByScheduleAndBetweenStartDateAndEndDate(Long scheduleId, LocalDate startDate,
 		LocalDate endDate) {
 		return queryFactory

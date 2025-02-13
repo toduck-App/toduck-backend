@@ -46,4 +46,8 @@ public class ScheduleRecord extends BaseEntity {
 		this.recordDate = recordDate;
 		this.schedule = schedule;
 	}
+
+	public void changeComplete(Boolean complete) {
+		this.isCompleted = complete;
+	}
 }

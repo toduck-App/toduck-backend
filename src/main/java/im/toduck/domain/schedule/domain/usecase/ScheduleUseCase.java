@@ -4,7 +4,10 @@ import java.time.LocalDate;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.schedule.domain.service.ScheduleRecordService;
 import im.toduck.domain.schedule.domain.service.ScheduleService;
+import im.toduck.domain.schedule.persistence.entity.Schedule;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
@@ -21,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ScheduleUseCase {
 	private final ScheduleService scheduleService;
 	private final UserService userService;
+	private final ScheduleRecordService scheduleRecordService;
 
 	@Transactional
 	public ScheduleCreateResponse createSchedule(Long userId,
@@ -42,5 +46,19 @@ public class ScheduleUseCase {
 		userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		return scheduleService.getSchedule(scheduleRecordId);
+	}
+
+	@Transactional
+	public void completeSchedule(Long userId, ScheduleCompleteRequest scheduleCompleteRequest) {
+		userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Schedule schedule = scheduleService.getScheduleById(scheduleCompleteRequest.scheduleId())
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
+		scheduleRecordService.getScheduleRecordWithSchedule(userId, scheduleCompleteRequest)
+			.ifPresentOrElse((scheduleRecord) -> {
+				scheduleRecordService.completeScheduleRecord(scheduleRecord, scheduleCompleteRequest);
+			}, () -> {
+				scheduleRecordService.createScheduleRecord(schedule, scheduleCompleteRequest);
+			});
 	}
 }

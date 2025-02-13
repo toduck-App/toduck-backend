@@ -3,6 +3,7 @@ package im.toduck.domain.schedule.domain.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,5 +52,9 @@ public class ScheduleService {
 		return scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(scheduleRecordId)
 			.map(ScheduleMapper::toScheduleInfoResponse)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE_RECORD));
+	}
+
+	public Optional<Schedule> getScheduleById(Long scheduleId) {
+		return scheduleRepository.findById(scheduleId);
 	}
 }
