@@ -3,12 +3,14 @@ package im.toduck.domain.schedule.domain.usecase;
 import static im.toduck.fixtures.schedule.ScheduleCreateRequestFixtures.*;
 import static im.toduck.fixtures.schedule.ScheduleFixtures.*;
 import static im.toduck.fixtures.schedule.ScheduleRecordFixtures.*;
+import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,14 +22,15 @@ import im.toduck.ServiceTest;
 import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
+import im.toduck.domain.schedule.persistence.repository.ScheduleRecordRepository;
 import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
 import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
@@ -39,6 +42,9 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private ScheduleRepository scheduleRepository;
+
+	@Autowired
+	private ScheduleRecordRepository scheduleRecordRepository;
 
 	@Nested
 	@DisplayName("일정 생성시")
@@ -61,7 +67,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			savedUser = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
 		}
 
 		@Test
@@ -182,7 +188,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			savedUser = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
 		}
 
 		@Test
@@ -296,7 +302,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			savedUser = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
 		}
 
 		@Test
@@ -334,6 +340,117 @@ class ScheduleUseCaseTest extends ServiceTest {
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE_RECORD.getErrorCode())
 					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_SCHEDULE_RECORD.getMessage());
 			});
+		}
+	}
+
+	@Nested
+	@DisplayName("일정 완료 변경 요청시")
+	class completeSchedule {
+		private final LocalDate MOCK_DATE = LocalDate.of(2025, 1, 15);
+
+		private Schedule savedSchedule;
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+			savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(
+					savedUser,
+					MOCK_DATE,
+					MOCK_DATE));
+		}
+
+		@Test
+		void 성공_해당날짜_일정기록이_있으면_기록이_추가생성되지_않고_완료여부가_변경된다() {
+			// given
+			testFixtureBuilder
+				.buildScheduleRecord(IS_NOT_COMPLETE_SCHEDULE_RECORD(
+					MOCK_DATE,
+					savedSchedule));
+			ScheduleCompleteRequest request = ScheduleCompleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isComplete(true)
+				.queryDate(MOCK_DATE)
+				.build();
+
+			// when
+			scheduleUsecase.completeSchedule(savedUser.getId(), request);
+			// then
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				savedUser.getId(),
+				MOCK_DATE,
+				savedSchedule.getId());
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord.orElse(null)).isNotNull();
+				softly.assertThat(scheduleRecord.get().getIsCompleted()).isEqualTo(request.isComplete());
+				softly.assertThat(scheduleRecord.get().getSchedule().getId()).isEqualTo(savedSchedule.getId());
+			});
+		}
+
+		@Test
+		void 성공_해당날짜_일정기록이_없으면_일정_기록이_생성된다() {
+			//given
+
+			ScheduleCompleteRequest request = ScheduleCompleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isComplete(true)
+				.queryDate(MOCK_DATE)
+				.build();
+
+			// when
+			scheduleUsecase.completeSchedule(savedUser.getId(), request);
+
+			// then
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				savedUser.getId(),
+				MOCK_DATE,
+				savedSchedule.getId());
+
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord.orElse(null)).isNotNull();
+				softly.assertThat(scheduleRecord.get().getSchedule().getId()).isEqualTo(savedSchedule.getId());
+			});
+		}
+
+		@Test
+		void 실패_유효한_유저가_아닐경우_실패한다() {
+			// given
+			ScheduleCompleteRequest request = ScheduleCompleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isComplete(true)
+				.queryDate(MOCK_DATE)
+				.build();
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> scheduleUsecase.completeSchedule(savedUser.getId() + 1, request))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_USER.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_USER.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_USER.getMessage());
+			});
+
+		}
+
+		@Test
+		void 실패_유효한_일정_아이디가_아닐경우_실패한다() {
+			// given
+			ScheduleCompleteRequest request = ScheduleCompleteRequest.builder()
+				.scheduleId(9999L)
+				.isComplete(true)
+				.queryDate(MOCK_DATE)
+				.build();
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> scheduleUsecase.completeSchedule(savedUser.getId(), request))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_SCHEDULE.getMessage());
+			});
+
 		}
 	}
 
