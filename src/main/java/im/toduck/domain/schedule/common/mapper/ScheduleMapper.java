@@ -1,5 +1,6 @@
 package im.toduck.domain.schedule.common.mapper;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -69,6 +70,7 @@ public class ScheduleMapper {
 			.isAllDay(schedule.getScheduleTime().getIsAllDay())
 			.startDate(schedule.getScheduleDate().getStartDate())
 			.endDate(schedule.getScheduleDate().getEndDate())
+			.daysOfWeek(convertDaysOfWeekBitmaskToDayOfWeekList(schedule.getDaysOfWeekBitmask()))
 			.time(schedule.getScheduleTime().getTime())
 			.location(schedule.getLocation())
 			.build();
@@ -84,6 +86,7 @@ public class ScheduleMapper {
 			.isAllDay(schedule.getScheduleTime().getIsAllDay())
 			.startDate(schedule.getScheduleDate().getStartDate())
 			.endDate(schedule.getScheduleDate().getEndDate())
+			.daysOfWeek(convertDaysOfWeekBitmaskToDayOfWeekList(schedule.getDaysOfWeekBitmask()))
 			.time(schedule.getScheduleTime().getTime())
 			.location(schedule.getLocation())
 			.memo(schedule.getMemo())
@@ -91,5 +94,12 @@ public class ScheduleMapper {
 			.isComplete(scheduleRecord.getIsCompleted())
 			.recordDate(scheduleRecord.getRecordDate())
 			.build();
+	}
+
+	private static List<DayOfWeek> convertDaysOfWeekBitmaskToDayOfWeekList(DaysOfWeekBitmask daysOfWeekBitmask) {
+		if (daysOfWeekBitmask == null) {
+			return null;
+		}
+		return daysOfWeekBitmask.getDaysOfWeek().stream().toList();
 	}
 }

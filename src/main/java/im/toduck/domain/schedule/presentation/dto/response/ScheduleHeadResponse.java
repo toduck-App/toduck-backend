@@ -1,5 +1,6 @@
 package im.toduck.domain.schedule.presentation.dto.response;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -60,6 +61,9 @@ public record ScheduleHeadResponse(
 		@JsonSerialize(using = LocalDateSerializer.class)
 		@JsonFormat(pattern = "yyyy-MM-dd")
 		LocalDate endDate,
+
+		@Schema(description = "반복 요일", example = "[\"MONDAY\",\"TUESDAY\"]")
+		List<DayOfWeek> daysOfWeek,
 
 		@Schema(description = "일정 시간", example = "14:30")
 		@JsonSerialize(using = LocalTimeSerializer.class)

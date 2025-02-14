@@ -316,6 +316,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(scheduleInfoResponse.scheduleId()).isEqualTo(savedSchedule.getId());
 				softly.assertThat(scheduleInfoResponse.scheduleRecordId()).isEqualTo(savedScheduleRecord.getId());
+				softly.assertThat(scheduleInfoResponse.daysOfWeek()).isEqualTo(savedSchedule.getDaysOfWeekBitmask());
 			});
 		}
 
