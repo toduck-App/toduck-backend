@@ -93,6 +93,7 @@ public class ScheduleMapper {
 			.scheduleRecordId(scheduleRecord.getId())
 			.isComplete(scheduleRecord.getIsCompleted())
 			.recordDate(scheduleRecord.getRecordDate())
+			.deletedAt(scheduleRecord.getDeletedAt())
 			.build();
 	}
 
@@ -101,5 +102,21 @@ public class ScheduleMapper {
 			return null;
 		}
 		return daysOfWeekBitmask.getDaysOfWeek().stream().toList();
+	}
+
+	public static Schedule copyToSchedule(Schedule schedule, LocalDate queryDate) {
+		ScheduleDate from = ScheduleDate.from(queryDate, queryDate);
+
+		return new Schedule(
+			schedule.getTitle(),
+			schedule.getCategory(),
+			schedule.getColor(),
+			from,
+			schedule.getScheduleTime(),
+			schedule.getDaysOfWeekBitmask(),
+			schedule.getLocation(),
+			schedule.getMemo(),
+			schedule.getUser()
+		);
 	}
 }
