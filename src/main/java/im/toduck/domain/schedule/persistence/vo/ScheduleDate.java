@@ -34,4 +34,9 @@ public class ScheduleDate {
 			throw new VoException("시작일은 종료일보다 이전이어야 합니다.");
 		}
 	}
+
+	public void changeEndDate(LocalDate localDate) {
+		validate(this.startDate, localDate);
+		this.endDate = localDate;
+	}
 }

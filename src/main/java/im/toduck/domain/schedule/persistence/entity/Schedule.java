@@ -1,5 +1,7 @@
 package im.toduck.domain.schedule.persistence.entity;
 
+import java.time.LocalDate;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -88,5 +90,9 @@ public class Schedule extends BaseEntity {
 		this.location = location;
 		this.memo = memo;
 		this.user = user;
+	}
+
+	public void changeEndDate(LocalDate localDate) {
+		this.scheduleDate.changeEndDate(localDate);
 	}
 }

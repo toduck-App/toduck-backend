@@ -22,7 +22,6 @@ public class ScheduleRecordService {
 		ScheduleCompleteRequest scheduleCompleteRequest) {
 		return scheduleRecordRepository
 			.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
-				userId,
 				scheduleCompleteRequest.queryDate(),
 				scheduleCompleteRequest.scheduleId());
 	}

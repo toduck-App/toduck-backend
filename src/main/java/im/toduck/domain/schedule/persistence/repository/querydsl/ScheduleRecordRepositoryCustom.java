@@ -7,11 +7,23 @@ import java.util.Optional;
 import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 
 public interface ScheduleRecordRepositoryCustom {
+	Optional<ScheduleRecord> findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+		LocalDate localDate,
+		Long aLong);
+
 	List<ScheduleRecord> findByScheduleAndBetweenStartDateAndEndDate(Long scheduleId, LocalDate startDate,
 		LocalDate endDate);
 
 	Optional<ScheduleRecord> findScheduleRecordFetchJoinSchedule(Long scheduleRecordId);
 
-	Optional<ScheduleRecord> findScheduleRecordByUserIdAndRecordDateAndScheduleId(Long userId, LocalDate localDate,
-		Long aLong);
+	void deleteByScheduleIdAndRecordDate(Long id, LocalDate startDate);
+
+	List<ScheduleRecord> findByCompletedScheduleAndAfterStartDate(Long scheduleId,
+		LocalDate startDate);
+
+	void deleteByNonCompletedScheduleAndBetweenStartDateAndEndDate(Long scheduleId,
+		LocalDate startDate,
+		LocalDate endDate);
+
+	void softDeleteByScheduleIdAndRecordDate(Long id, LocalDate localDate);
 }

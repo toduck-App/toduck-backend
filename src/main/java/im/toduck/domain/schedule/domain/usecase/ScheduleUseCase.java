@@ -9,6 +9,7 @@ import im.toduck.domain.schedule.domain.service.ScheduleService;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
@@ -18,9 +19,11 @@ import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @UseCase
 @RequiredArgsConstructor
+@Slf4j
 public class ScheduleUseCase {
 	private final ScheduleService scheduleService;
 	private final UserService userService;
@@ -61,4 +64,31 @@ public class ScheduleUseCase {
 				scheduleRecordService.createScheduleRecord(schedule, scheduleCompleteRequest);
 			});
 	}
+
+	@Transactional
+	public void deleteSchedule(Long userId, ScheduleDeleteRequest scheduleDeleteRequest) {
+		userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Schedule schedule = scheduleService.getScheduleById(scheduleDeleteRequest.scheduleId())
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
+
+		if (isSingleDaySchedule(schedule)) {
+			scheduleService.deleteSingleDaySchedule(schedule, scheduleDeleteRequest);
+			log.info("반복 X 하루 일정 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
+		} else {
+			if (scheduleDeleteRequest.isOneDayDeleted()) {
+				scheduleService.deleteOneDayDeletionForRepeatingSchedule(schedule, scheduleDeleteRequest);
+				log.info("반복 일정 중 하루 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
+			} else {
+				scheduleService.deleteAfterDeletionForRepeatingSchedule(schedule, scheduleDeleteRequest);
+				log.info("반복 일정 중 기간 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
+			}
+		}
+	}
+
+	private boolean isSingleDaySchedule(Schedule schedule) {
+		return schedule.getScheduleDate().getStartDate().equals(schedule.getScheduleDate().getEndDate())
+			&& schedule.getDaysOfWeekBitmask() == null;
+	}
+
 }
