@@ -27,6 +27,7 @@ import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
 import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
@@ -45,6 +46,17 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private ScheduleRecordRepository scheduleRecordRepository;
+
+	private final LocalDate QUERY_START_DATE = LocalDate.of(2025, 1, 10);
+	private final LocalDate QUERY_END_DATE = LocalDate.of(2025, 1, 25);
+
+	// 기간 밖
+	private final LocalDate LESS_THAN_QUERY_START_DATE = LocalDate.of(2025, 1, 1);
+	private final LocalDate GREATER_THAN_QUERY_END_DATE = LocalDate.of(2025, 1, 30);
+
+	//기간 사이
+	private final LocalDate GREATER_THAN_QUERY_START_DATE = LocalDate.of(2025, 1, 15);
+	private final LocalDate LESS_THAN_QUERY_END_DATE = LocalDate.of(2025, 1, 20);
 
 	@Nested
 	@DisplayName("일정 생성시")
@@ -174,16 +186,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("일정 기간 조회시")
 	class getSchedule {
-		private final LocalDate QUERY_START_DATE = LocalDate.of(2025, 1, 10);
-		private final LocalDate QUERY_END_DATE = LocalDate.of(2025, 1, 25);
 
-		// 기간 밖
-		private final LocalDate LESS_THAN_QUERY_START_DATE = LocalDate.of(2025, 1, 1);
-		private final LocalDate GREATER_THAN_QUERY_END_DATE = LocalDate.of(2025, 1, 30);
-
-		//기간 사이
-		private final LocalDate GREATER_THAN_QUERY_START_DATE = LocalDate.of(2025, 1, 15);
-		private final LocalDate LESS_THAN_QUERY_END_DATE = LocalDate.of(2025, 1, 20);
 		private User savedUser;
 
 		@BeforeEach
@@ -379,7 +382,6 @@ class ScheduleUseCaseTest extends ServiceTest {
 			scheduleUsecase.completeSchedule(savedUser.getId(), request);
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
-				savedUser.getId(),
 				MOCK_DATE,
 				savedSchedule.getId());
 			assertSoftly(softly -> {
@@ -404,7 +406,6 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
-				savedUser.getId(),
 				MOCK_DATE,
 				savedSchedule.getId());
 
@@ -453,6 +454,350 @@ class ScheduleUseCaseTest extends ServiceTest {
 			});
 
 		}
+	}
+
+	@Nested
+	@DisplayName("일정 삭제 요청시")
+	class deleteSchedule {
+		@BeforeEach
+		void setUp() {
+			testFixtureBuilder.buildUser(GENERAL_USER());
+		}
+
+		@Test
+		void 성공_반복_없는_하루_일정은_일정과_일정기록_모두_삭제된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 1), savedSchedule));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(true)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.build();
+
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+
+			// then
+			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findById(savedScheduleRecord.getId());
+			assertSoftly(softly -> {
+				softly.assertThat(schedule).isEmpty();
+				softly.assertThat(scheduleRecord).isEmpty();
+			});
+		}
+
+		@Test
+		void 성공_반복_없는_하루_일정은_일정기록이_없더라도_일정은_삭제된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(true)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.build();
+
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+
+			// then
+			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
+			assertSoftly(softly -> {
+				softly.assertThat(schedule).isEmpty();
+			});
+		}
+
+		@Test
+		void 성공_반복_있고_하루짜리_일정_하루_삭제는_해당_기록이_SoftDelete_된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 10), savedSchedule));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(true)
+				.queryDate(LocalDate.of(2025, 1, 10))
+				.build();
+
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+
+			// then
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findById(savedScheduleRecord.getId());
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord).isPresent();
+				softly.assertThat(scheduleRecord.get().getDeletedAt()).isNotNull();
+			});
+		}
+
+		@Test
+		void 성공_반복_있고_하루짜리_일정_하루_삭제는_해당_기록이_없더라도_SoftDelete_된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(true)
+				.queryDate(LocalDate.of(2025, 1, 10))
+				.build();
+
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+
+			// then
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				LocalDate.of(2025, 1, 10),
+				savedSchedule.getId());
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord).isPresent();
+				softly.assertThat(scheduleRecord.get().getDeletedAt()).isNotNull();
+			});
+		}
+
+		@Test
+		void 성공_반복_있고_하루짜리_일정_이후_삭제는_이후_완료_기록들은_다른_일정으로_변경되고_미완료_일정들은_삭제된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE.plusDays(1), savedSchedule));
+
+			ScheduleRecord savedScheduleRecord2 = testFixtureBuilder
+				.buildScheduleRecord(IS_NOT_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE.plusDays(2), savedSchedule));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(false)
+				.queryDate(QUERY_END_DATE)
+				.build();
+
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+
+			// then
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(
+				savedScheduleRecord.getId());
+			Optional<ScheduleRecord> scheduleRecord2 = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(
+				savedScheduleRecord2.getId());
+			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
+
+			assertSoftly(softly -> {
+				System.out.println("하루 짜리 반복 일정이 특정 날짜 이후 삭제시 특정 날짜 이전으로 end_date 변경");
+				softly.assertThat(schedule).isPresent();
+				softly.assertThat(schedule.get().getScheduleDate().getEndDate()).isEqualTo(QUERY_END_DATE.minusDays(1));
+				softly.assertThat(scheduleRecord).isPresent();
+
+				System.out.println("하루 짜리 반복 일정이 특정 날짜 이후 삭제시 성공 일정 기록은 원래 일정이 아닌 다른 일정으로 변경된다.");
+				Schedule schedule1 = scheduleRecord.get().getSchedule();
+				softly.assertThat(schedule1.getScheduleDate().getEndDate())
+					.isEqualTo(schedule1.getScheduleDate().getStartDate());
+				softly.assertThat(schedule1.getId()).isNotEqualTo(schedule.get().getId());
+
+				System.out.println("하루 짜리 반복 일정이 특정 날짜 이후 삭제시 실패 일정 기록은 삭제된다.");
+				softly.assertThat(scheduleRecord2).isEmpty();
+			});
+		}
+
+		@Test
+		void 성공_반복_상관없이_기간_일정_하루_삭제는_해당_기록이_SoftDelete_된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 30)));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 1), savedSchedule));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(true)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.build();
+
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+
+			// then
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findById(savedScheduleRecord.getId());
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord).isPresent();
+				softly.assertThat(scheduleRecord.get().getDeletedAt()).isNotNull();
+			});
+		}
+
+		@Test
+		void 성공_반복_상관없이_기간_일정_이후_삭제는_이후_완료_기록들은_다른_일정으로_변경되고_미완료_일정들은_삭제된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 30)));
+
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder
+				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE.plusDays(1), savedSchedule));
+
+			ScheduleRecord savedScheduleRecord2 = testFixtureBuilder
+				.buildScheduleRecord(IS_NOT_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE.plusDays(2), savedSchedule));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(false)
+				.queryDate(QUERY_END_DATE)
+				.build();
+
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+
+			// then
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(
+				savedScheduleRecord.getId());
+			Optional<ScheduleRecord> scheduleRecord2 = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(
+				savedScheduleRecord2.getId());
+			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
+
+			assertSoftly(softly -> {
+				System.out.println("기간 일정이 특정 날짜 이후 삭제시 특정 날짜 이전으로 end_date 변경");
+				softly.assertThat(schedule).isPresent();
+				softly.assertThat(schedule.get().getScheduleDate().getEndDate()).isEqualTo(QUERY_END_DATE.minusDays(1));
+				softly.assertThat(scheduleRecord).isPresent();
+
+				System.out.println("기간 일정이 특정 날짜 이후 삭제시 성공 일정 기록은 원래 일정이 아닌 다른 일정으로 변경된다.");
+				Schedule schedule1 = scheduleRecord.get().getSchedule();
+				softly.assertThat(schedule1.getScheduleDate().getEndDate())
+					.isEqualTo(schedule1.getScheduleDate().getStartDate());
+				softly.assertThat(schedule1.getId()).isNotEqualTo(schedule.get().getId());
+
+				System.out.println("기간 일정이 특정 날짜 이후 삭제시 실패 일정 기록은 삭제된다.");
+				softly.assertThat(scheduleRecord2).isEmpty();
+			});
+		}
+
+		@Test
+		void 성공_특정날짜_이후_삭제시_특정날짜와_일정의_시작날짜가_같을시_일정까지_삭제된다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					QUERY_END_DATE, LocalDate.of(2025, 1, 30)));
+			Schedule savedSchedule2 = testFixtureBuilder
+				.buildSchedule(DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					QUERY_END_DATE, LocalDate.of(2025, 1, 30)));
+			Schedule savedSchedule3 = testFixtureBuilder
+				.buildSchedule(DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					QUERY_END_DATE, QUERY_END_DATE));
+
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(false)
+				.queryDate(QUERY_END_DATE)
+				.build();
+
+			ScheduleDeleteRequest request2 = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule2.getId())
+				.isOneDayDeleted(false)
+				.queryDate(QUERY_END_DATE)
+				.build();
+
+			ScheduleDeleteRequest request3 = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule3.getId())
+				.isOneDayDeleted(false)
+				.queryDate(QUERY_END_DATE)
+				.build();
+			// when
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request2);
+			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request3);
+
+			// then
+			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
+			Optional<Schedule> schedule2 = scheduleRepository.findById(savedSchedule2.getId());
+			Optional<Schedule> schedule3 = scheduleRepository.findById(savedSchedule3.getId());
+
+			assertSoftly(softly -> {
+				softly.assertThat(schedule).isEmpty();
+				softly.assertThat(schedule2).isEmpty();
+				softly.assertThat(schedule3).isEmpty();
+			});
+		}
+
+		@Test
+		void 실패_유효하지_않는_유저ID_요청시_실패한다() {
+			// given
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(9999L)
+				.isOneDayDeleted(true)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.build();
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> scheduleUsecase.deleteSchedule(9999L, request))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_USER.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_USER.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_USER.getMessage());
+			});
+		}
+
+		@Test
+		void 실패_유효하지_않는_일정ID_요청시_실패한다() {
+			// given
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(9999L)
+				.isOneDayDeleted(true)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.build();
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(
+						() -> scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_SCHEDULE.getMessage());
+			});
+		}
+
+		@Test
+		void 실패_반복X_하루짜리_일정_삭제요청시_이후_삭제_요청은_실패한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder
+				.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
+				.scheduleId(savedSchedule.getId())
+				.isOneDayDeleted(false)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.build();
+
+			// when -> then
+			assertSoftly(softly -> {
+
+				softly.assertThatThrownBy(
+						() -> scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(),
+							request))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus",
+						ExceptionCode.NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode",
+						ExceptionCode.NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE.getErrorCode())
+					.hasFieldOrPropertyWithValue("message",
+						ExceptionCode.NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE.getMessage());
+			});
+		}
+
 	}
 
 }
