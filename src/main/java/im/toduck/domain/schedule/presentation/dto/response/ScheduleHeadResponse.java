@@ -75,6 +75,7 @@ public record ScheduleHeadResponse(
 		@Schema(description = "장소", example = "일정 장소")
 		String location
 	) {
+		@Schema(description = "일정 기록 DTO")
 		public record ScheduleRecordDto(
 			@Schema(description = "일정 고유 id", example = "1")
 			Long scheduleRecordId,

@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
+@Schema(description = "일정 기록에 대한 모든 정보를 담은 응답 DTO")
 public record ScheduleInfoResponse(
 	@Schema(description = "일정 Id", example = "1")
 	Long scheduleId,
