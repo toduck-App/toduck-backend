@@ -38,7 +38,7 @@ public class ScheduleRecordRepositoryCustomImpl implements ScheduleRecordReposit
 	}
 
 	@Override
-	public void deleteByNonCompletedScheduleAndBetweenStartDateAndEndDate(Long scheduleId,
+	public void deleteByNonCompletedScheduleAndAfterStartDate(Long scheduleId,
 		LocalDate startDate,
 		LocalDate endDate) {
 		queryFactory

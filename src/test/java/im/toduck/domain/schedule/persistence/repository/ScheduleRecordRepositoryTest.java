@@ -353,7 +353,7 @@ class ScheduleRecordRepositoryTest extends RepositoryTest {
 			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
 				IS_NOT_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
 			// when
-			scheduleRecordRepository.deleteByNonCompletedScheduleAndBetweenStartDateAndEndDate(savedSchedule.getId(),
+			scheduleRecordRepository.deleteByNonCompletedScheduleAndAfterStartDate(savedSchedule.getId(),
 				QUERY_START_DATE, QUERY_END_DATE);
 			entityManager.flush();
 			entityManager.clear();
@@ -373,7 +373,7 @@ class ScheduleRecordRepositoryTest extends RepositoryTest {
 				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
 
 			// when
-			scheduleRecordRepository.deleteByNonCompletedScheduleAndBetweenStartDateAndEndDate(savedSchedule.getId(),
+			scheduleRecordRepository.deleteByNonCompletedScheduleAndAfterStartDate(savedSchedule.getId(),
 				QUERY_START_DATE, QUERY_END_DATE);
 			entityManager.flush();
 			entityManager.clear();

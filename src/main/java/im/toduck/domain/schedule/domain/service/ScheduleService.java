@@ -96,7 +96,7 @@ public class ScheduleService {
 					ScheduleMapper.copyToSchedule(schedule, scheduleDeleteRequest.queryDate()));
 				scheduleRecord.changeSchedule(save);
 			});
-		scheduleRecordRepository.deleteByNonCompletedScheduleAndBetweenStartDateAndEndDate(
+		scheduleRecordRepository.deleteByNonCompletedScheduleAndAfterStartDate(
 			schedule.getId(),
 			scheduleDeleteRequest.queryDate(),
 			schedule.getScheduleDate().getEndDate());

@@ -21,7 +21,7 @@ public interface ScheduleRecordRepositoryCustom {
 	List<ScheduleRecord> findByCompletedScheduleAndAfterStartDate(Long scheduleId,
 		LocalDate startDate);
 
-	void deleteByNonCompletedScheduleAndBetweenStartDateAndEndDate(Long scheduleId,
+	void deleteByNonCompletedScheduleAndAfterStartDate(Long scheduleId,
 		LocalDate startDate,
 		LocalDate endDate);
 
