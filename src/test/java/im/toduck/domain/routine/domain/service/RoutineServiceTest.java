@@ -48,7 +48,7 @@ class RoutineServiceTest extends ServiceTest {
 		void setUp() {
 			request = new RoutineCreateRequest(
 				"Morning Exercise",
-				PlanCategory.EXERCISE,
+				PlanCategory.COMPUTER,
 				"#FF5733",
 				LocalTime.of(7, 0),
 				true,

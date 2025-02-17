@@ -142,10 +142,11 @@ CREATE TABLE social_image_file
 CREATE TABLE schedule (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(100) NOT NULL,
-    category ENUM('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY') DEFAULT NULL,
-    category_color VARCHAR(100) DEFAULT NULL,
+    category ENUM('COMPUTER', 'FOOD', 'PENCIL', 'RED_BOOK', 'YELLOW_BOOK', 'SLEEP', 'POWER', 'PEOPLE', 'MEDICINE', 'TALK', 'HEART', 'VEHICLE', 'NONE') DEFAULT NULL,
+    color VARCHAR(100) DEFAULT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
+    is_all_day BOOLEAN NOT NULL,
     time TIME DEFAULT NULL,
     days_of_week TINYINT  DEFAULT NULL,
     alarm ENUM('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY') DEFAULT NULL,
@@ -159,14 +160,14 @@ CREATE TABLE schedule (
 );
 
 
-CREATE TABLE schedule_record
-(
-    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
-    is_completed BOOLEAN  NOT NULL,
-    schedule_id  BIGINT   NOT NULL,
-    created_at   DATETIME NOT NULL,
-    updated_at   DATETIME NOT NULL,
-    deleted_at   DATETIME NULL,
+CREATE TABLE schedule_record (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    is_completed BOOLEAN NOT NULL,
+    record_date DATE NOT NULL,
+    schedule_id BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (schedule_id) REFERENCES schedule (id) ON DELETE CASCADE
 );
 
