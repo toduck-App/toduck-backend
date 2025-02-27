@@ -75,15 +75,15 @@ public class ScheduleUseCase {
 		if (isSingleDaySchedule(schedule)) {
 			scheduleService.deleteSingleDaySchedule(schedule, scheduleDeleteRequest);
 			log.info("반복 X 하루 일정 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
-		} else {
-			if (scheduleDeleteRequest.isOneDayDeleted()) {
-				scheduleService.deleteOneDayDeletionForRepeatingSchedule(schedule, scheduleDeleteRequest);
-				log.info("반복 일정 중 하루 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
-			} else {
-				scheduleService.deleteAfterDeletionForRepeatingSchedule(schedule, scheduleDeleteRequest);
-				log.info("반복 일정 중 기간 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
-			}
+			return;
 		}
+		if (scheduleDeleteRequest.isOneDayDeleted()) {
+			scheduleService.deleteOneDayDeletionForRepeatingSchedule(schedule, scheduleDeleteRequest);
+			log.info("반복 일정 중 하루 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
+			return;
+		}
+		scheduleService.deleteAfterDeletionForRepeatingSchedule(schedule, scheduleDeleteRequest);
+		log.info("반복 일정 중 기간 삭제 성공 : {}", scheduleDeleteRequest.scheduleId());
 	}
 
 	private boolean isSingleDaySchedule(Schedule schedule) {
