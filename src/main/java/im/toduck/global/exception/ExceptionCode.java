@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public enum ExceptionCode {
 
 	/* 401xx AUTH */
-	INVALID_PHONE_NUMBER_OR_PASSWORD(HttpStatus.UNAUTHORIZED, 40101, "전화번호 또는 비밀번호가 일치하지 않습니다.",
+	INVALID_LOGIN_ID_OR_PASSWORD(HttpStatus.UNAUTHORIZED, 40101, "아이디 또는 비밀번호가 일치하지 않습니다.",
 		"사용자가 제공한 전화번호나 비밀번호가 데이터베이스의 정보와 일치하지 않을 때 발생합니다."),
 	FORBIDDEN_ACCESS_TOKEN(HttpStatus.FORBIDDEN, 40102, "토큰에 접근 권한이 없습니다."),
 	EMPTY_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 40103, "토큰이 포함되어 있지 않습니다."),

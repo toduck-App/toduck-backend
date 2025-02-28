@@ -33,7 +33,7 @@ public interface AuthControllerApi {
 		success = @ApiSuccessResponseExplanation(responseClass = LoginResponse.class, description = "AccessToken은 응답"
 			+ "으로 제공되며, RefreshToken은 Cookie로 제공됩니다.\n"),
 		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_PHONE_NUMBER_OR_PASSWORD)
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_LOGIN_ID_OR_PASSWORD)
 		}
 	)
 	ResponseEntity<ApiResponse<LoginResponse>> signIn(LoginRequest request);
