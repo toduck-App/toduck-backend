@@ -14,7 +14,7 @@ public record LoginRequest(
 	@NotBlank(message = "아이디를 입력해주세요.")
 	String loginId,
 
-	@Schema(description = "사용자 비밀번호", example = "password123")
+	@Schema(description = "사용자 비밀번호", example = "Password2025@")
 	@Pattern(regexp = PASSWORD_REGEXP, message = "올바른 비밀번호를 입력해주세요.")
 	@NotBlank(message = "비밀번호를 입력해주세요.")
 	String password
