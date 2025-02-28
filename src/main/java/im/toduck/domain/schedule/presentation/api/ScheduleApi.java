@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -36,14 +36,14 @@ public interface ScheduleApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = ScheduleCreateResponse.class,
+			responseClass = ScheduleIdResponse.class,
 			description = "일정 생성 성공, 생성된 일정의 Id를 반환합니다."
 		),
 		errors = {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_USER),
 		}
 	)
-	ResponseEntity<ApiResponse<ScheduleCreateResponse>> createSchedule(
+	ResponseEntity<ApiResponse<ScheduleIdResponse>> createSchedule(
 		@RequestBody @Valid ScheduleCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);

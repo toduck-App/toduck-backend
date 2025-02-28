@@ -16,8 +16,9 @@ import im.toduck.domain.schedule.persistence.repository.ScheduleRecordRepository
 import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleModifyRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -31,10 +32,10 @@ public class ScheduleService {
 	private final ScheduleRecordRepository scheduleRecordRepository;
 
 	@Transactional
-	public ScheduleCreateResponse createSchedule(User user, ScheduleCreateRequest request) {
+	public ScheduleIdResponse createSchedule(User user, ScheduleCreateRequest request) {
 		Schedule schedule = ScheduleMapper.toSchedule(user, request);
 		Schedule save = scheduleRepository.save(schedule);
-		return ScheduleMapper.toScheduleCreateResponse(save);
+		return ScheduleMapper.toScheduleIdResponse(save);
 	}
 
 	@Transactional(readOnly = true)
@@ -80,7 +81,7 @@ public class ScheduleService {
 					request.queryDate());
 			}, () -> {
 				ScheduleRecord softDeletedScheduleRecord = ScheduleRecordMapper
-					.toSoftDeletedScheduleRecord(schedule, request);
+					.toSoftDeletedScheduleRecord(schedule, request.queryDate());
 				scheduleRecordRepository.save(softDeletedScheduleRecord);
 			});
 	}
@@ -107,4 +108,59 @@ public class ScheduleService {
 		schedule.changeEndDate(scheduleDeleteRequest.queryDate().minusDays(1));
 	}
 
+	public ScheduleIdResponse updateSingleDate(Schedule schedule, ScheduleModifyRequest request) {
+		if (isSingleDaySchedule(schedule)) {
+			schedule.updateInfo(request.scheduleData());
+			return ScheduleMapper.toScheduleIdResponse(schedule);
+		}
+		// 특정 날짜의 일정 기록이 있는지 확인하고 있으면 soft delete, 없으면 soft delete된 일정 기록 생성
+		scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				request.queryDate(),
+				schedule.getId())
+			.ifPresentOrElse(scheduleRecord -> {
+				scheduleRecordRepository.softDeleteByScheduleIdAndRecordDate(
+					schedule.getId(),
+					request.queryDate());
+			}, () -> {
+				ScheduleRecord softDeletedScheduleRecord = ScheduleRecordMapper
+					.toSoftDeletedScheduleRecord(schedule, request.queryDate());
+				scheduleRecordRepository.save(softDeletedScheduleRecord);
+			});
+		Schedule newSchedule = ScheduleMapper.toSchedule(schedule.getUser(), request.scheduleData());
+		return ScheduleMapper
+			.toScheduleIdResponse(scheduleRepository.save(newSchedule));
+	}
+
+	private boolean isSingleDaySchedule(Schedule schedule) {
+		return schedule.getScheduleDate().getStartDate().equals(schedule.getScheduleDate().getEndDate())
+			&& schedule.getDaysOfWeekBitmask() == null;
+	}
+
+	public ScheduleIdResponse updateAfterDate(Schedule schedule, ScheduleModifyRequest request) {
+		// 특정 날짜 이후 기록 중 완료 기록이 있다면 각각 하루짜리 반복 없는 일정 기록으로 변경
+		scheduleRecordRepository.findByCompletedScheduleAndAfterStartDate(
+				schedule.getId(),
+				request.queryDate())
+			.forEach(scheduleRecord -> {
+				Schedule save = scheduleRepository.save(
+					ScheduleMapper.copyToSchedule(schedule, request.queryDate()));
+				scheduleRecord.changeSchedule(save);
+			});
+		// 특정 날짜 이후 기록 중 미완료 기록이 있다면 삭제
+		scheduleRecordRepository.deleteByNonCompletedScheduleAndAfterStartDate(
+			schedule.getId(),
+			request.queryDate(),
+			schedule.getScheduleDate().getEndDate());
+		// 특정 날짜가 시작일이라면 해당 일정 삭제
+		if (schedule.getScheduleDate().getStartDate().equals(request.queryDate())) {
+			scheduleRepository.delete(schedule);
+		}
+		// 특정 날짜가 시작일이 아니라면 종료일을 특정 날짜 하루 전으로 변경
+		schedule.changeEndDate(request.queryDate().minusDays(1));
+
+		// 새로운 일정 생성
+		Schedule newSchedule = ScheduleMapper.toSchedule(schedule.getUser(), request.scheduleData());
+		return ScheduleMapper
+			.toScheduleIdResponse(scheduleRepository.save(newSchedule));
+	}
 }

@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,8 +20,9 @@ import im.toduck.domain.schedule.presentation.api.ScheduleApi;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleModifyRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -34,7 +36,7 @@ public class ScheduleController implements ScheduleApi {
 
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<ScheduleCreateResponse>> createSchedule(
+	public ResponseEntity<ApiResponse<ScheduleIdResponse>> createSchedule(
 		@RequestBody @Valid ScheduleCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
@@ -81,5 +83,15 @@ public class ScheduleController implements ScheduleApi {
 	) {
 		scheduleUseCase.deleteSchedule(user.getUserId(), scheduleDeleteRequest);
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@PutMapping
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<ScheduleIdResponse>> updateSchedule(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@RequestBody @Valid ScheduleModifyRequest request
+	) {
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(scheduleUseCase.updateSchedule(user.getUserId(), request)));
 	}
 }

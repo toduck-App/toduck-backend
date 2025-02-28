@@ -10,8 +10,9 @@ import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleModifyRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -30,7 +31,7 @@ public class ScheduleUseCase {
 	private final ScheduleRecordService scheduleRecordService;
 
 	@Transactional
-	public ScheduleCreateResponse createSchedule(Long userId,
+	public ScheduleIdResponse createSchedule(Long userId,
 		ScheduleCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
@@ -91,4 +92,27 @@ public class ScheduleUseCase {
 			&& schedule.getDaysOfWeekBitmask() == null;
 	}
 
+	@Transactional
+	public ScheduleIdResponse updateSchedule(Long userId, ScheduleModifyRequest request) {
+		userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Schedule schedule = scheduleService.getScheduleById(request.scheduleId())
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
+
+		if (isSingleDaySchedule(schedule) && !request.isOneDayDeleted()) {
+			log.info("반복 X 하루 일정은 하루 삭제만 가능 : {}", request.scheduleId());
+			throw CommonException.from(ExceptionCode.ONE_DAY__NONREPEATABLE_SCHEDULE_CANNOT_AFTER_DATE_UPDATE);
+		}
+		if (!request.scheduleData().startDate().equals(request.scheduleData().endDate())
+			&& !request.isOneDayDeleted()) {
+			log.info("기간 일정으로 수정은 하루 삭제만 가능 scheduleId : {}", request.scheduleId());
+			throw CommonException.from(ExceptionCode.PERIOD_SCHEDULE_CANNOT_AFTER_DATE_UPDATE);
+		}
+		if (request.isOneDayDeleted()) {
+			log.info("하루의 일정만 수정 : {}", request.scheduleId());
+			return scheduleService.updateSingleDate(schedule, request);
+		}
+		log.info("특정 날짜 이후 일괄 일정 수정 : {}", request.scheduleId());
+		return scheduleService.updateAfterDate(schedule, request);
+	}
 }
