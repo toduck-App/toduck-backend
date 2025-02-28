@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleModifyRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
@@ -139,6 +140,31 @@ public interface ScheduleApi {
 	ResponseEntity<ApiResponse<Map<String, Object>>> deleteSchedule(
 		@AuthenticationPrincipal CustomUserDetails user,
 		@RequestBody @Valid ScheduleDeleteRequest scheduleDeleteRequest
+	);
+
+	@Operation(
+		summary = "일정 수정 API",
+		description = """
+			일정을 수정합니다.
+			- 수정을 원하는 일정의 Id와 수정을 원하는 날짜, 하루or이후 일정 수정 여부 그리고 수정할 정보를 지정합니다.
+			- 수정된 일정의 Id를 반환합니다.
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = ScheduleIdResponse.class,
+			description = "일정 수정 성공, 수정된 일정의 Id를 반환합니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_USER),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SCHEDULE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.PERIOD_SCHEDULE_CANNOT_AFTER_DATE_UPDATE),
+		}
+	)
+	ResponseEntity<ApiResponse<ScheduleIdResponse>> updateSchedule(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@RequestBody @Valid ScheduleModifyRequest request
 	);
 
 }
