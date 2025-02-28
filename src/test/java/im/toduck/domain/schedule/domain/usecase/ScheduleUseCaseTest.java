@@ -28,8 +28,9 @@ import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleModifyRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -85,7 +86,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 		@Test
 		void 성공적으로_생성한다() {
 			// given ->when
-			ScheduleCreateResponse result = scheduleUsecase.createSchedule(savedUser.getId(),
+			ScheduleIdResponse result = scheduleUsecase.createSchedule(savedUser.getId(),
 				successScheduleCreateRequest);
 
 			// then
@@ -100,7 +101,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			ScheduleCreateRequest request = DAYS_OF_WEEK_NULL_REQUEST();
 
 			//when
-			ScheduleCreateResponse response = scheduleUsecase.createSchedule(savedUser.getId(), request);
+			ScheduleIdResponse response = scheduleUsecase.createSchedule(savedUser.getId(), request);
 
 			//then
 			assertSoftly(softly -> {
@@ -800,4 +801,368 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 	}
 
+	@Nested
+	@DisplayName("<일정 수정 요청시>")
+	class updateSchedule {
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+		}
+
+		@Nested
+		@DisplayName("하루 반복 x 일정 수정시")
+		class singleDateNonRepeatableModify {
+			@Test
+			void 성공_일정을_성공적으로_수정한다() {
+				//given
+				Schedule savedSchedule = testFixtureBuilder.buildSchedule(
+					DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+						LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+
+				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(null)
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+					.scheduleId(savedSchedule.getId())
+					.queryDate(LocalDate.of(2025, 1, 1))
+					.scheduleData(updateScheduleData)
+					.isOneDayDeleted(true)
+					.build();
+				// when
+				scheduleUsecase.updateSchedule(savedUser.getId(), request);
+
+				// then
+				Schedule schedule = scheduleRepository.findById(savedSchedule.getId()).get();
+				assertSoftly(softly -> {
+					softly.assertThat(schedule.getTitle()).isEqualTo(updateScheduleData.title());
+					softly.assertThat(schedule.getCategory()).isEqualTo(updateScheduleData.category());
+					softly.assertThat(schedule.getScheduleDate().getStartDate())
+						.isEqualTo(updateScheduleData.startDate());
+					softly.assertThat(schedule.getScheduleDate().getEndDate()).isEqualTo(updateScheduleData.endDate());
+					softly.assertThat(schedule.getScheduleTime().getIsAllDay())
+						.isEqualTo(updateScheduleData.isAllDay());
+					softly.assertThat(schedule.getColor().getValue()).isEqualTo(updateScheduleData.color());
+					softly.assertThat(schedule.getScheduleTime().getTime()).isEqualTo(updateScheduleData.time());
+					softly.assertThat(schedule.getScheduleTime().getAlarm()).isEqualTo(updateScheduleData.alarm());
+					softly.assertThat(schedule.getLocation()).isEqualTo(updateScheduleData.location());
+					softly.assertThat(schedule.getMemo()).isEqualTo(updateScheduleData.memo());
+					softly.assertThat(schedule.getDaysOfWeekBitmask()).isNull();
+				});
+			}
+
+			@Test
+			void 실패_하루_반복X_일정은_이후_일정_일괄_수정_실패한다() {
+				//given
+				Schedule savedSchedule = testFixtureBuilder.buildSchedule(
+					DEFAULT_NON_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+						LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+
+				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(null)
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+					.scheduleId(savedSchedule.getId())
+					.queryDate(LocalDate.of(2025, 1, 1))
+					.scheduleData(updateScheduleData)
+					.isOneDayDeleted(false)
+					.build();
+
+				// when -> then
+				assertSoftly(softly -> {
+					softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(savedUser.getId(), request))
+						.isInstanceOf(CommonException.class)
+						.hasFieldOrPropertyWithValue("errorCode",
+							ExceptionCode.ONE_DAY__NONREPEATABLE_SCHEDULE_CANNOT_AFTER_DATE_UPDATE.getErrorCode());
+				});
+			}
+		}
+
+		@Nested
+		@DisplayName("반복 일정 하루 수정시")
+		class repeatableScheduleModify {
+			@Test
+			void 성공_일정을_성공적으로_수정한다() {
+				//given
+				Schedule savedSchedule = testFixtureBuilder.buildSchedule(
+					DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+						LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+
+				ScheduleRecord scheduleRecord1 = testFixtureBuilder.buildScheduleRecord(
+					IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 10), savedSchedule));
+				ScheduleRecord scheduleRecord2 = testFixtureBuilder.buildScheduleRecord(
+					IS_NOT_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 20), savedSchedule));
+
+				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(null)
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+					.scheduleId(savedSchedule.getId())
+					.queryDate(LocalDate.of(2025, 1, 5))
+					.scheduleData(updateScheduleData)
+					.isOneDayDeleted(true)
+					.build();
+				// when
+				ScheduleIdResponse scheduleIdResponse = scheduleUsecase.updateSchedule(savedUser.getId(), request);
+
+				// then
+				Schedule preSchedule = scheduleRepository.findById(savedSchedule.getId()).get();
+				Schedule updatedSchedule = scheduleRepository.findById(scheduleIdResponse.scheduleId()).get();
+				Optional<ScheduleRecord> completedScheduleRecord = scheduleRecordRepository.findById(
+					scheduleRecord1.getId());
+				Optional<ScheduleRecord> notCompletedScheduleRecord = scheduleRecordRepository
+					.findById(scheduleRecord2.getId());
+				Optional<ScheduleRecord> softDeletedScheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+					LocalDate.of(2025, 1, 5),
+					savedSchedule.getId());
+
+				assertSoftly(softly -> {
+					// 수정된 일정이 잘 만들어 지는가
+					softly.assertThat(updatedSchedule.getTitle()).isEqualTo(updateScheduleData.title());
+					softly.assertThat(updatedSchedule.getCategory()).isEqualTo(updateScheduleData.category());
+					softly.assertThat(updatedSchedule.getScheduleDate().getStartDate())
+						.isEqualTo(updateScheduleData.startDate());
+					softly.assertThat(updatedSchedule.getScheduleDate().getEndDate())
+						.isEqualTo(updateScheduleData.endDate());
+					softly.assertThat(updatedSchedule.getScheduleTime().getIsAllDay())
+						.isEqualTo(updateScheduleData.isAllDay());
+					softly.assertThat(updatedSchedule.getColor().getValue()).isEqualTo(updateScheduleData.color());
+					softly.assertThat(updatedSchedule.getScheduleTime().getTime()).isEqualTo(updateScheduleData.time());
+					softly.assertThat(updatedSchedule.getScheduleTime().getAlarm())
+						.isEqualTo(updateScheduleData.alarm());
+					softly.assertThat(updatedSchedule.getLocation()).isEqualTo(updateScheduleData.location());
+					softly.assertThat(updatedSchedule.getMemo()).isEqualTo(updateScheduleData.memo());
+					softly.assertThat(updatedSchedule.getDaysOfWeekBitmask()).isNull();
+
+					// 기존 일정 기록은 삭제되면 안된다.
+					softly.assertThat(completedScheduleRecord).isPresent();
+					softly.assertThat(notCompletedScheduleRecord).isPresent();
+
+					// 기존 일정 기록의 쿼리 날짜는 soft delete 처리 되어야 한다.
+					softly.assertThat(softDeletedScheduleRecord).isPresent();
+					softly.assertThat(softDeletedScheduleRecord.get().getDeletedAt()).isNotNull();
+
+				});
+
+			}
+		}
+
+		@Nested
+		@DisplayName("반복 일정 특정 날짜 이후 일괄 수정시")
+		class repeatableScheduleAfterModify {
+			@Test
+			void 성공_일정을_성공적으로_수정한다() {
+				// given
+				Schedule savedSchedule = testFixtureBuilder.buildSchedule(
+					DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+						LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+				ScheduleRecord scheduleRecord1 = testFixtureBuilder.buildScheduleRecord(
+					IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 10), savedSchedule));
+				ScheduleRecord scheduleRecord2 = testFixtureBuilder.buildScheduleRecord(
+					IS_NOT_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 20), savedSchedule));
+
+				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(null)
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+					.scheduleId(savedSchedule.getId())
+					.queryDate(LocalDate.of(2025, 1, 5))
+					.scheduleData(updateScheduleData)
+					.isOneDayDeleted(false)
+					.build();
+				// when
+				ScheduleIdResponse scheduleIdResponse = scheduleUsecase.updateSchedule(savedUser.getId(), request);
+				// then
+				Schedule preSchedule = scheduleRepository.findById(savedSchedule.getId()).get();
+				Schedule updatedSchedule = scheduleRepository.findById(scheduleIdResponse.scheduleId()).get();
+				Optional<ScheduleRecord> completedScheduleRecord = scheduleRecordRepository.findById(
+					scheduleRecord1.getId());
+				Optional<ScheduleRecord> notCompletedScheduleRecord = scheduleRecordRepository
+					.findById(scheduleRecord2.getId());
+				Optional<ScheduleRecord> softDeletedScheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+					LocalDate.of(2025, 1, 5),
+					savedSchedule.getId());
+				assertSoftly(softly -> {
+					// 수정된 일정이 잘 만들어 지는가
+					softly.assertThat(updatedSchedule.getTitle()).isEqualTo(updateScheduleData.title());
+					softly.assertThat(updatedSchedule.getCategory()).isEqualTo(updateScheduleData.category());
+					softly.assertThat(updatedSchedule.getScheduleDate().getStartDate())
+						.isEqualTo(updateScheduleData.startDate());
+					softly.assertThat(updatedSchedule.getScheduleDate().getEndDate())
+						.isEqualTo(updateScheduleData.endDate());
+					softly.assertThat(updatedSchedule.getScheduleTime().getIsAllDay())
+						.isEqualTo(updateScheduleData.isAllDay());
+					softly.assertThat(updatedSchedule.getColor().getValue()).isEqualTo(updateScheduleData.color());
+					softly.assertThat(updatedSchedule.getScheduleTime().getTime()).isEqualTo(updateScheduleData.time());
+					softly.assertThat(updatedSchedule.getScheduleTime().getAlarm())
+						.isEqualTo(updateScheduleData.alarm());
+					softly.assertThat(updatedSchedule.getLocation()).isEqualTo(updateScheduleData.location());
+					softly.assertThat(updatedSchedule.getMemo()).isEqualTo(updateScheduleData.memo());
+					softly.assertThat(updatedSchedule.getDaysOfWeekBitmask()).isNull();
+
+					// 기존 일정 기록은 완료 되었다면 삭제되면 안된다. 미완료 기록만 삭제된다
+					softly.assertThat(completedScheduleRecord).isPresent();
+					softly.assertThat(notCompletedScheduleRecord).isEmpty();
+
+					// 기존 일정의 마감 일자가 쿼리 일자 하루 전으로 변경된다.
+					softly.assertThat(preSchedule.getScheduleDate().getEndDate())
+						.isEqualTo(request.queryDate().minusDays(1));
+
+				});
+
+			}
+
+			@Test
+			void 실패_특정_날짜_일괄_수정시_기간_날짜_변경은_실패한다() {
+				// given
+				Schedule savedSchedule = testFixtureBuilder.buildSchedule(
+					DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+						LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 10))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(null)
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+					.scheduleId(savedSchedule.getId())
+					.queryDate(LocalDate.of(2025, 1, 5))
+					.scheduleData(updateScheduleData)
+					.isOneDayDeleted(false)
+					.build();
+
+				// when -> then
+				assertSoftly(softly -> {
+					softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(savedUser.getId(), request))
+						.isInstanceOf(CommonException.class)
+						.hasFieldOrPropertyWithValue("errorCode",
+							ExceptionCode.PERIOD_SCHEDULE_CANNOT_AFTER_DATE_UPDATE.getErrorCode());
+				});
+			}
+
+		}
+
+		@Test
+		void 실패_유효하지_않은_유저ID_요청시_실패한다() {
+			// given
+			ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+				.title("일정 제목")
+				.category(PlanCategory.COMPUTER)
+				.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+				.endDate(LocalDate.of(2025, 1, 1))
+				.isAllDay(false)
+				.color("#FFFFFF")
+				.time(LocalTime.of(10, 30))
+				.daysOfWeek(null)
+				.alarm(ScheduleAlram.TEN_MINUTE)
+				.location("일정 장소")
+				.memo("일정 메모")
+				.build();
+
+			ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+				.scheduleId(9999L)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.scheduleData(updateScheduleData)
+				.isOneDayDeleted(true)
+				.build();
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(9999L, request))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_USER.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_USER.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_USER.getMessage());
+			});
+
+		}
+
+		@Test
+		void 실패_유효하지_않은_일정ID_요청시_실패한다() {
+			// given
+			ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+				.title("일정 제목")
+				.category(PlanCategory.COMPUTER)
+				.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+				.endDate(LocalDate.of(2025, 1, 1))
+				.isAllDay(false)
+				.color("#FFFFFF")
+				.time(LocalTime.of(10, 30))
+				.daysOfWeek(null)
+				.alarm(ScheduleAlram.TEN_MINUTE)
+				.location("일정 장소")
+				.memo("일정 메모")
+				.build();
+
+			ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+				.scheduleId(9999L)
+				.queryDate(LocalDate.of(2025, 1, 1))
+				.scheduleData(updateScheduleData)
+				.isOneDayDeleted(true)
+				.build();
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(savedUser.getId(), request))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.NOT_FOUND_SCHEDULE.getMessage());
+			});
+		}
+
+	}
 }
