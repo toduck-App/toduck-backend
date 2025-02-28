@@ -72,7 +72,7 @@ public class ScheduleService {
 	}
 
 	public void deleteOneDayDeletionForRepeatingSchedule(Schedule schedule, ScheduleDeleteRequest request) {
-		scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+		scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				request.queryDate(),
 				schedule.getId())
 			.ifPresentOrElse(scheduleRecord -> {
@@ -114,7 +114,7 @@ public class ScheduleService {
 			return ScheduleMapper.toScheduleIdResponse(schedule);
 		}
 		// 특정 날짜의 일정 기록이 있는지 확인하고 있으면 soft delete, 없으면 soft delete된 일정 기록 생성
-		scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+		scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				request.queryDate(),
 				schedule.getId())
 			.ifPresentOrElse(scheduleRecord -> {

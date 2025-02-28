@@ -21,7 +21,7 @@ public class ScheduleRecordService {
 	public Optional<ScheduleRecord> getScheduleRecordWithSchedule(Long userId,
 		ScheduleCompleteRequest scheduleCompleteRequest) {
 		return scheduleRecordRepository
-			.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+			.findScheduleRecordByRecordDateAndScheduleId(
 				scheduleCompleteRequest.queryDate(),
 				scheduleCompleteRequest.scheduleId());
 	}

@@ -382,7 +382,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			// when
 			scheduleUsecase.completeSchedule(savedUser.getId(), request);
 			// then
-			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				MOCK_DATE,
 				savedSchedule.getId());
 			assertSoftly(softly -> {
@@ -406,7 +406,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			scheduleUsecase.completeSchedule(savedUser.getId(), request);
 
 			// then
-			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				MOCK_DATE,
 				savedSchedule.getId());
 
@@ -558,7 +558,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
 
 			// then
-			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				LocalDate.of(2025, 1, 10),
 				savedSchedule.getId());
 			assertSoftly(softly -> {
@@ -946,7 +946,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 					scheduleRecord1.getId());
 				Optional<ScheduleRecord> notCompletedScheduleRecord = scheduleRecordRepository
 					.findById(scheduleRecord2.getId());
-				Optional<ScheduleRecord> softDeletedScheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				Optional<ScheduleRecord> softDeletedScheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 					LocalDate.of(2025, 1, 5),
 					savedSchedule.getId());
 
@@ -1024,7 +1024,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 					scheduleRecord1.getId());
 				Optional<ScheduleRecord> notCompletedScheduleRecord = scheduleRecordRepository
 					.findById(scheduleRecord2.getId());
-				Optional<ScheduleRecord> softDeletedScheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				Optional<ScheduleRecord> softDeletedScheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 					LocalDate.of(2025, 1, 5),
 					savedSchedule.getId());
 				assertSoftly(softly -> {
