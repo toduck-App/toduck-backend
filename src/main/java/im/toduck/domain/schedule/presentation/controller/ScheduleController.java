@@ -1,10 +1,12 @@
 package im.toduck.domain.schedule.presentation.controller;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.schedule.domain.usecase.ScheduleUseCase;
 import im.toduck.domain.schedule.presentation.api.ScheduleApi;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -57,5 +61,25 @@ public class ScheduleController implements ScheduleApi {
 	) {
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(scheduleUseCase.getSchedule(user.getUserId(), scheduleRecordId)));
+	}
+
+	@PostMapping("/is-complete")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> completeSchedule(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@RequestBody ScheduleCompleteRequest scheduleCompleteRequest
+	) {
+		scheduleUseCase.completeSchedule(user.getUserId(), scheduleCompleteRequest);
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
+	}
+
+	@DeleteMapping
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteSchedule(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@RequestBody @Valid ScheduleDeleteRequest scheduleDeleteRequest
+	) {
+		scheduleUseCase.deleteSchedule(user.getUserId(), scheduleDeleteRequest);
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
 }

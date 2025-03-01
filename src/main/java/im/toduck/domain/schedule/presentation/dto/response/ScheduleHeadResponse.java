@@ -2,12 +2,14 @@ package im.toduck.domain.schedule.presentation.dto.response;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
@@ -73,6 +75,7 @@ public record ScheduleHeadResponse(
 		@Schema(description = "장소", example = "일정 장소")
 		String location
 	) {
+		@Schema(description = "일정 기록 DTO")
 		public record ScheduleRecordDto(
 			@Schema(description = "일정 고유 id", example = "1")
 			Long scheduleRecordId,
@@ -81,11 +84,16 @@ public record ScheduleHeadResponse(
 			@Schema(description = "일정 기록 날짜", example = "2024-08-31")
 			@JsonSerialize(using = LocalDateSerializer.class)
 			@JsonFormat(pattern = "yyyy-MM-dd")
-			LocalDate recordDate
+			LocalDate recordDate,
+			@Schema(description = "일정 기록 삭제 날짜", example = "2024-08-31T14:30:00")
+			@JsonSerialize(using = LocalDateTimeSerializer.class)
+			@JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
+			LocalDateTime deletedAt
+
 		) {
 			public static ScheduleRecordDto from(ScheduleRecord scheduleRecord) {
 				return new ScheduleRecordDto(scheduleRecord.getId(), scheduleRecord.getIsCompleted(),
-					scheduleRecord.getRecordDate());
+					scheduleRecord.getRecordDate(), scheduleRecord.getDeletedAt());
 			}
 		}
 	}

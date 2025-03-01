@@ -20,24 +20,30 @@ import im.toduck.RepositoryTest;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 import im.toduck.domain.user.persistence.entity.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Transactional
 class ScheduleRecordRepositoryTest extends RepositoryTest {
 
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	@Autowired
 	private ScheduleRecordRepository scheduleRecordRepository;
+
+	private final LocalDate QUERY_START_DATE = LocalDate.of(2025, 1, 10);
+	private final LocalDate QUERY_END_DATE = LocalDate.of(2025, 1, 25);
+
+	private final LocalDate LESS_THAN_QUERY_DATE = LocalDate.of(2025, 1, 1);
+	private final LocalDate GREATER_THAN_QUERY_DATE = LocalDate.of(2025, 1, 30);
+
+	private final LocalDate BETWEEN_QUERY_DATE_15 = LocalDate.of(2025, 1, 15);
+	private final LocalDate BETWEEN_QUERY_DATE_20 = LocalDate.of(2025, 1, 20);
 
 	@Nested
 	@DisplayName("특정 기간에 포함된 일정 기록 조회시")
 	class findByScheduleAndBetweenStartDateAndEndDateTest {
-		private final LocalDate QUERY_START_DATE = LocalDate.of(2025, 1, 10);
-		private final LocalDate QUERY_END_DATE = LocalDate.of(2025, 1, 25);
-
-		private final LocalDate LESS_THAN_QUERY_DATE = LocalDate.of(2025, 1, 1);
-		private final LocalDate GREATER_THAN_QUERY_DATE = LocalDate.of(2025, 1, 30);
-
-		private final LocalDate BETWEEN_QUERY_DATE_15 = LocalDate.of(2025, 1, 15);
-		private final LocalDate BETWEEN_QUERY_DATE_20 = LocalDate.of(2025, 1, 20);
 
 		private User savedUser;
 		private Schedule savedSchedule;
@@ -126,4 +132,257 @@ class ScheduleRecordRepositoryTest extends RepositoryTest {
 		}
 	}
 
+	@Nested
+	@DisplayName("특정 사용자, 날짜, 일정에 해당하는 일정 기록 조회시")
+	class findScheduleRecordByUserIdAndRecordDateAndScheduleIdTest {
+
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+		}
+
+		@Test
+		void 성공_일정기록을_성공적으로_조회한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				LESS_THAN_QUERY_DATE, GREATER_THAN_QUERY_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			// when
+			ScheduleRecord scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				QUERY_END_DATE,
+				savedSchedule.getId()).get();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord).isNotNull();
+				softly.assertThat(scheduleRecord).isEqualTo(savedScheduleRecord);
+			});
+		}
+
+		@Test
+		void 성공_일정기록이_없다면_null을_반환한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				LESS_THAN_QUERY_DATE, GREATER_THAN_QUERY_DATE));
+			// when
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+				QUERY_END_DATE,
+				savedSchedule.getId());
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecord.orElse(null)).isNull();
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("특정 일정, 날짜에 해당하는 일정 기록 삭제시")
+	class deleteByScheduleIdAndRecordDateTest {
+
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+		}
+
+		@Test
+		void 성공_일정_날짜에_해당하는_일정_기록을_삭제한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_END_DATE, QUERY_END_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			// when
+			scheduleRecordRepository.deleteByScheduleIdAndRecordDate(savedSchedule.getId(), QUERY_END_DATE);
+			entityManager.flush();
+			entityManager.clear();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).orElse(null)).isNull();
+			});
+		}
+
+		@Test
+		void 실패_일정_날짜에_해당하지_않는_일정_기록은_삭제되지_않는다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_END_DATE, QUERY_END_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			// when
+			scheduleRecordRepository.deleteByScheduleIdAndRecordDate(savedSchedule.getId(), GREATER_THAN_QUERY_DATE);
+			entityManager.flush();
+			entityManager.clear();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).orElse(null))
+					.isNotNull();
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("특정 일정, 날짜에 해당하는 일정 기록 소프트 삭제시")
+	class softDeleteByScheduleIdAndRecordDateTest {
+
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+		}
+
+		@Test
+		void 성공_일정_날짜에_해당하는_일정_기록을_소프트_삭제한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_END_DATE, QUERY_END_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			// when
+			scheduleRecordRepository.softDeleteByScheduleIdAndRecordDate(savedSchedule.getId(), QUERY_END_DATE);
+			entityManager.flush();
+			entityManager.clear();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).orElse(null))
+					.isNotNull();
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).get().getDeletedAt())
+					.isNotNull();
+			});
+		}
+
+		@Test
+		void 실패_일정_날짜에_해당하지_않는_일정_기록은_소프트_삭제되지_않는다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_END_DATE, QUERY_END_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			// when
+			scheduleRecordRepository.softDeleteByScheduleIdAndRecordDate(savedSchedule.getId(),
+				GREATER_THAN_QUERY_DATE);
+			entityManager.flush();
+			entityManager.clear();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).orElse(null))
+					.isNotNull();
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).get().getDeletedAt())
+					.isNull();
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("특정 일정, 날짜에 해당하는 완료된 일정 기록 조회시")
+	class findByCompletedScheduleAndBetweenStartDateAndEndDateTest {
+
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+		}
+
+		@Test
+		void 성공_완료된_일정_기록을_성공적으로_조회한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_START_DATE, QUERY_END_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			testFixtureBuilder.buildScheduleRecord(
+				IS_NOT_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			// when
+			List<ScheduleRecord> scheduleRecords = scheduleRecordRepository.findByCompletedScheduleAndAfterStartDate(
+				savedSchedule.getId(),
+				QUERY_START_DATE);
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecords).hasSize(1);
+				softly.assertThat(scheduleRecords.get(0).getId()).isEqualTo(savedScheduleRecord.getId());
+			});
+		}
+
+		@Test
+		void 실패_완료된_일정_기록이_없다면_빈_리스트를_반환한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_START_DATE, QUERY_END_DATE));
+			testFixtureBuilder.buildScheduleRecord(
+				IS_NOT_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(LESS_THAN_QUERY_DATE, savedSchedule));
+			// when
+			List<ScheduleRecord> scheduleRecords = scheduleRecordRepository.findByCompletedScheduleAndAfterStartDate(
+				savedSchedule.getId(),
+				QUERY_START_DATE);
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecords).isEmpty();
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("특정 일정, 날짜에 해당하는 미완료된 일정 기록 삭제시")
+	class deleteByNonCompletedScheduleAndBetweenStartDateAndEndDateTest {
+
+		private User savedUser;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+		}
+
+		@Test
+		void 성공_미완료된_일정_기록을_성공적으로_삭제한다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_START_DATE, QUERY_END_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_NOT_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+			// when
+			scheduleRecordRepository.deleteByNonCompletedScheduleAndAfterStartDate(savedSchedule.getId(),
+				QUERY_START_DATE, QUERY_END_DATE);
+			entityManager.flush();
+			entityManager.clear();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).orElse(null)).isNull();
+			});
+		}
+
+		@Test
+		void 실패_미완료된_일정_기록이_없다면_삭제되지_않는다() {
+			// given
+			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
+				QUERY_START_DATE, QUERY_END_DATE));
+			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
+				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
+
+			// when
+			scheduleRecordRepository.deleteByNonCompletedScheduleAndAfterStartDate(savedSchedule.getId(),
+				QUERY_START_DATE, QUERY_END_DATE);
+			entityManager.flush();
+			entityManager.clear();
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(scheduleRecordRepository.findById(savedScheduleRecord.getId()).orElse(null))
+					.isNotNull();
+			});
+		}
+	}
 }

@@ -1,13 +1,16 @@
 package im.toduck.domain.schedule.presentation.api;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
@@ -91,4 +94,51 @@ public interface ScheduleApi {
 		@AuthenticationPrincipal CustomUserDetails user,
 		@RequestParam Long scheduleRecordId
 	);
+
+	@Operation(
+		summary = "일정 완료 API",
+		description = """
+			일정 완료 상태를 변경합니다.
+			- 완료 처리를 원하는 일정의 Id와 날짜를 지정합니다.
+			- 일정 기록이 없다면 일정 기록이 생성됩니다.
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "일정 완료 상태 변경 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_USER),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SCHEDULE),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> completeSchedule(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@RequestBody ScheduleCompleteRequest scheduleCompleteRequest
+	);
+
+	@Operation(
+		summary = "일정 삭제 API",
+		description = """
+			일정 및 일정 기록을 삭제합니다.
+			- 삭제를 원하는 일정의 Id와 삭제 기간을 지정합니다.
+			- 하루 일정을 원할 경우 isOneDayDeleted true 입니다.
+			- 특정 날짜 이후 삭제를 원할 경우 isOneDayDeleted false입니다 .
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "일정 삭제 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_USER),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SCHEDULE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteSchedule(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@RequestBody @Valid ScheduleDeleteRequest scheduleDeleteRequest
+	);
+
 }

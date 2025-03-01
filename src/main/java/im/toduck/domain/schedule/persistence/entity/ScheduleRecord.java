@@ -1,9 +1,7 @@
 package im.toduck.domain.schedule.persistence.entity;
 
 import java.time.LocalDate;
-
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import java.time.LocalDateTime;
 
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -23,8 +21,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "schedule_record")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE schedule_record SET deleted_at = NOW() where id=?")
-@SQLRestriction(value = "deleted_at is NULL")
 public class ScheduleRecord extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,5 +41,17 @@ public class ScheduleRecord extends BaseEntity {
 		this.isCompleted = isCompleted;
 		this.recordDate = recordDate;
 		this.schedule = schedule;
+	}
+
+	public void changeComplete(Boolean complete) {
+		this.isCompleted = complete;
+	}
+
+	public void changeSchedule(Schedule schedule) {
+		this.schedule = schedule;
+	}
+
+	public void softDelete() {
+		super.deletedAt = LocalDateTime.now();
 	}
 }

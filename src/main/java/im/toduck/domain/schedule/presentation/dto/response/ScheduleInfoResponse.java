@@ -2,12 +2,14 @@ package im.toduck.domain.schedule.presentation.dto.response;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
@@ -15,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
+@Schema(description = "일정 기록에 대한 모든 정보를 담은 응답 DTO")
 public record ScheduleInfoResponse(
 	@Schema(description = "일정 Id", example = "1")
 	Long scheduleId,
@@ -64,7 +67,11 @@ public record ScheduleInfoResponse(
 	@Schema(description = "일정 기록 날짜", example = "2024-08-31")
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	LocalDate recordDate
+	LocalDate recordDate,
 
+	@Schema(description = "일정 기록 삭제 날짜", example = "2024-08-31T14:30:00")
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
+	LocalDateTime deletedAt
 ) {
 }
