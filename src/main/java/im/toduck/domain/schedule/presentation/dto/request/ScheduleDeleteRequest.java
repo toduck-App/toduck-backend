@@ -11,7 +11,7 @@ public record ScheduleDeleteRequest(
 	@Schema(description = "일정 Id", example = "1")
 	@NotNull
 	Long scheduleId,
-	@Schema(description = "일정 하루 삭제 OR 이후 삭제 여부[true ", example = "true")
+	@Schema(description = "일정 하루 삭제 OR 이후 삭제 여부 ", example = "true")
 	@NotNull
 	Boolean isOneDayDeleted,
 	@Schema(description = "일정 삭제 날짜", example = "2024-08-31")
