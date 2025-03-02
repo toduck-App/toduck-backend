@@ -1,17 +1,21 @@
 package im.toduck.domain.auth.presentation.dto.request;
 
+import static im.toduck.global.regex.UserRegex.*;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Schema(description = "로그인 요청 DTO")
 public record LoginRequest(
-	// TODO: 추후 정책에 따른 전화번호 양식 검증 필요, 전화번호 예시 업데이트 필요
-	@Schema(description = "로그인 할 사용자 전화번호", example = "01012345678")
-	@NotBlank(message = "전화번호를 입력해주세요.")
-	String phoneNumber,
 
-	// TODO: 추후 정책에 따른 비밀번호 양식 검증 필요
-	@Schema(description = "사용자 비밀번호", example = "password123")
+	@Schema(description = "사용자 아이디", example = "toduck")
+	@Pattern(regexp = LOGIN_ID_REGEXP, message = "올바른 ID를 입력해주세요.")
+	@NotBlank(message = "아이디를 입력해주세요.")
+	String loginId,
+
+	@Schema(description = "사용자 비밀번호", example = "Password2025@")
+	@Pattern(regexp = PASSWORD_REGEXP, message = "올바른 비밀번호를 입력해주세요.")
 	@NotBlank(message = "비밀번호를 입력해주세요.")
 	String password
 ) {
