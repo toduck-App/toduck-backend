@@ -35,7 +35,7 @@ public class Record extends BaseEntity {
 	private User user;
 
 	@Column(nullable = false)
-	private LocalDate date; // 년월일만 저장
+	private LocalDate date; // 연월일만 저장
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
