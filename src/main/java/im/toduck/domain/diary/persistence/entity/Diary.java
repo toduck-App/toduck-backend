@@ -1,4 +1,4 @@
-package im.toduck.domain.record.persistence.entity;
+package im.toduck.domain.diary.persistence.entity;
 
 import java.time.LocalDate;
 
@@ -21,12 +21,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "record")
+@Table(name = "diary")
 @Getter
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE record SET deleted_at = NOW() where id=?")
 @SQLRestriction(value = "deleted_at is NULL")
-public class Record extends BaseEntity {
+public class Diary extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -48,5 +48,5 @@ public class Record extends BaseEntity {
 	private String img;
 
 	@Column(length = 2048)
-	private String diary;
+	private String memo;
 }
