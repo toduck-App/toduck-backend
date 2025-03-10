@@ -6,8 +6,8 @@ spring:
     password: abcd1234@
   data.redis:
     host: localhost
-    port:
-      6380    password: abcd1234@
+    port: 6380
+    password: abcd1234@
   jpa:
     hibernate:
       ddl-auto: validate
