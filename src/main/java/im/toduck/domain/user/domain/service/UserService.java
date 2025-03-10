@@ -29,8 +29,8 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<User> getUserByPhoneNumber(String phoneNumber) {
-		return userRepository.findByPhoneNumber(phoneNumber);
+	public Optional<User> getUserByLoginId(final String loginId) {
+		return userRepository.findByLoginId(loginId);
 	}
 
 	@Transactional(readOnly = true)

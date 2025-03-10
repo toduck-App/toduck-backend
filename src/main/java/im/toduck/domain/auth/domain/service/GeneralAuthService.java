@@ -22,17 +22,17 @@ public class GeneralAuthService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional(readOnly = true)
-	public User getUserIfValid(String phoneNumber, String password) {
-		Optional<User> user = userService.getUserByPhoneNumber(phoneNumber);
+	public User getUserIfValid(final String loginId, final String password) {
+		Optional<User> user = userService.getUserByLoginId(loginId);
 
 		if (user.isEmpty()) {
-			log.warn("존재하지 않는 유저 로그인 시도 - 유저 id: {}", phoneNumber);
-			throw CommonException.from(INVALID_PHONE_NUMBER_OR_PASSWORD);
+			log.warn("존재하지 않는 유저 로그인 시도 - 로그인 ID: {}", loginId);
+			throw CommonException.from(INVALID_LOGIN_ID_OR_PASSWORD);
 		}
 
 		if (!isValidPassword(password, user.get())) {
-			log.warn("잘못된 password 로그인 시도 - 유저 id: {}", user.get().getId());
-			throw CommonException.from(INVALID_PHONE_NUMBER_OR_PASSWORD);
+			log.warn("잘못된 비밀번호 로그인 시도 - 로그인 ID: {}", loginId);
+			throw CommonException.from(INVALID_LOGIN_ID_OR_PASSWORD);
 		}
 
 		return user.get();
