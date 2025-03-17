@@ -58,6 +58,7 @@ public enum ExceptionCode {
 		"차단 해제 시 차단 정보를 찾을 수 없을 때 발생하는 오류입니다."),
 	ALREADY_BLOCKED(HttpStatus.CONFLICT, 40205, "이미 차단된 사용자입니다.",
 		"해당 사용자를 이미 차단한 경우 발생하는 오류입니다."),
+	EXISTS_USER_NICKNAME(HttpStatus.CONFLICT, 40206, "이미 사용 중인 닉네임입니다."),
 
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
