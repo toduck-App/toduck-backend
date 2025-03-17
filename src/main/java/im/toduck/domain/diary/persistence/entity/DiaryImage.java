@@ -12,11 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "diary_images")
+@Table(name = "diary_image_file")
 @Getter
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE record SET deleted_at = NOW() where id=?")
@@ -30,11 +31,12 @@ public class DiaryImage extends BaseEntity {
 	@JoinColumn(name = "diary_id", nullable = false)
 	private Diary diary;
 
-	@Column(name = "image_url", length = 256, nullable = false)
-	private String imgUrl;
+	@Column(name = "url", length = 512, nullable = false)
+	private String url;
 
-	public DiaryImage(Diary diary, String imgUrl) {
+	@Builder
+	public DiaryImage(Diary diary, String url) {
 		this.diary = diary;
-		this.imgUrl = imgUrl;
+		this.url = url;
 	}
 }

@@ -95,6 +95,9 @@ public enum ExceptionCode {
 	PRIVATE_ROUTINE(HttpStatus.FORBIDDEN, 43203, "비공개된 루틴입니다.",
 		"요청하신 루틴은 비공개 상태입니다. 접근 권한이 없는 경우 접근할 수 없습니다."),
 
+	/* 450xx diary */
+	NOT_FOUND_EMOTION(HttpStatus.NOT_FOUND, 45001, "유효하지 않은 감정입니다."),
+
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
 	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다."),
