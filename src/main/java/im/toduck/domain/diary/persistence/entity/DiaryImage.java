@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,7 +34,8 @@ public class DiaryImage extends BaseEntity {
 	@Column(name = "url", length = 512, nullable = false)
 	private String url;
 
-	public DiaryImage(Diary diary, String url) {
+	@Builder
+	private DiaryImage(Diary diary, String url) {
 		this.diary = diary;
 		this.url = url;
 	}
