@@ -81,6 +81,9 @@ public enum ExceptionCode {
 	NOT_FOUND_PARENT_COMMENT(HttpStatus.NOT_FOUND, 40418, "부모 댓글을 찾을 수 없습니다."),
 	INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, 40419, "답글은 부모 댓글이 될 수 없습니다."),
 
+	/* 405xx diary */
+	NOT_FOUND_EMOTION(HttpStatus.NOT_FOUND, 45001, "유효하지 않은 감정입니다."),
+
 	/* 411xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 41101, "일정 기록을 찾을 수 없습니다.",
 		"일정 기록을 찾을 수 없을 때 발생하는 오류입니다."),
@@ -94,9 +97,6 @@ public enum ExceptionCode {
 		"요청된 날짜에 대한 루틴 변경이 불가능합니다. 루틴의 반복 요일과 현재 날짜를 확인하고 올바른 날짜로 다시 요청해 주세요."),
 	PRIVATE_ROUTINE(HttpStatus.FORBIDDEN, 43203, "비공개된 루틴입니다.",
 		"요청하신 루틴은 비공개 상태입니다. 접근 권한이 없는 경우 접근할 수 없습니다."),
-
-	/* 450xx diary */
-	NOT_FOUND_EMOTION(HttpStatus.NOT_FOUND, 45001, "유효하지 않은 감정입니다."),
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
