@@ -28,13 +28,7 @@ public class DiaryService {
 		final User user,
 		final DiaryCreateRequest request
 	) {
-		Diary diary = DiaryMapper.toDiary(
-			user,
-			request.date(),
-			request.emotion(),
-			request.title(),
-			request.memo()
-		);
+		Diary diary = DiaryMapper.toDiary(user, request);
 		return diaryRepository.save(diary);
 	}
 

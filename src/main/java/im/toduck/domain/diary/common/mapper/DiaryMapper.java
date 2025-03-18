@@ -1,10 +1,8 @@
 package im.toduck.domain.diary.common.mapper;
 
-import java.time.LocalDate;
-
 import im.toduck.domain.diary.persistence.entity.Diary;
+import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
-import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -13,17 +11,14 @@ import lombok.NoArgsConstructor;
 public class DiaryMapper {
 	public static Diary toDiary(
 		final User user,
-		final LocalDate date,
-		final Emotion emotion,
-		final String title,
-		final String memo
+		final DiaryCreateRequest request
 	) {
 		return Diary.builder()
 			.user(user)
-			.date(date)
-			.emotion(emotion)
-			.title(title)
-			.memo(memo)
+			.date(request.date())
+			.emotion(request.emotion())
+			.title(request.title())
+			.memo(request.memo())
 			.build();
 	}
 
