@@ -59,7 +59,7 @@ public class Diary extends BaseEntity {
 	private List<DiaryImage> diaryImages = new ArrayList<>();
 
 	@Builder
-	public Diary(User user,
+	private Diary(User user,
 		LocalDate date,
 		Emotion emotion,
 		String title,
