@@ -241,3 +241,28 @@ CREATE TABLE report
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (social_id) REFERENCES social (id)
 );
+
+CREATE TABLE diary
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    user_id     BIGINT                                                                              NOT NULL,
+    diary_date  DATE                                                                                NOT NULL,
+    emotion     ENUM ('HAPPY', 'GOOD', 'SAD', 'ANGRY', 'ANXIOUS', 'TIRED', 'SICK', 'SOSO', 'LOVE')  NOT NULL,
+    title       VARCHAR(50)                                                                         NULL,
+    memo        VARCHAR(2048)                                                                       NULL,
+    created_at  DATETIME                                                                            NOT NULL,
+    updated_at  DATETIME                                                                            NOT NULL,
+    deleted_at  DATETIME                                                                            NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE diary_image_file
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    diary_id    BIGINT                              NOT NULL,
+    url         VARCHAR(512)                        NOT NULL,
+    created_at  DATETIME                            NOT NULL,
+    updated_at  DATETIME                            NOT NULL,
+    deleted_at  DATETIME                            NULL,
+    FOREIGN KEY (diary_id) REFERENCES diary (id) ON DELETE CASCADE
+);
