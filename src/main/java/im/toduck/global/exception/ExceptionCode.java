@@ -82,7 +82,7 @@ public enum ExceptionCode {
 	INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, 40419, "답글은 부모 댓글이 될 수 없습니다."),
 
 	/* 405xx diary */
-	NOT_FOUND_EMOTION(HttpStatus.NOT_FOUND, 45001, "유효하지 않은 감정입니다."),
+	NOT_FOUND_EMOTION(HttpStatus.NOT_FOUND, 40501, "유효하지 않은 감정입니다."),
 
 	/* 411xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 41101, "일정 기록을 찾을 수 없습니다.",
