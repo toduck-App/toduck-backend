@@ -42,8 +42,8 @@ public class Diary extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(nullable = false)
-	private LocalDate date;
+	@Column(name = "diary_date", nullable = false)
+	private LocalDate diaryDate;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -60,12 +60,12 @@ public class Diary extends BaseEntity {
 
 	@Builder
 	private Diary(User user,
-		LocalDate date,
+		LocalDate diaryDate,
 		Emotion emotion,
 		String title,
 		String memo) {
 		this.user = user;
-		this.date = date;
+		this.diaryDate = diaryDate;
 		this.emotion = emotion;
 		this.title = title;
 		this.memo = memo;
