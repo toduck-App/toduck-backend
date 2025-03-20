@@ -3,6 +3,8 @@ package im.toduck.builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import im.toduck.domain.diary.persistence.repository.DiaryImageRepository;
+import im.toduck.domain.diary.persistence.repository.DiaryRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.schedule.persistence.repository.ScheduleRecordRepository;
@@ -63,6 +65,12 @@ public class BuilderSupporter {
 	@Autowired
 	private ScheduleRecordRepository scheduleRecordRepository;
 
+	@Autowired
+	private DiaryRepository diaryRepository;
+
+	@Autowired
+	private DiaryImageRepository diaryImageRepository;
+
 	public UserRepository userRepository() {
 		return userRepository;
 	}
@@ -119,4 +127,11 @@ public class BuilderSupporter {
 		return scheduleRecordRepository;
 	}
 
+	public DiaryRepository diaryRepository() {
+		return diaryRepository;
+	}
+
+	public DiaryImageRepository diaryImageRepository() {
+		return diaryImageRepository;
+	}
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import im.toduck.domain.diary.persistence.entity.Diary;
+import im.toduck.domain.diary.persistence.entity.DiaryImage;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
@@ -91,4 +93,11 @@ public class TestFixtureBuilder {
 		return bs.scheduleRecordRepository().save(scheduleRecord);
 	}
 
+	public Diary buildDiary(final Diary diary) {
+		return bs.diaryRepository().save(diary);
+	}
+
+	public List<DiaryImage> buildDiaryImage(final List<DiaryImage> diaryImage) {
+		return bs.diaryImageRepository().saveAll(diaryImage);
+	}
 }
