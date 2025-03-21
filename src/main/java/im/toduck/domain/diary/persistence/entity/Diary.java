@@ -42,7 +42,7 @@ public class Diary extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(nullable = false)
+	@Column(name = "diary_date", nullable = false)
 	private LocalDate date;
 
 	@Enumerated(EnumType.STRING)
