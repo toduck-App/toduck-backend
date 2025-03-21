@@ -4,6 +4,7 @@ import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class DiaryMapper {
 	public static Diary toDiary(
 		final User user,
-		final DiaryCreateRequest request
+		@Valid final DiaryCreateRequest request
 	) {
 		return Diary.builder()
 			.user(user)

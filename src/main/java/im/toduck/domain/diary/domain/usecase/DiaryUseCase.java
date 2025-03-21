@@ -11,6 +11,7 @@ import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +23,7 @@ public class DiaryUseCase {
 	private final DiaryService diaryService;
 
 	@Transactional
-	public DiaryCreateResponse createDiary(final Long userId, final DiaryCreateRequest request) {
+	public DiaryCreateResponse createDiary(final Long userId, @Valid final DiaryCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
