@@ -38,7 +38,7 @@ public class DiaryUseCase {
 	}
 
 	@Transactional
-	public void deleteDiaryBoard(Long userId, Long diaryId) {
+	public void deleteDiary(Long userId, Long diaryId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Diary diary = diaryService.getDiaryById(diaryId)

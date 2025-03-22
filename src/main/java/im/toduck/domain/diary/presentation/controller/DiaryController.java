@@ -53,7 +53,7 @@ public class DiaryController implements DiaryApi {
 		@PathVariable Long diaryId,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		diaryUseCase.deleteDiaryBoard(user.getUserId(), diaryId);
+		diaryUseCase.deleteDiary(user.getUserId(), diaryId);
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
