@@ -1,10 +1,12 @@
 package im.toduck.domain.diary.domain.usecase;
 
 import static im.toduck.fixtures.user.UserFixtures.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +21,10 @@ import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
-import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 public class DiaryUseCaseTest extends ServiceTest {
 	private User USER;
@@ -45,6 +50,14 @@ public class DiaryUseCaseTest extends ServiceTest {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDate date = LocalDate.parse(dateStr, formatter);
 		Emotion emotion = Emotion.valueOf("HAPPY");
+
+		private Validator validator;
+
+		@BeforeEach
+		void setUp() {
+			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			validator = factory.getValidator();
+		}
 
 		@Test
 		void 성공() {
@@ -77,12 +90,16 @@ public class DiaryUseCaseTest extends ServiceTest {
 				null
 			);
 
-			// when -> then
-			assertSoftly(softly -> {
-				softly.assertThatThrownBy(
-						() -> diaryUseCase.createDiary(USER.getId(), DATE_EMOTION_NULL_REQUEST))
-					.isInstanceOf(ConstraintViolationException.class);
-			});
+			// when
+			Set<ConstraintViolation<DiaryCreateRequest>> violations = validator.validate(DATE_EMOTION_NULL_REQUEST);
+
+			// then
+			assertThat(violations)
+				.extracting(ConstraintViolation::getMessage)
+				.containsExactlyInAnyOrder(
+					"날짜는 비어있을 수 없습니다.",
+					"감정은 비어있을 수 없습니다."
+				);
 		}
 	}
 }
