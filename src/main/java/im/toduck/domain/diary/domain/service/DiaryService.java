@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 
 import im.toduck.domain.diary.common.mapper.DiaryImageFileMapper;
@@ -13,7 +14,11 @@ import im.toduck.domain.diary.persistence.entity.DiaryImage;
 import im.toduck.domain.diary.persistence.repository.DiaryImageRepository;
 import im.toduck.domain.diary.persistence.repository.DiaryRepository;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
+import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
+import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,5 +58,39 @@ public class DiaryService {
 	public void deleteDiary(final Diary diary) {
 		List<DiaryImage> imageFiles = diaryImageRepository.findAllByDiary(diary);
 		imageFiles.forEach(DiaryImage::softDelete);
+	}
+
+	@Transactional
+	public void updateDiary(
+		User user,
+		Diary diary,
+		DiaryUpdateRequest request
+	) {
+		if (request.isChangeEmotion()) {
+			if (request.emotion() == null) {
+				log.warn("일기 업데이트시 감정을 null 값으로 일기 수정 시도 - UserId: {}, DiaryId: {}", user.getId(), diary.getId());
+				throw CommonException.from(ExceptionCode.EMPTY_DIARY_EMOTION);
+			}
+
+			if (!EnumUtils.isValidEnum(Emotion.class, request.emotion().name())) {
+				log.warn("일기 업데이트 시 잘못된 감정 값 입력 - UserId: {}, DiaryId: {}, Emotion: {}",
+					user.getId(), diary.getId(), request.emotion());
+				throw CommonException.from(ExceptionCode.INVALID_DIARY_EMOTION);
+			}
+			diary.updateEmotion(request.emotion());
+		}
+
+		if (request.title() != null) {
+			diary.updateTitle(request.title());
+		}
+
+		if (request.memo() != null) {
+			diary.updateMemo(request.memo());
+		}
+
+		if (request.diaryImageUrls() != null) {
+			diaryImageRepository.deleteAllByDiary(diary);
+			addDiaryImageFiles(request.diaryImageUrls(), diary);
+		}
 	}
 }

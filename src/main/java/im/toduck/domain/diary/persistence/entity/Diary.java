@@ -74,4 +74,16 @@ public class Diary extends BaseEntity {
 	public boolean isOwner(User requestingUser) {
 		return this.user.getId().equals(requestingUser.getId());
 	}
+
+	public void updateEmotion(Emotion emotion) {
+		this.emotion = emotion;
+	}
+
+	public void updateTitle(String title) {
+		this.title = title;
+	}
+
+	public void updateMemo(String memo) {
+		this.memo = memo;
+	}
 }
