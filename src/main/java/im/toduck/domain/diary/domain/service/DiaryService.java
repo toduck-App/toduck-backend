@@ -108,6 +108,16 @@ public class DiaryService {
 
 		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
 
-		return diaries.stream().map(DiaryResponse::fromEntity).collect(Collectors.toList());
+		return diaries.stream()
+			.map(DiaryResponse::fromEntity)
+			.collect(Collectors.toList());
+	}
+
+	@Transactional
+	public List<DiaryResponse> getAllDiaries(Long userId) {
+		List<Diary> diaries = diaryRepository.findAllByUserId(userId);
+		return diaries.stream()
+			.map(DiaryResponse::fromEntity)
+			.collect(Collectors.toList());
 	}
 }
