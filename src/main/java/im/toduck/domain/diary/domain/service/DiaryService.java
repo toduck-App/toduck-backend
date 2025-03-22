@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import im.toduck.domain.diary.common.mapper.DiaryImageFileMapper;
 import im.toduck.domain.diary.common.mapper.DiaryMapper;
@@ -15,7 +16,6 @@ import im.toduck.domain.diary.persistence.repository.DiaryRepository;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +29,7 @@ public class DiaryService {
 	@Transactional
 	public Diary createDiary(
 		final User user,
-		@Valid final DiaryCreateRequest request
+		@Validated final DiaryCreateRequest request
 	) {
 		Diary diary = DiaryMapper.toDiary(user, request);
 		return diaryRepository.save(diary);
