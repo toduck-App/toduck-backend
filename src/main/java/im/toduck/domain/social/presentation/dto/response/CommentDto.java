@@ -20,6 +20,12 @@ public record CommentDto(
 	@Schema(description = "작성자 정보")
 	OwnerDto owner,
 
+	@Schema(description = "사진 포함 여부", example = "true")
+	Boolean hasImage,
+
+	@Schema(description = "사진 주소", example = "https://cdn.toduck.app/example.jpg")
+	String imageUrl,
+
 	@Schema(description = "댓글 내용", example = "루틴 너무 좋네요!")
 	String content,
 

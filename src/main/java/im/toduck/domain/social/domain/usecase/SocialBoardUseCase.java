@@ -1,6 +1,7 @@
 package im.toduck.domain.social.domain.usecase;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -13,6 +14,7 @@ import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
@@ -152,9 +154,17 @@ public class SocialBoardUseCase {
 
 		List<CommentDto> commentDtos = comments.stream()
 			.map((comment) -> {
+				Optional<CommentImageFile> commentImageFile = socialInteractionService.getCommentImageByComment(
+					comment
+				);
+				boolean hasImage = commentImageFile.isPresent();
+				String imageUrl = null;
+				if (hasImage) {
+					imageUrl = commentImageFile.get().getUrl();
+				}
 				boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
 				boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
-				return CommentMapper.toCommentDto(comment, isCommentLike, isBlocked);
+				return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
 			})
 			.toList();
 
