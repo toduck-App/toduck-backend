@@ -43,4 +43,15 @@ public class DiaryService {
 			.toList();
 		diaryImageRepository.saveAll(diaryImageFiles);
 	}
+
+	@Transactional
+	public Optional<Diary> getDiaryById(final Long diaryId) {
+		return diaryRepository.findById(diaryId);
+	}
+
+	@Transactional
+	public void deleteDiary(final Diary diary) {
+		List<DiaryImage> imageFiles = diaryImageRepository.findAllByDiary(diary);
+		imageFiles.forEach(DiaryImage::softDelete);
+	}
 }

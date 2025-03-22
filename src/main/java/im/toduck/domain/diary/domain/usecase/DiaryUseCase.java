@@ -32,4 +32,24 @@ public class DiaryUseCase {
 		log.info("일기 생성 - UserId: {}, DiaryId: {}", userId, diary.getId());
 		return DiaryMapper.toDiaryCreateResponse(diary);
 	}
+
+	private boolean isDiaryOwner(final Diary diary, final User user) {
+		return diary.isOwner(user);
+	}
+
+	@Transactional
+	public void deleteDiaryBoard(Long userId, Long diaryId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Diary diary = diaryService.getDiaryById(diaryId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_DIARY));
+
+		if (!isDiaryOwner(diary, user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 삭제 시도 - UserId: {}, DiaryId: {}, ", user.getId(), diary.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_DIARY);
+		}
+
+		diaryService.deleteDiary(diary);
+		log.info("일기 삭제 - UserId: {}, DiaryId: {}", userId, diaryId);
+	}
 }

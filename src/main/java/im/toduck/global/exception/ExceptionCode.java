@@ -82,6 +82,8 @@ public enum ExceptionCode {
 	INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, 40419, "답글은 부모 댓글이 될 수 없습니다."),
 
 	/* 405xx diary */
+	NOT_FOUND_DIARY(HttpStatus.NOT_FOUND, 40501, "일기를 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_DIARY(HttpStatus.FORBIDDEN, 40502, "일기에 접근 권한이 없습니다."),
 
 	/* 411xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 41101, "일정 기록을 찾을 수 없습니다.",

@@ -70,4 +70,8 @@ public class Diary extends BaseEntity {
 		this.title = title;
 		this.memo = memo;
 	}
+
+	public boolean isOwner(User requestingUser) {
+		return this.user.getId().equals(requestingUser.getId());
+	}
 }
