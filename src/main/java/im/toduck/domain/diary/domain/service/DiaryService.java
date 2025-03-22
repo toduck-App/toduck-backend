@@ -61,6 +61,8 @@ public class DiaryService {
 	public void deleteDiary(final Diary diary) {
 		List<DiaryImage> imageFiles = diaryImageRepository.findAllByDiary(diary);
 		imageFiles.forEach(DiaryImage::softDelete);
+
+		diaryRepository.delete(diary);
 	}
 
 	@Transactional
