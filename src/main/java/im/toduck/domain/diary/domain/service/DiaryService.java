@@ -1,6 +1,8 @@
 package im.toduck.domain.diary.domain.service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,9 @@ public class DiaryService {
 
 	@Transactional
 	public void addDiaryImageFiles(final List<String> imageUrls, final Diary diary) {
-		List<DiaryImage> diaryImageFiles = imageUrls.stream()
+		List<String> safeImageUrls = Optional.ofNullable(imageUrls).orElse(Collections.emptyList());
+
+		List<DiaryImage> diaryImageFiles = safeImageUrls.stream()
 			.map(url -> DiaryImageFileMapper.toDiaryImageFile(diary, url))
 			.toList();
 		diaryImageRepository.saveAll(diaryImageFiles);
