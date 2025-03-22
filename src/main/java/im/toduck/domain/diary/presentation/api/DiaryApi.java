@@ -133,23 +133,4 @@ public interface DiaryApi {
 		@RequestParam("month") int month,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
-
-	@Operation(
-		summary = "모든 작성된 일기 검색",
-		description =
-			"""
-				<b>모든 작성된 일기들을 조회합니다.</b><br/><br/>
-				<p>조회 방법 예시: /v1/diary/all</p><br/>
-				<p>검색 결과가 존재하지 않는 경우 빈 배열이 반환됩니다.</p>
-				"""
-	)
-	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(
-			responseClass = DiaryResponse.class,
-			description = "일기 조회 성공, 모든 작성된 일기들을 반환합니다."
-		)
-	)
-	ResponseEntity<ApiResponse<List<DiaryResponse>>> getAllDiaries(
-		@AuthenticationPrincipal CustomUserDetails user
-	);
 }

@@ -83,11 +83,4 @@ public class DiaryUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		return diaryService.getDiariesByMonth(userId, year, month);
 	}
-
-	@Transactional
-	public List<DiaryResponse> getAllDiaries(final Long userId) {
-		User user = userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		return diaryService.getAllDiaries(userId);
-	}
 }

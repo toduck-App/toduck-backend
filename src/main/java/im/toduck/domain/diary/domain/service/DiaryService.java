@@ -114,12 +114,4 @@ public class DiaryService {
 			.map(DiaryResponse::fromEntity)
 			.collect(Collectors.toList());
 	}
-
-	@Transactional
-	public List<DiaryResponse> getAllDiaries(Long userId) {
-		List<Diary> diaries = diaryRepository.findAllByUserId(userId);
-		return diaries.stream()
-			.map(DiaryResponse::fromEntity)
-			.collect(Collectors.toList());
-	}
 }
