@@ -1,15 +1,18 @@
 package im.toduck.domain.diary.presentation.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -99,12 +102,35 @@ public interface DiaryApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_DIARY),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_DIARY),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_DIARY_EMOTION)
-
 		}
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateDiary(
 		@PathVariable Long diaryId,
 		@AuthenticationPrincipal DiaryUpdateRequest request,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "특정 연월에 작성된 일기 검색",
+		description =
+			"""
+				<b>특정 연월에 작성된 일기들을 조회합니다.</b><br/><br/>
+				<p><b>연월 필터를 적용하는 방법:</b></p>
+				<p>예시: /v1/diary?year=2025&month=3</p><br/>
+				<p>- <b>year:</b> 조회 할 연도</p>
+				<p>- <b>month:</b> 조회 할 달</p>
+				<p>검색 결과가 존재하지 않는 경우 빈 배열이 반환됩니다.</p>
+				"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = DiaryResponse.class,
+			description = "일기 조회 성공, 해당 연월에 작성된 일기들을 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<List<DiaryResponse>>> getDiariesByMonth(
+		@RequestParam("year") int year,
+		@RequestParam("month") int month,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

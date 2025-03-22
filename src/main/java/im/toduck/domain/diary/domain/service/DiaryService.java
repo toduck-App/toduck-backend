@@ -1,8 +1,10 @@
 package im.toduck.domain.diary.domain.service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import im.toduck.domain.diary.persistence.repository.DiaryImageRepository;
 import im.toduck.domain.diary.persistence.repository.DiaryRepository;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
+import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -92,5 +95,19 @@ public class DiaryService {
 			diaryImageRepository.deleteAllByDiary(diary);
 			addDiaryImageFiles(request.diaryImageUrls(), diary);
 		}
+	}
+
+	@Transactional
+	public List<DiaryResponse> getDiariesByMonth(
+		final Long userId,
+		final int year,
+		final int month
+	) {
+		LocalDate startDate = LocalDate.of(year, month, 1);
+		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+
+		return diaries.stream().map(DiaryResponse::fromEntity).collect(Collectors.toList());
 	}
 }
