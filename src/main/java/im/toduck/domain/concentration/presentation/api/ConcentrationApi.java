@@ -1,10 +1,14 @@
 package im.toduck.domain.concentration.presentation.api;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -13,6 +17,7 @@ import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 @Tag(name = "Concentration")
 public interface ConcentrationApi {
@@ -40,6 +45,28 @@ public interface ConcentrationApi {
 	)
 	ResponseEntity<ApiResponse<ConcentrationSaveResponse>> saveConcentration(
 		@RequestBody @Valid ConcentrationRequest request,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "집중 조회",
+		description = """
+			특정 달의 집중을 조회합니다.
+			- 조회된 집중 데이터를 반환합니다.
+			- 조회를 원하는 연월을(yyyy-MM) /v1/concentration/monthly 엔드포인트에 yearMonth 파라미터로 요청합니다.
+			- 기간에 해당하는 집중 기록들을 반환합니다.
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = ConcentrationResponse.class,
+			description = "집중 조회 성공, 해당 달의 집중 정보를 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<List<ConcentrationResponse>>> getMonthlyConcentration(
+		@RequestParam("yearMonth")
+		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
+		String yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

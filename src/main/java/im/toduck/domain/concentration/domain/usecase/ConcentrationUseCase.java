@@ -1,8 +1,12 @@
 package im.toduck.domain.concentration.domain.usecase;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import im.toduck.domain.concentration.domain.service.ConcentrationService;
 import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -29,5 +33,17 @@ public class ConcentrationUseCase {
 
 		log.info("집중 저장 - UserId: {}, ConcentrationId: {}", userId, concentration.getId());
 		return new ConcentrationSaveResponse(concentration.getId());
+	}
+
+	@Transactional
+	public List<ConcentrationResponse> getMonthlyConcentration(Long userId, String yearMonth) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		List<Concentration> concentrations = concentrationService.getMonthlyConcentration(user, yearMonth);
+
+		return concentrations.stream()
+			.map(ConcentrationResponse::fromEntity)
+			.collect(Collectors.toList());
 	}
 }

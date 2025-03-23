@@ -1,5 +1,8 @@
 package im.toduck.domain.concentration.domain.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import im.toduck.domain.concentration.persistence.entity.Concentration;
@@ -26,5 +29,13 @@ public class ConcentrationService {
 		concentration.addTime(request.time());
 
 		return concentrationRepository.save(concentration);
+	}
+
+	@Transactional
+	public List<Concentration> getMonthlyConcentration(User user, String yearMonth) {
+		LocalDate startDate = LocalDate.parse(yearMonth + "-01");
+		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+		return concentrationRepository.findByUserAndDateBetween(user, startDate, endDate);
 	}
 }
