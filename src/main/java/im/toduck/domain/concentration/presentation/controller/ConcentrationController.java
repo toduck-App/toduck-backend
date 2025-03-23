@@ -42,6 +42,7 @@ public class ConcentrationController implements ConcentrationApi {
 
 	@Override
 	@GetMapping("/monthly")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<List<ConcentrationResponse>>> getMonthlyConcentration(
 		@RequestParam("yearMonth")
 		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
