@@ -73,6 +73,7 @@ public interface DiaryApi {
 				}<br/><br/>
 				<p>위 예시는 감정, 제목, 이미지를 수정하며, 메모는 변경하지 않는 경우입니다.</p><br/>
 				<b>필드별 동작 방식:</b><br/>
+				<p>- <b>isChangeEmotion</b>: emotion 값이 변경 됐는지 boolean 값으로 확인합니다. null 값이 들어갈 수 없습니다.</p>
 				<p>- <b>emotion</b>: isChangeEmotion이 true인 경우에만 내용을 수정합니다. null 값이 들어갈 수 없습니다.</p>
 				<p>- <b>title</b>: null이 아닌 경우에만 제목을 수정합니다. null인 경우 기존 제목이 유지됩니다.</p>
 				<p>- <b>memo</b>: null이 아닌 경우에만 메모(일기)를 수정합니다. null인 경우 기존 메모(일기)가 유지됩니다.</p>
