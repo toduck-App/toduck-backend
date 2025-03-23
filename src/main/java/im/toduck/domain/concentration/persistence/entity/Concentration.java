@@ -1,4 +1,4 @@
-package im.toduck.domain.concentration.presentation.entity;
+package im.toduck.domain.concentration.persistence.entity;
 
 import java.time.LocalDate;
 

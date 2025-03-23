@@ -1,4 +1,4 @@
-package im.toduck.domain.concentration.presentation.repository;
+package im.toduck.domain.concentration.persistence.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
