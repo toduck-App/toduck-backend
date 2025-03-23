@@ -35,7 +35,7 @@ public class Concentration extends BaseEntity {
 	private User user;
 
 	@Column(name = "concentration_date", nullable = false)
-	private LocalDate concentrationDate;
+	private LocalDate date;
 
 	@Column(name = "target_count", nullable = false)
 	private Integer targetCount = 0;
@@ -43,8 +43,13 @@ public class Concentration extends BaseEntity {
 	@Column(name = "setting_count", nullable = false)
 	private Integer settingCount = 0;
 
-	@Column(nullable = false)
+	@Column(name = "concentration_time", nullable = false)
 	private Integer time = 0;
+
+	public Concentration(User user, LocalDate date) {
+		this.user = user;
+		this.date = date;
+	}
 
 	public void addTargetCount(int value) {
 		this.targetCount += value;
