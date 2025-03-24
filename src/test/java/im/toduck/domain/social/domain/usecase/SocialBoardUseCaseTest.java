@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +91,7 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 작성시")
 	class CreateSocialBoard {
+		String title = "Test title";
 		String content = "Test Content";
 		Boolean isAnonymous = false;
 		List<String> imageUrls = List.of("image1.jpg", "image2.jpg");
@@ -186,6 +188,29 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> socialBoardUseCase.createSocialBoard(USER.getId(), requestWithPrivateRoutine))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.PRIVATE_ROUTINE.getMessage());
+		}
+
+		@ParameterizedTest
+		@NullAndEmptySource
+		@DisplayName("이미지 URL이 null 또는 빈 리스트일 때 게시글 생성에 성공한다")
+		void 이미지URL이_null이거나_빈_리스트일때_게시글_작성_성공한다(List<String> nullAndEmptyImageUrls) {
+			SocialCreateRequest requestWithoutImages = new SocialCreateRequest(
+				title,
+				content,
+				null,
+				isAnonymous,
+				categoryIds,
+				nullAndEmptyImageUrls
+			);
+
+			// when
+			SocialCreateResponse response = socialBoardUseCase.createSocialBoard(USER.getId(), requestWithoutImages);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.socialId()).isNotNull();
+			});
 		}
 
 	}
