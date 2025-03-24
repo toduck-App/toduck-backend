@@ -7,7 +7,7 @@ import java.util.Optional;
 import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 
 public interface ScheduleRecordRepositoryCustom {
-	Optional<ScheduleRecord> findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+	Optional<ScheduleRecord> findScheduleRecordByRecordDateAndScheduleId(
 		LocalDate localDate,
 		Long aLong);
 

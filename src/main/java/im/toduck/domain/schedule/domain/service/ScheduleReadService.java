@@ -9,15 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.schedule.common.mapper.ScheduleMapper;
-import im.toduck.domain.schedule.common.mapper.ScheduleRecordMapper;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 import im.toduck.domain.schedule.persistence.repository.ScheduleRecordRepository;
 import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
-import im.toduck.domain.schedule.presentation.dto.request.ScheduleDeleteRequest;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -26,15 +24,15 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ScheduleService {
+public class ScheduleReadService {
 	private final ScheduleRepository scheduleRepository;
 	private final ScheduleRecordRepository scheduleRecordRepository;
 
 	@Transactional
-	public ScheduleCreateResponse createSchedule(User user, ScheduleCreateRequest request) {
+	public ScheduleIdResponse createSchedule(User user, ScheduleCreateRequest request) {
 		Schedule schedule = ScheduleMapper.toSchedule(user, request);
 		Schedule save = scheduleRepository.save(schedule);
-		return ScheduleMapper.toScheduleCreateResponse(save);
+		return ScheduleMapper.toScheduleIdResponse(save);
 	}
 
 	@Transactional(readOnly = true)
@@ -59,52 +57,4 @@ public class ScheduleService {
 	public Optional<Schedule> getScheduleById(Long scheduleId) {
 		return scheduleRepository.findById(scheduleId);
 	}
-
-	public void deleteSingleDaySchedule(Schedule schedule, ScheduleDeleteRequest request) {
-		if (!request.isOneDayDeleted()) {
-			throw CommonException.from(ExceptionCode.NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE);
-		}
-		scheduleRecordRepository.deleteByScheduleIdAndRecordDate(
-			schedule.getId(),
-			schedule.getScheduleDate().getStartDate());
-		scheduleRepository.delete(schedule);
-	}
-
-	public void deleteOneDayDeletionForRepeatingSchedule(Schedule schedule, ScheduleDeleteRequest request) {
-		scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
-				request.queryDate(),
-				schedule.getId())
-			.ifPresentOrElse(scheduleRecord -> {
-				scheduleRecordRepository.softDeleteByScheduleIdAndRecordDate(
-					schedule.getId(),
-					request.queryDate());
-			}, () -> {
-				ScheduleRecord softDeletedScheduleRecord = ScheduleRecordMapper
-					.toSoftDeletedScheduleRecord(schedule, request);
-				scheduleRecordRepository.save(softDeletedScheduleRecord);
-			});
-	}
-
-	@Transactional
-	public void deleteAfterDeletionForRepeatingSchedule(Schedule schedule,
-		ScheduleDeleteRequest scheduleDeleteRequest) {
-		scheduleRecordRepository.findByCompletedScheduleAndAfterStartDate(
-				schedule.getId(),
-				scheduleDeleteRequest.queryDate())
-			.forEach(scheduleRecord -> {
-				Schedule save = scheduleRepository.save(
-					ScheduleMapper.copyToSchedule(schedule, scheduleDeleteRequest.queryDate()));
-				scheduleRecord.changeSchedule(save);
-			});
-		scheduleRecordRepository.deleteByNonCompletedScheduleAndAfterStartDate(
-			schedule.getId(),
-			scheduleDeleteRequest.queryDate(),
-			schedule.getScheduleDate().getEndDate());
-		if (schedule.getScheduleDate().getStartDate().equals(scheduleDeleteRequest.queryDate())) {
-			scheduleRepository.delete(schedule);
-			return;
-		}
-		schedule.changeEndDate(scheduleDeleteRequest.queryDate().minusDays(1));
-	}
-
 }
