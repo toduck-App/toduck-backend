@@ -91,7 +91,6 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 	@Nested
 	@DisplayName("게시글 작성시")
 	class CreateSocialBoard {
-		String title = "Test title";
 		String content = "Test Content";
 		Boolean isAnonymous = false;
 		List<String> imageUrls = List.of("image1.jpg", "image2.jpg");
@@ -192,10 +191,9 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 		@ParameterizedTest
 		@NullAndEmptySource
-		@DisplayName("이미지 URL이 null 또는 빈 리스트일 때 게시글 생성에 성공한다")
-		void 이미지URL이_null이거나_빈_리스트일때_게시글_작성_성공한다(List<String> nullAndEmptyImageUrls) {
+		void 이미지URL이_null이거나_빈_리스트일때_게시글_작성에_성공한다(List<String> nullAndEmptyImageUrls) {
 			SocialCreateRequest requestWithoutImages = new SocialCreateRequest(
-				title,
+				null,
 				content,
 				null,
 				isAnonymous,
