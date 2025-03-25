@@ -25,6 +25,9 @@ public class ConcentrationMapper {
 	}
 
 	public static Concentration concentration(User user, ConcentrationRequest request) {
-		return Concentration.concentration(user, request);
+		return Concentration.builder()
+			.user(user)
+			.date(request.date())
+			.build();
 	}
 }

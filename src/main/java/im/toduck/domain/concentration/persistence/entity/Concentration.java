@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -17,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,13 +47,10 @@ public class Concentration extends BaseEntity {
 	@Column(name = "concentration_time", nullable = false)
 	private Integer time = 0;
 
+	@Builder
 	private Concentration(User user, LocalDate date) {
 		this.user = user;
 		this.date = date;
-	}
-
-	public static Concentration concentration(User user, ConcentrationRequest request) {
-		return new Concentration(user, request.date());
 	}
 
 	public void addTargetCount(int value) {
