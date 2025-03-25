@@ -1,7 +1,9 @@
 package im.toduck.domain.concentration.common.mapper;
 
 import im.toduck.domain.concentration.persistence.entity.Concentration;
+import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
+import im.toduck.domain.user.persistence.entity.User;
 
 public class ConcentrationMapper {
 	public static ConcentrationResponse fromConcentration(Concentration concentration) {
@@ -17,5 +19,9 @@ public class ConcentrationMapper {
 			.time(concentration.getTime())
 			.percentage(percentage)
 			.build();
+	}
+
+	public static Concentration concentration(User user, ConcentrationRequest request) {
+		return Concentration.concentration(user, request);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import im.toduck.domain.concentration.common.mapper.ConcentrationMapper;
 import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.concentration.persistence.repository.ConcentrationRepository;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
@@ -22,7 +23,7 @@ public class ConcentrationService {
 	@Transactional
 	public Concentration saveConcentration(User user, ConcentrationRequest request) {
 		Concentration concentration = concentrationRepository.findByUserAndDate(user, request.date())
-			.orElseGet((() -> new Concentration(user, request.date())));
+			.orElseGet((() -> ConcentrationMapper.concentration(user, request)));
 
 		concentration.addTargetCount(request.targetCount());
 		concentration.addSettingCount(request.settingCount());
