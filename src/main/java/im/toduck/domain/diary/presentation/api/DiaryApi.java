@@ -99,10 +99,8 @@ public interface DiaryApi {
 			description = "일기 수정 성공, 빈 content 객체를 반환합니다."
 		),
 		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.EMPTY_DIARY_EMOTION),
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_DIARY),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_DIARY),
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_DIARY_EMOTION)
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.UNAUTHORIZED_ACCESS_DIARY)
 		}
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateDiary(
