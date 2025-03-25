@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
@@ -51,6 +52,7 @@ public record ScheduleCreateRequest(
 	Boolean isAllDay,
 
 	@Schema(description = "일정 시간 (종일 일정이면 null)", example = "10:30")
+	@JsonDeserialize(using = LocalTimeDeserializer.class)
 	LocalTime time,
 
 	@Schema(description = "알람 시간 (null 이면 알람을 보내지 않음)", example = "TEN_MINUTE")

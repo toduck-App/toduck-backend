@@ -2,6 +2,9 @@ package im.toduck.domain.schedule.presentation.dto.request;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -15,6 +18,7 @@ public record ScheduleModifyRequest(
 	Boolean isOneDayDeleted,
 
 	@Schema(description = "일정 수정 날짜", example = "2025-02-07")
+	@JsonDeserialize(using = LocalDateDeserializer.class)
 	LocalDate queryDate,
 
 	@Schema(description = "일정 수정 데이터 ")

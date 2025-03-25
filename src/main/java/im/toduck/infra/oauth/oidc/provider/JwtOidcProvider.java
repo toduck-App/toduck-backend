@@ -87,8 +87,6 @@ public class JwtOidcProvider {
 				"sub is not matched. expected : " + sub + ", actual : " + payload.get("sub"));
 			Assert.isTrue(payload.get("aud").equals(aud),
 				"aud is not matched. expected : " + aud + ", actual : " + payload.get("aud"));
-			Assert.isTrue(payload.get("nonce").equals(nonce),
-				"nonce is not matched. expected : " + nonce + ", actual : " + payload.get("nonce"));
 
 			return Map.of("header", header, "payload", payload);
 		} catch (IllegalArgumentException e) {
