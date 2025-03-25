@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.diary.common.mapper.DiaryImageFileMapper;
 import im.toduck.domain.diary.common.mapper.DiaryMapper;
@@ -22,7 +22,6 @@ import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,7 +51,7 @@ public class DiaryService {
 		diaryImageRepository.saveAll(diaryImageFiles);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public Optional<Diary> getDiaryById(final Long diaryId) {
 		return diaryRepository.findById(diaryId);
 	}
@@ -99,7 +98,7 @@ public class DiaryService {
 		}
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<DiaryResponse> getDiariesByMonth(
 		final Long userId,
 		final int year,
@@ -112,6 +111,6 @@ public class DiaryService {
 
 		return diaries.stream()
 			.map(DiaryResponse::fromEntity)
-			.collect(Collectors.toList());
+			.toList();
 	}
 }
