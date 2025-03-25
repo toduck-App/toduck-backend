@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "다이어리 수정 요청 DTO")
 public record DiaryUpdateRequest(
 	@NotNull
 	@Schema(description = "감정 변경 여부", example = "true")
