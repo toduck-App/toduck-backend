@@ -1,8 +1,12 @@
 package im.toduck.domain.diary.common.mapper;
 
+import java.util.stream.Collectors;
+
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryImageDto;
+import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -26,5 +30,17 @@ public class DiaryMapper {
 		return DiaryCreateResponse.builder()
 			.diaryId(diary.getId())
 			.build();
+	}
+
+	public static DiaryResponse fromDiary(Diary diary) {
+		return new DiaryResponse(
+			diary.getDate(),
+			diary.getEmotion(),
+			diary.getTitle(),
+			diary.getMemo(),
+			diary.getDiaryImages().stream()
+				.map(DiaryImageDto::fromEntity)
+				.collect(Collectors.toList())
+		);
 	}
 }

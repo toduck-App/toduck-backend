@@ -2,9 +2,7 @@ package im.toduck.domain.diary.presentation.dto.response;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.user.persistence.entity.Emotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -26,15 +24,5 @@ public record DiaryResponse(
 	@Schema(description = "일기 이미지 목록")
 	List<DiaryImageDto> diaryImages
 ) {
-	public static DiaryResponse fromEntity(Diary diary) {
-		return new DiaryResponse(
-			diary.getDate(),
-			diary.getEmotion(),
-			diary.getTitle(),
-			diary.getMemo(),
-			diary.getDiaryImages().stream()
-				.map(DiaryImageDto::fromEntity)
-				.collect(Collectors.toList())
-		);
-	}
+
 }

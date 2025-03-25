@@ -96,7 +96,7 @@ public class DiaryService {
 		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate);
 
 		return diaries.stream()
-			.map(DiaryResponse::fromEntity)
+			.map(DiaryMapper::fromDiary)
 			.toList();
 	}
 }
