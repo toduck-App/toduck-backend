@@ -101,10 +101,6 @@ public class JwtOidcProvider {
 	 */
 	private Jws<Claims> getOidcTokenJws(String token, String modulus, String exponent) {
 		try {
-			System.out.println("lfsldfjsldkfjsdf");
-			System.out.println("modulus : " + modulus);
-			System.out.println("exponent : " + exponent);
-			System.out.println("token : " + token);
 			return Jwts.parser()
 				.verifyWith(getRsaPublicKey(modulus, exponent))
 				.build()
