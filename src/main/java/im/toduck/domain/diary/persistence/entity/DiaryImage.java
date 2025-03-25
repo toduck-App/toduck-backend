@@ -37,7 +37,7 @@ public class DiaryImage extends BaseEntity {
 	private String url;
 
 	@Builder
-	public DiaryImage(Diary diary, String url) {
+	private DiaryImage(Diary diary, String url) {
 		this.diary = diary;
 		this.url = url;
 	}
