@@ -1,8 +1,8 @@
 package im.toduck.domain.concentration.domain.usecase;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import im.toduck.domain.concentration.common.mapper.ConcentrationMapper;
 import im.toduck.domain.concentration.domain.service.ConcentrationService;
 import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
@@ -43,7 +43,7 @@ public class ConcentrationUseCase {
 		List<Concentration> concentrations = concentrationService.getMonthlyConcentration(user, yearMonth);
 
 		return concentrations.stream()
-			.map(ConcentrationResponse::fromEntity)
-			.collect(Collectors.toList());
+			.map(ConcentrationMapper::fromConcentration)
+			.toList();
 	}
 }
