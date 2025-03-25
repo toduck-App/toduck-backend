@@ -1,11 +1,8 @@
 package im.toduck.domain.diary.common.mapper;
 
-import java.util.stream.Collectors;
-
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
-import im.toduck.domain.diary.presentation.dto.response.DiaryImageDto;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
@@ -39,8 +36,8 @@ public class DiaryMapper {
 			diary.getTitle(),
 			diary.getMemo(),
 			diary.getDiaryImages().stream()
-				.map(DiaryImageDto::fromEntity)
-				.collect(Collectors.toList())
+				.map(DiaryImageFileMapper::fromDiaryImage)
+				.toList()
 		);
 	}
 }
