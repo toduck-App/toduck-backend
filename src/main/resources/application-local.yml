@@ -38,7 +38,7 @@ oauth2:
   client:
     provider:
       apple:
-        jwks-uri: ${OIDC_KAKAO_SECRET_KEY}
+        jwks-uri: ${OIDC_APPLE_JWKS_URI}
         secret: ${OIDC_APPLE_SECRET_KEY}
       google:
         jwks-uri: https://www.googleapis.com

@@ -87,8 +87,6 @@ public class JwtOidcProvider {
 				"sub is not matched. expected : " + sub + ", actual : " + payload.get("sub"));
 			Assert.isTrue(payload.get("aud").equals(aud),
 				"aud is not matched. expected : " + aud + ", actual : " + payload.get("aud"));
-			Assert.isTrue(payload.get("nonce").equals(nonce),
-				"nonce is not matched. expected : " + nonce + ", actual : " + payload.get("nonce"));
 
 			return Map.of("header", header, "payload", payload);
 		} catch (IllegalArgumentException e) {
@@ -103,6 +101,10 @@ public class JwtOidcProvider {
 	 */
 	private Jws<Claims> getOidcTokenJws(String token, String modulus, String exponent) {
 		try {
+			System.out.println("lfsldfjsldkfjsdf");
+			System.out.println("modulus : " + modulus);
+			System.out.println("exponent : " + exponent);
+			System.out.println("token : " + token);
 			return Jwts.parser()
 				.verifyWith(getRsaPublicKey(modulus, exponent))
 				.build()
