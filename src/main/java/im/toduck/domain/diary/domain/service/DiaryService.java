@@ -108,7 +108,7 @@ public class DiaryService {
 		LocalDate startDate = LocalDate.of(year, month, 1);
 		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate);
 
 		return diaries.stream()
 			.map(DiaryResponse::fromEntity)

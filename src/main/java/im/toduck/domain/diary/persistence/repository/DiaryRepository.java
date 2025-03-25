@@ -10,5 +10,5 @@ import im.toduck.domain.diary.persistence.entity.Diary;
 
 @Repository
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
-	List<Diary> findByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+	List<Diary> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);
 }
