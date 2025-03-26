@@ -150,23 +150,8 @@ public class SocialBoardUseCase {
 
 		List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(socialBoard);
 		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard);
+		List<CommentDto> commentDtos = convertCommentsToDto(user, comments);
 		boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, socialBoard);
-
-		List<CommentDto> commentDtos = comments.stream()
-			.map((comment) -> {
-				Optional<CommentImageFile> commentImageFile = socialInteractionService.getCommentImageByComment(
-					comment
-				);
-				boolean hasImage = commentImageFile.isPresent();
-				String imageUrl = null;
-				if (hasImage) {
-					imageUrl = commentImageFile.get().getUrl();
-				}
-				boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
-				boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
-				return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
-			})
-			.toList();
 
 		log.info("소셜 게시글 단건 상세 조회 - UserId: {}, SocialBoardId: {}", userId, socialId);
 		return SocialMapper.toSocialDetailResponse(socialBoard, imageFiles, commentDtos, isSocialBoardLiked);
@@ -214,6 +199,23 @@ public class SocialBoardUseCase {
 		final List<SocialCategory> socialCategories
 	) {
 		return socialCategories.size() != socialCategoryIds.size();
+	}
+
+	private List<CommentDto> convertCommentsToDto(final User user, final List<Comment> comments) {
+		return comments.stream()
+			.map(comment -> createCommentDto(user, comment))
+			.toList();
+	}
+
+	private CommentDto createCommentDto(final User user, final Comment comment) {
+		Optional<CommentImageFile> commentImageFile = socialInteractionService.getCommentImageByComment(comment);
+		boolean hasImage = commentImageFile.isPresent();
+		String imageUrl = hasImage ? commentImageFile.get().getUrl() : null;
+
+		boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
+		boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
+
+		return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
 	}
 
 	private List<SocialResponse> createSocialResponses(
