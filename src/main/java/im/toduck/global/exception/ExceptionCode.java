@@ -87,6 +87,11 @@ public enum ExceptionCode {
 	NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, 41102, "일정을 찾을 수 없습니다."),
 	NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE(HttpStatus.BAD_REQUEST, 41103, "반복되지 않는 하루 일정은 기간 삭제가 불가능합니다.",
 		"반복되지 않는 하루 일정은 기간 삭제가 불가능한 요청을 클라이언트에서 보냈을 때 발생합니다."),
+	ONE_DAY__NONREPEATABLE_SCHEDULE_CANNOT_AFTER_DATE_UPDATE(HttpStatus.FORBIDDEN, 41104,
+		"반복되지 않는 하루 일정은 하루 삭제만 가능합니다.",
+		"반복되지 않는 하루 일정을 하루 삭제만 가능한 요청을 클라이언트에서 일괄 수정 보냈을 때 발생합니다."),
+	PERIOD_SCHEDULE_CANNOT_AFTER_DATE_UPDATE(HttpStatus.BAD_REQUEST, 41105, "기간 일정은 하루 삭제만 가능합니다.",
+		"기간 일정을 하루 삭제만 가능한 요청을 클라이언트에서 일괄 수정 보냈을 때 발생합니다."),
 
 	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),

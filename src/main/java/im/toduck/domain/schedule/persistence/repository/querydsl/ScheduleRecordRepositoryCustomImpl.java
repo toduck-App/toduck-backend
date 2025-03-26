@@ -77,7 +77,7 @@ public class ScheduleRecordRepositoryCustomImpl implements ScheduleRecordReposit
 	}
 
 	@Override
-	public Optional<ScheduleRecord> findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+	public Optional<ScheduleRecord> findScheduleRecordByRecordDateAndScheduleId(
 		LocalDate localDate,
 		Long aLong) {
 		return Optional.ofNullable(

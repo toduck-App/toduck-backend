@@ -151,7 +151,7 @@ class ScheduleRecordRepositoryTest extends RepositoryTest {
 			ScheduleRecord savedScheduleRecord = testFixtureBuilder.buildScheduleRecord(
 				IS_COMPLETE_SCHEDULE_RECORD(QUERY_END_DATE, savedSchedule));
 			// when
-			ScheduleRecord scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+			ScheduleRecord scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				QUERY_END_DATE,
 				savedSchedule.getId()).get();
 
@@ -168,7 +168,7 @@ class ScheduleRecordRepositoryTest extends RepositoryTest {
 			Schedule savedSchedule = testFixtureBuilder.buildSchedule(DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser,
 				LESS_THAN_QUERY_DATE, GREATER_THAN_QUERY_DATE));
 			// when
-			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByUserIdAndRecordDateAndScheduleId(
+			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				QUERY_END_DATE,
 				savedSchedule.getId());
 

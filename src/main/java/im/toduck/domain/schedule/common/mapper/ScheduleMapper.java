@@ -10,8 +10,8 @@ import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 import im.toduck.domain.schedule.persistence.vo.ScheduleDate;
 import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleCreateResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
+import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
@@ -41,8 +41,8 @@ public class ScheduleMapper {
 			user);
 	}
 
-	public static ScheduleCreateResponse toScheduleCreateResponse(final Schedule schedule) {
-		return ScheduleCreateResponse.builder()
+	public static ScheduleIdResponse toScheduleIdResponse(final Schedule schedule) {
+		return ScheduleIdResponse.builder()
 			.scheduleId(schedule.getId())
 			.build();
 	}

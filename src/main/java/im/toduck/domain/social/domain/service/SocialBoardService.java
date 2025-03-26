@@ -142,6 +142,10 @@ public class SocialBoardService {
 
 	@Transactional
 	public void addSocialImageFiles(final List<String> imageUrls, final Social socialBoard) {
+		if (imageUrls == null || imageUrls.isEmpty()) {
+			return;
+		}
+
 		List<SocialImageFile> socialImageFiles = imageUrls.stream()
 			.map(url -> SocialImageFileMapper.toSocialImageFile(socialBoard, url))
 			.toList();
