@@ -17,15 +17,11 @@ public class MyPageUseCase {
 	private final UserService userService;
 	private final MyPageService myPageService;
 
-	private static final long UPDATE_SUCCESS = 1L;
-
 	@Transactional
 	public void updateNickname(Long userId, NickNameUpdateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		if (myPageService.updateUniqueNickname(user, request.nickname()) != UPDATE_SUCCESS) {
-			throw CommonException.from(ExceptionCode.EXISTS_USER_NICKNAME);
-		}
+		myPageService.updateUniqueNickname(user, request.nickname());
 	}
 }

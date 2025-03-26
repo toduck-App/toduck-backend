@@ -2,7 +2,6 @@ package im.toduck.domain.user.persistence.repository.querydsl;
 
 import org.springframework.stereotype.Repository;
 
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import im.toduck.domain.user.persistence.entity.QUser;
@@ -16,18 +15,10 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 	private final QUser qUser = QUser.user;
 
 	@Override
-	public long updateUniqueNickname(User user, String nickname) {
-		return queryFactory.update(qUser)
+	public void updateNickname(User user, String nickname) {
+		queryFactory.update(qUser)
 			.set(qUser.nickname, nickname)
-			.where(
-				qUser.id.eq(user.getId())
-					.and(qUser.deletedAt.isNull())
-					.and(JPAExpressions.selectOne()
-						.from(qUser)
-						.where(qUser.nickname.eq(nickname))
-						.notExists()
-					)
-			)
+			.where(qUser.id.eq(user.getId()))
 			.execute();
 	}
 }
