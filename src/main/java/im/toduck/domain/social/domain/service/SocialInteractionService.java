@@ -72,8 +72,12 @@ public class SocialInteractionService {
 			throw CommonException.from(ExceptionCode.INVALID_COMMENT_FOR_BOARD);
 		}
 
+		commentImageFileRepository.findByComment(comment)
+			.ifPresent(commentImageFileRepository::delete);
+
 		List<CommentLike> commentLikes = commentLikeRepository.findAllByComment(comment);
 		commentLikeRepository.deleteAll(commentLikes);
+
 		commentRepository.delete(comment);
 	}
 
