@@ -11,6 +11,10 @@ public record CommentCreateRequest(
 
 	@Nullable
 	@Schema(description = "부모 댓글 comment id, 대댓글이 아닐시 null", nullable = true, example = "1")
-	Long parentId
+	Long parentId,
+
+	@Nullable
+	@Schema(description = "이미지 URL", nullable = true, example = "https://cdn.toduck.app/example.jpg")
+	String imageUrl
 ) {
 }

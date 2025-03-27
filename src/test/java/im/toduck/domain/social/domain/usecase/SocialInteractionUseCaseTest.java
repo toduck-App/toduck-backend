@@ -19,10 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.repository.CommentImageFileRepository;
 import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
@@ -61,6 +63,9 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 	@Autowired
 	private CommentLikeRepository commentLikeRepository;
 
+	@Autowired
+	private CommentImageFileRepository commentImageFileRepository;
+
 	@BeforeEach
 	public void setUp() {
 		USER = testFixtureBuilder.buildUser(GENERAL_USER());
@@ -74,7 +79,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		Social SOCIAL_BOARD;
 		String commentContent = "This is a test comment.";
 
-		CommentCreateRequest request = new CommentCreateRequest(commentContent, null);
+		CommentCreateRequest request = new CommentCreateRequest(commentContent, null, null);
 
 		@BeforeEach
 		public void setUp() {
@@ -97,7 +102,11 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		@Test
 		void 주어진_요청에_따라_대댓글을_생성할_수_있다() {
 			// given
-			CommentCreateRequest replyCommentRequest = new CommentCreateRequest(commentContent, PARENT_COMMENT.getId());
+			CommentCreateRequest replyCommentRequest = new CommentCreateRequest(
+				commentContent,
+				PARENT_COMMENT.getId(),
+				null
+			);
 
 			// when
 			CommentCreateResponse response = socialInteractionUseCase.createComment(
@@ -143,7 +152,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		void 댓글_내용이_빈_경우_댓글_생성에_실패한다() {
 			// given
 			String emptyContent = "";
-			CommentCreateRequest emptyRequest = new CommentCreateRequest(emptyContent, null);
+			CommentCreateRequest emptyRequest = new CommentCreateRequest(emptyContent, null, null);
 
 			// when & then
 			assertThatThrownBy(
@@ -156,7 +165,7 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		void 댓글_내용이_공백인_경우_댓글_생성에_실패한다() {
 			// given
 			String whitespaceContent = "   ";
-			CommentCreateRequest whitespaceRequest = new CommentCreateRequest(whitespaceContent, null);
+			CommentCreateRequest whitespaceRequest = new CommentCreateRequest(whitespaceContent, null, null);
 
 			// when & then
 			assertThatThrownBy(
@@ -173,7 +182,11 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			Comment replyToParent = testFixtureBuilder.buildComment(
 				CommentFixtures.REPLY_COMMENT(USER, SOCIAL_BOARD, parentComment));
 
-			CommentCreateRequest invalidParentRequest = new CommentCreateRequest(commentContent, replyToParent.getId());
+			CommentCreateRequest invalidParentRequest = new CommentCreateRequest(
+				commentContent,
+				replyToParent.getId(),
+				null
+			);
 
 			// when & then
 			assertThatThrownBy(() -> socialInteractionUseCase.createComment(
@@ -183,6 +196,35 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.INVALID_PARENT_COMMENT.getMessage());
+		}
+
+		@Test
+		void 이미지가_포함된_댓글을_작성할_수_있다() {
+			// given
+			String imageUrl = "https://cdn.toduck.app/test-image.jpg";
+			CommentCreateRequest requestWithImage = new CommentCreateRequest(
+				commentContent,
+				null,
+				imageUrl
+			);
+
+			// when
+			CommentCreateResponse response = socialInteractionUseCase.createComment(
+				USER.getId(),
+				SOCIAL_BOARD.getId(),
+				requestWithImage
+			);
+
+			// then
+			Comment savedComment = commentRepository.findById(response.commentId()).orElseThrow();
+			CommentImageFile savedCommentImage = commentImageFileRepository.findByComment(savedComment).orElseThrow();
+
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.commentId()).isNotNull();
+				softly.assertThat(savedCommentImage.getUrl()).isEqualTo(imageUrl);
+				softly.assertThat(savedComment.getContent().getValue()).isEqualTo(commentContent);
+			});
 		}
 	}
 

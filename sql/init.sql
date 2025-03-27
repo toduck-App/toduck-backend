@@ -93,6 +93,16 @@ CREATE TABLE comment_likes
     FOREIGN KEY (comment_id) REFERENCES comment (id)
 );
 
+CREATE TABLE comment_image_file
+(
+    id         BIGINT PRIMARY KEY auto_increment,
+    comment_id BIGINT        NOT NULL,
+    url        VARCHAR(1024) NOT NULL,
+    created_at DATETIME      NOT NULL,
+    updated_at DATETIME      NOT NULL,
+    deleted_at DATETIME      NULL,
+    FOREIGN KEY (comment_id) REFERENCES comment (id) ON DELETE CASCADE
+);
 
 CREATE TABLE likes
 (
