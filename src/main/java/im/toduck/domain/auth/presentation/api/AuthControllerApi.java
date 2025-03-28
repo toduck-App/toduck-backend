@@ -36,7 +36,7 @@ public interface AuthControllerApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_LOGIN_ID_OR_PASSWORD)
 		}
 	)
-	ResponseEntity<ApiResponse<LoginResponse>> signIn(LoginRequest request);
+	ResponseEntity<ApiResponse<LoginResponse>> signIn(@RequestBody @Valid LoginRequest request);
 
 	@Operation(
 		summary = "AccessToken 재발급",

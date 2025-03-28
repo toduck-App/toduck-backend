@@ -67,8 +67,8 @@ public class SocialMapper {
 		Social socialBoard,
 		List<SocialImageFile> imageFiles,
 		int commentCount,
-		boolean isLiked) {
-
+		boolean isLiked
+	) {
 		return SocialResponse.builder()
 			.socialId(socialBoard.getId())
 			.owner(getOwner(socialBoard.getUser()))
@@ -100,10 +100,11 @@ public class SocialMapper {
 			.toList();
 	}
 
-	private static OwnerDto getOwner(User user) {
+	private static OwnerDto getOwner(final User user) {
 		return OwnerDto.builder()
 			.ownerId(user.getId())
 			.nickname(user.getNickname())
+			.profileImageUrl(user.getImageUrl())
 			.build();
 	}
 }

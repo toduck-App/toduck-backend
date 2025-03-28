@@ -71,7 +71,7 @@ public record ScheduleInfoResponse(
 
 	@Schema(description = "일정 기록 삭제 날짜", example = "2024-08-31T14:30:00")
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
-	@JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	LocalDateTime deletedAt
 ) {
 }
