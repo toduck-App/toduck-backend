@@ -63,4 +63,9 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 			throw CommonException.from(ExceptionCode.NOT_VERIFIED_PHONE_NUMBER);
 		}
 	}
+
+	@Override
+	public void deleteVerifiedPhoneNumber(String phoneNumber) {
+		phoneNumberRepository.deleteById(phoneNumber);
+	}
 }
