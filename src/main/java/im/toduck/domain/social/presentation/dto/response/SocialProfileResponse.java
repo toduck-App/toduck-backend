@@ -1,10 +1,13 @@
 package im.toduck.domain.social.presentation.dto.response;
 
+import lombok.Builder;
+
+@Builder
 public record SocialProfileResponse(
 	String nickname,
-	Long followingCount,
-	Long followerCount,
-	Long postCount,
+	int followingCount,
+	int followerCount,
+	int postCount,
 	boolean isMe
 ) {
 }

@@ -210,5 +210,10 @@ public class SocialBoardService {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 		return socialRepository.searchSocialsExcludingBlocked(cursor, userId, keyword, pageRequest);
 	}
+
+	@Transactional(readOnly = true)
+	public int countSocialPostsByUserId(final Long userId) {
+		return (int)socialRepository.countByUserId(userId);
+	}
 }
 
