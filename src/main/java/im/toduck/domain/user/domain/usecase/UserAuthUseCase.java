@@ -29,6 +29,8 @@ public class UserAuthUseCase {
 	private final UserService userService;
 	private final PasswordEncoder passwordEncoder;
 
+	private static final String MASKING_CHARACTER = "**";
+
 	public void signOut(Long userId, String authHeader, String refreshToken) {
 		jwtService.removeAccessTokenAndRefreshToken(userId, authHeader, refreshToken);
 	}
@@ -52,8 +54,12 @@ public class UserAuthUseCase {
 		phoneNumberService.deleteVerifiedPhoneNumber(phoneNumber);
 		log.info("로그인 id 찾기 성공 phoneNumber: {}, loginId: {}", phoneNumber, user.getLoginId());
 		return LoginIdResponse.builder()
-			.loginId(user.getLoginId())
+			.loginId(maskLoginId(user.getLoginId()))
 			.build();
+	}
+
+	private String maskLoginId(String loginId) {
+		return loginId.substring(0, loginId.length() - MASKING_CHARACTER.length()) + "**";
 	}
 
 	public void verifyLoginIdPhoneNumber(final VerifyLoginIdPhoneNumberRequest request) {
