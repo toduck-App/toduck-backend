@@ -9,6 +9,7 @@ CREATE TABLE users
     login_id     VARCHAR(100)                               NULL,
     password     VARCHAR(255)                               NULL,
     email        VARCHAR(100)                               NULL,
+    image_url    VARCHAR(1024)                              NULL,
     role         ENUM ('ADMIN', 'USER')                     NOT NULL,
     provider     ENUM ('KAKAO', 'NAVER', 'GOOGLE', 'APPLE') NULL,
     created_at   DATETIME                                   NOT NULL,
