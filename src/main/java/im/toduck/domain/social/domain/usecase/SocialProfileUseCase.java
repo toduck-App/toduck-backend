@@ -1,16 +1,25 @@
 package im.toduck.domain.social.domain.usecase;
 
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.common.mapper.SocialProfileMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
+import im.toduck.domain.social.domain.service.SocialInteractionService;
+import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.user.domain.service.FollowService;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
+import im.toduck.global.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,9 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class SocialProfileUseCase {
+	private static final int DEFAULT_PROFILE_SOCIAL_PAGE_SIZE = 10;
+
 	private final UserService userService;
 	private final FollowService followService;
 	private final SocialBoardService socialBoardService;
+	private final SocialInteractionService socialInteractionService;
 
 	@Transactional(readOnly = true)
 	public SocialProfileResponse getUserProfile(final Long profileUserId, final Long authUserId) {
@@ -40,5 +52,58 @@ public class SocialProfileUseCase {
 			postCount,
 			isMe
 		);
+	}
+
+	@Transactional(readOnly = true)
+	public CursorPaginationResponse<SocialResponse> getUserSocials(
+		final Long profileUserId,
+		final Long authUserId,
+		final Long cursor,
+		final Integer limit
+	) {
+		User profileUser = userService.getUserById(profileUserId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		User authUser = userService.getUserById(authUserId)
+			.orElseThrow(
+				() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_PROFILE_SOCIAL_PAGE_SIZE);
+		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
+
+		List<Social> userSocials = socialBoardService.getSocialsByUserId(
+			profileUser.getId(),
+			authUser.getId(),
+			cursor,
+			fetchLimit
+		);
+
+		boolean hasMore = PaginationUtil.hasMore(userSocials, actualLimit);
+		Long nextCursor = PaginationUtil.getNextCursor(hasMore, userSocials, actualLimit, Social::getId);
+
+		List<SocialResponse> socialResponses = createSocialResponsesForUser(userSocials, authUser, actualLimit);
+
+		log.info("유저 게시글 목록 조회 - 대상 UserId: {}, 요청자 UserId: {}, HasMore: {}, NextCursor: {}",
+			profileUserId, authUserId, hasMore, nextCursor);
+
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
+	}
+
+	private List<SocialResponse> createSocialResponsesForUser(
+		final List<Social> socialBoards,
+		final User requestingUser,
+		final int actualLimit
+	) {
+		return socialBoards.stream()
+			.limit(actualLimit)
+			.map(social -> {
+				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(social);
+				int commentCount = socialInteractionService.countCommentsBySocial(social);
+				boolean isLikedByRequestingUser = socialInteractionService.getSocialBoardIsLiked(requestingUser,
+					social);
+
+				return SocialMapper.toSocialResponse(social, imageFiles, commentCount, isLikedByRequestingUser);
+			})
+			.toList();
 	}
 }

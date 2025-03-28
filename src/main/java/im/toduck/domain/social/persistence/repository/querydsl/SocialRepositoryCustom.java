@@ -20,4 +20,10 @@ public interface SocialRepositoryCustom {
 		String keyword,
 		Pageable pageable
 	);
+
+	List<Social> findUserSocials(
+		Long profileUserId,
+		Long cursor,
+		Pageable pageable
+	);
 }
