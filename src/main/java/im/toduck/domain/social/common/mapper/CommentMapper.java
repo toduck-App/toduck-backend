@@ -76,6 +76,7 @@ public class CommentMapper {
 		return OwnerDto.builder()
 			.ownerId(comment.getUser().getId())
 			.nickname(comment.getUser().getNickname())
+			.profileImageUrl(comment.getUser().getImageUrl())
 			.build();
 	}
 
