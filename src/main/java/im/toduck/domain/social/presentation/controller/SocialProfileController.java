@@ -13,6 +13,7 @@ import im.toduck.domain.social.domain.usecase.SocialProfileUseCase;
 import im.toduck.domain.social.presentation.api.SocialProfileApi;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
+import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -22,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/v1/profiles")
 public class SocialProfileController implements SocialProfileApi {
-
 	private final SocialProfileUseCase socialProfileUseCase;
 
 	@Override
@@ -52,5 +52,19 @@ public class SocialProfileController implements SocialProfileApi {
 			limit
 		);
 		return ResponseEntity.ok(ApiResponse.createSuccess(userSocials));
+	}
+
+	@Override
+	@GetMapping("/{userId}/routines")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<UserProfileRoutineListResponse>> getUserProfileRoutines(
+		@PathVariable Long userId,
+		@AuthenticationPrincipal CustomUserDetails authUser
+	) {
+		UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
+			userId,
+			authUser.getUserId()
+		);
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }

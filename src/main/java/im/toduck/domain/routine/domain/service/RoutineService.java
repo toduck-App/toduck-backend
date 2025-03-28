@@ -57,6 +57,10 @@ public class RoutineService {
 		return routineRepository.findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByUpdatedAtDesc(user);
 	}
 
+	public List<Routine> getSocialProfileRoutines(final User user) {
+		return routineRepository.findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByTimeAsc(user);
+	}
+
 	@Transactional
 	public void remove(final Routine routine) {
 		routine.delete();

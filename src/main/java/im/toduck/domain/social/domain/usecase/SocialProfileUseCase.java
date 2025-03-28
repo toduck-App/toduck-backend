@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.routine.common.mapper.RoutineMapper;
+import im.toduck.domain.routine.domain.service.RoutineService;
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.common.mapper.SocialProfileMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
@@ -12,6 +15,7 @@ import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
+import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
 import im.toduck.domain.user.domain.service.FollowService;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -33,6 +37,7 @@ public class SocialProfileUseCase {
 	private final FollowService followService;
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
+	private final RoutineService routineService;
 
 	@Transactional(readOnly = true)
 	public SocialProfileResponse getUserProfile(final Long profileUserId, final Long authUserId) {
@@ -64,9 +69,10 @@ public class SocialProfileUseCase {
 		User profileUser = userService.getUserById(profileUserId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
+		// TODO: profileUser의 프로필 공개 여부 필드 추가 후 처리 예외 처리
+
 		User authUser = userService.getUserById(authUserId)
-			.orElseThrow(
-				() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_PROFILE_SOCIAL_PAGE_SIZE);
 		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
@@ -105,5 +111,18 @@ public class SocialProfileUseCase {
 				return SocialMapper.toSocialResponse(social, imageFiles, commentCount, isLikedByRequestingUser);
 			})
 			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public UserProfileRoutineListResponse readUserAvailableRoutines(final Long profileUserId, final Long authUserId) {
+		User profileUser = userService.getUserById(profileUserId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		// TODO: profileUser의 프로필 공개 여부 필드 추가 후 처리 예외 처리
+
+		List<Routine> routines = routineService.getSocialProfileRoutines(profileUser);
+
+		log.info("사용자 ID {}의 공개 루틴 목록 조회 - 요청자 Id: {}", profileUserId, authUserId);
+		return RoutineMapper.toUserProfileRoutineListResponse(routines);
 	}
 }

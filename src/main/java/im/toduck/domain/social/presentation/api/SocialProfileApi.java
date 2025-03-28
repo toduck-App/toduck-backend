@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
+import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -66,5 +68,24 @@ public interface SocialProfileApi {
 		@AuthenticationPrincipal CustomUserDetails authUser,
 		@Parameter(description = "조회를 시작할 커서 값 (게시글 ID)") @RequestParam(required = false) Long cursor,
 		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
+	);
+
+	@Operation(
+		summary = "특정 유저의 공개된 루틴 목록 조회",
+		description = "userId에 해당하는 사용자의 루틴 목록 중, **공개(isPublic=true) 상태이고 삭제되지 않은 루틴**만 조회합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = MyRoutineAvailableListResponse.class,
+			description = "루틴 목록 조회 성공. 루틴 시간(time) 기준으로 오름차순 정렬됩니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_USER)
+		}
+	)
+	@GetMapping("/{userId}/routines")
+	ResponseEntity<ApiResponse<UserProfileRoutineListResponse>> getUserProfileRoutines(
+		@Parameter(description = "루틴 목록을 조회할 유저 ID") @PathVariable Long userId,
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails authUser
 	);
 }
