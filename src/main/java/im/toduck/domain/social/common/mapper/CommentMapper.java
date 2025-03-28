@@ -40,6 +40,8 @@ public class CommentMapper {
 
 	public static CommentDto toCommentDto(
 		final Comment comment,
+		final boolean hasImage,
+		final String imageUrl,
 		final boolean isCommentLiked,
 		final boolean isBlocked
 	) {
@@ -47,6 +49,8 @@ public class CommentMapper {
 			.commentId(comment.getId())
 			.parentCommentId(getParentCommentId(comment))
 			.owner(getOwner(comment, isBlocked))
+			.hasImage(hasImage)
+			.imageUrl(imageUrl)
 			.content(getContent(comment, isBlocked))
 			.commentLikeInfo(getCommentLikeDto(comment, isCommentLiked))
 			.isReply(isReply(comment))
@@ -72,6 +76,7 @@ public class CommentMapper {
 		return OwnerDto.builder()
 			.ownerId(comment.getUser().getId())
 			.nickname(comment.getUser().getNickname())
+			.profileImageUrl(comment.getUser().getImageUrl())
 			.build();
 	}
 

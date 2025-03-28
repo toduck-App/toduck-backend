@@ -10,6 +10,7 @@ import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.schedule.common.converter.ScheduleDaysOfWeekBitmaskConverter;
 import im.toduck.domain.schedule.persistence.vo.ScheduleDate;
 import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import im.toduck.global.helper.DaysOfWeekBitmask;
@@ -94,5 +95,20 @@ public class Schedule extends BaseEntity {
 
 	public void changeEndDate(LocalDate localDate) {
 		this.scheduleDate.changeEndDate(localDate);
+	}
+
+	public void updateInfo(ScheduleCreateRequest updateDto) {
+		DaysOfWeekBitmask daysOfWeekBitmask = null;
+		if (updateDto.daysOfWeek() != null) {
+			daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(updateDto.daysOfWeek());
+		}
+		this.title = updateDto.title();
+		this.category = updateDto.category();
+		this.color = PlanCategoryColor.from(updateDto.color());
+		this.scheduleDate = ScheduleDate.from(updateDto.startDate(), updateDto.endDate());
+		this.scheduleTime = ScheduleTime.from(updateDto.isAllDay(), updateDto.time(), updateDto.alarm());
+		this.daysOfWeekBitmask = daysOfWeekBitmask;
+		this.location = updateDto.location();
+		this.memo = updateDto.memo();
 	}
 }

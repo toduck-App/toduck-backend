@@ -9,6 +9,9 @@ public record OwnerDto(
 	Long ownerId,
 
 	@Schema(description = "작성자 닉네임", example = "오리발")
-	String nickname
+	String nickname,
+
+	@Schema(description = "작성자 프로필 이미지 url", example = "https://cdn.toduck.app/profile.jpg")
+	String profileImageUrl
 ) {
 }

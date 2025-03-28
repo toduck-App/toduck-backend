@@ -38,13 +38,13 @@ oauth2:
   client:
     provider:
       apple:
-        jwks-uri: https://appleid.apple.com/auth/keys
-        secret: appleSecret
+        jwks-uri: ${OIDC_APPLE_JWKS_URI}
+        secret: ${OIDC_APPLE_SECRET_KEY}
       google:
         jwks-uri: https://www.googleapis.com
         secret: googleSecret
         issuer: https://accounts.google.com
       kakao:
-        jwks-uri: https://kauth.kakao.com
-        secret: kakaoSecret
+        jwks-uri: ${OIDC_KAKAO_JWKS_URI}
+        secret: ${OIDC_KAKAO_SECRET_KEY}
 

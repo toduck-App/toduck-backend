@@ -24,7 +24,6 @@ import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
-import im.toduck.global.annotation.valid.PaginationLimit;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -92,7 +91,7 @@ public class SocialBoardController implements SocialBoardApi {
 	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		CustomUserDetails user,
 		Long cursor,
-		@PaginationLimit Integer limit,
+		Integer limit,
 		List<Long> categoryIds
 	) {
 		return ResponseEntity.ok().body(
@@ -118,7 +117,7 @@ public class SocialBoardController implements SocialBoardApi {
 		CustomUserDetails user,
 		@RequestParam(name = "keyword") String keyword,
 		Long cursor,
-		@PaginationLimit Integer limit
+		Integer limit
 	) {
 		return ResponseEntity.ok().body(ApiResponse.createSuccess(
 			socialBoardUseCase.searchSocials(user.getUserId(), keyword, cursor, limit)));

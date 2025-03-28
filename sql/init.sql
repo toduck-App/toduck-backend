@@ -9,6 +9,7 @@ CREATE TABLE users
     login_id     VARCHAR(100)                               NULL,
     password     VARCHAR(255)                               NULL,
     email        VARCHAR(100)                               NULL,
+    image_url    VARCHAR(1024)                              NULL,
     role         ENUM ('ADMIN', 'USER')                     NOT NULL,
     provider     ENUM ('KAKAO', 'NAVER', 'GOOGLE', 'APPLE') NULL,
     created_at   DATETIME                                   NOT NULL,
@@ -94,6 +95,16 @@ CREATE TABLE comment_likes
     FOREIGN KEY (comment_id) REFERENCES comment (id)
 );
 
+CREATE TABLE comment_image_file
+(
+    id         BIGINT PRIMARY KEY auto_increment,
+    comment_id BIGINT        NOT NULL,
+    url        VARCHAR(1024) NOT NULL,
+    created_at DATETIME      NOT NULL,
+    updated_at DATETIME      NOT NULL,
+    deleted_at DATETIME      NULL,
+    FOREIGN KEY (comment_id) REFERENCES comment (id) ON DELETE CASCADE
+);
 
 CREATE TABLE likes
 (
@@ -243,4 +254,29 @@ CREATE TABLE report
     deleted_at  DATETIME                                                                                                      NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (social_id) REFERENCES social (id)
+);
+
+CREATE TABLE diary
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    user_id     BIGINT                                                                              NOT NULL,
+    diary_date  DATE                                                                                NOT NULL,
+    emotion     ENUM ('HAPPY', 'GOOD', 'SAD', 'ANGRY', 'ANXIOUS', 'TIRED', 'SICK', 'SOSO', 'LOVE')  NOT NULL,
+    title       VARCHAR(50)                                                                         NULL,
+    memo        VARCHAR(2048)                                                                       NULL,
+    created_at  DATETIME                                                                            NOT NULL,
+    updated_at  DATETIME                                                                            NOT NULL,
+    deleted_at  DATETIME                                                                            NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE diary_image_file
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    diary_id    BIGINT                              NOT NULL,
+    url         VARCHAR(512)                        NOT NULL,
+    created_at  DATETIME                            NOT NULL,
+    updated_at  DATETIME                            NOT NULL,
+    deleted_at  DATETIME                            NULL,
+    FOREIGN KEY (diary_id) REFERENCES diary (id) ON DELETE CASCADE
 );

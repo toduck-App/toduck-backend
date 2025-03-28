@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -186,6 +187,28 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> socialBoardUseCase.createSocialBoard(USER.getId(), requestWithPrivateRoutine))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.PRIVATE_ROUTINE.getMessage());
+		}
+
+		@ParameterizedTest
+		@NullAndEmptySource
+		void 이미지URL이_null이거나_빈_리스트일때_게시글_작성에_성공한다(List<String> nullAndEmptyImageUrls) {
+			SocialCreateRequest requestWithoutImages = new SocialCreateRequest(
+				null,
+				content,
+				null,
+				isAnonymous,
+				categoryIds,
+				nullAndEmptyImageUrls
+			);
+
+			// when
+			SocialCreateResponse response = socialBoardUseCase.createSocialBoard(USER.getId(), requestWithoutImages);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.socialId()).isNotNull();
+			});
 		}
 
 	}

@@ -49,6 +49,9 @@ public class User extends BaseEntity {
 	@Column(nullable = true, length = 100)
 	private String email;
 
+	@Column(nullable = true, length = 1024)
+	private String imageUrl;
+
 	@Builder
 	private User(UserRole role, String nickname, String phoneNumber, String loginId, String password,
 		OAuthProvider provider, String email) {

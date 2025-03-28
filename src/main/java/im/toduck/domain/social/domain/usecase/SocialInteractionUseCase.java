@@ -48,6 +48,7 @@ public class SocialInteractionUseCase {
 		Comment parentComment = getParentComment(request.parentId());
 
 		Comment comment = socialInteractionService.createComment(user, socialBoard, parentComment, request);
+		socialInteractionService.addCommentImageFile(request.imageUrl(), comment);
 
 		log.info("소셜 게시글 댓글 생성 - UserId: {}, SocialBoardId: {}, CommentId: {}", userId, socialId, comment.getId());
 		return CommentMapper.toCommentCreateResponse(comment);

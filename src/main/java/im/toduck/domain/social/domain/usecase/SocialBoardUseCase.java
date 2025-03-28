@@ -1,6 +1,7 @@
 package im.toduck.domain.social.domain.usecase;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -13,6 +14,7 @@ import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
@@ -148,15 +150,8 @@ public class SocialBoardUseCase {
 
 		List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(socialBoard);
 		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard);
+		List<CommentDto> commentDtos = convertCommentsToDto(user, comments);
 		boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, socialBoard);
-
-		List<CommentDto> commentDtos = comments.stream()
-			.map((comment) -> {
-				boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
-				boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
-				return CommentMapper.toCommentDto(comment, isCommentLike, isBlocked);
-			})
-			.toList();
 
 		log.info("소셜 게시글 단건 상세 조회 - UserId: {}, SocialBoardId: {}", userId, socialId);
 		return SocialMapper.toSocialDetailResponse(socialBoard, imageFiles, commentDtos, isSocialBoardLiked);
@@ -204,6 +199,23 @@ public class SocialBoardUseCase {
 		final List<SocialCategory> socialCategories
 	) {
 		return socialCategories.size() != socialCategoryIds.size();
+	}
+
+	private List<CommentDto> convertCommentsToDto(final User user, final List<Comment> comments) {
+		return comments.stream()
+			.map(comment -> createCommentDto(user, comment))
+			.toList();
+	}
+
+	private CommentDto createCommentDto(final User user, final Comment comment) {
+		Optional<CommentImageFile> commentImageFile = socialInteractionService.getCommentImageByComment(comment);
+		boolean hasImage = commentImageFile.isPresent();
+		String imageUrl = hasImage ? commentImageFile.get().getUrl() : null;
+
+		boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
+		boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
+
+		return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
 	}
 
 	private List<SocialResponse> createSocialResponses(

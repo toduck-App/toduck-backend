@@ -58,7 +58,13 @@ public enum ExceptionCode {
 		"차단 해제 시 차단 정보를 찾을 수 없을 때 발생하는 오류입니다."),
 	ALREADY_BLOCKED(HttpStatus.CONFLICT, 40205, "이미 차단된 사용자입니다.",
 		"해당 사용자를 이미 차단한 경우 발생하는 오류입니다."),
-	EXISTS_USER_NICKNAME(HttpStatus.CONFLICT, 40206, "이미 사용 중인 닉네임입니다."),
+	CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, 40206, "자기 자신을 팔로우할 수 없습니다.",
+		"사용자가 자신의 계정을 팔로우하려고 시도할 때 발생하는 오류입니다."),
+	ALREADY_FOLLOWING(HttpStatus.CONFLICT, 40207, "이미 팔로우 중입니다.",
+		"해당 사용자를 이미 팔로우하고 있는 경우 발생하는 오류입니다."),
+	NOT_FOUND_FOLLOW(HttpStatus.NOT_FOUND, 40208, "팔로우 정보를 찾을 수 없습니다.",
+		"언팔로우 시 팔로우 관계가 존재하지 않을 때 발생하는 오류입니다."),
+	EXISTS_USER_NICKNAME(HttpStatus.CONFLICT, 40209, "이미 사용 중인 닉네임입니다."),
 
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
@@ -88,6 +94,11 @@ public enum ExceptionCode {
 	NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, 41102, "일정을 찾을 수 없습니다."),
 	NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE(HttpStatus.BAD_REQUEST, 41103, "반복되지 않는 하루 일정은 기간 삭제가 불가능합니다.",
 		"반복되지 않는 하루 일정은 기간 삭제가 불가능한 요청을 클라이언트에서 보냈을 때 발생합니다."),
+	ONE_DAY__NONREPEATABLE_SCHEDULE_CANNOT_AFTER_DATE_UPDATE(HttpStatus.FORBIDDEN, 41104,
+		"반복되지 않는 하루 일정은 하루 삭제만 가능합니다.",
+		"반복되지 않는 하루 일정을 하루 삭제만 가능한 요청을 클라이언트에서 일괄 수정 보냈을 때 발생합니다."),
+	PERIOD_SCHEDULE_CANNOT_AFTER_DATE_UPDATE(HttpStatus.BAD_REQUEST, 41105, "기간 일정은 하루 삭제만 가능합니다.",
+		"기간 일정을 하루 삭제만 가능한 요청을 클라이언트에서 일괄 수정 보냈을 때 발생합니다."),
 
 	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),
