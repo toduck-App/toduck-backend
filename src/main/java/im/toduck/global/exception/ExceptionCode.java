@@ -68,6 +68,7 @@ public enum ExceptionCode {
 		"해당 사용자를 이미 팔로우하고 있는 경우 발생하는 오류입니다."),
 	NOT_FOUND_FOLLOW(HttpStatus.NOT_FOUND, 40208, "팔로우 정보를 찾을 수 없습니다.",
 		"언팔로우 시 팔로우 관계가 존재하지 않을 때 발생하는 오류입니다."),
+	EXISTS_USER_NICKNAME(HttpStatus.CONFLICT, 40209, "이미 사용 중인 닉네임입니다."),
 
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),

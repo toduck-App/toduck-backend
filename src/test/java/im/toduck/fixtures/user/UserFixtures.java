@@ -1,5 +1,7 @@
 package im.toduck.fixtures.user;
 
+import java.util.UUID;
+
 import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.persistence.entity.OAuthProvider;
 import im.toduck.domain.user.persistence.entity.User;
@@ -42,12 +44,13 @@ public class UserFixtures {
 	 * ENTITY
 	 */
 	public static User GENERAL_USER() {
-		return UserMapper.toGeneralUser(GENERAL_USER1_USERNAME, GENERAL_USER1_USER_ID, GENERAL_USER1_PASSWORD,
-			GENERAL_USER1_PHONENUMBER);
+		return UserMapper.toGeneralUser(GENERAL_USER1_USERNAME + UUID.randomUUID(), GENERAL_USER1_USER_ID,
+			GENERAL_USER1_PASSWORD, GENERAL_USER1_PHONENUMBER);
 	}
 
 	public static User OAUTH_USER() {
-		return UserMapper.toOAuthUser(OAUTH_USER1_USERNAME, OAUTHE_USER1_PROVIDER, OAUTH_USER1_EMAIL);
+		return UserMapper.toOAuthUser(OAUTH_USER1_USERNAME + UUID.randomUUID(), OAUTHE_USER1_PROVIDER,
+			OAUTH_USER1_EMAIL);
 	}
 
 	/**

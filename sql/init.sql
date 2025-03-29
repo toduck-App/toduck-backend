@@ -4,7 +4,7 @@ CREATE TABLE users
 (
     -- TODO: 3. users 테이블  oauth 사용 시 필요한 사용자 식별값 → oauth 에서 전화번호 수집이 가능한지 다시 확인 필요
     id           BIGINT PRIMARY KEY auto_increment,
-    nickname     VARCHAR(100)                               NOT NULL,
+    nickname     VARCHAR(100)                               NULL,
     phone_number VARCHAR(50)                                NULL,
     login_id     VARCHAR(100)                               NULL,
     password     VARCHAR(255)                               NULL,
@@ -14,7 +14,8 @@ CREATE TABLE users
     provider     ENUM ('KAKAO', 'NAVER', 'GOOGLE', 'APPLE') NULL,
     created_at   DATETIME                                   NOT NULL,
     updated_at   DATETIME                                   NOT NULL,
-    deleted_at   DATETIME                                   NULL
+    deleted_at   DATETIME                                   NULL,
+    CONSTRAINT users_nickname_unique UNIQUE (nickname)
 );
 
 CREATE TABLE routine
@@ -150,35 +151,37 @@ CREATE TABLE social_image_file
 );
 
 -- Schedule 테이블
-CREATE TABLE schedule (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(100) NOT NULL,
-    category ENUM('COMPUTER', 'FOOD', 'PENCIL', 'RED_BOOK', 'YELLOW_BOOK', 'SLEEP', 'POWER', 'PEOPLE', 'MEDICINE', 'TALK', 'HEART', 'VEHICLE', 'NONE') DEFAULT NULL,
-    color VARCHAR(100) DEFAULT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    is_all_day BOOLEAN NOT NULL,
-    time TIME DEFAULT NULL,
-    days_of_week TINYINT  DEFAULT NULL,
-    alarm ENUM('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY') DEFAULT NULL,
-    location VARCHAR(255) DEFAULT NULL,
-    memo VARCHAR(255) DEFAULT NULL,
-    user_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    deleted_at DATETIME DEFAULT NULL,
+CREATE TABLE schedule
+(
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title        VARCHAR(100) NOT NULL,
+    category     ENUM ('COMPUTER', 'FOOD', 'PENCIL', 'RED_BOOK', 'YELLOW_BOOK', 'SLEEP', 'POWER', 'PEOPLE', 'MEDICINE', 'TALK', 'HEART', 'VEHICLE', 'NONE') DEFAULT NULL,
+    color        VARCHAR(100)                                                                                                                               DEFAULT NULL,
+    start_date   DATE         NOT NULL,
+    end_date     DATE         NOT NULL,
+    is_all_day   BOOLEAN      NOT NULL,
+    time         TIME                                                                                                                                       DEFAULT NULL,
+    days_of_week TINYINT                                                                                                                                    DEFAULT NULL,
+    alarm        ENUM ('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY')                                                                                                 DEFAULT NULL,
+    location     VARCHAR(255)                                                                                                                               DEFAULT NULL,
+    memo         VARCHAR(255)                                                                                                                               DEFAULT NULL,
+    user_id      BIGINT       NOT NULL,
+    created_at   DATETIME     NOT NULL,
+    updated_at   DATETIME     NOT NULL,
+    deleted_at   DATETIME                                                                                                                                   DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 
-CREATE TABLE schedule_record (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    is_completed BOOLEAN NOT NULL,
-    record_date DATE NOT NULL,
-    schedule_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    deleted_at DATETIME NULL,
+CREATE TABLE schedule_record
+(
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+    is_completed BOOLEAN  NOT NULL,
+    record_date  DATE     NOT NULL,
+    schedule_id  BIGINT   NOT NULL,
+    created_at   DATETIME NOT NULL,
+    updated_at   DATETIME NOT NULL,
+    deleted_at   DATETIME NULL,
     FOREIGN KEY (schedule_id) REFERENCES schedule (id) ON DELETE CASCADE
 );
 

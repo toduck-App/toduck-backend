@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import im.toduck.domain.user.persistence.entity.OAuthProvider;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.domain.user.persistence.repository.querydsl.UserRepositoryCustom;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 	Optional<User> findByPhoneNumber(String username);
 
 	Optional<User> findByLoginId(String loginId);
