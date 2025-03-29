@@ -1,11 +1,13 @@
 package im.toduck.domain.social.domain.usecase;
 
+import static im.toduck.fixtures.RoutineFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static im.toduck.global.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +17,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import im.toduck.ServiceTest;
+import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
+import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
@@ -206,5 +210,71 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		// TODO: 차단 로직 구현 시 차단된 사용자의 게시글 조회 테스트 추가
+	}
+
+	@Nested
+	@DisplayName("유저의 공개 루틴 목록 조회시")
+	class GetUserAvailableRoutinesTests {
+
+		@Test
+		void 유저의_공개_루틴_목록을_조회할_수_있다() {
+			// given
+			int routineCount = 5;
+			List<Routine> routines = new ArrayList<>();
+
+			for (int i = 0; i < routineCount; i++) {
+				Routine routine = testFixtureBuilder.buildRoutine(WEEKEND_NOON_ROUTINE(PROFILE_USER));
+				routines.add(routine);
+			}
+
+			// when
+			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
+				PROFILE_USER.getId(),
+				AUTH_USER.getId()
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.routines()).hasSize(routineCount);
+
+				List<Long> responseRoutineIds = response.routines().stream()
+					.map(UserProfileRoutineListResponse.UserProfileRoutineResponse::routineId)
+					.toList();
+
+				List<Long> expectedRoutineIds = routines.stream()
+					.map(Routine::getId)
+					.toList();
+
+				softly.assertThat(responseRoutineIds).containsExactlyInAnyOrderElementsOf(expectedRoutineIds);
+			});
+		}
+
+		@Test
+		void 존재하지_않는_사용자의_루틴_조회_시_예외가_발생한다() {
+			// given
+			Long nonExistentUserId = -1L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialProfileUseCase.readUserAvailableRoutines(nonExistentUserId, AUTH_USER.getId()))
+				.isInstanceOf(CommonException.class)
+				.hasMessageContaining(NOT_FOUND_USER.getMessage());
+		}
+
+		@Test
+		void 루틴이_없는_경우_빈_목록을_반환한다() {
+			// when
+			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
+				PROFILE_USER.getId(),
+				AUTH_USER.getId()
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.routines()).isEmpty();
+			});
+		}
 	}
 }
