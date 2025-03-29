@@ -15,17 +15,17 @@ public record DiaryUpdateRequest(
 	boolean isChangeEmotion,
 
 	@NotNull
-	@Schema(description = "기존/변경된 감정", example = "HAPPY")
+	@Schema(description = "기존/변경된 감정", example = "SAD")
 	Emotion emotion,
 
 	@Nullable
 	@Size(max = 50, message = "제목은 공백일 수 없으며 50자 이하여야 합니다.")
-	@Schema(description = "변경된 제목", example = "오늘의 기분은 최고!")
+	@Schema(description = "변경된 제목", example = "버그를 만났어")
 	String title,
 
 	@Nullable
 	@Size(max = 2048, message = "메모는 공백일 수 없으며 2048자 이하여야 합니다.")
-	@Schema(description = "변경된 메모", example = "오늘 하루를 기록해봅니다...")
+	@Schema(description = "변경된 메모", example = "슬퍼짐")
 	String memo,
 
 	@Nullable
