@@ -94,5 +94,9 @@ public class User extends BaseEntity {
 			return DELETED_MEMBER_NICKNAME;
 		}
 		return nickname;
+  }
+  
+	public void changePassword(String encodedPassword) {
+		this.password = encodedPassword;
 	}
 }

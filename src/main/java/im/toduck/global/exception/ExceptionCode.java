@@ -47,6 +47,10 @@ public enum ExceptionCode {
 	INVALID_ID_TOKEN(HttpStatus.FORBIDDEN, 40118, "유효하지 않은 ID 토큰입니다.", "ID 토큰이 유효하지 않을 때 발생하는 오류입니다."),
 	ABNORMAL_ID_TOKEN(HttpStatus.FORBIDDEN, 40119, "비정상적인 ID 토큰입니다.", "ID 토큰 공개키로 암호화 도중에 발생하는 오류입니다."),
 	NOT_MATCHED_PUBLIC_KEY(HttpStatus.NOT_FOUND, 40120, "일치하는 공개키를 찾을 수 없습니다.", "KID 와 공개키가 일치하지 않을 때 발생하는 오류입니다."),
+	NOT_EXIST_PHONE_NUMBER(HttpStatus.BAD_REQUEST, 40121, "가입된 전화번호가 아닙니다.",
+		"자체 회원가입에서 ID 찾기 혹은 비밀번호 찾기를 위한 인증번호 요청에서 회원으로 등록되지 않은 전화번호이어서 발생하는 오류입니다."),
+	INVALID_LOGIN_ID(HttpStatus.BAD_REQUEST, 40122, "유효하지 않은 아이디입니다.",
+		"비밀번호 찾기를 위한 인증번호 요청에서 회원ID와 일치하지 않는 로그인 아이디이어서 발생하는 오류입니다."),
 
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),

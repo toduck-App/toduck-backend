@@ -12,4 +12,6 @@ public interface PhoneNumberService {
 	void validateVerifiedCode(PhoneNumber phoneNumberEntity, String verifiedCode);
 
 	void validateVerifiedPhoneNumber(String phoneNumber);
+
+	void deleteVerifiedPhoneNumber(String phoneNumber);
 }

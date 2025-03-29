@@ -34,10 +34,8 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public void validateUserByPhoneNumber(String phoneNumber) {
-		userRepository.findByPhoneNumber(phoneNumber).ifPresent(user -> {
-			throw CommonException.from(ExceptionCode.EXISTS_PHONE_NUMBER);
-		});
+	public Optional<User> findUserByPhoneNumber(String phoneNumber) {
+		return userRepository.findByPhoneNumber(phoneNumber);
 	}
 
 	@Transactional(readOnly = true)
