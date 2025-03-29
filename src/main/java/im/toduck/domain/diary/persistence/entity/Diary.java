@@ -43,7 +43,7 @@ public class Diary extends BaseEntity {
 	private User user;
 
 	@Column(name = "diary_date", nullable = false)
-	private LocalDate diaryDate;
+	private LocalDate date;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -60,14 +60,30 @@ public class Diary extends BaseEntity {
 
 	@Builder
 	private Diary(User user,
-		LocalDate diaryDate,
+		LocalDate date,
 		Emotion emotion,
 		String title,
 		String memo) {
 		this.user = user;
-		this.diaryDate = diaryDate;
+		this.date = date;
 		this.emotion = emotion;
 		this.title = title;
+		this.memo = memo;
+	}
+
+	public boolean isOwner(User requestingUser) {
+		return this.user.getId().equals(requestingUser.getId());
+	}
+
+	public void updateEmotion(Emotion emotion) {
+		this.emotion = emotion;
+	}
+
+	public void updateTitle(String title) {
+		this.title = title;
+	}
+
+	public void updateMemo(String memo) {
 		this.memo = memo;
 	}
 }

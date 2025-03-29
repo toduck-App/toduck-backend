@@ -1,5 +1,7 @@
 package im.toduck.domain.diary.persistence.entity;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -38,5 +40,9 @@ public class DiaryImage extends BaseEntity {
 	private DiaryImage(Diary diary, String url) {
 		this.diary = diary;
 		this.url = url;
+	}
+
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
 	}
 }
