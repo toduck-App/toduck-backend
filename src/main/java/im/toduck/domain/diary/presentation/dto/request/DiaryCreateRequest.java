@@ -19,7 +19,7 @@ public record DiaryCreateRequest(
 	LocalDate date,
 
 	@NotNull(message = "감정은 비어있을 수 없습니다.")
-	@Schema(description = "감정", example = "HAPPY")
+	@Schema(description = "감정", example = "SAD")
 	Emotion emotion,
 
 	@Size(max = 16, message = "제목은 16자를 초과할 수 없습니다.")
