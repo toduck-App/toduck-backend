@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "diary")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE record SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE diary SET deleted_at = NOW() where id=?")
 @SQLRestriction(value = "deleted_at is NULL")
 public class Diary extends BaseEntity {
 	@Id
