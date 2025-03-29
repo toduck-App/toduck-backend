@@ -25,7 +25,9 @@ public class GeneralSignUpUseCase {
 	private final NickNameGenerateService nickNameGenerateService;
 
 	public void sendVerifiedCodeToPhoneNumber(String phoneNumber) {
-		userService.validateUserByPhoneNumber(phoneNumber);
+		userService.findUserByPhoneNumber(phoneNumber).ifPresent(user -> {
+			throw CommonException.from(ExceptionCode.EXISTS_PHONE_NUMBER);
+		});
 
 		phoneNumberService.findAlreadySentPhoneNumber(phoneNumber)
 			.ifPresentOrElse(phoneNumberService::reSendVerifiedCodeToPhoneNumber,
@@ -46,12 +48,15 @@ public class GeneralSignUpUseCase {
 	@Transactional
 	public void signUp(SignUpRequest.General request) {
 		userService.validateByLoginId(request.loginId());
-		userService.validateUserByPhoneNumber(request.phoneNumber());
+		userService.findUserByPhoneNumber(request.phoneNumber()).ifPresent(user -> {
+			throw CommonException.from(ExceptionCode.EXISTS_PHONE_NUMBER);
+		});
 		phoneNumberService.validateVerifiedPhoneNumber(request.phoneNumber());
 		String encodedPassword = passwordEncoder.encode(request.password());
 		String nickname = nickNameGenerateService.generateRandomNickname();
 
 		userService.registerGeneralUser(
 			UserMapper.toGeneralUser(nickname, request.loginId(), encodedPassword, request.phoneNumber()));
+		phoneNumberService.deleteVerifiedPhoneNumber(request.phoneNumber());
 	}
 }
