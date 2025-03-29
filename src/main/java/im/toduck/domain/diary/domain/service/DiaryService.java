@@ -99,4 +99,8 @@ public class DiaryService {
 			.map(DiaryMapper::fromDiary)
 			.toList();
 	}
+
+	public Diary getDiaryByDate(Long userId, LocalDate date) {
+		return diaryRepository.findByUserIdAndDate(userId, date);
+	}
 }
