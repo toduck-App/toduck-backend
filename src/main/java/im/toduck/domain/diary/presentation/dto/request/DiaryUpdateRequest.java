@@ -12,7 +12,7 @@ import jakarta.validation.constraints.Size;
 public record DiaryUpdateRequest(
 	@NotNull
 	@Schema(description = "감정 변경 여부", example = "true")
-	boolean isChangeEmotion,
+	Boolean isChangeEmotion,
 
 	@NotNull
 	@Schema(description = "기존/변경된 감정", example = "SAD")
