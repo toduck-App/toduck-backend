@@ -91,7 +91,7 @@ public class DiaryService {
 		final int month
 	) {
 		LocalDate startDate = LocalDate.of(year, month, 1);
-		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()).plusDays(1);
 
 		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate);
 
