@@ -31,6 +31,7 @@ public class DiaryMapper {
 
 	public static DiaryResponse fromDiary(Diary diary) {
 		return new DiaryResponse(
+			diary.getId(),
 			diary.getDate(),
 			diary.getEmotion(),
 			diary.getTitle(),
