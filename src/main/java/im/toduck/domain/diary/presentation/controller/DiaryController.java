@@ -41,9 +41,9 @@ public class DiaryController implements DiaryApi {
 		@RequestBody @Valid final DiaryCreateRequest request,
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	) {
-		return ResponseEntity.ok(
-			ApiResponse.createSuccess(diaryUseCase.createDiary(userDetails.getUserId(), request))
-		);
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(diaryUseCase.createDiary(userDetails.getUserId(), request))
+			);
 	}
 
 	@Override
