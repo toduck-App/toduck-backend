@@ -105,7 +105,7 @@ public interface DiaryApi {
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateDiary(
 		@PathVariable Long diaryId,
-		@AuthenticationPrincipal DiaryUpdateRequest request,
+		@RequestBody @Valid DiaryUpdateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
