@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.mypage.domain.service.MyPageService;
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
+import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -23,5 +24,14 @@ public class MyPageUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		myPageService.updateUniqueNickname(user, request.nickname());
+	}
+
+	public NickNameResponse getMyNickname(Long userId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		return NickNameResponse.builder()
+			.nickname(user.getNickname())
+			.build();
 	}
 }

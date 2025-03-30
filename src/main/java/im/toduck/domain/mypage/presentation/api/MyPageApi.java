@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
+import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -36,4 +37,17 @@ public interface MyPageApi {
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	);
 
+	@Operation(
+		summary = "자신의 닉네임 조회",
+		description = "사용자 자신의 닉네임을 조회합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = NickNameResponse.class,
+			description = "닉네임 조회 성공, 자신의 닉네임을 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<NickNameResponse>> getMyNickname(
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	);
 }
