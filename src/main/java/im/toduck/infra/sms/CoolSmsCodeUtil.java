@@ -11,6 +11,8 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 
 import im.toduck.domain.auth.presentation.dto.VerifyCodeDto;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,7 +45,12 @@ public class CoolSmsCodeUtil extends VerifiyCodeUtil {
 		message.setTo(verifyCodeDto.getPhoneNumber());
 		message.setText(SMS_MESSAGE_FORMAT + verifyCodeDto.getCode());
 
-		SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+		SingleMessageSentResponse response;
+		try {
+			response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+		} catch (Exception e) {
+			throw CommonException.from(ExceptionCode.SMS_ERROR);
+		}
 		log.info("send message response: {}", response);
 	}
 }
