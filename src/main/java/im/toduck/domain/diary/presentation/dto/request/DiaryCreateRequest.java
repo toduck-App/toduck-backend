@@ -3,6 +3,9 @@ package im.toduck.domain.diary.presentation.dto.request;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+
 import im.toduck.domain.user.persistence.entity.Emotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -11,11 +14,12 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "다이어리 생성 요청 DTO")
 public record DiaryCreateRequest(
 	@NotNull(message = "날짜는 비어있을 수 없습니다.")
+	@JsonDeserialize(using = LocalDateDeserializer.class)
 	@Schema(description = "일기 날짜", example = "2025-03-12")
 	LocalDate date,
 
 	@NotNull(message = "감정은 비어있을 수 없습니다.")
-	@Schema(description = "감정", example = "HAPPY")
+	@Schema(description = "감정", example = "SAD")
 	Emotion emotion,
 
 	@Size(max = 16, message = "제목은 16자를 초과할 수 없습니다.")

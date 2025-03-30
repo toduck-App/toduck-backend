@@ -3,12 +3,19 @@ package im.toduck.domain.diary.presentation.dto.response;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+
 import im.toduck.domain.user.persistence.entity.Emotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
 public record DiaryResponse(
+	@Schema(description = "일기 번호", example = "1")
+	Long diaryId,
+
+	@JsonSerialize(using = LocalDateSerializer.class)
 	@Schema(description = "날짜", example = "2025-03-21")
 	LocalDate date,
 

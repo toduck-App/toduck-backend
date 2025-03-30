@@ -89,7 +89,7 @@ public interface DiaryApi {
 				<p>2. <b>메모 수정</b>: memo = 변경할 내용(지우고 싶은 경우 빈 문자열)</p>
 				<b>이미지 관련 시나리오:</b><br/>
 				<p>1. <b>이미지 유지</b>: diaryImageUrls = null (이미지를 수정하지 않음)</p>
-				<p>2. <b>이미지 추가/수정</b>: diaryImageUrls = [새로운 이미지 URL 리스트]</p>
+				<p>2. <b>이미지 추가/수정</b>: diaryImageUrls = [새로운 이미지 URL 리스트] (유지되는 이미지도 다시 첨부)</p>
 				<p>3. <b>이미지 모두 제거</b>: diaryImageUrls = [] (기존 이미지를 모두 제거)</p>
 				<p>4. <b>최대 이미지 초과</b>: diaryImageUrls = [이미지 URL 3개 이상] (예외 발생)</p><br/>
 				"""
@@ -105,7 +105,7 @@ public interface DiaryApi {
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> updateDiary(
 		@PathVariable Long diaryId,
-		@AuthenticationPrincipal DiaryUpdateRequest request,
+		@RequestBody @Valid DiaryUpdateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 

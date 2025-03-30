@@ -30,6 +30,10 @@ public class DiaryUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
+		Diary checkDiary = diaryService.getDiaryByDate(userId, request.date());
+		if (checkDiary != null) {
+			throw CommonException.from(ExceptionCode.EXISTS_DATE_DIARY);
+		}
 		Diary diary = diaryService.createDiary(user, request);
 		diaryService.addDiaryImageFiles(request.diaryImageUrls(), diary);
 
