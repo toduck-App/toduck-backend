@@ -96,7 +96,7 @@ public enum ExceptionCode {
 	NOT_FOUND_DIARY(HttpStatus.NOT_FOUND, 40501, "일기를 찾을 수 없습니다."),
 	UNAUTHORIZED_ACCESS_DIARY(HttpStatus.FORBIDDEN, 40502, "일기에 접근 권한이 없습니다."),
 
-	/* 411xx schedule */
+	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 41101, "일정 기록을 찾을 수 없습니다.",
 		"일정 기록을 찾을 수 없을 때 발생하는 오류입니다."),
 	NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, 41102, "일정을 찾을 수 없습니다."),
@@ -119,7 +119,8 @@ public enum ExceptionCode {
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
 	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다."),
 	INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, 49903, "지원되지 않는 이미지 파일 확장자입니다.",
-		"이미지 파일 업로드에 허용되지 않는 파일 형식입니다.");
+		"이미지 파일 업로드에 허용되지 않는 파일 형식입니다."),
+	SMS_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 49904, "외부 SMS 통신중 에러가 났습니다.");
 
 	private final HttpStatus httpStatus;
 	private final int errorCode;
