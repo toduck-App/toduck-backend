@@ -82,4 +82,16 @@ public class DiaryController implements DiaryApi {
 		List<DiaryResponse> diaries = diaryUseCase.getDiariesByMonth(user.getUserId(), year, month);
 		return ResponseEntity.ok(ApiResponse.createSuccess(diaries));
 	}
+
+	@GetMapping("/count")
+	@PreAuthorize("isAuthenticated()")
+	@Override
+	public ResponseEntity<ApiResponse<Integer>> getDiaryCountByMonth(
+		@RequestParam("year") int year,
+		@RequestParam("month") int month,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		int diaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
+		return ResponseEntity.ok(ApiResponse.createSuccess(diaryCount));
+	}
 }
