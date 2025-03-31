@@ -134,21 +134,20 @@ public interface DiaryApi {
 	);
 
 	@Operation(
-		summary = "특정 연월에 작성된 일기 개수 검색",
+		summary = "특정 연월의 일기 개수 증감 (전월 대비)",
 		description =
 			"""
-				<b>특정 연월에 작성된 일기의 개수를 조회합니다.</b><br/><br/>
+				<b>특정 연월과 전월의 일기 개수를 비교하여 그 차이를 조회합니다.</b><br/><br/>
 				<p><b>연월 필터를 적용하는 방법:</b></p>
 				<p>예시: /v1/diary/count?year=2025&month=3</p><br/>
 				<p>- <b>year:</b> 조회 할 연도</p>
 				<p>- <b>month:</b> 조회 할 달</p>
-				<p>검색 결과가 존재하지 않는 경우 0이 반환됩니다.</p>
 				"""
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = DiaryResponse.class,
-			description = "일기 조회 성공, 해당 연월에 작성된 일기의 개수를 반환합니다."
+			responseClass = ApiResponse.class,
+			description = "일기 조회 성공, 특정 연월의 일기 개수 증감(전월 대비)을 반환합니다."
 		)
 	)
 	ResponseEntity<ApiResponse<Integer>> getDiaryCountByMonth(
