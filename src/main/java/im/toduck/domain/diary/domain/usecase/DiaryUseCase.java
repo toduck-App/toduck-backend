@@ -2,6 +2,8 @@ package im.toduck.domain.diary.domain.usecase;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import im.toduck.domain.diary.common.mapper.DiaryMapper;
 import im.toduck.domain.diary.domain.service.DiaryService;
 import im.toduck.domain.diary.persistence.entity.Diary;
@@ -14,7 +16,6 @@ import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,14 +82,14 @@ public class DiaryUseCase {
 		return diary.isOwner(user);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<DiaryResponse> getDiariesByMonth(final Long userId, final int year, final int month) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		return diaryService.getDiariesByMonth(userId, year, month);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public int getDiaryCountByMonth(Long userId, int year, int month) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
