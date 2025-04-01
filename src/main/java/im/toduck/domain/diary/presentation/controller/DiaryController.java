@@ -22,6 +22,7 @@ import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
+import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -86,12 +87,13 @@ public class DiaryController implements DiaryApi {
 	@GetMapping("/count")
 	@PreAuthorize("isAuthenticated()")
 	@Override
-	public ResponseEntity<ApiResponse<Integer>> getDiaryCountByMonth(
+	public ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
 		@RequestParam("year") int year,
 		@RequestParam("month") int month,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		int monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
-		return ResponseEntity.ok(ApiResponse.createSuccess(monthDiaryCount));
+		MonthDiaryResponse monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
+		return ResponseEntity.ok()
+			.body(ApiResponse.createSuccess(monthDiaryCount));
 	}
 }
