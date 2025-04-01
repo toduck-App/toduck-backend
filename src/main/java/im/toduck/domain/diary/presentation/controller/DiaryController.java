@@ -91,14 +91,7 @@ public class DiaryController implements DiaryApi {
 		@RequestParam("month") int month,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		int lastMonth = month - 1;
-		int lastYear = year;
-		if (lastMonth == 0) {
-			lastMonth = 12;
-			lastYear--;
-		}
-		int lastMonthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), lastYear, lastMonth);
-		int thisMonthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
-		return ResponseEntity.ok(ApiResponse.createSuccess(thisMonthDiaryCount - lastMonthDiaryCount));
+		int monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
+		return ResponseEntity.ok(ApiResponse.createSuccess(monthDiaryCount));
 	}
 }

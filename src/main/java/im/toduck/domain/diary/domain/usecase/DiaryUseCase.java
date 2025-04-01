@@ -93,6 +93,14 @@ public class DiaryUseCase {
 	public int getDiaryCountByMonth(Long userId, int year, int month) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		return diaryService.getDiaryCountByMonth(userId, year, month);
+		int lastMonth = month - 1;
+		int lastYear = year;
+		if (lastMonth == 0) {
+			lastMonth = 12;
+			lastYear--;
+		}
+		int thisMonthCount = diaryService.getDiaryCountByMonth(userId, year, month);
+		int lastMonthCount = diaryService.getDiaryCountByMonth(userId, lastYear, lastMonth);
+		return thisMonthCount - lastMonthCount;
 	}
 }
