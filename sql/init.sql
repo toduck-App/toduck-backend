@@ -280,3 +280,17 @@ CREATE TABLE diary_image_file
     deleted_at  DATETIME                            NULL,
     FOREIGN KEY (diary_id) REFERENCES diary (id) ON DELETE CASCADE
 );
+
+CREATE TABLE concentration
+(
+    id                  BIGINT PRIMARY KEY auto_increment,
+    user_id             BIGINT                              NOT NULL,
+    concentration_date  DATE                                NOT NULL,
+    target_count        BIGINT                              NOT NULL,
+    setting_count       BIGINT                              NOT NULL,
+    concentration_time  BIGINT                              NOT NULL,
+    created_at          DATETIME                            NOT NULL,
+    updated_at          DATETIME                            NOT NULL,
+    deleted_at          DATETIME                            NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
