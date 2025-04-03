@@ -1,5 +1,6 @@
 package im.toduck.domain.diary.domain.usecase;
 
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -94,14 +95,14 @@ public class DiaryUseCase {
 	public MonthDiaryResponse getDiaryCountByMonth(Long userId, int year, int month) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		int lastMonth = month - 1;
-		int lastYear = year;
-		if (lastMonth == 0) {
-			lastMonth = 12;
-			lastYear--;
-		}
-		int thisMonthCount = diaryService.getDiaryCountByMonth(userId, year, month);
-		int lastMonthCount = diaryService.getDiaryCountByMonth(userId, lastYear, lastMonth);
+
+		YearMonth currentMonth = YearMonth.of(year, month);
+		YearMonth previousMonth = currentMonth.minusMonths(1);
+
+		int thisMonthCount = diaryService.getDiaryCountByMonth(userId, currentMonth.getYear(),
+			currentMonth.getMonthValue());
+		int lastMonthCount = diaryService.getDiaryCountByMonth(userId, previousMonth.getYear(),
+			previousMonth.getMonthValue());
 		return DiaryMapper.toMonthDiaryResponse(thisMonthCount, lastMonthCount);
 	}
 }
