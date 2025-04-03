@@ -201,14 +201,16 @@ public class SocialBoardService {
 		return socialCategoryRepository.findAll();
 	}
 
+	@Transactional(readOnly = true)
 	public List<Social> searchSocialsWithFilters(
 		final Long userId,
 		final String keyword,
 		final Long cursor,
-		final int limit
+		final int limit,
+		final List<Long> categoryIds
 	) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
-		return socialRepository.searchSocialsExcludingBlocked(cursor, userId, keyword, pageRequest);
+		return socialRepository.searchSocialsExcludingBlocked(cursor, userId, keyword, categoryIds, pageRequest);
 	}
 }
 

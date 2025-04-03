@@ -117,9 +117,10 @@ public class SocialBoardController implements SocialBoardApi {
 		CustomUserDetails user,
 		@RequestParam(name = "keyword") String keyword,
 		Long cursor,
-		Integer limit
+		Integer limit,
+		List<Long> categoryIds
 	) {
 		return ResponseEntity.ok().body(ApiResponse.createSuccess(
-			socialBoardUseCase.searchSocials(user.getUserId(), keyword, cursor, limit)));
+			socialBoardUseCase.searchSocials(user.getUserId(), keyword, cursor, limit, categoryIds)));
 	}
 }
