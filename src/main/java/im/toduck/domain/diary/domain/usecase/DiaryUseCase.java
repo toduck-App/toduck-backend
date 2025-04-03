@@ -1,6 +1,9 @@
 package im.toduck.domain.diary.domain.usecase;
 
+import java.time.YearMonth;
 import java.util.List;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.diary.common.mapper.DiaryMapper;
 import im.toduck.domain.diary.domain.service.DiaryService;
@@ -9,12 +12,12 @@ import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
+import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,10 +84,25 @@ public class DiaryUseCase {
 		return diary.isOwner(user);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<DiaryResponse> getDiariesByMonth(final Long userId, final int year, final int month) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		return diaryService.getDiariesByMonth(userId, year, month);
+	}
+
+	@Transactional(readOnly = true)
+	public MonthDiaryResponse getDiaryCountByMonth(Long userId, int year, int month) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		YearMonth currentMonth = YearMonth.of(year, month);
+		YearMonth previousMonth = currentMonth.minusMonths(1);
+
+		int thisMonthCount = diaryService.getDiaryCountByMonth(userId, currentMonth.getYear(),
+			currentMonth.getMonthValue());
+		int lastMonthCount = diaryService.getDiaryCountByMonth(userId, previousMonth.getYear(),
+			previousMonth.getMonthValue());
+		return DiaryMapper.toMonthDiaryResponse(thisMonthCount, lastMonthCount);
 	}
 }

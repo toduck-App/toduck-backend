@@ -14,4 +14,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 	List<Diary> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);
 
 	Diary findByUserIdAndDate(Long userId, @NotNull(message = "날짜는 비어있을 수 없습니다.") LocalDate date);
+
+	int countByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 }
