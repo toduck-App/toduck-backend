@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import im.toduck.domain.social.common.mapper.SocialCategoryMapper;
 import im.toduck.domain.social.persistence.entity.Social;
-import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.repository.SocialCategoryLinkRepository;
 import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
@@ -20,11 +19,9 @@ public class SocialCategoryService {
 	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
 
 	public List<SocialCategoryDto> getSocialCategoryDtosBySocial(final Social social) {
-		List<SocialCategoryLink> socialCategoryLinks = socialCategoryLinkRepository.findAllBySocial(social);
-		List<SocialCategory> socialCategories = socialCategoryLinks.stream()
+		List<SocialCategoryLink> socialCategoryLinks = socialCategoryLinkRepository.findAllBySocial(social); // 1. 링크 조회
+		return socialCategoryLinks.stream()
 			.map(SocialCategoryLink::getSocialCategory)
-			.toList();
-		return socialCategories.stream()
 			.map(SocialCategoryMapper::toSocialCategoryDto)
 			.toList();
 	}
