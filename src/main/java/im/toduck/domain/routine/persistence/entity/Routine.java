@@ -3,6 +3,8 @@ package im.toduck.domain.routine.persistence.entity;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.common.converter.DaysOfWeekBitmaskConverter;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
@@ -64,6 +66,10 @@ public class Routine extends BaseEntity {
 	@Convert(converter = DaysOfWeekBitmaskConverter.class)
 	@Column(name = "days_of_week", nullable = false)
 	private DaysOfWeekBitmask daysOfWeekBitmask;
+
+	@Column(name = "shared_count", nullable = false)
+	@ColumnDefault("0")
+	private Integer sharedCount = 0;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
