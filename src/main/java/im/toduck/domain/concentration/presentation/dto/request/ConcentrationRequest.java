@@ -16,14 +16,14 @@ public record ConcentrationRequest(
 
 	@NotNull(message = "달성횟수는 필수 입력 항목입니다.")
 	@Schema(description = "달성 횟수", example = "2")
-	Integer targetCount,
+	Long targetCount,
 
 	@NotNull(message = "설정횟수는 필수 입력 항목입니다.")
 	@Schema(description = "설정 횟수", example = "5")
-	Integer settingCount,
+	Long settingCount,
 
 	@NotNull(message = "집중시간은 필수 입력 항목입니다.")
 	@Schema(description = "집중 시간(초)", example = "1200")
-	Integer time
+	Long time
 ) {
 }
