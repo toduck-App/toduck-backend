@@ -114,7 +114,4 @@ public class Routine extends BaseEntity {
 		return deletedAt != null;
 	}
 
-	public void increaseSharedCount() {
-		sharedCount++;
-	}
 }

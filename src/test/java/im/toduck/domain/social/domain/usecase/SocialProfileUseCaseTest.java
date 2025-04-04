@@ -8,16 +8,20 @@ import static im.toduck.global.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
+import java.lang.reflect.Field;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.person.persistence.entity.PlanCategory;
@@ -32,6 +36,7 @@ import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListR
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
+import jakarta.persistence.EntityManager;
 
 public class SocialProfileUseCaseTest extends ServiceTest {
 
@@ -40,6 +45,9 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private RoutineRepository routineRepository;
+
+	@Autowired
+	private EntityManager entityManager;
 
 	private User PROFILE_USER;
 	private User AUTH_USER;
@@ -273,7 +281,61 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 루틴이_없는_경우_빈_목록을_반환한다() {
+		@Transactional
+		void 유저의_공개_루틴_목록_조회시_총_공유수가_정확히_계산된다() throws Exception {
+			// given
+			int routineCount = 3;
+			List<Routine> routines = new ArrayList<>();
+			final int[] totalSharedCountArray = {0};
+
+			// 리플렉션을 이용한 필드 값 변경
+			Field sharedCountField = Routine.class.getDeclaredField("sharedCount");
+			sharedCountField.setAccessible(true);
+
+			for (int i = 0; i < routineCount; i++) {
+				Routine routine = testFixtureBuilder.buildRoutine(WEEKEND_NOON_ROUTINE(PROFILE_USER));
+
+				int sharedCount = i * 10;
+				sharedCountField.set(routine, sharedCount);
+
+				entityManager.merge(routine);
+				entityManager.flush();
+
+				totalSharedCountArray[0] += sharedCount;
+				routines.add(routine);
+			}
+
+			entityManager.clear();
+
+			final int expectedTotalSharedCount = totalSharedCountArray[0];
+
+			// when
+			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
+				PROFILE_USER.getId(),
+				AUTH_USER.getId()
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.routines()).hasSize(routineCount);
+				softly.assertThat(response.totalSharedCount()).isEqualTo(expectedTotalSharedCount);
+
+				final Map<Long, Integer> routineIdToSharedCount = new HashMap<>();
+				for (int i = 0; i < routineCount; i++) {
+					routineIdToSharedCount.put(routines.get(i).getId(), i * 10);
+				}
+
+				response.routines().forEach(routineResponse -> {
+					Long routineId = routineResponse.routineId();
+					Integer expectedSharedCount = routineIdToSharedCount.get(routineId);
+					softly.assertThat(routineResponse.sharedCount()).isEqualTo(expectedSharedCount);
+				});
+			});
+		}
+
+		@Test
+		void 루틴이_없는_경우_빈_목록을_반환하며_총_공유수는_0이다() {
 			// when
 			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
 				PROFILE_USER.getId(),
@@ -284,8 +346,10 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
 				softly.assertThat(response.routines()).isEmpty();
+				softly.assertThat(response.totalSharedCount()).isZero();
 			});
 		}
+
 	}
 
 	@Nested

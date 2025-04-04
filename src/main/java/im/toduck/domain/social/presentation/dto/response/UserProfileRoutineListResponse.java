@@ -15,7 +15,10 @@ import lombok.Builder;
 @Builder
 public record UserProfileRoutineListResponse(
 	@Schema(description = "루틴 목록")
-	List<UserProfileRoutineResponse> routines
+	List<UserProfileRoutineResponse> routines,
+
+	@Schema(description = "루틴 공유 수 총합", example = "1304")
+	int totalSharedCount
 ) {
 	@Schema(description = "사용자 프로필 루틴 목록 내부 DTO")
 	@Builder
@@ -31,6 +34,9 @@ public record UserProfileRoutineListResponse(
 
 		@Schema(description = "루틴 메모", example = "눈 뜨자마자 한 잔")
 		String memo,
+
+		@Schema(description = "루틴 공유 수", example = "455")
+		int sharedCount,
 
 		@JsonSerialize(using = LocalTimeSerializer.class)
 		@JsonFormat(pattern = "HH:mm")
