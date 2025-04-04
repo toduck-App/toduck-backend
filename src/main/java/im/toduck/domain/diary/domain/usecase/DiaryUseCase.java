@@ -11,6 +11,7 @@ import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.domain.user.domain.service.UserService;
@@ -85,10 +86,11 @@ public class DiaryUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public List<DiaryResponse> getDiariesByMonth(final Long userId, final int year, final int month) {
+	public DiaryListResponse getDiariesByMonth(final Long userId, final int year, final int month) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		return diaryService.getDiariesByMonth(userId, year, month);
+		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, year, month);
+		return DiaryListResponse.from(diaries);
 	}
 
 	@Transactional(readOnly = true)
