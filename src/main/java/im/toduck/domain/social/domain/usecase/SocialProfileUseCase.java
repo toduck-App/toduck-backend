@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.domain.service.RoutineService;
 import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.common.mapper.SocialProfileMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
@@ -124,5 +126,21 @@ public class SocialProfileUseCase {
 
 		log.info("사용자 ID {}의 공개 루틴 목록 조회 - 요청자 Id: {}", profileUserId, authUserId);
 		return RoutineMapper.toUserProfileRoutineListResponse(routines);
+	}
+
+	@Transactional
+	public RoutineCreateResponse saveSharedRoutine(
+		final Long userId,
+		final Long sourceRoutineId,
+		final RoutineCreateRequest request
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Routine sourceRoutine = routineService.findAvailablePublicRoutineById(sourceRoutineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		RoutineCreateResponse routineCreateResponse = routineService.create(user, request);
+		routineService.incrementSharedCountAtomically(sourceRoutine);
+		return routineCreateResponse;
 	}
 }

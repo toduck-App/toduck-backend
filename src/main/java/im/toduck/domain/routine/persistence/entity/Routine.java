@@ -113,4 +113,8 @@ public class Routine extends BaseEntity {
 	public Boolean isInDeletedState() {
 		return deletedAt != null;
 	}
+
+	public void increaseSharedCount() {
+		sharedCount++;
+	}
 }

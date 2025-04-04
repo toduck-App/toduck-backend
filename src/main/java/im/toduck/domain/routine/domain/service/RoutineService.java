@@ -61,9 +61,19 @@ public class RoutineService {
 		return routineRepository.findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByTimeAsc(user);
 	}
 
+	@Transactional(readOnly = true)
+	public Optional<Routine> findAvailablePublicRoutineById(final Long routineId) {
+		return routineRepository.findByIdAndIsPublicTrueAndDeletedAtIsNull(routineId);
+	}
+
 	@Transactional
 	public void remove(final Routine routine) {
 		routine.delete();
 		routineRepository.save(routine);
+	}
+
+	@Transactional
+	public void incrementSharedCountAtomically(final Routine sourceRoutine) {
+		routineRepository.incrementSharedCountAtomically(sourceRoutine.getId());
 	}
 }

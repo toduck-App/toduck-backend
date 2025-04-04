@@ -2,11 +2,13 @@ package im.toduck.domain.social.presentation.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
+import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
@@ -21,6 +23,7 @@ import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @Tag(name = "Social Profile")
 public interface SocialProfileApi {
@@ -62,7 +65,6 @@ public interface SocialProfileApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_USER)
 		}
 	)
-	@GetMapping("/{userId}/socials")
 	ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getUserSocials(
 		@Parameter(description = "게시글을 조회할 유저 ID") @PathVariable Long userId,
 		@AuthenticationPrincipal CustomUserDetails authUser,
@@ -83,9 +85,31 @@ public interface SocialProfileApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_USER)
 		}
 	)
-	@GetMapping("/{userId}/routines")
 	ResponseEntity<ApiResponse<UserProfileRoutineListResponse>> getUserProfileRoutines(
 		@Parameter(description = "루틴 목록을 조회할 유저 ID") @PathVariable Long userId,
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails authUser
+	);
+
+	@Operation(
+		summary = "루틴 저장 (공유 루틴 추가)",
+		description = """
+			<b>다른 사용자의 공개된 루틴을 내 목록으로 저장(공유)합니다.</b><br/><br/>
+			<p>다른 사용자의 프로필 등에서 발견한 유용한 루틴을 자신의 루틴 목록에 추가(저장)할 때 사용됩니다.</p><br/>
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "루틴 저장 성공. 응답 본문은 없습니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.PRIVATE_ROUTINE),
+		}
+	)
+	ResponseEntity<ApiResponse<RoutineCreateResponse>> saveSharedRoutine(
+		@Parameter(description = "저장할 루틴의 ID", required = true, example = "1")
+		@PathVariable final Long routineId,
+		@Parameter(hidden = true) @AuthenticationPrincipal final CustomUserDetails authUser,
+		@RequestBody @Valid final RoutineCreateRequest request
 	);
 }
