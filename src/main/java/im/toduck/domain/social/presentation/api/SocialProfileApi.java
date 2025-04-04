@@ -99,7 +99,7 @@ public interface SocialProfileApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			description = "루틴 저장 성공. 응답 본문은 없습니다."
+			description = "루틴 저장 성공. 생성된 루틴의 Id를 반환합니다."
 		),
 		errors = {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
