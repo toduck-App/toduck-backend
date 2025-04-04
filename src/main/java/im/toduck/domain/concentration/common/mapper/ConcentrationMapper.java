@@ -20,7 +20,7 @@ public class ConcentrationMapper {
 			.targetCount(concentration.getTargetCount())
 			.settingCount(concentration.getSettingCount())
 			.time(concentration.getTime())
-			.percentage((long)percentage)
+			.percentage(percentage)
 			.build();
 	}
 

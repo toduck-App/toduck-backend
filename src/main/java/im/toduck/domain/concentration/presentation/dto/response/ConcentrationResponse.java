@@ -18,16 +18,16 @@ public record ConcentrationResponse(
 	LocalDate date,
 
 	@Schema(description = "달성 횟수", example = "2")
-	Long targetCount,
+	Integer targetCount,
 
 	@Schema(description = "설정 횟수", example = "5")
-	Long settingCount,
+	Integer settingCount,
 
 	@Schema(description = "집중 시간(초)", example = "1200")
-	Long time,
+	Integer time,
 
 	@Schema(description = "달성률(%)", example = "40")
-	Long percentage
+	Integer percentage
 ) {
 
 }

@@ -39,13 +39,13 @@ public class Concentration extends BaseEntity {
 	private LocalDate date;
 
 	@Column(name = "target_count", nullable = false)
-	private Long targetCount = 0L;
+	private Integer targetCount = 0;
 
 	@Column(name = "setting_count", nullable = false)
-	private Long settingCount = 0L;
+	private Integer settingCount = 0;
 
 	@Column(name = "concentration_time", nullable = false)
-	private Long time = 0L;
+	private Integer time = 0;
 
 	@Builder
 	private Concentration(User user, LocalDate date) {
@@ -53,15 +53,15 @@ public class Concentration extends BaseEntity {
 		this.date = date;
 	}
 
-	public void addTargetCount(long value) {
+	public void addTargetCount(int value) {
 		this.targetCount += value;
 	}
 
-	public void addSettingCount(long value) {
+	public void addSettingCount(int value) {
 		this.settingCount += value;
 	}
 
-	public void addTime(long value) {
+	public void addTime(int value) {
 		this.time += value;
 	}
 }
