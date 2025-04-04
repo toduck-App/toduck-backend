@@ -400,7 +400,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 저장하는_사용자를_찾지_못하면_예외를_던진다() {
+		void 저장하는_사용자를_찾지_못하면_루틴_저장에_실패한다() {
 			// given
 			Long nonExistentUserId = -1L;
 			Long sourceRoutineId = SOURCE_ROUTINE_IS_PUBLIC.getId();
@@ -413,7 +413,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 원본_루틴을_찾지_못하면_예외를_던진다() {
+		void 원본_루틴을_찾지_못하면_루틴_저장에_실패한다() {
 			// given
 			Long nonExistentRoutineId = -99L;
 
@@ -425,7 +425,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 원본_루틴이_비공개이면_예외를_던진다() {
+		void 원본_루틴이_비공개이면_루틴_저장에_실패한다() {
 			// when & then
 			assertThatThrownBy(
 				() -> socialProfileUseCase.saveSharedRoutine(SOURCE_ROUTINE_IS_PRIVATE.getId(), AUTH_USER.getId(),
