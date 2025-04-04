@@ -211,5 +211,10 @@ public class SocialInteractionService {
 	public Optional<CommentImageFile> getCommentImageByComment(final Comment comment) {
 		return commentImageFileRepository.findByComment(comment);
 	}
+
+	@Transactional(readOnly = true)
+	public int countCommentsBySocial(final Social social) {
+		return commentRepository.countBySocial(social);
+	}
 }
 

@@ -17,6 +17,7 @@ import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.user.persistence.entity.Block;
+import im.toduck.domain.user.persistence.entity.Follow;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.infra.redis.phonenumber.PhoneNumber;
 
@@ -91,4 +92,11 @@ public class TestFixtureBuilder {
 		return bs.scheduleRecordRepository().save(scheduleRecord);
 	}
 
+	public Follow buildFollow(final User follower, final User followed) {
+		Follow follow = Follow.builder()
+			.follower(follower)
+			.followed(followed)
+			.build();
+		return bs.followRepository().save(follow);
+	}
 }

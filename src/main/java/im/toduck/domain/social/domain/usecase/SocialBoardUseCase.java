@@ -227,9 +227,9 @@ public class SocialBoardUseCase {
 			.limit(actualLimit)
 			.map(sb -> {
 				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(sb);
-				List<Comment> comments = socialInteractionService.getCommentsBySocial(sb);
+				int commentCounts = socialInteractionService.countCommentsBySocial(sb);
 				boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, sb);
-				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isSocialBoardLiked);
+				return SocialMapper.toSocialResponse(sb, imageFiles, commentCounts, isSocialBoardLiked);
 			})
 			.toList();
 	}
