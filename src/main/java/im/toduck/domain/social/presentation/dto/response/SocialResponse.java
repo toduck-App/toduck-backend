@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -39,6 +40,9 @@ public record SocialResponse(
 
 	@Schema(description = "댓글 수", example = "1")
 	int commentCount,
+
+	@Schema(description = "카테고리 목록")
+	List<SocialCategoryDto> categories,
 
 	@Schema(description = "게시글 작성 시간", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-09-11 10:30")
 	@JsonSerialize(using = LocalDateTimeSerializer.class)

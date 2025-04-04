@@ -1,5 +1,7 @@
 package im.toduck.domain.social.domain.usecase;
 
+import static im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.*;
+
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.common.mapper.SocialProfileMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
+import im.toduck.domain.social.domain.service.SocialCategoryService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
@@ -38,6 +41,7 @@ public class SocialProfileUseCase {
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
 	private final RoutineService routineService;
+	private final SocialCategoryService socialCategoryService;
 
 	@Transactional(readOnly = true)
 	public SocialProfileResponse getUserProfile(final Long profileUserId, final Long authUserId) {
@@ -107,8 +111,15 @@ public class SocialProfileUseCase {
 				int commentCount = socialInteractionService.countCommentsBySocial(social);
 				boolean isLikedByRequestingUser = socialInteractionService.getSocialBoardIsLiked(requestingUser,
 					social);
-
-				return SocialMapper.toSocialResponse(social, imageFiles, commentCount, isLikedByRequestingUser);
+				List<SocialCategoryDto> socialCategoryDtos = socialCategoryService.getSocialCategoryDtosBySocial(
+					social);
+				return SocialMapper.toSocialResponse(
+					social,
+					imageFiles,
+					socialCategoryDtos,
+					commentCount,
+					isLikedByRequestingUser
+				);
 			})
 			.toList();
 	}

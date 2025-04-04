@@ -9,6 +9,7 @@ import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
 import im.toduck.domain.social.presentation.dto.response.OwnerDto;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
@@ -66,6 +67,7 @@ public class SocialMapper {
 	public static SocialResponse toSocialResponse(
 		Social socialBoard,
 		List<SocialImageFile> imageFiles,
+		List<SocialCategoryDto> socialCategoryDtos,
 		int commentCount,
 		boolean isLiked
 	) {
@@ -79,6 +81,7 @@ public class SocialMapper {
 			.images(getImageDtos(imageFiles))
 			.socialLikeInfo(getSocialLikeDto(socialBoard, isLiked))
 			.commentCount(commentCount)
+			.categories(socialCategoryDtos)
 			.createdAt(socialBoard.getCreatedAt())
 			.build();
 	}

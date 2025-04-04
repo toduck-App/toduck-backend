@@ -12,6 +12,7 @@ import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.SocialCategoryMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
+import im.toduck.domain.social.domain.service.SocialCategoryService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentImageFile;
@@ -46,6 +47,7 @@ public class SocialBoardUseCase {
 	private final SocialInteractionService socialInteractionService;
 	private final UserService userService;
 	private final RoutineService routineService;
+	private final SocialCategoryService socialCategoryService;
 
 	@Transactional
 	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
@@ -220,16 +222,25 @@ public class SocialBoardUseCase {
 
 	private List<SocialResponse> createSocialResponses(
 		final List<Social> socialBoards,
-		final User user,
+		final User requestingUser,
 		final int actualLimit
 	) {
 		return socialBoards.stream()
 			.limit(actualLimit)
-			.map(sb -> {
-				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(sb);
-				int commentCounts = socialInteractionService.countCommentsBySocial(sb);
-				boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, sb);
-				return SocialMapper.toSocialResponse(sb, imageFiles, commentCounts, isSocialBoardLiked);
+			.map(social -> {
+				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(social);
+				int commentCount = socialInteractionService.countCommentsBySocial(social);
+				boolean isLikedByRequestingUser = socialInteractionService.getSocialBoardIsLiked(requestingUser,
+					social);
+				List<SocialCategoryDto> socialCategoryDtos = socialCategoryService.getSocialCategoryDtosBySocial(
+					social);
+				return SocialMapper.toSocialResponse(
+					social,
+					imageFiles,
+					socialCategoryDtos,
+					commentCount,
+					isLikedByRequestingUser
+				);
 			})
 			.toList();
 	}
