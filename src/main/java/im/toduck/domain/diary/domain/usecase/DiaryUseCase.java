@@ -90,7 +90,7 @@ public class DiaryUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, year, month);
-		return DiaryListResponse.from(diaries);
+		return DiaryMapper.toListDiaryResponse(diaries);
 	}
 
 	@Transactional(readOnly = true)
