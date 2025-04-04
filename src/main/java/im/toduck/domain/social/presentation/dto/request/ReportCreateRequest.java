@@ -20,7 +20,7 @@ public record ReportCreateRequest(
 ) {
 
 	@AssertTrue(message = "신고 유형이 'OTHER'일 때 사유는 필수 입력 항목입니다.")
-	public boolean isReasonRequiredForOtherType() {
+	private boolean isReasonRequiredForOtherType() {
 		if (reportType == ReportType.OTHER) {
 			return reason != null && !reason.isBlank();
 		}
@@ -28,7 +28,7 @@ public record ReportCreateRequest(
 	}
 
 	@AssertTrue(message = "신고 유형이 'OTHER'가 아닌 경우 사유는 입력할 수 없습니다.")
-	public boolean isReasonNotAllowedForNonOtherType() {
+	private boolean isReasonNotAllowedForNonOtherType() {
 		if (reportType != ReportType.OTHER) {
 			return reason == null || reason.isBlank();
 		}
