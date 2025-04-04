@@ -21,6 +21,9 @@ public record SocialProfileResponse(
 	int postCount,
 
 	@Schema(description = "현재 사용자의 프로필인지 여부", example = "false")
-	boolean isMe
+	boolean isMe,
+
+	@Schema(description = "팔로잉 여부", example = "true")
+	boolean isFollowing
 ) {
 }

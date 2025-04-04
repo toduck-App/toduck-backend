@@ -43,6 +43,8 @@ public class SocialProfileUseCase {
 
 	@Transactional(readOnly = true)
 	public SocialProfileResponse getUserProfile(final Long profileUserId, final Long authUserId) {
+		User authUser = userService.getUserById(authUserId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		User profileUser = userService.getUserById(profileUserId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
@@ -50,6 +52,7 @@ public class SocialProfileUseCase {
 		int followerCount = followService.countFollowers(profileUserId);
 		int postCount = socialBoardService.countSocialPostsByUserId(profileUserId);
 		boolean isMe = profileUserId.equals(authUserId);
+		boolean isFollowing = !isMe && followService.isFollowing(authUser, profileUser);
 
 		log.info("프로필 조회 - 요청자 UserId: {}, 대상 UserId: {}", authUserId, profileUserId);
 		return SocialProfileMapper.toSocialProfileResponse(
@@ -57,7 +60,8 @@ public class SocialProfileUseCase {
 			followingCount,
 			followerCount,
 			postCount,
-			isMe
+			isMe,
+			isFollowing
 		);
 	}
 
