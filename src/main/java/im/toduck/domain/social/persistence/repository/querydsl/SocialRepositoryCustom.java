@@ -21,4 +21,10 @@ public interface SocialRepositoryCustom {
 		List<Long> categoryIds,
 		Pageable pageable
 	);
+
+	List<Social> findUserSocials(
+		Long profileUserId,
+		Long cursor,
+		Pageable pageable
+	);
 }

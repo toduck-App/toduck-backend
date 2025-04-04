@@ -4,6 +4,7 @@ import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
+import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -40,5 +41,9 @@ public class DiaryMapper {
 				.map(DiaryImageFileMapper::fromDiaryImage)
 				.toList()
 		);
+	}
+
+	public static MonthDiaryResponse toMonthDiaryResponse(int thisMonthCount, int lastMonthCount) {
+		return new MonthDiaryResponse(thisMonthCount - lastMonthCount);
 	}
 }

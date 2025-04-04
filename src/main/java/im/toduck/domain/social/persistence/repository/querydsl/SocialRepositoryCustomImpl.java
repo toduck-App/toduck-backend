@@ -67,6 +67,24 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 		return applyPagination(query, pageable).fetch();
 	}
 
+	@Override
+	public List<Social> findUserSocials(
+		Long profileUserId,
+		Long cursor,
+		Pageable pageable
+	) {
+		JPAQuery<Social> query = queryFactory
+			.selectFrom(qSocial)
+			.leftJoin(qSocial.user).fetchJoin()
+			.where(
+				qSocial.deletedAt.isNull(),
+				qSocial.user.id.eq(profileUserId),
+				cursorCondition(cursor)
+			);
+
+		return applyPagination(query, pageable).fetch();
+	}
+
 	private BooleanExpression keywordCondition(String keyword) {
 		if (keyword == null || keyword.isEmpty()) {
 			return null;

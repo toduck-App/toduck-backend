@@ -16,5 +16,7 @@ public interface RoutineRepository extends JpaRepository<Routine, Long>, Routine
 
 	List<Routine> findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByUpdatedAtDesc(User user);
 
+	List<Routine> findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByTimeAsc(User user);
+
 	Optional<Routine> findByIdAndUserAndDeletedAtIsNull(Long id, User user);
 }

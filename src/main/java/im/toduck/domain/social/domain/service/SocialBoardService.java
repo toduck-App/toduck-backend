@@ -212,5 +212,22 @@ public class SocialBoardService {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 		return socialRepository.searchSocialsExcludingBlocked(cursor, userId, keyword, categoryIds, pageRequest);
 	}
+
+	@Transactional(readOnly = true)
+	public int countSocialPostsByUserId(final Long userId) {
+		return (int)socialRepository.countByUserId(userId);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Social> getSocialsByUserId(
+		final Long profileUserId,
+		final Long authUserId,
+		final Long cursor,
+		final Integer limit
+	) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+
+		return socialRepository.findUserSocials(profileUserId, cursor, pageRequest);
+	}
 }
 

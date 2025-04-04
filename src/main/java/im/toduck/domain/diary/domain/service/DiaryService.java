@@ -103,4 +103,12 @@ public class DiaryService {
 	public Diary getDiaryByDate(Long userId, LocalDate date) {
 		return diaryRepository.findByUserIdAndDate(userId, date);
 	}
+
+	@Transactional(readOnly = true)
+	public int getDiaryCountByMonth(final Long userId, final int year, final int month) {
+		LocalDate startDate = LocalDate.of(year, month, 1);
+		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()).plusDays(1);
+
+		return diaryRepository.countByUserIdAndDateBetween(userId, startDate, endDate);
+	}
 }

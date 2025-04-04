@@ -18,4 +18,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	List<Comment> findCommentsBySocial(@Param("social") Social social);
 
 	List<Comment> findAllBySocial(Social socialBoard);
+
+	int countBySocial(Social social);
 }
