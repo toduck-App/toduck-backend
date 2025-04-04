@@ -122,10 +122,14 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 
 	private void applyCategoryFilter(JPAQuery<Social> query, List<Long> categoryIds) {
 		if (categoryIds != null && !categoryIds.isEmpty()) {
-			query.join(qSocialCategoryLink).on(qSocialCategoryLink.social.eq(qSocial))
-				.join(qSocialCategory).on(qSocialCategoryLink.socialCategory.eq(qSocialCategory))
-				.where(qSocialCategory.id.in(categoryIds));
-			query.distinct();
+			for (Long categoryId : categoryIds) {
+				query.where(qSocial.id.in(
+					queryFactory
+						.select(qSocialCategoryLink.social.id)
+						.from(qSocialCategoryLink)
+						.where(qSocialCategoryLink.socialCategory.id.eq(categoryId))
+				));
+			}
 		}
 	}
 }

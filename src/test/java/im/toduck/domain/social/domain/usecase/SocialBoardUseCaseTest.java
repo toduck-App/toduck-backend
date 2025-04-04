@@ -1061,6 +1061,91 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 				softly.assertThat(response.nextCursor()).isNull();
 			});
 		}
+
+		@Test
+		void 여러_카테고리_ID를_모두_만족하는_게시글을_검색한다() {
+			// given
+			// 게시글 1: 카테고리 1, 2
+			Social social1 = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_CONTENT(USER, "운동과 식단"));
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(0), social1);
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(1), social1);
+
+			// 게시글 2: 카테고리 1
+			Social social2 = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_CONTENT(USER, "운동"));
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(0), social2);
+
+			// 게시글 3: 카테고리 2
+			Social social3 = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_CONTENT(USER, "식단"));
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(1), social3);
+
+			String keyword = null;
+			Long cursor = null;
+			Integer limit = 10;
+			List<Long> filterCategoryIds = List.of(category1Id, category2Id); // 카테고리 1과 2를 모두 만족해야 함
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.searchSocials(
+				USER.getId(),
+				keyword,
+				cursor,
+				limit,
+				filterCategoryIds
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results()).hasSize(1);
+				softly.assertThat(response.results())
+					.extracting(SocialResponse::socialId)
+					.containsExactlyInAnyOrder(social1.getId());
+			});
+		}
+
+		@Test
+		void 키워드_검색과_여러_카테고리_ID를_모두_만족하는_게시글을_검색한다() {
+			// given
+			// 게시글 1: 카테고리 1, 2, "운동 식단" 포함
+			Social social1 = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_CONTENT(USER, "오늘의 운동 식단 관리"));
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(0), social1);
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(1), social1);
+
+			// 게시글 2: 카테고리 1, "운동" 포함
+			Social social2 = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_CONTENT(USER, "즐거운 운동 시간"));
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(0), social2);
+
+			// 게시글 3: 카테고리 2, "식단" 포함
+			Social social3 = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_CONTENT(USER, "건강한 식단 레시피"));
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(1), social3);
+
+			// 게시글 4: 카테고리 1, 2, "운동" 포함
+			Social social4 = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_CONTENT(USER, "힘든 웨이트 운동"));
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(0), social4);
+			testFixtureBuilder.buildSocialCategoryLinks(categories.get(1), social4);
+
+			String keyword = "운동";
+			Long cursor = null;
+			Integer limit = 10;
+			List<Long> filterCategoryIds = List.of(category1Id, category2Id); // 카테고리 1과 2를 모두 만족해야 함
+
+			// when
+			CursorPaginationResponse<SocialResponse> response = socialBoardUseCase.searchSocials(
+				USER.getId(),
+				keyword,
+				cursor,
+				limit,
+				filterCategoryIds
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.results()).hasSize(2);
+				softly.assertThat(response.results())
+					.extracting(SocialResponse::socialId)
+					.containsExactlyInAnyOrder(social1.getId(), social4.getId());
+			});
+		}
 	}
 
 }
