@@ -9,8 +9,5 @@ public record DiaryListResponse(
 	@Schema(description = "일기 목록")
 	List<DiaryResponse> diaryDtos
 ) {
-	public static DiaryListResponse from(List<DiaryResponse> diaries) {
-		return new DiaryListResponse(diaries);
-	}
 }
 
