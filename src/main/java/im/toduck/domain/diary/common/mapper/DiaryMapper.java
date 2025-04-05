@@ -47,7 +47,7 @@ public class DiaryMapper {
 	}
 
 	public static DiaryListResponse toListDiaryResponse(List<DiaryResponse> diaries) {
-		return new DiaryListResponse(diaries);
+		return DiaryListResponse.toListDiaryResponse(diaries);
 	}
 
 	public static MonthDiaryResponse toMonthDiaryResponse(int thisMonthCount, int lastMonthCount) {
