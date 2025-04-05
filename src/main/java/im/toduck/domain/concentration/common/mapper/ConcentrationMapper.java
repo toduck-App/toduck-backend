@@ -34,7 +34,7 @@ public class ConcentrationMapper {
 			.build();
 	}
 
-	public static ConcentrationListResponse toListConcentrationResponse(List<Concentration> concentrations) {
+	public static ConcentrationListResponse toListConcentrationResponse(List<ConcentrationResponse> concentrations) {
 		return ConcentrationListResponse.from(concentrations);
 	}
 }

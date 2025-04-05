@@ -7,6 +7,7 @@ import im.toduck.domain.concentration.domain.service.ConcentrationService;
 import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -42,6 +43,10 @@ public class ConcentrationUseCase {
 
 		List<Concentration> concentrations = concentrationService.getMonthlyConcentration(user, yearMonth);
 
-		return ConcentrationMapper.toListConcentrationResponse(concentrations);
+		List<ConcentrationResponse> dtos = concentrations.stream()
+			.map(ConcentrationMapper::fromConcentration)
+			.toList();
+
+		return ConcentrationMapper.toListConcentrationResponse(dtos);
 	}
 }
