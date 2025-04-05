@@ -1,14 +1,12 @@
 package im.toduck.domain.concentration.presentation.api;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
-import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -59,11 +57,11 @@ public interface ConcentrationApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = ConcentrationResponse.class,
+			responseClass = ConcentrationListResponse.class,
 			description = "집중 조회 성공, 해당 달의 집중 정보를 반환합니다."
 		)
 	)
-	ResponseEntity<ApiResponse<List<ConcentrationResponse>>> getMonthlyConcentration(
+	ResponseEntity<ApiResponse<ConcentrationListResponse>> getMonthlyConcentration(
 		@RequestParam("yearMonth")
 		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
 		String yearMonth,

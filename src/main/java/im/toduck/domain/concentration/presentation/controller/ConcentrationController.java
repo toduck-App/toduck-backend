@@ -1,7 +1,5 @@
 package im.toduck.domain.concentration.presentation.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import im.toduck.domain.concentration.domain.usecase.ConcentrationUseCase;
 import im.toduck.domain.concentration.presentation.api.ConcentrationApi;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
-import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -43,14 +41,13 @@ public class ConcentrationController implements ConcentrationApi {
 	@Override
 	@GetMapping("/monthly")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<List<ConcentrationResponse>>> getMonthlyConcentration(
+	public ResponseEntity<ApiResponse<ConcentrationListResponse>> getMonthlyConcentration(
 		@RequestParam("yearMonth")
 		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
 		String yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		List<ConcentrationResponse> response = concentrationUseCase.getMonthlyConcentration(user.getUserId(),
-			yearMonth);
+		ConcentrationListResponse response = concentrationUseCase.getMonthlyConcentration(user.getUserId(), yearMonth);
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }
