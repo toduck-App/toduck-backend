@@ -1,6 +1,5 @@
 package im.toduck.domain.diary.presentation.api;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
-import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -124,11 +123,11 @@ public interface DiaryApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = DiaryResponse.class,
+			responseClass = DiaryListResponse.class,
 			description = "일기 조회 성공, 해당 연월에 작성된 일기들을 반환합니다."
 		)
 	)
-	ResponseEntity<ApiResponse<List<DiaryResponse>>> getDiariesByMonth(
+	ResponseEntity<ApiResponse<DiaryListResponse>> getDiariesByMonth(
 		@RequestParam("year") int year,
 		@RequestParam("month") int month,
 		@AuthenticationPrincipal CustomUserDetails user

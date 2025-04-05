@@ -1,6 +1,5 @@
 package im.toduck.domain.diary.presentation.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ import im.toduck.domain.diary.presentation.api.DiaryApi;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
-import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -75,13 +74,14 @@ public class DiaryController implements DiaryApi {
 	@Override
 	@GetMapping
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<List<DiaryResponse>>> getDiariesByMonth(
+	public ResponseEntity<ApiResponse<DiaryListResponse>> getDiariesByMonth(
 		@RequestParam("year") int year,
 		@RequestParam("month") int month,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		List<DiaryResponse> diaries = diaryUseCase.getDiariesByMonth(user.getUserId(), year, month);
-		return ResponseEntity.ok(ApiResponse.createSuccess(diaries));
+		DiaryListResponse response = diaryUseCase.getDiariesByMonth(user.getUserId(), year, month);
+
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 
 	@GetMapping("/count")
@@ -93,6 +93,7 @@ public class DiaryController implements DiaryApi {
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
 		MonthDiaryResponse monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
+
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(monthDiaryCount));
 	}

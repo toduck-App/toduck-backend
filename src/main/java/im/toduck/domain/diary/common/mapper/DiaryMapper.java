@@ -1,8 +1,11 @@
 package im.toduck.domain.diary.common.mapper;
 
+import java.util.List;
+
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.domain.user.persistence.entity.User;
@@ -41,6 +44,10 @@ public class DiaryMapper {
 				.map(DiaryImageFileMapper::fromDiaryImage)
 				.toList()
 		);
+	}
+
+	public static DiaryListResponse toListDiaryResponse(List<DiaryResponse> diaries) {
+		return DiaryListResponse.toListDiaryResponse(diaries);
 	}
 
 	public static MonthDiaryResponse toMonthDiaryResponse(int thisMonthCount, int lastMonthCount) {
