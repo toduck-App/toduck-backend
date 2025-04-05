@@ -21,6 +21,7 @@ import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 @Tag(name = "Diary")
 public interface DiaryApi {
@@ -113,9 +114,7 @@ public interface DiaryApi {
 			"""
 				<b>특정 연월에 작성된 일기들을 조회합니다.</b><br/><br/>
 				<p><b>연월 필터를 적용하는 방법:</b></p>
-				<p>예시: /v1/diary?year=2025&month=3</p><br/>
-				<p>- <b>year:</b> 조회 할 연도</p>
-				<p>- <b>month:</b> 조회 할 달</p>
+				<p>예시: /v1/diary?yearMonth=2025-03</p><br/>
 				<p>검색 결과가 존재하지 않는 경우 빈 배열이 반환됩니다.</p>
 				"""
 	)
@@ -126,8 +125,9 @@ public interface DiaryApi {
 		)
 	)
 	ResponseEntity<ApiResponse<DiaryListResponse>> getDiariesByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth")
+		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
+		String yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -137,9 +137,7 @@ public interface DiaryApi {
 			"""
 				<b>특정 연월과 전월의 일기 개수를 비교하여 그 차이를 조회합니다.</b><br/><br/>
 				<p><b>연월 필터를 적용하는 방법:</b></p>
-				<p>예시: /v1/diary/count?year=2025&month=3</p><br/>
-				<p>- <b>year:</b> 조회 할 연도</p>
-				<p>- <b>month:</b> 조회 할 달</p>
+				<p>예시: /v1/diary/count?yearMonth=2025-03</p><br/>
 				"""
 	)
 	@ApiResponseExplanations(
@@ -149,8 +147,9 @@ public interface DiaryApi {
 		)
 	)
 	ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth")
+		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
+		String yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

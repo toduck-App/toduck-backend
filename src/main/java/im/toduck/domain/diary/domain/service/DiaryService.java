@@ -85,12 +85,8 @@ public class DiaryService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<DiaryResponse> getDiariesByMonth(
-		final Long userId,
-		final int year,
-		final int month
-	) {
-		LocalDate startDate = LocalDate.of(year, month, 1);
+	public List<DiaryResponse> getDiariesByMonth(final Long userId, String yearMonth) {
+		LocalDate startDate = LocalDate.parse(yearMonth + "-01");
 		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()).plusDays(1);
 
 		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate);

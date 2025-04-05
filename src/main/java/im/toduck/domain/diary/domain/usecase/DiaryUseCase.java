@@ -84,19 +84,19 @@ public class DiaryUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public DiaryListResponse getDiariesByMonth(final Long userId, final int year, final int month) {
+	public DiaryListResponse getDiariesByMonth(final Long userId, String yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, year, month);
+		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, yearMonth);
 		return DiaryMapper.toListDiaryResponse(diaries);
 	}
 
 	@Transactional(readOnly = true)
-	public MonthDiaryResponse getDiaryCountByMonth(Long userId, int year, int month) {
+	public MonthDiaryResponse getDiaryCountByMonth(Long userId, String yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		YearMonth currentMonth = YearMonth.of(year, month);
+		YearMonth currentMonth = YearMonth.parse(yearMonth);
 		YearMonth previousMonth = currentMonth.minusMonths(1);
 
 		int thisMonthCount = diaryService.getDiaryCountByMonth(userId, currentMonth.getYear(),

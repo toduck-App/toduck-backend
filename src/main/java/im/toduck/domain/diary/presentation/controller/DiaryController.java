@@ -24,6 +24,7 @@ import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -73,11 +74,12 @@ public class DiaryController implements DiaryApi {
 	@GetMapping
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<DiaryListResponse>> getDiariesByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth")
+		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
+		String yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		DiaryListResponse response = diaryUseCase.getDiariesByMonth(user.getUserId(), year, month);
+		DiaryListResponse response = diaryUseCase.getDiariesByMonth(user.getUserId(), yearMonth);
 
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
@@ -86,11 +88,12 @@ public class DiaryController implements DiaryApi {
 	@PreAuthorize("isAuthenticated()")
 	@Override
 	public ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth")
+		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
+		String yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		MonthDiaryResponse monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
+		MonthDiaryResponse monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), yearMonth);
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(monthDiaryCount));
