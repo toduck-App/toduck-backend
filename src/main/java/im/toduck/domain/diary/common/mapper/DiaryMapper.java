@@ -4,7 +4,6 @@ import java.util.List;
 
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
-import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
@@ -24,12 +23,6 @@ public class DiaryMapper {
 			.emotion(request.emotion())
 			.title(request.title())
 			.memo(request.memo())
-			.build();
-	}
-
-	public static DiaryCreateResponse toDiaryCreateResponse(Diary diary) {
-		return DiaryCreateResponse.builder()
-			.diaryId(diary.getId())
 			.build();
 	}
 

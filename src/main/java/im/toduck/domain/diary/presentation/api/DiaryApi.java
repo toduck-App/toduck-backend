@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
-import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
@@ -31,11 +30,10 @@ public interface DiaryApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = DiaryCreateResponse.class,
-			description = "일기 생성 성공, 생성된 일기의 Id를 반환합니다."
+			description = "일기 생성 성공. 빈 content 객체를 반환합니다."
 		)
 	)
-	ResponseEntity<ApiResponse<DiaryCreateResponse>> createDiary(
+	ResponseEntity<ApiResponse<Map<String, Object>>> createDiary(
 		@RequestBody @Valid DiaryCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	);

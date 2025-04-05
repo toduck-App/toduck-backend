@@ -10,7 +10,6 @@ import im.toduck.domain.diary.domain.service.DiaryService;
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
-import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
@@ -30,7 +29,7 @@ public class DiaryUseCase {
 	private final DiaryService diaryService;
 
 	@Transactional
-	public DiaryCreateResponse createDiary(final Long userId, final DiaryCreateRequest request) {
+	public void createDiary(final Long userId, final DiaryCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
@@ -42,7 +41,6 @@ public class DiaryUseCase {
 		diaryService.addDiaryImageFiles(request.diaryImageUrls(), diary);
 
 		log.info("일기 생성 - UserId: {}, DiaryId: {}", userId, diary.getId());
-		return DiaryMapper.toDiaryCreateResponse(diary);
 	}
 
 	@Transactional
