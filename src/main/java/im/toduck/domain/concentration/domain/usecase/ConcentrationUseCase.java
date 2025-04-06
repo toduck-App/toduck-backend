@@ -8,6 +8,7 @@ import im.toduck.domain.concentration.domain.service.ConcentrationService;
 import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationPercentResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.domain.user.domain.service.UserService;
@@ -49,5 +50,14 @@ public class ConcentrationUseCase {
 			.toList();
 
 		return ConcentrationMapper.toListConcentrationResponse(dtos);
+	}
+
+	public ConcentrationPercentResponse getMonthConcentrationPercent(Long userId, YearMonth yearMonth) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		int percent = concentrationService.getMonthConcentrationPercent(userId, yearMonth);
+
+		return ConcentrationMapper.toConcentrationPercentResponse(percent);
 	}
 }

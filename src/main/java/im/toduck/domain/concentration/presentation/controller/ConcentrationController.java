@@ -16,6 +16,7 @@ import im.toduck.domain.concentration.domain.usecase.ConcentrationUseCase;
 import im.toduck.domain.concentration.presentation.api.ConcentrationApi;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationPercentResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -47,6 +48,18 @@ public class ConcentrationController implements ConcentrationApi {
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
 		ConcentrationListResponse response = concentrationUseCase.getMonthlyConcentration(user.getUserId(), yearMonth);
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
+	}
+
+	@Override
+	@GetMapping("/percent")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<ConcentrationPercentResponse>> getMonthConcentrationPercent(
+		@RequestParam YearMonth yearMonth,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		ConcentrationPercentResponse response = concentrationUseCase.getMonthConcentrationPercent(user.getUserId(),
+			yearMonth);
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }

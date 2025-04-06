@@ -40,4 +40,14 @@ public class ConcentrationService {
 
 		return concentrationRepository.findByUserAndDateBetween(user, startDate, endDate);
 	}
+
+	public int getMonthConcentrationPercent(Long userId, YearMonth yearMonth) {
+		Integer totalPercentage = concentrationRepository.getAverageConcentrationPercentageByMonth(userId, yearMonth);
+
+		if (totalPercentage == null) {
+			return 0;
+		}
+
+		return totalPercentage;
+	}
 }

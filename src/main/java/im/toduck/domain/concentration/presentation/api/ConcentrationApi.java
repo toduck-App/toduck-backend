@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationPercentResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -63,6 +64,25 @@ public interface ConcentrationApi {
 		)
 	)
 	ResponseEntity<ApiResponse<ConcentrationListResponse>> getMonthlyConcentration(
+		@RequestParam YearMonth yearMonth,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "특정 연월 집중도 평균 조회",
+		description = """
+			특정 연월의 집중도 평균 값을 조회합니다.
+			- 평균 값을 계산하여 반환합니다.
+			- 조회를 원하는 연월을(yyyy-MM) /v1/concentration/percent 엔드포인트에 yearMonth 파라미터로 요청합니다.
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = ConcentrationPercentResponse.class,
+			description = "조회 성공, 해당 연월의 집중도 평균 값을 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<ConcentrationPercentResponse>> getMonthConcentrationPercent(
 		@RequestParam YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
