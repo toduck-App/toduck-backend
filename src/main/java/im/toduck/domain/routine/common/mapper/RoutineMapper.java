@@ -126,13 +126,8 @@ public class RoutineMapper {
 			.map(RoutineMapper::toUserProfileRoutineRecordReadResponse)
 			.toList();
 
-		int totalSharedCount = routines.stream()
-			.mapToInt(Routine::getSharedCount)
-			.sum();
-
 		return UserProfileRoutineListResponse.builder()
 			.routines(routineResponses)
-			.totalSharedCount(totalSharedCount)
 			.build();
 	}
 

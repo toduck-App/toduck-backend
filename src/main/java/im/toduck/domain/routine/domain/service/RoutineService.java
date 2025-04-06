@@ -76,4 +76,9 @@ public class RoutineService {
 	public void incrementSharedCountAtomically(final Routine sourceRoutine) {
 		routineRepository.incrementSharedCountAtomically(sourceRoutine.getId());
 	}
+
+	@Transactional(readOnly = true)
+	public int getTotalRoutineShareCount(final User user) {
+		return routineRepository.sumRoutineSharedCountByUser(user);
+	}
 }

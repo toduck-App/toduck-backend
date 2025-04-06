@@ -15,10 +15,7 @@ import lombok.Builder;
 @Builder
 public record UserProfileRoutineListResponse(
 	@Schema(description = "루틴 목록")
-	List<UserProfileRoutineResponse> routines,
-
-	@Schema(description = "루틴 공유 수 총합", example = "1304")
-	int totalSharedCount
+	List<UserProfileRoutineResponse> routines
 ) {
 	@Schema(description = "사용자 프로필 루틴 목록 내부 DTO")
 	@Builder

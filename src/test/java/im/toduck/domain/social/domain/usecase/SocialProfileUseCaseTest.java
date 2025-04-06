@@ -286,7 +286,6 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			// given
 			int routineCount = 3;
 			List<Routine> routines = new ArrayList<>();
-			final int[] totalSharedCountArray = {0};
 
 			// 리플렉션을 이용한 필드 값 변경
 			Field sharedCountField = Routine.class.getDeclaredField("sharedCount");
@@ -301,13 +300,10 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 				entityManager.merge(routine);
 				entityManager.flush();
 
-				totalSharedCountArray[0] += sharedCount;
 				routines.add(routine);
 			}
 
 			entityManager.clear();
-
-			final int expectedTotalSharedCount = totalSharedCountArray[0];
 
 			// when
 			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
@@ -319,7 +315,6 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
 				softly.assertThat(response.routines()).hasSize(routineCount);
-				softly.assertThat(response.totalSharedCount()).isEqualTo(expectedTotalSharedCount);
 
 				final Map<Long, Integer> routineIdToSharedCount = new HashMap<>();
 				for (int i = 0; i < routineCount; i++) {
@@ -335,7 +330,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 루틴이_없는_경우_빈_목록을_반환하며_총_공유수는_0이다() {
+		void 루틴이_없는_경우_빈_목록을_반환한다() {
 			// when
 			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
 				PROFILE_USER.getId(),
@@ -346,7 +341,6 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(response).isNotNull();
 				softly.assertThat(response.routines()).isEmpty();
-				softly.assertThat(response.totalSharedCount()).isZero();
 			});
 		}
 
