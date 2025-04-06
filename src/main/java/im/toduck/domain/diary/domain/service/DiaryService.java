@@ -1,6 +1,7 @@
 package im.toduck.domain.diary.domain.service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -85,9 +86,9 @@ public class DiaryService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<DiaryResponse> getDiariesByMonth(final Long userId, String yearMonth) {
-		LocalDate startDate = LocalDate.parse(yearMonth + "-01");
-		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()).plusDays(1);
+	public List<DiaryResponse> getDiariesByMonth(final Long userId, YearMonth yearMonth) {
+		LocalDate startDate = yearMonth.atDay(1);
+		LocalDate endDate = yearMonth.atEndOfMonth();
 
 		List<Diary> diaries = diaryRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate);
 

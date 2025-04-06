@@ -1,5 +1,6 @@
 package im.toduck.domain.diary.presentation.api;
 
+import java.time.YearMonth;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,6 @@ import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 
 @Tag(name = "Diary")
 public interface DiaryApi {
@@ -125,9 +125,7 @@ public interface DiaryApi {
 		)
 	)
 	ResponseEntity<ApiResponse<DiaryListResponse>> getDiariesByMonth(
-		@RequestParam("yearMonth")
-		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
-		String yearMonth,
+		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -147,9 +145,7 @@ public interface DiaryApi {
 		)
 	)
 	ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
-		@RequestParam("yearMonth")
-		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
-		String yearMonth,
+		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }
