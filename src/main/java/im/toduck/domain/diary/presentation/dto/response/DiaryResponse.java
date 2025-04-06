@@ -3,6 +3,7 @@ package im.toduck.domain.diary.presentation.dto.response;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
@@ -16,6 +17,7 @@ public record DiaryResponse(
 	Long diaryId,
 
 	@JsonSerialize(using = LocalDateSerializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Schema(description = "날짜", example = "2025-03-21")
 	LocalDate date,
 

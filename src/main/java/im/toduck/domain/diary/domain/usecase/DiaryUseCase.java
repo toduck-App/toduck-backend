@@ -10,7 +10,6 @@ import im.toduck.domain.diary.domain.service.DiaryService;
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
-import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
@@ -30,7 +29,7 @@ public class DiaryUseCase {
 	private final DiaryService diaryService;
 
 	@Transactional
-	public DiaryCreateResponse createDiary(final Long userId, final DiaryCreateRequest request) {
+	public void createDiary(final Long userId, final DiaryCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
@@ -42,7 +41,6 @@ public class DiaryUseCase {
 		diaryService.addDiaryImageFiles(request.diaryImageUrls(), diary);
 
 		log.info("일기 생성 - UserId: {}, DiaryId: {}", userId, diary.getId());
-		return DiaryMapper.toDiaryCreateResponse(diary);
 	}
 
 	@Transactional
@@ -86,20 +84,20 @@ public class DiaryUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public DiaryListResponse getDiariesByMonth(final Long userId, final int year, final int month) {
+	public DiaryListResponse getDiariesByMonth(final Long userId, YearMonth yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, year, month);
+		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, yearMonth);
 		return DiaryMapper.toListDiaryResponse(diaries);
 	}
 
 	@Transactional(readOnly = true)
-	public MonthDiaryResponse getDiaryCountByMonth(Long userId, int year, int month) {
+	public MonthDiaryResponse getDiaryCountByMonth(Long userId, YearMonth yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		YearMonth currentMonth = YearMonth.of(year, month);
-		YearMonth previousMonth = currentMonth.minusMonths(1);
+		YearMonth currentMonth = yearMonth;
+		YearMonth previousMonth = yearMonth.minusMonths(1);
 
 		int thisMonthCount = diaryService.getDiaryCountByMonth(userId, currentMonth.getYear(),
 			currentMonth.getMonthValue());

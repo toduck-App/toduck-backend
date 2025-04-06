@@ -1,5 +1,6 @@
 package im.toduck.domain.diary.presentation.api;
 
+import java.time.YearMonth;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
-import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
@@ -31,11 +31,10 @@ public interface DiaryApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = DiaryCreateResponse.class,
-			description = "일기 생성 성공, 생성된 일기의 Id를 반환합니다."
+			description = "일기 생성 성공. 빈 content 객체를 반환합니다."
 		)
 	)
-	ResponseEntity<ApiResponse<DiaryCreateResponse>> createDiary(
+	ResponseEntity<ApiResponse<Map<String, Object>>> createDiary(
 		@RequestBody @Valid DiaryCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	);
@@ -115,9 +114,7 @@ public interface DiaryApi {
 			"""
 				<b>특정 연월에 작성된 일기들을 조회합니다.</b><br/><br/>
 				<p><b>연월 필터를 적용하는 방법:</b></p>
-				<p>예시: /v1/diary?year=2025&month=3</p><br/>
-				<p>- <b>year:</b> 조회 할 연도</p>
-				<p>- <b>month:</b> 조회 할 달</p>
+				<p>예시: /v1/diary?yearMonth=2025-03</p><br/>
 				<p>검색 결과가 존재하지 않는 경우 빈 배열이 반환됩니다.</p>
 				"""
 	)
@@ -128,8 +125,7 @@ public interface DiaryApi {
 		)
 	)
 	ResponseEntity<ApiResponse<DiaryListResponse>> getDiariesByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 
@@ -139,9 +135,7 @@ public interface DiaryApi {
 			"""
 				<b>특정 연월과 전월의 일기 개수를 비교하여 그 차이를 조회합니다.</b><br/><br/>
 				<p><b>연월 필터를 적용하는 방법:</b></p>
-				<p>예시: /v1/diary/count?year=2025&month=3</p><br/>
-				<p>- <b>year:</b> 조회 할 연도</p>
-				<p>- <b>month:</b> 조회 할 달</p>
+				<p>예시: /v1/diary/count?yearMonth=2025-03</p><br/>
 				"""
 	)
 	@ApiResponseExplanations(
@@ -151,8 +145,7 @@ public interface DiaryApi {
 		)
 	)
 	ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

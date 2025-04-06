@@ -1,5 +1,6 @@
 package im.toduck.domain.diary.presentation.controller;
 
+import java.time.YearMonth;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,6 @@ import im.toduck.domain.diary.domain.usecase.DiaryUseCase;
 import im.toduck.domain.diary.presentation.api.DiaryApi;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
-import im.toduck.domain.diary.presentation.dto.response.DiaryCreateResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -37,13 +37,12 @@ public class DiaryController implements DiaryApi {
 	@Override
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<DiaryCreateResponse>> createDiary(
+	public ResponseEntity<ApiResponse<Map<String, Object>>> createDiary(
 		@RequestBody @Valid final DiaryCreateRequest request,
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	) {
-		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(diaryUseCase.createDiary(userDetails.getUserId(), request))
-			);
+		diaryUseCase.createDiary(userDetails.getUserId(), request);
+		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
 
 	@Override
@@ -75,11 +74,10 @@ public class DiaryController implements DiaryApi {
 	@GetMapping
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<DiaryListResponse>> getDiariesByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		DiaryListResponse response = diaryUseCase.getDiariesByMonth(user.getUserId(), year, month);
+		DiaryListResponse response = diaryUseCase.getDiariesByMonth(user.getUserId(), yearMonth);
 
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
@@ -88,11 +86,10 @@ public class DiaryController implements DiaryApi {
 	@PreAuthorize("isAuthenticated()")
 	@Override
 	public ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
-		@RequestParam("year") int year,
-		@RequestParam("month") int month,
+		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
-		MonthDiaryResponse monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), year, month);
+		MonthDiaryResponse monthDiaryCount = diaryUseCase.getDiaryCountByMonth(user.getUserId(), yearMonth);
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(monthDiaryCount));
