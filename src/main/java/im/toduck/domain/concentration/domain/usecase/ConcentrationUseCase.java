@@ -1,5 +1,6 @@
 package im.toduck.domain.concentration.domain.usecase;
 
+import java.time.YearMonth;
 import java.util.List;
 
 import im.toduck.domain.concentration.common.mapper.ConcentrationMapper;
@@ -37,7 +38,7 @@ public class ConcentrationUseCase {
 	}
 
 	@Transactional
-	public ConcentrationListResponse getMonthlyConcentration(Long userId, String yearMonth) {
+	public ConcentrationListResponse getMonthlyConcentration(Long userId, YearMonth yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 

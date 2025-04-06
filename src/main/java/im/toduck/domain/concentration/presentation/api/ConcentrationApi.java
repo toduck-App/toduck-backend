@@ -1,5 +1,7 @@
 package im.toduck.domain.concentration.presentation.api;
 
+import java.time.YearMonth;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +17,6 @@ import im.toduck.global.security.authentication.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 
 @Tag(name = "Concentration")
 public interface ConcentrationApi {
@@ -62,9 +63,7 @@ public interface ConcentrationApi {
 		)
 	)
 	ResponseEntity<ApiResponse<ConcentrationListResponse>> getMonthlyConcentration(
-		@RequestParam("yearMonth")
-		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
-		String yearMonth,
+		@RequestParam YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }
