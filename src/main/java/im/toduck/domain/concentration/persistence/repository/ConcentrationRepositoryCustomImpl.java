@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class ConcentrationRepositoryImpl implements ConcentrationRepositoryCustom {
+public class ConcentrationRepositoryCustomImpl implements ConcentrationRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 
