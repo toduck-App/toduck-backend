@@ -197,8 +197,20 @@ public interface SocialBoardApi {
 	ResponseEntity<ApiResponse<SocialCategoryResponse>> getAllCategories();
 
 	@Operation(
-		summary = "게시글 검색",
-		description = "키워드로 게시글을 검색합니다."
+		summary = "게시글 검색 (카테고리 필터 가능)",
+		description = """
+			<b>키워드로 게시글을 검색하며, 선택적으로 카테고리 필터를 적용할 수 있습니다.</b><br/><br/>
+			<p><b>카테고리 필터를 적용하는 방법:</b></p>
+			<p>예시: /v1/socials/search?keyword=검색어&limit=10&categoryIds=1,2</p><br/>
+			<p><b>커서 페이지네이션 사용법:</b></p>
+			<p>Notion > API 개요 > 페이지네이션을 확인해주세요.</p><br/>
+			<p><b>파라미터:</b><br/>
+			<p>- <b>keyword:</b> 검색할 키워드 (필수)</p>
+			<p>- <b>cursor:</b> 조회를 시작할 커서 값 (게시글 ID)</p>
+			<p>- <b>limit:</b> 한 페이지에 표시할 게시글 수</p>
+			<p>- <b>categoryIds:</b> 필터링할 카테고리 ID 목록 (쉼표로 구분, 선택)</p><br/>
+			<p>공유할 루틴이 존재하지 않는 경우 <b>routine</b> 필드에 <b>null</b>이 반환됩니다.</p>
+			"""
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -210,7 +222,8 @@ public interface SocialBoardApi {
 		@AuthenticationPrincipal CustomUserDetails user,
 		@RequestParam(name = "keyword") @NotBlank String keyword,
 		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long cursor,
-		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
+		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit,
+		@Parameter(description = "카테고리 ID 목록 (필터링 시)") @RequestParam(required = false) List<Long> categoryIds
 	);
 
 }

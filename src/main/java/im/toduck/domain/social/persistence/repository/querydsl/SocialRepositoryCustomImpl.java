@@ -40,12 +40,7 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 				cursorCondition(cursor)
 			);
 
-		if (categoryIds != null && !categoryIds.isEmpty()) {
-			query.join(qSocialCategoryLink).on(qSocialCategoryLink.social.eq(qSocial))
-				.join(qSocialCategory).on(qSocialCategoryLink.socialCategory.eq(qSocialCategory))
-				.where(qSocialCategory.id.in(categoryIds));
-			query.distinct();
-		}
+		applyCategoryFilter(query, categoryIds);
 
 		return applyPagination(query, pageable).fetch();
 	}
@@ -55,6 +50,7 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 		Long cursor,
 		Long currentUserId,
 		String keyword,
+		List<Long> categoryIds,
 		Pageable pageable
 	) {
 		JPAQuery<Social> query = queryFactory
@@ -65,6 +61,8 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 				cursorCondition(cursor),
 				keywordCondition(keyword)
 			);
+
+		applyCategoryFilter(query, categoryIds);
 
 		return applyPagination(query, pageable).fetch();
 	}
@@ -120,5 +118,15 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 			.orderBy(qSocial.id.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize());
+	}
+
+	private void applyCategoryFilter(JPAQuery<Social> query, List<Long> categoryIds) {
+		if (categoryIds != null && !categoryIds.isEmpty()) {
+			query
+				.join(qSocialCategoryLink).on(qSocialCategoryLink.social.eq(qSocial))
+				.where(qSocialCategoryLink.socialCategory.id.in(categoryIds))
+				.groupBy(qSocial.id)
+				.having(qSocialCategoryLink.socialCategory.id.countDistinct().eq((long)categoryIds.size()));
+		}
 	}
 }

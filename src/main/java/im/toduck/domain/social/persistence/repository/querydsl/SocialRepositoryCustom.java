@@ -18,6 +18,7 @@ public interface SocialRepositoryCustom {
 		Long cursor,
 		Long currentUserId,
 		String keyword,
+		List<Long> categoryIds,
 		Pageable pageable
 	);
 
