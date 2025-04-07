@@ -1,23 +1,34 @@
 package im.toduck.domain.social.domain.usecase;
 
 import static im.toduck.fixtures.RoutineFixtures.*;
+import static im.toduck.fixtures.RoutineFixtures.PRIVATE_ROUTINE;
 import static im.toduck.fixtures.social.SocialFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static im.toduck.global.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
+import java.lang.reflect.Field;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
+import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.persistence.repository.RoutineRepository;
+import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -25,11 +36,18 @@ import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListR
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
+import jakarta.persistence.EntityManager;
 
 public class SocialProfileUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private SocialProfileUseCase socialProfileUseCase;
+
+	@Autowired
+	private RoutineRepository routineRepository;
+
+	@Autowired
+	private EntityManager entityManager;
 
 	private User PROFILE_USER;
 	private User AUTH_USER;
@@ -263,6 +281,55 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		@Test
+		@Transactional
+		void 유저의_공개_루틴_목록_조회시_총_공유수가_정확히_계산된다() throws Exception {
+			// given
+			int routineCount = 3;
+			List<Routine> routines = new ArrayList<>();
+
+			// 리플렉션을 이용한 필드 값 변경
+			Field sharedCountField = Routine.class.getDeclaredField("sharedCount");
+			sharedCountField.setAccessible(true);
+
+			for (int i = 0; i < routineCount; i++) {
+				Routine routine = testFixtureBuilder.buildRoutine(WEEKEND_NOON_ROUTINE(PROFILE_USER));
+
+				int sharedCount = i * 10;
+				sharedCountField.set(routine, sharedCount);
+
+				entityManager.merge(routine);
+				entityManager.flush();
+
+				routines.add(routine);
+			}
+
+			entityManager.clear();
+
+			// when
+			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
+				PROFILE_USER.getId(),
+				AUTH_USER.getId()
+			);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(response).isNotNull();
+				softly.assertThat(response.routines()).hasSize(routineCount);
+
+				final Map<Long, Integer> routineIdToSharedCount = new HashMap<>();
+				for (int i = 0; i < routineCount; i++) {
+					routineIdToSharedCount.put(routines.get(i).getId(), i * 10);
+				}
+
+				response.routines().forEach(routineResponse -> {
+					Long routineId = routineResponse.routineId();
+					Integer expectedSharedCount = routineIdToSharedCount.get(routineId);
+					softly.assertThat(routineResponse.sharedCount()).isEqualTo(expectedSharedCount);
+				});
+			});
+		}
+
+		@Test
 		void 루틴이_없는_경우_빈_목록을_반환한다() {
 			// when
 			UserProfileRoutineListResponse response = socialProfileUseCase.readUserAvailableRoutines(
@@ -275,6 +342,90 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 				softly.assertThat(response).isNotNull();
 				softly.assertThat(response.routines()).isEmpty();
 			});
+		}
+
+	}
+
+	@Nested
+	class SaveSharedRoutineTests {
+		private RoutineCreateRequest request;
+		private Routine SOURCE_ROUTINE_IS_PUBLIC;
+		private Routine SOURCE_ROUTINE_IS_PRIVATE;
+
+		@BeforeEach
+		void setUp() {
+			request = new RoutineCreateRequest(
+				"Morning Exercise",
+				PlanCategory.COMPUTER,
+				"#FF5733",
+				LocalTime.of(7, 0),
+				true,
+				List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY),
+				30,
+				"30 minutes jogging"
+			);
+
+			SOURCE_ROUTINE_IS_PUBLIC = testFixtureBuilder.buildRoutine(WEEKEND_NOON_ROUTINE(PROFILE_USER));
+			SOURCE_ROUTINE_IS_PRIVATE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(PROFILE_USER));
+		}
+
+		@Test
+		void 공유_루틴_저장을_성공한다() {
+			// given
+			int initialSharedCount = SOURCE_ROUTINE_IS_PUBLIC.getSharedCount();
+
+			// when
+			RoutineCreateResponse response = socialProfileUseCase.saveSharedRoutine(
+				AUTH_USER.getId(),
+				SOURCE_ROUTINE_IS_PUBLIC.getId(),
+				request
+			);
+
+			// then
+			assertThat(response.routineId()).isNotNull();
+
+			Routine newlyCreatedRoutine = routineRepository.findById(response.routineId()).orElseThrow();
+			assertThat(newlyCreatedRoutine.getUser().getId()).isEqualTo(AUTH_USER.getId());
+			assertThat(newlyCreatedRoutine.getSharedCount()).isZero();
+
+			Routine updatedSourceRoutine = routineRepository.findById(SOURCE_ROUTINE_IS_PUBLIC.getId()).orElseThrow();
+
+			assertThat(updatedSourceRoutine.getSharedCount()).isEqualTo(initialSharedCount + 1);
+		}
+
+		@Test
+		void 저장하는_사용자를_찾지_못하면_루틴_저장에_실패한다() {
+			// given
+			Long nonExistentUserId = -1L;
+			Long sourceRoutineId = SOURCE_ROUTINE_IS_PUBLIC.getId();
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialProfileUseCase.saveSharedRoutine(nonExistentUserId, sourceRoutineId, request))
+				.isInstanceOf(CommonException.class)
+				.hasMessageContaining(NOT_FOUND_USER.getMessage());
+		}
+
+		@Test
+		void 원본_루틴을_찾지_못하면_루틴_저장에_실패한다() {
+			// given
+			Long nonExistentRoutineId = -99L;
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialProfileUseCase.saveSharedRoutine(AUTH_USER.getId(), nonExistentRoutineId, request))
+				.isInstanceOf(CommonException.class)
+				.hasMessageContaining(NOT_FOUND_ROUTINE.getMessage());
+		}
+
+		@Test
+		void 원본_루틴이_비공개이면_루틴_저장에_실패한다() {
+			// when & then
+			assertThatThrownBy(
+				() -> socialProfileUseCase.saveSharedRoutine(SOURCE_ROUTINE_IS_PRIVATE.getId(), AUTH_USER.getId(),
+					request))
+				.isInstanceOf(CommonException.class)
+				.hasMessageContaining(NOT_FOUND_ROUTINE.getMessage());
 		}
 	}
 }

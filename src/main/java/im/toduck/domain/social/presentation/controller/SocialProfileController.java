@@ -5,10 +5,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.social.domain.usecase.SocialProfileUseCase;
 import im.toduck.domain.social.presentation.api.SocialProfileApi;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
@@ -66,5 +70,18 @@ public class SocialProfileController implements SocialProfileApi {
 			authUser.getUserId()
 		);
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
+	}
+
+	@Override
+	@PostMapping("/shared-routines/{routineId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<RoutineCreateResponse>> saveSharedRoutine(
+		@PathVariable Long routineId,
+		@AuthenticationPrincipal CustomUserDetails authUser,
+		@RequestBody RoutineCreateRequest request
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.createSuccess(socialProfileUseCase.saveSharedRoutine(authUser.getUserId(), routineId, request))
+		);
 	}
 }

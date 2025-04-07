@@ -32,6 +32,9 @@ public record UserProfileRoutineListResponse(
 		@Schema(description = "루틴 메모", example = "눈 뜨자마자 한 잔")
 		String memo,
 
+		@Schema(description = "루틴 공유 수", example = "455")
+		int sharedCount,
+
 		@JsonSerialize(using = LocalTimeSerializer.class)
 		@JsonFormat(pattern = "HH:mm")
 		@Schema(description = "루틴 시간 (null 이면 종일 루틴)", type = "string", example = "07:30")

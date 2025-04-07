@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.domain.service.RoutineService;
 import im.toduck.domain.routine.persistence.entity.Routine;
+import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.common.mapper.SocialProfileMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
@@ -45,13 +47,17 @@ public class SocialProfileUseCase {
 
 	@Transactional(readOnly = true)
 	public SocialProfileResponse getUserProfile(final Long profileUserId, final Long authUserId) {
+		User authUser = userService.getUserById(authUserId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		User profileUser = userService.getUserById(profileUserId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		int followingCount = followService.countFollowing(profileUserId);
 		int followerCount = followService.countFollowers(profileUserId);
 		int postCount = socialBoardService.countSocialPostsByUserId(profileUserId);
+		int totalRoutineShareCount = routineService.getTotalRoutineShareCount(profileUser);
 		boolean isMe = profileUserId.equals(authUserId);
+		boolean isFollowing = !isMe && followService.isFollowing(authUser, profileUser);
 
 		log.info("프로필 조회 - 요청자 UserId: {}, 대상 UserId: {}", authUserId, profileUserId);
 		return SocialProfileMapper.toSocialProfileResponse(
@@ -59,7 +65,9 @@ public class SocialProfileUseCase {
 			followingCount,
 			followerCount,
 			postCount,
-			isMe
+			totalRoutineShareCount,
+			isMe,
+			isFollowing
 		);
 	}
 
@@ -135,5 +143,21 @@ public class SocialProfileUseCase {
 
 		log.info("사용자 ID {}의 공개 루틴 목록 조회 - 요청자 Id: {}", profileUserId, authUserId);
 		return RoutineMapper.toUserProfileRoutineListResponse(routines);
+	}
+
+	@Transactional
+	public RoutineCreateResponse saveSharedRoutine(
+		final Long userId,
+		final Long sourceRoutineId,
+		final RoutineCreateRequest request
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Routine sourceRoutine = routineService.findAvailablePublicRoutineById(sourceRoutineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		RoutineCreateResponse routineCreateResponse = routineService.create(user, request);
+		routineService.incrementSharedCountAtomically(sourceRoutine);
+		return routineCreateResponse;
 	}
 }

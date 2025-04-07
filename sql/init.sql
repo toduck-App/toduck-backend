@@ -32,6 +32,7 @@ CREATE TABLE routine
     is_public        BOOLEAN                                             NOT NULL,
     reminder_minutes INT UNSIGNED                                        NULL,
     memo             TEXT                                                NULL,
+    shared_count     INT UNSIGNED       DEFAULT 0                        NOT NULL,
     created_at       DATETIME                                            NOT NULL,
     updated_at       DATETIME                                            NOT NULL,
     deleted_at       DATETIME                                            NULL,

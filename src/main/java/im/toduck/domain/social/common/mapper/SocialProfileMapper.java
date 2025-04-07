@@ -11,7 +11,9 @@ public class SocialProfileMapper {
 		final int followingCount,
 		final int followerCount,
 		final int postCount,
-		final boolean isMe
+		final int totalRoutineShareCount,
+		final boolean isMe,
+		final boolean isFollowing
 
 	) {
 		return SocialProfileResponse.builder()
@@ -19,7 +21,9 @@ public class SocialProfileMapper {
 			.followingCount(followingCount)
 			.followerCount(followerCount)
 			.postCount(postCount)
+			.totalRoutineShareCount(totalRoutineShareCount)
 			.isMe(isMe)
+			.isFollowing(isFollowing)
 			.build();
 	}
 }

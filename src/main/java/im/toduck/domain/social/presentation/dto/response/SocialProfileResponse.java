@@ -20,7 +20,13 @@ public record SocialProfileResponse(
 	@Schema(description = "게시물 수", example = "315")
 	int postCount,
 
+	@Schema(description = "총 루틴 공유 수", example = "1304")
+	int totalRoutineShareCount,
+
 	@Schema(description = "현재 사용자의 프로필인지 여부", example = "false")
-	boolean isMe
+	boolean isMe,
+
+	@Schema(description = "팔로잉 여부", example = "true")
+	boolean isFollowing
 ) {
 }

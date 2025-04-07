@@ -140,6 +140,7 @@ public class RoutineMapper {
 			.title(routine.getTitle())
 			.memo(routine.getMemoValue())
 			.time(routine.getTime())
+			.sharedCount(routine.getSharedCount())
 			.build();
 	}
 }
