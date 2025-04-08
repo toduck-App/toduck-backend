@@ -26,6 +26,9 @@ public record UserProfileRoutineListResponse(
 		@Schema(description = "루틴 카테고리", example = "MEDICINE")
 		PlanCategory category,
 
+		@Schema(description = "루틴 색상(null 이면 없는 색상)", example = "#FCDCDF")
+		String color,
+
 		@Schema(description = "루틴 제목", example = "하루 물 1L 이상 마시기")
 		String title,
 

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
-import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
@@ -78,7 +77,7 @@ public interface SocialProfileApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = MyRoutineAvailableListResponse.class,
+			responseClass = UserProfileRoutineListResponse.class,
 			description = "루틴 목록 조회 성공. 루틴 시간(time) 기준으로 오름차순 정렬됩니다."
 		),
 		errors = {
