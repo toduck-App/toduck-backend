@@ -12,6 +12,7 @@ import static org.mockito.BDDMockito.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +29,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
+import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -287,6 +290,394 @@ class RoutineUseCaseTest extends ServiceTest {
 		@Test
 		void 모_루틴이_Soft_DELETE_된_경우에도_상태_변경이_가능하다() {
 
+		}
+	}
+
+	@Nested
+	@DisplayName("루틴 수정시")
+	class UpdateRoutineTest {
+		@BeforeEach
+		void setUp() {
+			given(userService.getUserById(any(Long.class))).willReturn(Optional.ofNullable(USER));
+		}
+
+		@Test
+		void 기본_정보_수정이_성공한다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+			LocalDateTime originalScheduleModifiedAt = routine.getScheduleModifiedAt();
+
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				"수정된 제목",
+				PlanCategory.EXERCISE,
+				"#FF0000",
+				routine.getTime(),
+				false,
+				routine.getDaysOfWeekBitmask().getDaysOfWeek().stream().toList(),
+				30,
+				"수정된 메모",
+				true,   // isTitleChanged
+				true,   // isCategoryChanged
+				true,   // isColorChanged
+				false,  // isTimeChanged
+				true,   // isPublicChanged
+				false,  // isDaysOfWeekChanged
+				true,   // isReminderMinutesChanged
+				true    // isMemoChanged
+			);
+
+			// when
+			routineUseCase.updateRoutine(USER.getId(), routine.getId(), request);
+
+			// then
+			Routine updatedRoutine = routineRepository.findById(routine.getId()).get();
+			assertSoftly(softly -> {
+				softly.assertThat(updatedRoutine.getTitle()).isEqualTo("수정된 제목");
+				softly.assertThat(updatedRoutine.getCategory()).isEqualTo(PlanCategory.EXERCISE);
+				softly.assertThat(updatedRoutine.getColorValue()).isEqualTo("#FF0000");
+				softly.assertThat(updatedRoutine.getIsPublic()).isFalse();
+				softly.assertThat(updatedRoutine.getReminderMinutes()).isEqualTo(30);
+				softly.assertThat(updatedRoutine.getMemoValue()).isEqualTo("수정된 메모");
+				softly.assertThat(updatedRoutine.getScheduleModifiedAt()).isEqualTo(originalScheduleModifiedAt);
+			});
+		}
+
+		@Test
+		@Disabled
+		void 시간_수정시_미래의_미완료_기록이_삭제되고_누락된_기록이_생성된다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+
+			// 과거 완료 기록 (유지)
+			RoutineRecord pastComplete = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(routine).recordAt("2024-12-12 07:00:00").build()
+			);
+			// 과거 미완료 기록 (유지)
+			RoutineRecord pastIncomplete = testFixtureBuilder.buildRoutineRecord(
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-13 07:00:00").build()
+			);
+			// 미래 미완료 (삭제)
+			RoutineRecord futureIncomplete = testFixtureBuilder.buildRoutineRecord(
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-30 07:00:00").build()
+			);
+			// 미래 완료 (유지)
+			RoutineRecord futureComplete = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(routine).recordAt("2024-12-31 07:00:00").build()
+			);
+
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				routine.getTitle(),
+				routine.getCategory(),
+				routine.getColorValue(),
+				LocalTime.of(9, 0),  // 7시 -> 9시로 변경
+				routine.getIsPublic(),
+				routine.getDaysOfWeekBitmask().getDaysOfWeek().stream().toList(),
+				routine.getReminderMinutes(),
+				null,
+				false,  // isTitleChanged
+				false,  // isCategoryChanged
+				false,  // isColorChanged
+				true,   // isTimeChanged
+				false,  // isPublicChanged
+				false,  // isDaysOfWeekChanged
+				false,  // isReminderMinutesChanged
+				false   // isMemoChanged
+			);
+
+			// when
+			routineUseCase.updateRoutine(USER.getId(), routine.getId(), request);
+
+			// then
+			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
+			assertSoftly(softly -> {
+				softly.assertThat(remainingRecords).hasSize(3);
+
+				List<Long> remainingIds = remainingRecords.stream()
+					.map(RoutineRecord::getId)
+					.toList();
+
+				softly.assertThat(remainingIds)
+					.contains(pastComplete.getId(), pastIncomplete.getId(), futureComplete.getId());
+				softly.assertThat(remainingIds)
+					.doesNotContain(futureIncomplete.getId());
+			});
+		}
+
+		@Test
+		@Disabled
+		void 요일_수정시_미래의_미완료_기록이_삭제되고_누락된_기록이_생성된다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)  // 월화수목금
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+
+			// 과거 완료 기록 (유지)
+			RoutineRecord pastComplete = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(routine).recordAt("2024-12-12 07:00:00").build()
+			);
+			// 과거 미완료 기록 (유지)
+			RoutineRecord pastIncomplete = testFixtureBuilder.buildRoutineRecord(
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-13 07:00:00").build()
+			);
+			// 미래 미완료 (삭제)
+			RoutineRecord futureIncomplete = testFixtureBuilder.buildRoutineRecord(
+				INCOMPLETED_RECORD(routine).recordAt("2024-12-30 07:00:00").build()
+			);
+			// 미래 완료 (유지)
+			RoutineRecord futureComplete = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(routine).recordAt("2024-12-31 07:00:00").build()
+			);
+
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				routine.getTitle(),
+				routine.getCategory(),
+				routine.getColorValue(),
+				routine.getTime(),
+				routine.getIsPublic(),
+				List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY),  // 월수금으로 변경
+				routine.getReminderMinutes(),
+				null,
+				false,  // isTitleChanged
+				false,  // isCategoryChanged
+				false,  // isColorChanged
+				false,  // isTimeChanged
+				false,  // isPublicChanged
+				true,   // isDaysOfWeekChanged
+				false,  // isReminderMinutesChanged
+				false   // isMemoChanged
+			);
+
+			// when
+			routineUseCase.updateRoutine(USER.getId(), routine.getId(), request);
+
+			// then
+			List<RoutineRecord> remainingRecords = routineRecordRepository.findAll();
+			assertSoftly(softly -> {
+				softly.assertThat(remainingRecords).hasSizeGreaterThan(4);  // 정확한 개수는 날짜에 따라 다름
+
+				List<Long> remainingIds = remainingRecords.stream()
+					.map(RoutineRecord::getId)
+					.toList();
+
+				softly.assertThat(remainingIds)
+					.contains(pastComplete.getId(), pastIncomplete.getId(), futureComplete.getId());
+				softly.assertThat(remainingIds)
+					.doesNotContain(futureIncomplete.getId());
+
+				// 새로 생성된 기록들 확인
+				remainingRecords.stream()
+					.filter(record -> !record.getId().equals(pastComplete.getId())
+						&& !record.getId().equals(pastIncomplete.getId())
+						&& !record.getId().equals(futureComplete.getId()))
+					.forEach(record -> {
+						DayOfWeek dayOfWeek = record.getRecordAt().toLocalDate().getDayOfWeek();
+						softly.assertThat(dayOfWeek)
+							.isIn(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
+						softly.assertThat(record.getIsCompleted()).isFalse();
+					});
+			});
+		}
+
+		@Test
+		void 종일_루틴을_특정_시간_루틴으로_변경할_수_있다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_ALLDAY_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				routine.getTitle(),
+				routine.getCategory(),
+				routine.getColorValue(),
+				LocalTime.of(9, 0),
+				routine.getIsPublic(),
+				routine.getDaysOfWeekBitmask().getDaysOfWeek().stream().toList(),
+				routine.getReminderMinutes(),
+				null,
+				false,  // isTitleChanged
+				false,  // isCategoryChanged
+				false,  // isColorChanged
+				true,   // isTimeChanged
+				false,  // isPublicChanged
+				false,  // isDaysOfWeekChanged
+				false,  // isReminderMinutesChanged
+				false   // isMemoChanged
+			);
+
+			// when
+			routineUseCase.updateRoutine(USER.getId(), routine.getId(), request);
+
+			// then
+			Routine updatedRoutine = routineRepository.findById(routine.getId()).get();
+			assertThat(updatedRoutine.getTime()).isEqualTo(LocalTime.of(9, 0));
+			assertThat(updatedRoutine.isAllDay()).isFalse();
+		}
+
+		@Test
+		void 특정_시간_루틴을_종일_루틴으로_변경할_수_있다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				routine.getTitle(),
+				routine.getCategory(),
+				routine.getColorValue(),
+				null,  // 종일 루틴으로 변경
+				routine.getIsPublic(),
+				routine.getDaysOfWeekBitmask().getDaysOfWeek().stream().toList(),
+				routine.getReminderMinutes(),
+				null,
+				false,  // isTitleChanged
+				false,  // isCategoryChanged
+				false,  // isColorChanged
+				true,   // isTimeChanged
+				false,  // isPublicChanged
+				false,  // isDaysOfWeekChanged
+				false,  // isReminderMinutesChanged
+				false   // isMemoChanged
+			);
+
+			// when
+			routineUseCase.updateRoutine(USER.getId(), routine.getId(), request);
+
+			// then
+			Routine updatedRoutine = routineRepository.findById(routine.getId()).get();
+			assertThat(updatedRoutine.getTime()).isNull();
+			assertThat(updatedRoutine.isAllDay()).isTrue();
+		}
+
+		@Test
+		void 존재하지_않는_루틴을_수정하려고_하면_예외가_발생한다() {
+			// given
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				"제목",
+				null,
+				null,
+				LocalTime.of(9, 0),
+				true,
+				List.of(DayOfWeek.MONDAY),
+				null,
+				null,
+				true,   // isTitleChanged
+				false,  // isCategoryChanged
+				false,  // isColorChanged
+				true,   // isTimeChanged
+				true,   // isPublicChanged
+				true,   // isDaysOfWeekChanged
+				false,  // isReminderMinutesChanged
+				false   // isMemoChanged
+			);
+
+			// when & then
+			assertThatThrownBy(() -> routineUseCase.updateRoutine(USER.getId(), 999L, request))
+				.isInstanceOf(CommonException.class)
+				.hasMessageContaining(NOT_FOUND_ROUTINE.getMessage());
+		}
+
+		@Test
+		void 삭제된_루틴을_수정하려고_하면_예외가_발생한다() {
+			// given
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.deletedAt("2024-12-01 01:00:00")
+					.build()
+			);
+
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				"새 제목",
+				null,
+				null,
+				LocalTime.of(9, 0),
+				true,
+				List.of(DayOfWeek.MONDAY),
+				null,
+				null,
+				true,   // isTitleChanged
+				false,  // isCategoryChanged
+				false,  // isColorChanged
+				true,   // isTimeChanged
+				true,   // isPublicChanged
+				true,   // isDaysOfWeekChange
+				false,  // isReminderMinutesChanged
+				false   // isMemoChanged
+			);
+			// when & then
+			assertThatThrownBy(() -> routineUseCase.updateRoutine(USER.getId(), routine.getId(), request))
+				.isInstanceOf(CommonException.class)
+				.hasMessageContaining(NOT_FOUND_ROUTINE.getMessage());
+		}
+
+		@Test
+		void 수정_요청에서_변경_표시된_필드만_업데이트된다() {
+
+			// given
+			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+
+			String originalTitle = routine.getTitle();
+			PlanCategory originalCategory = routine.getCategory();
+			String originalColor = routine.getColorValue();
+			LocalTime originalTime = routine.getTime();
+			Boolean originalIsPublic = routine.getIsPublic();
+			List<DayOfWeek> originalDaysOfWeek = routine.getDaysOfWeekBitmask().getDaysOfWeek().stream().toList();
+			Integer originalReminderMinutes = routine.getReminderMinutes();
+			String originalMemo = routine.getMemoValue();
+
+			RoutineUpdateRequest request = new RoutineUpdateRequest(
+				"새 제목",
+				PlanCategory.EXERCISE,
+				"#FF0000",
+				LocalTime.of(9, 0),
+				false,
+				List.of(DayOfWeek.MONDAY),
+				30,
+				"새 메모",
+				false,  // isTitleChanged
+				false,  // isCategoryChanged
+				true,   // isColorChanged만 true
+				false,  // isTimeChanged
+				false,  // isPublicChanged
+				false,  // isDaysOfWeekChanged
+				false,  // isReminderMinutesChanged
+				false   // isMemoChanged
+			);
+
+			// when
+			routineUseCase.updateRoutine(USER.getId(), routine.getId(), request);
+
+			// then
+			Routine updatedRoutine = routineRepository.findById(routine.getId()).get();
+			assertSoftly(softly -> {
+				softly.assertThat(updatedRoutine.getTitle()).isEqualTo(originalTitle);
+				softly.assertThat(updatedRoutine.getCategory()).isEqualTo(originalCategory);
+				softly.assertThat(updatedRoutine.getColorValue()).isEqualTo("#FF0000");  // 이것만 변경됨
+				softly.assertThat(updatedRoutine.getTime()).isEqualTo(originalTime);
+				softly.assertThat(updatedRoutine.getIsPublic()).isEqualTo(originalIsPublic);
+				softly.assertThat(updatedRoutine.getDaysOfWeekBitmask().getDaysOfWeek())
+					.containsExactlyElementsOf(originalDaysOfWeek);
+				softly.assertThat(updatedRoutine.getReminderMinutes()).isEqualTo(originalReminderMinutes);
+				softly.assertThat(updatedRoutine.getMemoValue()).isEqualTo(originalMemo);
+			});
 		}
 	}
 

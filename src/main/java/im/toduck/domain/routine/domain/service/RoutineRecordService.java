@@ -51,6 +51,7 @@ public class RoutineRecordService {
 			.orElse(false);
 	}
 
+	@Transactional
 	public void removeIncompletedFuturesByRoutine(final Routine routine, final LocalDateTime targetDateTime) {
 		routineRecordRepository.deleteIncompletedFuturesByRoutine(routine, targetDateTime);
 	}

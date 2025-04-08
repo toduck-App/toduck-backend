@@ -14,6 +14,7 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,12 @@ public class RoutineService {
 	@Transactional(readOnly = true)
 	public Optional<Routine> findAvailablePublicRoutineById(final Long routineId) {
 		return routineRepository.findByIdAndIsPublicTrueAndDeletedAtIsNull(routineId);
+	}
+
+	@Transactional
+	public void updateFields(final Routine routine, final RoutineUpdateRequest request) {
+		routine.updateFromRequest(request);
+		routineRepository.save(routine);
 	}
 
 	@Transactional

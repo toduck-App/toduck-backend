@@ -17,6 +17,7 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
@@ -114,7 +115,24 @@ public class RoutineUseCase {
 		return RoutineMapper.toMyRoutineAvailableListResponse(routines);
 	}
 
-	// TODO: 수정 필요
+	@Transactional
+	public void updateRoutine(final Long userId, final Long routineId, final RoutineUpdateRequest request) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		Routine routine = routineService.getUserRoutine(user, routineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		routineService.updateFields(routine, request);
+		if (request.isTimeChanged() || request.isDaysOfWeekChanged()) {
+			LocalDateTime deletionTime = LocalDateTime.now();
+			routineRecordService.removeIncompletedFuturesByRoutine(routine, deletionTime);
+			createMissingIncompleteRecordsInBulk(routine, routine.getScheduleModifiedAt(), deletionTime);
+		}
+
+		log.info("루틴 수정 성공 - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
+	}
+
 	@Transactional
 	public void deleteRoutine(final Long userId, final Long routineId, final boolean keepRecords) {
 		User user = userService.getUserById(userId)
