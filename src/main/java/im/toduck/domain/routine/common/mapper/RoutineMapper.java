@@ -116,6 +116,7 @@ public class RoutineMapper {
 		return MyRoutineAvailableListResponse.MyRoutineAvailableResponse.builder()
 			.routineId(routine.getId())
 			.category(routine.getCategory())
+			.color(routine.getColorValue())
 			.title(routine.getTitle())
 			.memo(routine.getMemoValue())
 			.build();
