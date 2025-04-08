@@ -5,6 +5,7 @@ import java.util.List;
 import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationPercentResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
@@ -36,5 +37,11 @@ public class ConcentrationMapper {
 
 	public static ConcentrationListResponse toListConcentrationResponse(List<ConcentrationResponse> concentrations) {
 		return ConcentrationListResponse.from(concentrations);
+	}
+
+	public static ConcentrationPercentResponse toConcentrationPercentResponse(int percent) {
+		return ConcentrationPercentResponse.builder()
+			.percent(percent)
+			.build();
 	}
 }

@@ -1,5 +1,7 @@
 package im.toduck.domain.concentration.presentation.controller;
 
+import java.time.YearMonth;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,11 +16,11 @@ import im.toduck.domain.concentration.domain.usecase.ConcentrationUseCase;
 import im.toduck.domain.concentration.presentation.api.ConcentrationApi;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationListResponse;
+import im.toduck.domain.concentration.presentation.dto.response.ConcentrationPercentResponse;
 import im.toduck.domain.concentration.presentation.dto.response.ConcentrationSaveResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,12 +44,22 @@ public class ConcentrationController implements ConcentrationApi {
 	@GetMapping("/monthly")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<ConcentrationListResponse>> getMonthlyConcentration(
-		@RequestParam("yearMonth")
-		@Pattern(regexp = "\\d{4}-\\d{2}", message = "yyyy-MM 형식으로 입력해야 합니다.")
-		String yearMonth,
+		@RequestParam YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
 		ConcentrationListResponse response = concentrationUseCase.getMonthlyConcentration(user.getUserId(), yearMonth);
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
+	}
+
+	@Override
+	@GetMapping("/percent")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<ConcentrationPercentResponse>> getMonthConcentrationPercent(
+		@RequestParam YearMonth yearMonth,
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		ConcentrationPercentResponse response = concentrationUseCase.getMonthConcentrationPercent(user.getUserId(),
+			yearMonth);
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }

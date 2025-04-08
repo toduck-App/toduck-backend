@@ -11,7 +11,7 @@ import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.user.persistence.entity.User;
 
 @Repository
-public interface ConcentrationRepository extends JpaRepository<Concentration, Long> {
+public interface ConcentrationRepository extends JpaRepository<Concentration, Long>, ConcentrationRepositoryCustom {
 	Optional<Concentration> findByUserAndDate(User user, LocalDate date);
 
 	List<Concentration> findByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate);

@@ -1,6 +1,7 @@
 package im.toduck.domain.concentration.domain.service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -33,10 +34,20 @@ public class ConcentrationService {
 	}
 
 	@Transactional
-	public List<Concentration> getMonthlyConcentration(User user, String yearMonth) {
-		LocalDate startDate = LocalDate.parse(yearMonth + "-01");
-		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+	public List<Concentration> getMonthlyConcentration(User user, YearMonth yearMonth) {
+		LocalDate startDate = yearMonth.atDay(1);
+		LocalDate endDate = yearMonth.atEndOfMonth();
 
 		return concentrationRepository.findByUserAndDateBetween(user, startDate, endDate);
+	}
+
+	public int getMonthConcentrationPercent(Long userId, YearMonth yearMonth) {
+		Integer totalPercentage = concentrationRepository.getAverageConcentrationPercentageByMonth(userId, yearMonth);
+
+		if (totalPercentage == null) {
+			return 0;
+		}
+
+		return totalPercentage;
 	}
 }
