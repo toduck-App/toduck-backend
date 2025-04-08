@@ -14,6 +14,7 @@ import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableList
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
+import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
 import lombok.NoArgsConstructor;
@@ -117,6 +118,29 @@ public class RoutineMapper {
 			.category(routine.getCategory())
 			.title(routine.getTitle())
 			.memo(routine.getMemoValue())
+			.build();
+	}
+
+	public static UserProfileRoutineListResponse toUserProfileRoutineListResponse(final List<Routine> routines) {
+		List<UserProfileRoutineListResponse.UserProfileRoutineResponse> routineResponses = routines.stream()
+			.map(RoutineMapper::toUserProfileRoutineRecordReadResponse)
+			.toList();
+
+		return UserProfileRoutineListResponse.builder()
+			.routines(routineResponses)
+			.build();
+	}
+
+	private static UserProfileRoutineListResponse.UserProfileRoutineResponse toUserProfileRoutineRecordReadResponse(
+		final Routine routine
+	) {
+		return UserProfileRoutineListResponse.UserProfileRoutineResponse.builder()
+			.routineId(routine.getId())
+			.category(routine.getCategory())
+			.title(routine.getTitle())
+			.memo(routine.getMemoValue())
+			.time(routine.getTime())
+			.sharedCount(routine.getSharedCount())
 			.build();
 	}
 }

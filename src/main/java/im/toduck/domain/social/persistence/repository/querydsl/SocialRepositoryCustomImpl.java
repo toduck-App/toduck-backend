@@ -26,8 +26,12 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 	private final QSocialCategory qSocialCategory = QSocialCategory.socialCategory;
 
 	@Override
-	public List<Social> findSocialsExcludingBlocked(Long cursor, Long currentUserId, List<Long> categoryIds,
-		Pageable pageable) {
+	public List<Social> findSocialsExcludingBlocked(
+		Long cursor,
+		Long currentUserId,
+		List<Long> categoryIds,
+		Pageable pageable
+	) {
 		JPAQuery<Social> query = queryFactory
 			.selectFrom(qSocial)
 			.where(
@@ -36,14 +40,57 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 				cursorCondition(cursor)
 			);
 
-		if (categoryIds != null && !categoryIds.isEmpty()) {
-			query.join(qSocialCategoryLink).on(qSocialCategoryLink.social.eq(qSocial))
-				.join(qSocialCategory).on(qSocialCategoryLink.socialCategory.eq(qSocialCategory))
-				.where(qSocialCategory.id.in(categoryIds));
-			query.distinct();
-		}
+		applyCategoryFilter(query, categoryIds);
 
 		return applyPagination(query, pageable).fetch();
+	}
+
+	@Override
+	public List<Social> searchSocialsExcludingBlocked(
+		Long cursor,
+		Long currentUserId,
+		String keyword,
+		List<Long> categoryIds,
+		Pageable pageable
+	) {
+		JPAQuery<Social> query = queryFactory
+			.selectFrom(qSocial)
+			.where(
+				qSocial.deletedAt.isNull(),
+				excludeBlockedUsers(currentUserId),
+				cursorCondition(cursor),
+				keywordCondition(keyword)
+			);
+
+		applyCategoryFilter(query, categoryIds);
+
+		return applyPagination(query, pageable).fetch();
+	}
+
+	@Override
+	public List<Social> findUserSocials(
+		Long profileUserId,
+		Long cursor,
+		Pageable pageable
+	) {
+		JPAQuery<Social> query = queryFactory
+			.selectFrom(qSocial)
+			.leftJoin(qSocial.user).fetchJoin()
+			.where(
+				qSocial.deletedAt.isNull(),
+				qSocial.user.id.eq(profileUserId),
+				cursorCondition(cursor)
+			);
+
+		return applyPagination(query, pageable).fetch();
+	}
+
+	private BooleanExpression keywordCondition(String keyword) {
+		if (keyword == null || keyword.isEmpty()) {
+			return null;
+		}
+		return qSocial.content.containsIgnoreCase(keyword)
+			.or(qSocial.title.containsIgnoreCase(keyword));
 	}
 
 	private BooleanExpression excludeBlockedUsers(Long currentUserId) {
@@ -71,5 +118,15 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 			.orderBy(qSocial.id.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize());
+	}
+
+	private void applyCategoryFilter(JPAQuery<Social> query, List<Long> categoryIds) {
+		if (categoryIds != null && !categoryIds.isEmpty()) {
+			query
+				.join(qSocialCategoryLink).on(qSocialCategoryLink.social.eq(qSocial))
+				.where(qSocialCategoryLink.socialCategory.id.in(categoryIds))
+				.groupBy(qSocial.id)
+				.having(qSocialCategoryLink.socialCategory.id.countDistinct().eq((long)categoryIds.size()));
+		}
 	}
 }

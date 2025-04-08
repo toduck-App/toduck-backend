@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.social.domain.usecase.SocialBoardUseCase;
@@ -23,7 +24,6 @@ import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
-import im.toduck.global.annotation.valid.PaginationLimit;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -91,7 +91,7 @@ public class SocialBoardController implements SocialBoardApi {
 	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> getSocials(
 		CustomUserDetails user,
 		Long cursor,
-		@PaginationLimit Integer limit,
+		Integer limit,
 		List<Long> categoryIds
 	) {
 		return ResponseEntity.ok().body(
@@ -108,5 +108,19 @@ public class SocialBoardController implements SocialBoardApi {
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(socialBoardUseCase.getAllCategories()));
+	}
+
+	@Override
+	@GetMapping("/search")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CursorPaginationResponse<SocialResponse>>> searchSocials(
+		CustomUserDetails user,
+		@RequestParam(name = "keyword") String keyword,
+		Long cursor,
+		Integer limit,
+		List<Long> categoryIds
+	) {
+		return ResponseEntity.ok().body(ApiResponse.createSuccess(
+			socialBoardUseCase.searchSocials(user.getUserId(), keyword, cursor, limit, categoryIds)));
 	}
 }

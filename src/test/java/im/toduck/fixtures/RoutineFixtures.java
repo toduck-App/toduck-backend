@@ -10,6 +10,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
+import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
 
@@ -62,6 +63,7 @@ public class RoutineFixtures {
 			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)))
 			.time(NOON_TIME)
 			.color(PlanCategoryColor.from("#00FF00"))
+			.memo(RoutineMemo.from("주말 점심 루틴 메모"))
 			.isPublic(true)
 			.build();
 	}

@@ -6,16 +6,19 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.social.common.mapper.CommentImageFileMapper;
 import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
 import im.toduck.domain.social.common.mapper.SocialLikeMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Report;
 import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.repository.CommentImageFileRepository;
 import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
@@ -35,14 +38,16 @@ public class SocialInteractionService {
 	private final LikeRepository likeRepository;
 	private final ReportRepository reportRepository;
 	private final CommentLikeRepository commentLikeRepository;
+	private final CommentImageFileRepository commentImageFileRepository;
 
 	@Transactional
 	public Comment createComment(
 		final User user,
 		final Social socialBoard,
+		final Comment parentComment,
 		final CommentCreateRequest request
 	) {
-		Comment comment = CommentMapper.toComment(user, socialBoard, request);
+		Comment comment = CommentMapper.toComment(user, socialBoard, parentComment, request);
 		return commentRepository.save(comment);
 	}
 
@@ -67,8 +72,12 @@ public class SocialInteractionService {
 			throw CommonException.from(ExceptionCode.INVALID_COMMENT_FOR_BOARD);
 		}
 
+		commentImageFileRepository.findByComment(comment)
+			.ifPresent(commentImageFileRepository::delete);
+
 		List<CommentLike> commentLikes = commentLikeRepository.findAllByComment(comment);
 		commentLikeRepository.deleteAll(commentLikes);
+
 		commentRepository.delete(comment);
 	}
 
@@ -112,8 +121,8 @@ public class SocialInteractionService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Comment> getCommentsBySocial(final Social socialBoard, final Long userId) {
-		return commentRepository.findAllBySocialExcludingBlocked(socialBoard, userId);
+	public List<Comment> getCommentsBySocial(final Social socialBoard) {
+		return commentRepository.findCommentsBySocial(socialBoard);
 	}
 
 	@Transactional(readOnly = true)
@@ -189,5 +198,23 @@ public class SocialInteractionService {
 		comment.decrementLikeCount();
 	}
 
+	@Transactional
+	public void addCommentImageFile(final String imageUrl, final Comment comment) {
+		if (imageUrl == null) {
+			return;
+		}
+		CommentImageFile commentImageFile = CommentImageFileMapper.toCommentImageFile(comment, imageUrl);
+		commentImageFileRepository.save(commentImageFile);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<CommentImageFile> getCommentImageByComment(final Comment comment) {
+		return commentImageFileRepository.findByComment(comment);
+	}
+
+	@Transactional(readOnly = true)
+	public int countCommentsBySocial(final Social social) {
+		return commentRepository.countBySocial(social);
+	}
 }
 

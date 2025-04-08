@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 public interface SocialInteractionApi {
 	@Operation(
 		summary = "게시글 댓글 생성",
-		description = "게시글 댓글을 작성합니다."
+		description = "게시글 댓글을 작성합니다. 대댓글이 아닐시 parentId는 null"
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -36,6 +36,7 @@ public interface SocialInteractionApi {
 		),
 		errors = {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_SOCIAL_BOARD),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_PARENT_COMMENT),
 		}
 	)
 	ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(

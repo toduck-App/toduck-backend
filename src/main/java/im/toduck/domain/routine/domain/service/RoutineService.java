@@ -57,9 +57,28 @@ public class RoutineService {
 		return routineRepository.findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByUpdatedAtDesc(user);
 	}
 
+	public List<Routine> getSocialProfileRoutines(final User user) {
+		return routineRepository.findAllByUserAndIsPublicTrueAndDeletedAtIsNullOrderByTimeAsc(user);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Routine> findAvailablePublicRoutineById(final Long routineId) {
+		return routineRepository.findByIdAndIsPublicTrueAndDeletedAtIsNull(routineId);
+	}
+
 	@Transactional
 	public void remove(final Routine routine) {
 		routine.delete();
 		routineRepository.save(routine);
+	}
+
+	@Transactional
+	public void incrementSharedCountAtomically(final Routine sourceRoutine) {
+		routineRepository.incrementSharedCountAtomically(sourceRoutine.getId());
+	}
+
+	@Transactional(readOnly = true)
+	public int getTotalRoutineShareCount(final User user) {
+		return routineRepository.sumRoutineSharedCountByUser(user);
 	}
 }

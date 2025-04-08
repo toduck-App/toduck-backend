@@ -20,6 +20,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class User extends BaseEntity {
+	public static final String DELETED_MEMBER_NICKNAME = "탈퇴한 회원";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -28,7 +30,7 @@ public class User extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
 
-	@Column(nullable = false, length = 100)
+	@Column(nullable = true, length = 100, unique = true)
 	private String nickname;
 
 	@Column(nullable = true, length = 50)
@@ -46,6 +48,9 @@ public class User extends BaseEntity {
 
 	@Column(nullable = true, length = 100)
 	private String email;
+
+	@Column(nullable = true, length = 1024)
+	private String imageUrl;
 
 	@Builder
 	private User(UserRole role, String nickname, String phoneNumber, String loginId, String password,
@@ -82,5 +87,16 @@ public class User extends BaseEntity {
 			return provider == null && email == null;
 		}
 		return false;
+	}
+
+	public String getNickname() {
+		if (nickname == null) {
+			return DELETED_MEMBER_NICKNAME;
+		}
+		return nickname;
+	}
+
+	public void changePassword(String encodedPassword) {
+		this.password = encodedPassword;
 	}
 }

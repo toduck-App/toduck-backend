@@ -11,13 +11,13 @@ import io.lettuce.core.dynamic.annotation.Param;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 	@Query("SELECT c FROM Comment c "
-		+ "WHERE c.social = :socialBoard "
-		+ "AND c.user.id NOT IN ("
-		+ "  SELECT b.blocked.id FROM Block b WHERE b.blocker.id = :userId"
-		+ ")")
-	List<Comment> findAllBySocialExcludingBlocked(
-		@Param("socialBoard") Social socialBoard,
-		@Param("userId") Long userId);
+		+ "WHERE c.social = :social "
+		+ "ORDER BY "
+		+ "CASE WHEN c.parent IS NULL THEN c.id ELSE c.parent.id END ASC, "
+		+ "CASE WHEN c.parent IS NOT NULL THEN c.id ELSE 0 END ASC")
+	List<Comment> findCommentsBySocial(@Param("social") Social social);
 
 	List<Comment> findAllBySocial(Social socialBoard);
+
+	int countBySocial(Social social);
 }

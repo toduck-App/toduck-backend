@@ -20,8 +20,8 @@ public class AuthUseCase {
 	private final JwtService jwtService;
 
 	@Transactional(readOnly = true)
-	public Pair<Long, JwtPair> signIn(LoginRequest request) {
-		User user = generalAuthService.getUserIfValid(request.phoneNumber(), request.password());
+	public Pair<Long, JwtPair> signIn(final LoginRequest request) {
+		User user = generalAuthService.getUserIfValid(request.loginId(), request.password());
 
 		return Pair.of(user.getId(), jwtService.createToken(user));
 	}

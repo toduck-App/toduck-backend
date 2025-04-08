@@ -1,6 +1,7 @@
 package im.toduck.domain.social.domain.usecase;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -11,8 +12,10 @@ import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.SocialCategoryMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
+import im.toduck.domain.social.domain.service.SocialCategoryService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
@@ -44,6 +47,7 @@ public class SocialBoardUseCase {
 	private final SocialInteractionService socialInteractionService;
 	private final UserService userService;
 	private final RoutineService routineService;
+	private final SocialCategoryService socialCategoryService;
 
 	@Transactional
 	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
@@ -79,18 +83,27 @@ public class SocialBoardUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-		Routine routine = findRoutineForUpdate(user, request.routineId(), request.isRemoveRoutine());
+
+		if (!isBoardOwner(socialBoard, user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		Routine routine = findRoutineForUpdate(user, request.routineId());
 
 		socialBoardService.updateSocialBoard(user, socialBoard, routine, request);
 		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
 	}
 
+	private boolean isBoardOwner(final Social socialBoard, final User user) {
+		return socialBoard.isOwner(user);
+	}
+
 	private Routine findRoutineForUpdate(
 		final User user,
-		final Long routineId,
-		final boolean isRemoveRoutine
+		final Long routineId
 	) {
-		if (isRemoveRoutine || routineId == null) {
+		if (routineId == null) {
 			return null;
 		}
 
@@ -114,8 +127,13 @@ public class SocialBoardUseCase {
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
+		if (!isBoardOwner(socialBoard, user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		socialBoardService.deleteSocialBoard(socialBoard);
 		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
-		socialBoardService.deleteSocialBoard(user, socialBoard);
 	}
 
 	@Transactional(readOnly = true)
@@ -133,15 +151,9 @@ public class SocialBoardUseCase {
 		}
 
 		List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(socialBoard);
-		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard, user.getId());
+		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard);
+		List<CommentDto> commentDtos = convertCommentsToDto(user, comments);
 		boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, socialBoard);
-
-		List<CommentDto> commentDtos = comments.stream()
-			.map((comment) -> {
-				boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
-				return CommentMapper.toCommentDto(comment, isCommentLike);
-			})
-			.toList();
 
 		log.info("소셜 게시글 단건 상세 조회 - UserId: {}, SocialBoardId: {}", userId, socialId);
 		return SocialMapper.toSocialDetailResponse(socialBoard, imageFiles, commentDtos, isSocialBoardLiked);
@@ -191,18 +203,44 @@ public class SocialBoardUseCase {
 		return socialCategories.size() != socialCategoryIds.size();
 	}
 
+	private List<CommentDto> convertCommentsToDto(final User user, final List<Comment> comments) {
+		return comments.stream()
+			.map(comment -> createCommentDto(user, comment))
+			.toList();
+	}
+
+	private CommentDto createCommentDto(final User user, final Comment comment) {
+		Optional<CommentImageFile> commentImageFile = socialInteractionService.getCommentImageByComment(comment);
+		boolean hasImage = commentImageFile.isPresent();
+		String imageUrl = hasImage ? commentImageFile.get().getUrl() : null;
+
+		boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
+		boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
+
+		return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
+	}
+
 	private List<SocialResponse> createSocialResponses(
 		final List<Social> socialBoards,
-		final User user,
+		final User requestingUser,
 		final int actualLimit
 	) {
 		return socialBoards.stream()
 			.limit(actualLimit)
-			.map(sb -> {
-				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(sb);
-				List<Comment> comments = socialInteractionService.getCommentsBySocial(sb, user.getId());
-				boolean isSocialBoardLiked = socialInteractionService.getSocialBoardIsLiked(user, sb);
-				return SocialMapper.toSocialResponse(sb, imageFiles, comments.size(), isSocialBoardLiked);
+			.map(social -> {
+				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(social);
+				int commentCount = socialInteractionService.countCommentsBySocial(social);
+				boolean isLikedByRequestingUser = socialInteractionService.getSocialBoardIsLiked(requestingUser,
+					social);
+				List<SocialCategoryDto> socialCategoryDtos = socialCategoryService.getSocialCategoryDtosBySocial(
+					social);
+				return SocialMapper.toSocialResponse(
+					social,
+					imageFiles,
+					socialCategoryDtos,
+					commentCount,
+					isLikedByRequestingUser
+				);
 			})
 			.toList();
 	}
@@ -217,4 +255,36 @@ public class SocialBoardUseCase {
 
 		return SocialCategoryMapper.toSocialCategoryResponse(socialCategoryDtos);
 	}
+
+	@Transactional(readOnly = true)
+	public CursorPaginationResponse<SocialResponse> searchSocials(
+		final Long userId,
+		final String keyword,
+		final Long cursor,
+		final Integer limit,
+		final List<Long> categoryIds
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
+		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
+
+		validateCategories(userId, categoryIds);
+
+		List<Social> searchResults = socialBoardService.searchSocialsWithFilters(
+			userId,
+			keyword,
+			cursor,
+			fetchLimit,
+			categoryIds
+		);
+
+		boolean hasMore = PaginationUtil.hasMore(searchResults, actualLimit);
+		Long nextCursor = PaginationUtil.getNextCursor(hasMore, searchResults, actualLimit, Social::getId);
+
+		List<SocialResponse> searchResponses = createSocialResponses(searchResults, user, actualLimit);
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, searchResponses);
+	}
+
 }

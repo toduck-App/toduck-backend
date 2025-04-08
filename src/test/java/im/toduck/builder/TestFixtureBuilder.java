@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
+import im.toduck.domain.schedule.persistence.entity.Schedule;
+import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
@@ -15,6 +17,7 @@ import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.user.persistence.entity.Block;
+import im.toduck.domain.user.persistence.entity.Follow;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.infra.redis.phonenumber.PhoneNumber;
 
@@ -81,4 +84,19 @@ public class TestFixtureBuilder {
 		bs.socialCategoryLinkRepository().save(link);
 	}
 
+	public Schedule buildSchedule(final Schedule schedule) {
+		return bs.scheduleRepository().save(schedule);
+	}
+
+	public ScheduleRecord buildScheduleRecord(final ScheduleRecord scheduleRecord) {
+		return bs.scheduleRecordRepository().save(scheduleRecord);
+	}
+
+	public Follow buildFollow(final User follower, final User followed) {
+		Follow follow = Follow.builder()
+			.follower(follower)
+			.followed(followed)
+			.build();
+		return bs.followRepository().save(follow);
+	}
 }

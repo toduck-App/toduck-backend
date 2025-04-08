@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
+import im.toduck.domain.schedule.persistence.repository.ScheduleRecordRepository;
+import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
 import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
@@ -13,6 +15,7 @@ import im.toduck.domain.social.persistence.repository.SocialCategoryRepository;
 import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.user.persistence.repository.BlockRepository;
+import im.toduck.domain.user.persistence.repository.FollowRepository;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.infra.redis.phonenumber.PhoneNumberRepository;
 
@@ -54,6 +57,15 @@ public class BuilderSupporter {
 
 	@Autowired
 	private SocialCategoryLinkRepository socialCategoryLinkRepository;
+
+	@Autowired
+	private ScheduleRepository scheduleRepository;
+
+	@Autowired
+	private ScheduleRecordRepository scheduleRecordRepository;
+
+	@Autowired
+	private FollowRepository followRepository;
 
 	public UserRepository userRepository() {
 		return userRepository;
@@ -101,6 +113,18 @@ public class BuilderSupporter {
 
 	public SocialCategoryLinkRepository socialCategoryLinkRepository() {
 		return socialCategoryLinkRepository;
+	}
+
+	public ScheduleRepository scheduleRepository() {
+		return scheduleRepository;
+	}
+
+	public ScheduleRecordRepository scheduleRecordRepository() {
+		return scheduleRecordRepository;
+	}
+
+	public FollowRepository followRepository() {
+		return followRepository;
 	}
 
 }

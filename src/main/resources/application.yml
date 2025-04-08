@@ -21,3 +21,13 @@ decorator:
   datasource:
     p6spy:
       enable-logging: false
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+      endpoint: ${AWS_S3_ENDPOINT}
+    region: ${AWS_REGION}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+

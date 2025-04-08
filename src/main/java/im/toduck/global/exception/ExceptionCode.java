@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public enum ExceptionCode {
 
 	/* 401xx AUTH */
-	INVALID_PHONE_NUMBER_OR_PASSWORD(HttpStatus.UNAUTHORIZED, 40101, "전화번호 또는 비밀번호가 일치하지 않습니다.",
+	INVALID_LOGIN_ID_OR_PASSWORD(HttpStatus.UNAUTHORIZED, 40101, "아이디 또는 비밀번호가 일치하지 않습니다.",
 		"사용자가 제공한 전화번호나 비밀번호가 데이터베이스의 정보와 일치하지 않을 때 발생합니다."),
 	FORBIDDEN_ACCESS_TOKEN(HttpStatus.FORBIDDEN, 40102, "토큰에 접근 권한이 없습니다."),
 	EMPTY_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 40103, "토큰이 포함되어 있지 않습니다."),
@@ -47,6 +47,10 @@ public enum ExceptionCode {
 	INVALID_ID_TOKEN(HttpStatus.FORBIDDEN, 40118, "유효하지 않은 ID 토큰입니다.", "ID 토큰이 유효하지 않을 때 발생하는 오류입니다."),
 	ABNORMAL_ID_TOKEN(HttpStatus.FORBIDDEN, 40119, "비정상적인 ID 토큰입니다.", "ID 토큰 공개키로 암호화 도중에 발생하는 오류입니다."),
 	NOT_MATCHED_PUBLIC_KEY(HttpStatus.NOT_FOUND, 40120, "일치하는 공개키를 찾을 수 없습니다.", "KID 와 공개키가 일치하지 않을 때 발생하는 오류입니다."),
+	NOT_EXIST_PHONE_NUMBER(HttpStatus.BAD_REQUEST, 40121, "가입된 전화번호가 아닙니다.",
+		"자체 회원가입에서 ID 찾기 혹은 비밀번호 찾기를 위한 인증번호 요청에서 회원으로 등록되지 않은 전화번호이어서 발생하는 오류입니다."),
+	INVALID_LOGIN_ID(HttpStatus.BAD_REQUEST, 40122, "유효하지 않은 아이디입니다.",
+		"비밀번호 찾기를 위한 인증번호 요청에서 회원ID와 일치하지 않는 로그인 아이디이어서 발생하는 오류입니다."),
 
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),
@@ -58,6 +62,13 @@ public enum ExceptionCode {
 		"차단 해제 시 차단 정보를 찾을 수 없을 때 발생하는 오류입니다."),
 	ALREADY_BLOCKED(HttpStatus.CONFLICT, 40205, "이미 차단된 사용자입니다.",
 		"해당 사용자를 이미 차단한 경우 발생하는 오류입니다."),
+	CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, 40206, "자기 자신을 팔로우할 수 없습니다.",
+		"사용자가 자신의 계정을 팔로우하려고 시도할 때 발생하는 오류입니다."),
+	ALREADY_FOLLOWING(HttpStatus.CONFLICT, 40207, "이미 팔로우 중입니다.",
+		"해당 사용자를 이미 팔로우하고 있는 경우 발생하는 오류입니다."),
+	NOT_FOUND_FOLLOW(HttpStatus.NOT_FOUND, 40208, "팔로우 정보를 찾을 수 없습니다.",
+		"언팔로우 시 팔로우 관계가 존재하지 않을 때 발생하는 오류입니다."),
+	EXISTS_USER_NICKNAME(HttpStatus.CONFLICT, 40209, "이미 사용 중인 닉네임입니다."),
 
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
@@ -77,6 +88,26 @@ public enum ExceptionCode {
 	CANNOT_REPORT_OWN_POST(HttpStatus.FORBIDDEN, 40414, "자신의 게시글은 신고할 수 없습니다."),
 	EXISTS_COMMENT_LIKE(HttpStatus.CONFLICT, 40415, "이미 댓글에 좋아요를 눌렀습니다."),
 	NOT_FOUND_COMMENT_LIKE(HttpStatus.NOT_FOUND, 40416, "해당 댓글 좋아요를 찾을 수 없습니다."),
+	INVALID_SEARCH_KEYWORD(HttpStatus.BAD_REQUEST, 40417, "검색 키워드는 null일 수 없습니다."),
+	NOT_FOUND_PARENT_COMMENT(HttpStatus.NOT_FOUND, 40418, "부모 댓글을 찾을 수 없습니다."),
+	INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, 40419, "답글은 부모 댓글이 될 수 없습니다."),
+
+	/* 405xx diary */
+	NOT_FOUND_DIARY(HttpStatus.NOT_FOUND, 40501, "일기를 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_DIARY(HttpStatus.FORBIDDEN, 40502, "일기에 접근 권한이 없습니다."),
+	EXISTS_DATE_DIARY(HttpStatus.CONFLICT, 40503, "이미 해당 날짜에 일기가 존재합니다."),
+
+	/* 431xx schedule */
+	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",
+		"일정 기록을 찾을 수 없을 때 발생하는 오류입니다."),
+	NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, 43102, "일정을 찾을 수 없습니다."),
+	NON_REPESTITIVE_ONE_SCHEDULE_NOT_PERIOD_DELETE(HttpStatus.BAD_REQUEST, 43103, "반복되지 않는 하루 일정은 기간 삭제가 불가능합니다.",
+		"반복되지 않는 하루 일정은 기간 삭제가 불가능한 요청을 클라이언트에서 보냈을 때 발생합니다."),
+	ONE_DAY__NONREPEATABLE_SCHEDULE_CANNOT_AFTER_DATE_UPDATE(HttpStatus.FORBIDDEN, 43104,
+		"반복되지 않는 하루 일정은 하루 삭제만 가능합니다.",
+		"반복되지 않는 하루 일정을 하루 삭제만 가능한 요청을 클라이언트에서 일괄 수정 보냈을 때 발생합니다."),
+	PERIOD_SCHEDULE_CANNOT_AFTER_DATE_UPDATE(HttpStatus.BAD_REQUEST, 43105, "기간 일정은 하루 삭제만 가능합니다.",
+		"기간 일정을 하루 삭제만 가능한 요청을 클라이언트에서 일괄 수정 보냈을 때 발생합니다."),
 
 	/* 432xx */
 	NOT_FOUND_ROUTINE(HttpStatus.NOT_FOUND, 43201, "권한이 없거나 존재하지 않는 루틴입니다."),
@@ -87,7 +118,10 @@ public enum ExceptionCode {
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
-	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다.");
+	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다."),
+	INVALID_IMAGE_EXTENSION(HttpStatus.BAD_REQUEST, 49903, "지원되지 않는 이미지 파일 확장자입니다.",
+		"이미지 파일 업로드에 허용되지 않는 파일 형식입니다."),
+	SMS_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 49904, "외부 SMS 통신중 에러가 났습니다.");
 
 	private final HttpStatus httpStatus;
 	private final int errorCode;

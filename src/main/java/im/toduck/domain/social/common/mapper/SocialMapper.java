@@ -9,6 +9,7 @@ import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
 import im.toduck.domain.social.presentation.dto.response.CommentDto;
 import im.toduck.domain.social.presentation.dto.response.OwnerDto;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
@@ -23,11 +24,13 @@ public class SocialMapper {
 	public static Social toSocial(
 		final User user,
 		final Routine routine,
+		final String title,
 		final String content,
 		final Boolean isAnonymous
 	) {
 		return Social.builder()
 			.user(user)
+			.title(title)
 			.routine(routine)
 			.content(content)
 			.isAnonymous(isAnonymous)
@@ -49,10 +52,11 @@ public class SocialMapper {
 		return SocialDetailResponse.builder()
 			.socialId(socialBoard.getId())
 			.owner(getOwner(socialBoard.getUser()))
+			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
+			.title(socialBoard.getTitle())
+			.content(socialBoard.getContent())
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
-			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
-			.content(socialBoard.getContent())
 			.socialLikeInfo(getSocialLikeDto(socialBoard, isSocialBoardLiked))
 			.comments(comments)
 			.createdAt(socialBoard.getCreatedAt())
@@ -63,18 +67,21 @@ public class SocialMapper {
 	public static SocialResponse toSocialResponse(
 		Social socialBoard,
 		List<SocialImageFile> imageFiles,
+		List<SocialCategoryDto> socialCategoryDtos,
 		int commentCount,
-		boolean isLiked) {
-
+		boolean isLiked
+	) {
 		return SocialResponse.builder()
 			.socialId(socialBoard.getId())
 			.owner(getOwner(socialBoard.getUser()))
+			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
+			.title(socialBoard.getTitle())
 			.content(socialBoard.getContent())
 			.hasImages(!imageFiles.isEmpty())
 			.images(getImageDtos(imageFiles))
-			.routine(getSocialRoutineDto(socialBoard.getRoutine()))
 			.socialLikeInfo(getSocialLikeDto(socialBoard, isLiked))
 			.commentCount(commentCount)
+			.categories(socialCategoryDtos)
 			.createdAt(socialBoard.getCreatedAt())
 			.build();
 	}
@@ -96,10 +103,11 @@ public class SocialMapper {
 			.toList();
 	}
 
-	private static OwnerDto getOwner(User user) {
+	private static OwnerDto getOwner(final User user) {
 		return OwnerDto.builder()
 			.ownerId(user.getId())
 			.nickname(user.getNickname())
+			.profileImageUrl(user.getImageUrl())
 			.build();
 	}
 }

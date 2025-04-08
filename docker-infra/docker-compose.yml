@@ -1,8 +1,7 @@
 version: '3'
 services:
   mysql8:
-    image: mysql:8.0.28
-    platform: linux/x86_64
+    image: mysql:8.0.36
     container_name: toduck_mysql
     restart: always
     ports:

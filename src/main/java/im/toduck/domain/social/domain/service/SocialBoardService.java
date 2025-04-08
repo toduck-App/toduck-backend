@@ -12,12 +12,14 @@ import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
 import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
+import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.CommentLike;
 import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.persistence.entity.SocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.SocialImageFile;
+import im.toduck.domain.social.persistence.repository.CommentImageFileRepository;
 import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
@@ -44,6 +46,7 @@ public class SocialBoardService {
 	private final SocialCategoryLinkRepository socialCategoryLinkRepository;
 	private final CommentRepository commentRepository;
 	private final CommentLikeRepository commentLikeRepository;
+	private final CommentImageFileRepository commentImageFileRepository;
 	private final LikeRepository likeRepository;
 
 	@Transactional(readOnly = true)
@@ -57,17 +60,18 @@ public class SocialBoardService {
 		final Routine routine,
 		final SocialCreateRequest request
 	) {
-		Social socialBoard = SocialMapper.toSocial(user, routine, request.content(), request.isAnonymous());
+		Social socialBoard = SocialMapper.toSocial(
+			user,
+			routine,
+			request.title(),
+			request.content(),
+			request.isAnonymous()
+		);
 		return socialRepository.save(socialBoard);
 	}
 
 	@Transactional
-	public void deleteSocialBoard(final User user, final Social socialBoard) {
-		if (!isBoardOwner(socialBoard, user)) {
-			log.warn("권한이 없는 유저가 게시글 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
-			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
-		}
-
+	public void deleteSocialBoard(final Social socialBoard) {
 		List<SocialImageFile> imageFiles = socialImageFileRepository.findAllBySocial(socialBoard);
 		imageFiles.forEach(SocialImageFile::softDelete);
 
@@ -76,6 +80,7 @@ public class SocialBoardService {
 
 		List<Comment> comments = commentRepository.findAllBySocial(socialBoard);
 		comments.forEach(comment -> {
+			commentImageFileRepository.findByComment(comment).ifPresent(CommentImageFile::softDelete);
 			commentLikeRepository.findAllByComment(comment).forEach(CommentLike::softDelete);
 		});
 		comments.forEach(Comment::softDelete);
@@ -93,11 +98,6 @@ public class SocialBoardService {
 		final Routine routine,
 		final SocialUpdateRequest request
 	) {
-		if (!isBoardOwner(socialBoard, user)) {
-			log.warn("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
-			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
-		}
-
 		if (request.socialCategoryIds() != null) {
 			if (request.socialCategoryIds().isEmpty()) {
 				log.warn("게시글 업데이트시 빈 카테고리 리스트로 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(),
@@ -117,7 +117,11 @@ public class SocialBoardService {
 			addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
 		}
 
-		if (request.isRemoveRoutine() || request.routineId() != null) {
+		if (request.isChangeTitle()) {
+			socialBoard.updateTitle(request.title());
+		}
+
+		if (request.isChangeRoutine()) {
 			socialBoard.updateRoutine(routine);
 		}
 
@@ -142,6 +146,10 @@ public class SocialBoardService {
 
 	@Transactional
 	public void addSocialImageFiles(final List<String> imageUrls, final Social socialBoard) {
+		if (imageUrls == null || imageUrls.isEmpty()) {
+			return;
+		}
+
 		List<SocialImageFile> socialImageFiles = imageUrls.stream()
 			.map(url -> SocialImageFileMapper.toSocialImageFile(socialBoard, url))
 			.toList();
@@ -181,10 +189,6 @@ public class SocialBoardService {
 		return socialRepository.findSocialsExcludingBlocked(cursor, currentUserId, categoryIds, pageRequest);
 	}
 
-	private boolean isBoardOwner(final Social socialBoard, final User user) {
-		return socialBoard.isOwner(user);
-	}
-
 	private boolean isInvalidCategoryIncluded(
 		final List<Long> socialCategoryIds,
 		final List<SocialCategory> socialCategories
@@ -195,6 +199,35 @@ public class SocialBoardService {
 	@Transactional(readOnly = true)
 	public List<SocialCategory> findAllSocialCategories() {
 		return socialCategoryRepository.findAll();
+	}
+
+	@Transactional(readOnly = true)
+	public List<Social> searchSocialsWithFilters(
+		final Long userId,
+		final String keyword,
+		final Long cursor,
+		final int limit,
+		final List<Long> categoryIds
+	) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+		return socialRepository.searchSocialsExcludingBlocked(cursor, userId, keyword, categoryIds, pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public int countSocialPostsByUserId(final Long userId) {
+		return (int)socialRepository.countByUserId(userId);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Social> getSocialsByUserId(
+		final Long profileUserId,
+		final Long authUserId,
+		final Long cursor,
+		final Integer limit
+	) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+
+		return socialRepository.findUserSocials(profileUserId, cursor, pageRequest);
 	}
 }
 
