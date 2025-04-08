@@ -137,6 +137,7 @@ public class RoutineMapper {
 		return UserProfileRoutineListResponse.UserProfileRoutineResponse.builder()
 			.routineId(routine.getId())
 			.category(routine.getCategory())
+			.color(routine.getColorValue())
 			.title(routine.getTitle())
 			.memo(routine.getMemoValue())
 			.time(routine.getTime())
