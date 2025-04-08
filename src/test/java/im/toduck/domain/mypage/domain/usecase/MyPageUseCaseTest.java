@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
+import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.fixtures.user.UserFixtures;
@@ -54,6 +55,24 @@ public class MyPageUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> myPageUseCase.updateNickname(updatingUser.getId(), request))
 				.isInstanceOf(CommonException.class)
 				.hasMessageContaining(ExceptionCode.EXISTS_USER_NICKNAME.getMessage());
+		}
+	}
+
+	@Nested
+	@DisplayName("프로필 이미지 변경 시")
+	class UpdateProfileImage {
+		@Test
+		public void 프로필_사진을_변경할_수_있다() {
+			// given
+			User user = testFixtureBuilder.buildUser(UserFixtures.GENERAL_USER());
+			String imageUrl = "https://cdn.toduck.app/example.jpg";
+
+			// when
+			ProfileImageUpdateRequest request = new ProfileImageUpdateRequest(imageUrl);
+			myPageUseCase.updateProfileImage(user.getId(), request);
+
+			// then
+			assertThat(userRepository.findById(user.getId()).get().getImageUrl()).isEqualTo(imageUrl);
 		}
 	}
 }
