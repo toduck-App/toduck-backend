@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
+import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -48,6 +49,20 @@ public interface MyPageApi {
 		)
 	)
 	ResponseEntity<ApiResponse<NickNameResponse>> getMyNickname(
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	);
+
+	@Operation(
+		summary = "프로필 사진 변경",
+		description = "사용자 프로필 사진을 변경합니다. null을 보낼 경우 프로필 사진 삭제를 의미합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "프로필 사진 변경 성공, 빈 content 객체를 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> updateProfileImage(
+		@RequestBody @Valid ProfileImageUpdateRequest request,
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	);
 }
