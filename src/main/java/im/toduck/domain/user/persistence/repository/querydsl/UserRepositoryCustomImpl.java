@@ -21,4 +21,12 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 			.where(qUser.id.eq(user.getId()))
 			.execute();
 	}
+
+	@Override
+	public void updateProfileImageUrl(User user, String imageUrl) {
+		queryFactory.update(qUser)
+			.set(qUser.imageUrl, imageUrl)
+			.where(qUser.id.eq(user.getId()))
+			.execute();
+	}
 }

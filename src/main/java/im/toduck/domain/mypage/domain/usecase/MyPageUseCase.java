@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.mypage.domain.service.MyPageService;
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
+import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -33,5 +34,13 @@ public class MyPageUseCase {
 		return NickNameResponse.builder()
 			.nickname(user.getNickname())
 			.build();
+	}
+
+	@Transactional
+	public void updateProfileImage(Long userId, ProfileImageUpdateRequest request) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		myPageService.updateProfileImage(user, request.imageUrl());
 	}
 }

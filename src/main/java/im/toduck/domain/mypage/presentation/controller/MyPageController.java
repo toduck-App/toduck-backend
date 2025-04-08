@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import im.toduck.domain.mypage.domain.usecase.MyPageUseCase;
 import im.toduck.domain.mypage.presentation.api.MyPageApi;
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
+import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -45,6 +46,17 @@ public class MyPageController implements MyPageApi {
 	) {
 		NickNameResponse response = myPageUseCase.getMyNickname(userDetails.getUserId());
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
+	}
+
+	@Override
+	@PatchMapping("/profile-image")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> updateProfileImage(
+		@RequestBody @Valid ProfileImageUpdateRequest request,
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	) {
+		myPageUseCase.updateProfileImage(userDetails.getUserId(), request);
+		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 
 }

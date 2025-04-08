@@ -23,4 +23,9 @@ public class MyPageService {
 			throw CommonException.from(ExceptionCode.EXISTS_USER_NICKNAME);
 		}
 	}
+
+	@Transactional
+	public void updateProfileImage(User user, String imageUrl) {
+		userRepository.updateProfileImageUrl(user, imageUrl);
+	}
 }
