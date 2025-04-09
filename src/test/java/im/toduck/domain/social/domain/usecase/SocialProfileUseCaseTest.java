@@ -1,6 +1,5 @@
 package im.toduck.domain.social.domain.usecase;
 
-import static im.toduck.fixtures.routine.RoutineFixtures.PRIVATE_ROUTINE;
 import static im.toduck.fixtures.routine.RoutineFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
@@ -373,11 +372,15 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			);
 
 			SOURCE_ROUTINE_IS_PUBLIC = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+			SOURCE_ROUTINE_IS_PRIVATE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
 				PRIVATE_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
 					.createdAt("2024-11-29 01:00:00")
 					.build()
 			);
-			SOURCE_ROUTINE_IS_PRIVATE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(PROFILE_USER));
 		}
 
 		@Test
