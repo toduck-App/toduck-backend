@@ -35,6 +35,20 @@ public class RoutineFixtures {
 			.routine(routine);
 	}
 
+	public static RoutineWithAuditInfo.RoutineWithAuditInfoBuilder PRIVATE_MONDAY_ONLY_MORNING_ROUTINE(User user) {
+		Routine routine = Routine.builder()
+			.user(user)
+			.title("내용")
+			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.MONDAY)))
+			.time(MORNING_TIME)
+			.color(PlanCategoryColor.from("#FF0000"))
+			.isPublic(false)
+			.build();
+
+		return RoutineWithAuditInfo.builder()
+			.routine(routine);
+	}
+
 	public static RoutineWithAuditInfo.RoutineWithAuditInfoBuilder PUBLIC_MONDAY_ONLY_ALLDAY_ROUTINE(User user) {
 		Routine routine = Routine.builder()
 			.user(user)

@@ -1,7 +1,7 @@
 package im.toduck.domain.social.domain.usecase;
 
-import static im.toduck.fixtures.RoutineFixtures.*;
-import static im.toduck.fixtures.RoutineFixtures.PRIVATE_ROUTINE;
+import static im.toduck.fixtures.routine.RoutineFixtures.PRIVATE_ROUTINE;
+import static im.toduck.fixtures.routine.RoutineFixtures.*;
 import static im.toduck.fixtures.social.SocialFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static im.toduck.global.exception.ExceptionCode.*;
@@ -241,7 +241,11 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			List<Routine> routines = new ArrayList<>();
 
 			for (int i = 0; i < routineCount; i++) {
-				Routine routine = testFixtureBuilder.buildRoutine(WEEKEND_NOON_ROUTINE(PROFILE_USER));
+				Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+					PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+						.createdAt("2024-11-29 01:00:00")
+						.build()
+				);
 				routines.add(routine);
 			}
 
@@ -292,8 +296,11 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			sharedCountField.setAccessible(true);
 
 			for (int i = 0; i < routineCount; i++) {
-				Routine routine = testFixtureBuilder.buildRoutine(WEEKEND_NOON_ROUTINE(PROFILE_USER));
-
+				Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+					PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+						.createdAt("2024-11-29 01:00:00")
+						.build()
+				);
 				int sharedCount = i * 10;
 				sharedCountField.set(routine, sharedCount);
 
@@ -365,7 +372,11 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 				"30 minutes jogging"
 			);
 
-			SOURCE_ROUTINE_IS_PUBLIC = testFixtureBuilder.buildRoutine(WEEKEND_NOON_ROUTINE(PROFILE_USER));
+			SOURCE_ROUTINE_IS_PUBLIC = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PRIVATE_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			SOURCE_ROUTINE_IS_PRIVATE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(PROFILE_USER));
 		}
 

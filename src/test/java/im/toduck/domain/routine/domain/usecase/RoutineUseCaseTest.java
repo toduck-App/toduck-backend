@@ -313,7 +313,7 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			RoutineUpdateRequest request = new RoutineUpdateRequest(
 				"수정된 제목",
-				PlanCategory.EXERCISE,
+				PlanCategory.POWER,
 				"#FF0000",
 				routine.getTime(),
 				false,
@@ -337,7 +337,7 @@ class RoutineUseCaseTest extends ServiceTest {
 			Routine updatedRoutine = routineRepository.findById(routine.getId()).get();
 			assertSoftly(softly -> {
 				softly.assertThat(updatedRoutine.getTitle()).isEqualTo("수정된 제목");
-				softly.assertThat(updatedRoutine.getCategory()).isEqualTo(PlanCategory.EXERCISE);
+				softly.assertThat(updatedRoutine.getCategory()).isEqualTo(PlanCategory.POWER);
 				softly.assertThat(updatedRoutine.getColorValue()).isEqualTo("#FF0000");
 				softly.assertThat(updatedRoutine.getIsPublic()).isFalse();
 				softly.assertThat(updatedRoutine.getReminderMinutes()).isEqualTo(30);
@@ -645,7 +645,7 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			RoutineUpdateRequest request = new RoutineUpdateRequest(
 				"새 제목",
-				PlanCategory.EXERCISE,
+				PlanCategory.POWER,
 				"#FF0000",
 				LocalTime.of(9, 0),
 				false,
