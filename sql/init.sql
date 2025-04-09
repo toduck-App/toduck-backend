@@ -22,8 +22,7 @@ CREATE TABLE routine
 (
     id               BIGINT PRIMARY KEY auto_increment,
     user_id          BIGINT                                              NOT NULL,
--- TODO: 8. routine 의 이모지 필드 enum 값 필요
-    category         ENUM ('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY') NULL,
+    category     ENUM ('COMPUTER', 'FOOD', 'PENCIL', 'RED_BOOK', 'YELLOW_BOOK', 'SLEEP', 'POWER', 'PEOPLE', 'MEDICINE', 'TALK', 'HEART', 'VEHICLE', 'NONE') DEFAULT NULL,
 -- TODO: 4. routine 테이블의 color enum 값 필요
     color            VARCHAR(10)                                         NULL,
     time             TIME                                                NULL,
