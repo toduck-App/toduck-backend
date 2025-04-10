@@ -1,6 +1,8 @@
 package im.toduck.domain.routine.domain.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +14,7 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +40,15 @@ public class RoutineService {
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
 	) {
-		// TODO: 여기에선 삭제되면 조회되면 안됨, 근데 삭제 시점 미래 기준으로는 조회가 안되는거고 과거 시점이면 조회가 되어야함
-		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
+		List<Routine> routines = routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
+
+		return routines.stream().filter(routine -> {
+			LocalDateTime compareTime = routine.isAllDay()
+				? date.minusDays(1).atTime(LocalTime.MAX)
+				: date.atTime(routine.getTime());
+
+			return !routine.getScheduleModifiedAt().isAfter(compareTime);
+		}).toList();
 	}
 
 	public Optional<Routine> getUserRoutine(final User user, final Long id) {
@@ -50,7 +60,15 @@ public class RoutineService {
 	}
 
 	public boolean canCreateRecordForDate(final Routine routine, final LocalDate date) {
-		return routineRepository.isActiveForDate(routine, date);
+		if (routineRepository.isActiveForDate(routine, date)) {
+			LocalDateTime compareTime = routine.isAllDay()
+				? date.minusDays(1).atTime(LocalTime.MAX)
+				: date.atTime(routine.getTime());
+
+			return !routine.getScheduleModifiedAt().isAfter(compareTime);
+		}
+
+		return false;
 	}
 
 	public List<Routine> getAvailableRoutine(final User user) {
@@ -64,6 +82,12 @@ public class RoutineService {
 	@Transactional(readOnly = true)
 	public Optional<Routine> findAvailablePublicRoutineById(final Long routineId) {
 		return routineRepository.findByIdAndIsPublicTrueAndDeletedAtIsNull(routineId);
+	}
+
+	@Transactional
+	public void updateFields(final Routine routine, final RoutineUpdateRequest request) {
+		routine.updateFromRequest(request);
+		routineRepository.save(routine);
 	}
 
 	@Transactional

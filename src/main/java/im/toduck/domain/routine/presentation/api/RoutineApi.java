@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
@@ -110,6 +111,30 @@ public interface RoutineApi {
 	)
 	ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails
+	);
+
+	@Operation(
+		summary = "루틴 수정",
+		description = """
+			루틴의 내용을 수정합니다.
+			1. 모든 필드는 수정 여부와 관계없이 항상 전체 데이터를 전송해야 합니다.
+			2. 각 필드의 변경 여부는 is{FieldName}Changed 필드를 통해 명시적으로 표시해야 합니다.
+			3. null 값은 유효한 데이터로 취급될 수 있으며(예: 카테고리 삭제), 변경 여부 필드를 통해 의도적인 수정인지 구분합니다.
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "루틴 수정 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE)
+		}
+	)
+	ResponseEntity<ApiResponse<?>> putRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "수정할 루틴의 Id", required = true, example = "1")
+		@PathVariable final Long routineId,
+		@RequestBody @Valid final RoutineUpdateRequest request
 	);
 
 	@Operation(

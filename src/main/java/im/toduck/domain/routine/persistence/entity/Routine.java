@@ -2,6 +2,7 @@ package im.toduck.domain.routine.persistence.entity;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -9,6 +10,7 @@ import im.toduck.domain.person.persistence.entity.PlanCategory;
 import im.toduck.domain.routine.common.converter.DaysOfWeekBitmaskConverter;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.routine.persistence.vo.RoutineMemo;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import im.toduck.global.helper.DaysOfWeekBitmask;
@@ -33,7 +35,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "routine")
 @NoArgsConstructor
-// TODO: SQLRestriction 등 Soft delete 를 위한 설정 및 어노테이션 필요
 public class Routine extends BaseEntity {
 
 	@Id
@@ -62,6 +63,9 @@ public class Routine extends BaseEntity {
 
 	@Column
 	private LocalTime time;
+
+	@Column(name = "schedule_modified_at")
+	private LocalDateTime scheduleModifiedAt;
 
 	@Convert(converter = DaysOfWeekBitmaskConverter.class)
 	@Column(name = "days_of_week", nullable = false)
@@ -96,6 +100,7 @@ public class Routine extends BaseEntity {
 		this.time = time;
 		this.daysOfWeekBitmask = daysOfWeekBitmask;
 		this.user = user;
+		this.scheduleModifiedAt = LocalDateTime.now();
 	}
 
 	public String getColorValue() {
@@ -103,7 +108,49 @@ public class Routine extends BaseEntity {
 	}
 
 	public String getMemoValue() {
+		if (memo == null) {
+			return null;
+		}
 		return memo.getValue();
+	}
+
+	public void updateFromRequest(RoutineUpdateRequest request) {
+		if (request.isTitleChanged()) {
+			this.title = request.title();
+		}
+
+		if (request.isCategoryChanged()) {
+			this.category = request.category();
+		}
+
+		if (request.isColorChanged()) {
+			this.color = PlanCategoryColor.from(request.color());
+		}
+
+		if (request.isTimeChanged() && !Objects.equals(this.time, request.time())) {
+			this.time = request.time();
+			this.scheduleModifiedAt = LocalDateTime.now();
+		}
+
+		if (request.isPublicChanged()) {
+			this.isPublic = request.isPublic();
+		}
+
+		if (request.isDaysOfWeekChanged()) {
+			DaysOfWeekBitmask newDaysOfWeek = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
+			if (!newDaysOfWeek.equals(this.daysOfWeekBitmask)) {
+				this.daysOfWeekBitmask = newDaysOfWeek;
+				this.scheduleModifiedAt = LocalDateTime.now();
+			}
+		}
+
+		if (request.isReminderMinutesChanged()) {
+			this.reminderMinutes = request.reminderMinutes();
+		}
+
+		if (request.isMemoChanged()) {
+			this.memo = RoutineMemo.from(request.memo());
+		}
 	}
 
 	public void delete() {
@@ -114,4 +161,7 @@ public class Routine extends BaseEntity {
 		return deletedAt != null;
 	}
 
+	public Boolean isAllDay() {
+		return time == null;
+	}
 }

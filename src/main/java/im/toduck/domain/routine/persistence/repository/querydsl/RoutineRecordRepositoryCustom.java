@@ -1,6 +1,7 @@
 package im.toduck.domain.routine.persistence.repository.querydsl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +17,11 @@ public interface RoutineRecordRepositoryCustom {
 		final LocalDate date
 	);
 
-	void deleteIncompletedFuturesByRoutine(final Routine routine);
+	void deleteIncompletedFuturesByRoutine(final Routine routine, final LocalDateTime targetDateTime);
+
+	List<RoutineRecord> findAllByRoutineAndRecordAtBetween(
+		final Routine routine,
+		final LocalDateTime startTime,
+		final LocalDateTime endTime
+	);
 }
