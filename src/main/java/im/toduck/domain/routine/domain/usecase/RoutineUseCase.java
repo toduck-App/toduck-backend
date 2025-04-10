@@ -123,12 +123,12 @@ public class RoutineUseCase {
 		Routine routine = routineService.getUserRoutine(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
-		routineService.updateFields(routine, request);
 		if (request.isTimeChanged() || request.isDaysOfWeekChanged()) {
 			LocalDateTime deletionTime = LocalDateTime.now();
 			routineRecordService.removeIncompletedFuturesByRoutine(routine, deletionTime);
-			createMissingIncompleteRecordsInBulk(routine, routine.getScheduleModifiedAt(), deletionTime);
+			saveMissingIncompleteRecordsInBulk(routine, routine.getScheduleModifiedAt(), deletionTime);
 		}
+		routineService.updateFields(routine, request);
 
 		log.info("루틴 수정 성공 - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 	}
@@ -143,7 +143,7 @@ public class RoutineUseCase {
 		if (keepRecords) {
 			LocalDateTime deletionTime = LocalDateTime.now();
 			routineRecordService.removeIncompletedFuturesByRoutine(routine, deletionTime);
-			createMissingIncompleteRecordsInBulk(routine, routine.getScheduleModifiedAt(), deletionTime);
+			saveMissingIncompleteRecordsInBulk(routine, routine.getScheduleModifiedAt(), deletionTime);
 			routineService.remove(routine);
 			log.info("루틴 삭제 성공(기록 유지) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 			return;
@@ -154,48 +154,47 @@ public class RoutineUseCase {
 		log.info("루틴 삭제 성공(기록 포함 삭제) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 	}
 
-	private void createMissingIncompleteRecordsInBulk(
+	/**
+	 * 특정 기간 동안 루틴에 대한 누락된 기록을 생성합니다.
+	 * <p>
+	 * 이 메서드는 루틴의 수정이나 삭제 시 호출되어, 스케줄 변경 이전의 기록을 보존합니다.
+	 * 루틴의 반복 설정(요일, 시간)이 변경되더라도 과거의 데이터는 독립적으로 유지하여
+	 * 사용자의 루틴 이행 이력을 정확하게 기록하는 역할을 합니다.
+	 * <p>
+	 * 예를 들어, 사용자가 월/수/금 루틴을 화/목 루틴으로 변경한 경우,
+	 * 변경 이전의 월/수/금 날짜들에 대한 기록은 그대로 유지되도록 합니다.
+	 *
+	 * @param routine 대상 루틴
+	 * @param startTime 기록 시작 시간(보통 이전 스케줄 변경 시간)
+	 * @param endTime 기록 종료 시간(보통 현재 시간)
+	 */
+	private void saveMissingIncompleteRecordsInBulk(
 		final Routine routine,
 		final LocalDateTime startTime,
 		final LocalDateTime endTime
 	) {
 		Set<LocalDate> existingDates = routineRecordService.getExistingRecordDates(routine, startTime, endTime);
-
 		List<RoutineRecord> newRecords = new ArrayList<>();
+
 		LocalDate startDate = startTime.toLocalDate();
 		LocalDate endDate = endTime.toLocalDate();
 
-		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-			if (existingDates.contains(date)) {
-				continue;
-			}
-
-			if (!routine.getDaysOfWeekBitmask().includesDayOf(date)) {
-				continue;
-			}
-
-			if (date.equals(startDate)) {
-				LocalDateTime compareTime = routine.isAllDay()
-					? date.atTime(LocalTime.MIN)
-					: date.atTime(routine.getTime());
-				if (compareTime.isBefore(startTime)) {
-					continue;
+		routine.getDaysOfWeekBitmask().streamMatchingDatesInRange(startDate, endDate)
+			.filter(date -> !existingDates.contains(date))
+			.filter(date -> {
+				if (date.equals(startDate)) {
+					LocalTime timeToCompare = routine.isAllDay() ? LocalTime.MIN : routine.getTime();
+					return !date.atTime(timeToCompare).isBefore(startTime);
 				}
-			}
-
-			if (date.equals(endDate)) {
-				LocalDateTime compareTime = routine.isAllDay()
-					? date.atTime(LocalTime.MAX)
-					: date.atTime(routine.getTime());
-				if (compareTime.isAfter(endTime)) {
-					continue;
+				if (date.equals(endDate)) {
+					LocalTime timeToCompare = routine.isAllDay() ? LocalTime.MAX : routine.getTime();
+					return !date.atTime(timeToCompare).isAfter(endTime);
 				}
-			}
 
-			newRecords.add(
-				RoutineRecordMapper.toRoutineRecord(routine, date, false)
-			);
-		}
+				return true;
+			})
+			.map(date -> RoutineRecordMapper.toRoutineRecord(routine, date, false))
+			.forEach(newRecords::add);
 
 		if (!newRecords.isEmpty()) {
 			routineRecordService.saveAll(newRecords);
