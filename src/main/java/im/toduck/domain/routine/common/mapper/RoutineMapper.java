@@ -76,6 +76,7 @@ public class RoutineMapper {
 		return MyRoutineRecordReadListResponse.MyRoutineReadResponse.builder()
 			.routineId(routine.getId())
 			.color(routine.getColorValue())
+			.category(routine.getCategory())
 			.time(routine.getTime())
 			.title(routine.getTitle())
 			.isCompleted(isCompleted)

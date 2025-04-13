@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
+import im.toduck.domain.person.persistence.entity.PlanCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -29,6 +30,9 @@ public record MyRoutineRecordReadListResponse(
 	public record MyRoutineReadResponse(
 		@Schema(description = "루틴 Id", example = "1")
 		Long routineId,
+
+		@Schema(description = "루틴 카테고리", example = "COMPUTER")
+		PlanCategory category,
 
 		@Schema(description = "루틴 색상(null 이면 없는 색상)", example = "#FCDCDF")
 		String color,
