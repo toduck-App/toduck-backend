@@ -241,7 +241,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 
 			for (int i = 0; i < routineCount; i++) {
 				Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-					PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+					PUBLIC_MONDAY_MORNING_ROUTINE(PROFILE_USER)
 						.createdAt("2024-11-29 01:00:00")
 						.build()
 				);
@@ -296,7 +296,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 
 			for (int i = 0; i < routineCount; i++) {
 				Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-					PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+					PUBLIC_MONDAY_MORNING_ROUTINE(PROFILE_USER)
 						.createdAt("2024-11-29 01:00:00")
 						.build()
 				);
@@ -372,12 +372,12 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			);
 
 			SOURCE_ROUTINE_IS_PUBLIC = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(PROFILE_USER)
 					.createdAt("2024-11-29 01:00:00")
 					.build()
 			);
 			SOURCE_ROUTINE_IS_PRIVATE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PRIVATE_MONDAY_ONLY_MORNING_ROUTINE(PROFILE_USER)
+				PRIVATE_MONDAY_MORNING_ROUTINE(PROFILE_USER)
 					.createdAt("2024-11-29 01:00:00")
 					.build()
 			);

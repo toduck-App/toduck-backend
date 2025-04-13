@@ -154,7 +154,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		void 루틴이_자신의_소유가_아닌_경우_게시글_생성에_실패한다() {
 			// given
 			User ANOTHER_USER = testFixtureBuilder.buildUser(GENERAL_USER());
-			Routine ANOTHER_USER_ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(ANOTHER_USER));
+			Routine ANOTHER_USER_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(ANOTHER_USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			SocialCreateRequest requestWithAnotherUserRoutine = new SocialCreateRequest(
 				null,
 				content,
@@ -173,7 +177,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		@Test
 		void 비공개_루틴으로_게시글_작성시_실패한다() {
 			// given
-			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(USER));
+			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PRIVATE_SUNDAY_NIGHT_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			SocialCreateRequest requestWithPrivateRoutine = new SocialCreateRequest(
 				null,
 				content,
@@ -238,7 +246,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 		@Test
 		void 게시글이_삭제되어도_루틴은_삭제되지_않는다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
 				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
 			);
@@ -452,7 +464,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 		@Test
 		void isChangeRoutine이_true이고_routineId가_null인_경우_해당_게시글의_공유_루틴을_제거한다() {
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
 				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
 			);
@@ -482,7 +498,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 		@Test
 		void isChangeRoutine이_false인_경우_해당_게시글의_공유_루틴을_변경하지_않는다() {
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			Social SOCIAL_WITH_ROUTINE = testFixtureBuilder.buildSocial(
 				SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false)
 			);
@@ -583,7 +603,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 		@Test
 		void 비공개_루틴으로_게시글_수정시_실패한다() {
-			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutine(PRIVATE_ROUTINE(USER));
+			Routine PRIVATE_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PRIVATE_SUNDAY_NIGHT_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			SocialUpdateRequest updateRequest = new SocialUpdateRequest(
 				true, null, false, PRIVATE_ROUTINE.getId(),
 				updateContent, isAnonymous, validCategoryIds, imageUrls
@@ -610,7 +634,11 @@ public class SocialBoardUseCaseTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL_WITH_ROUTINE(USER, ROUTINE, false));
 			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
 			LIKE = testFixtureBuilder.buildLike(LIKE(USER, SOCIAL_BOARD));

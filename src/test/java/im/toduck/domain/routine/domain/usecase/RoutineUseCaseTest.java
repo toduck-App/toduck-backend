@@ -93,13 +93,13 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			// then
 			assertSoftly(softly -> {
-				assertThat(responses.queryDate()).isEqualTo(queryDate);
-				assertThat(responses.routines()).hasSize(1);
+				softly.assertThat(responses.queryDate()).isEqualTo(queryDate);
+				softly.assertThat(responses.routines()).hasSize(1);
 
 				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
-				assertThat(response.routineId()).isEqualTo(WEEKDAY_MORNING_ROUTINE.getId());
-				assertThat(response.isCompleted()).isEqualTo(ROUTINE_RECORD.getIsCompleted());
-				assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
+				softly.assertThat(response.routineId()).isEqualTo(WEEKDAY_MORNING_ROUTINE.getId());
+				softly.assertThat(response.isCompleted()).isEqualTo(ROUTINE_RECORD.getIsCompleted());
+				softly.assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
 			});
 		}
 
@@ -118,13 +118,13 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			// then
 			assertSoftly(softly -> {
-				assertThat(responses.queryDate()).isEqualTo(queryDate);
-				assertThat(responses.routines()).hasSize(1);
+				softly.assertThat(responses.queryDate()).isEqualTo(queryDate);
+				softly.assertThat(responses.routines()).hasSize(1);
 
 				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
-				assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
-				assertThat(response.isCompleted()).isFalse();
-				assertThat(response.time()).isEqualTo(WEEKDAY_ROUTINE.getTime());
+				softly.assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
+				softly.assertThat(response.isCompleted()).isFalse();
+				softly.assertThat(response.time()).isEqualTo(WEEKDAY_ROUTINE.getTime());
 			});
 		}
 
@@ -132,7 +132,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		void 루틴_수정으로_인해_동기화되지_않은_루틴_기록을_정상적으로_조회할_수_있다() {
 			// given
 			Routine WEEKDAY_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER) // 월요일
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER) // 월요일
 					.createdAt("2024-11-29 01:00:00")
 					.scheduleModifiedAt("2024-12-05 00:01:00")
 					.build()
@@ -148,13 +148,13 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			// then
 			assertSoftly(softly -> {
-				assertThat(responses.queryDate()).isEqualTo(queryDate);
-				assertThat(responses.routines()).hasSize(1);
+				softly.assertThat(responses.queryDate()).isEqualTo(queryDate);
+				softly.assertThat(responses.routines()).hasSize(1);
 
 				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
-				assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
-				assertThat(response.isCompleted()).isTrue();
-				assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
+				softly.assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
+				softly.assertThat(response.isCompleted()).isTrue();
+				softly.assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
 			});
 		}
 
@@ -162,7 +162,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		void 모_루틴이_Soft_DELETE_된_경우에도_루틴_기록이_존재한다면_정상적으로_조회할_수_있다() {
 			// given
 			Routine WEEKDAY_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER) // 월요일
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER) // 월요일
 					.createdAt("2024-11-29 01:00:00")
 					.scheduleModifiedAt("2024-12-05 00:01:00")
 					.deletedAt("2024-12-06 00:01:00")
@@ -178,13 +178,13 @@ class RoutineUseCaseTest extends ServiceTest {
 
 			// then
 			assertSoftly(softly -> {
-				assertThat(responses.queryDate()).isEqualTo(queryDate);
-				assertThat(responses.routines()).hasSize(1);
+				softly.assertThat(responses.queryDate()).isEqualTo(queryDate);
+				softly.assertThat(responses.routines()).hasSize(1);
 
 				MyRoutineRecordReadListResponse.MyRoutineReadResponse response = responses.routines().get(0);
-				assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
-				assertThat(response.isCompleted()).isEqualTo(ROUTINE_RECORD.getIsCompleted());
-				assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
+				softly.assertThat(response.routineId()).isEqualTo(WEEKDAY_ROUTINE.getId());
+				softly.assertThat(response.isCompleted()).isEqualTo(ROUTINE_RECORD.getIsCompleted());
+				softly.assertThat(response.time()).isEqualTo(ROUTINE_RECORD.getRecordAt().toLocalTime());
 			});
 		}
 	}
@@ -201,9 +201,16 @@ class RoutineUseCaseTest extends ServiceTest {
 		@Test
 		void 기존_기록이_존재하는_경우에_완료_상태_변경이_성공한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(
-				COMPLETED_SYNCED_RECORD(ROUTINE)
+				COMPLETED_RECORD(ROUTINE)
+					.recordAt("2024-12-02 07:00:00") // 월요일 아침
+					.allDay(ROUTINE.getTime() == null)
+					.build()
 			);
 			RoutinePutCompletionRequest request =
 				new RoutinePutCompletionRequest(RECORD.getRecordAt().toLocalDate(), !RECORD.getIsCompleted());
@@ -222,9 +229,17 @@ class RoutineUseCaseTest extends ServiceTest {
 		@Test
 		void 기존_기록이_존재하는_경우에_모_루틴의_반복요일에_변경이_있더라도_변경이_성공한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
+
 			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(
-				INCOMPLETED_MODIFIED_RECORD(ROUTINE)
+				INCOMPLETED_RECORD(ROUTINE)
+					.recordAt("2024-12-07 10:00:00") // 토요일 (평일 루틴이 아닌 날짜로 설정)
+					.allDay(ROUTINE.getTime() == null)
+					.build()
 			);
 
 			RoutinePutCompletionRequest request =
@@ -244,7 +259,11 @@ class RoutineUseCaseTest extends ServiceTest {
 		@Test
 		void 기존_기록이_존재하지_않는_경우에_완료_상태_변경이_성공한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 
 			RoutinePutCompletionRequest request =
 				new RoutinePutCompletionRequest(getNextDayOfWeek(DayOfWeek.MONDAY), true);
@@ -263,7 +282,11 @@ class RoutineUseCaseTest extends ServiceTest {
 		@Test
 		void 루틴기록의_일자가_모_루틴의_반복_규칙과_상이한_경우에_예외를_반환한다() {
 			// given
-			Routine ROUTINE = testFixtureBuilder.buildRoutine(WEEKDAY_MORNING_ROUTINE(USER));
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_WEEKDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 
 			RoutinePutCompletionRequest request =
 				new RoutinePutCompletionRequest(getNextDayOfWeek(DayOfWeek.SATURDAY), true);
@@ -492,7 +515,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		void 종일_루틴을_특정_시간_루틴으로_변경할_수_있다() {
 			// given
 			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_ALLDAY_ROUTINE(USER)
+				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER)
 					.createdAt("2024-11-29 01:00:00")
 					.build()
 			);
@@ -529,7 +552,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		void 특정_시간_루틴을_종일_루틴으로_변경할_수_있다() {
 			// given
 			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-11-29 01:00:00")
 					.build()
 			);
@@ -594,7 +617,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		void 삭제된_루틴을_수정하려고_하면_예외가_발생한다() {
 			// given
 			Routine routine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-11-29 01:00:00")
 					.deletedAt("2024-12-01 01:00:00")
 					.build()

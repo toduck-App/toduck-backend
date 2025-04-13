@@ -86,7 +86,7 @@ class RoutineServiceTest extends ServiceTest {
 		void 종일_루틴의_경우_수정_시각과_관계없이_당일_수정된_루틴은_조회되지_않는다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_ALLDAY_ROUTINE(USER)
+				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.scheduleModifiedAt("2024-12-16 00:01:00")
 					.build()
@@ -104,7 +104,7 @@ class RoutineServiceTest extends ServiceTest {
 		void 특정_시간_루틴의_경우_해당_시간_이후_수정된_루틴은_조회되지_않는다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_ALLDAY_ROUTINE(USER) //아침 7시 루틴
+				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER) //아침 7시 루틴
 					.createdAt("2024-12-01 01:00:00")
 					.scheduleModifiedAt("2024-12-16 06:00:00") // 아침 6시 수정
 					.build()

@@ -39,7 +39,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 주어진_날짜와_조건에_따라_기록되지_않은_루틴을_올바르게_조회한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.build()
 			);
@@ -56,7 +56,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 종일_루틴이_아닌_경우_루틴_반복요일및시간_변경일시가_조회_날짜보다_이후인_경우_조회되지_않음을_확인한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.scheduleModifiedAt("2024-12-06 01:00:00")
 					.build()
@@ -74,7 +74,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 주어진_날짜와_조건에_따라_이미_루틴기록이_있는_루틴을_조회하지_않는다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-11-29 01:00:00")
 					.scheduleModifiedAt("2024-12-01 01:00:00")
 					.build()
@@ -159,7 +159,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 루틴이_삭제되었더라면_조회되지_않는다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-11-29 01:00:00")
 					.scheduleModifiedAt("2024-12-01 01:00:00")
 					.deletedAt("2024-12-02 02:00:00")
@@ -178,13 +178,13 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 종일_루틴_여부와_관계없이_조회_날짜가_루틴_반복요일및시간_변경일시의_날짜와_같다면_조회된다() {
 			// given
 			Routine ALLDAY_ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_ALLDAY_ROUTINE(USER)
+				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.scheduleModifiedAt("2024-12-09 01:00:00")
 					.build()
 			);
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.scheduleModifiedAt("2024-12-09 01:00:00")
 					.build()
@@ -206,7 +206,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 날짜가_유효한_경우를_정상적으로_확인한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.build()
 			);
@@ -223,7 +223,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 날짜가_루틴_생성_시점_이전인_경우를_정상적으로_확인한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-12-03 01:00:00")
 					.build()
 			);
@@ -240,7 +240,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 반복요일및시간_변경일시가_조회_날짜보다_이후인_경우를_정상적으로_확인한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.scheduleModifiedAt("2024-12-06 01:00:00")
 					.build()
@@ -258,7 +258,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 루틴의_반복_요일이_날짜의_요일과_일치하지_않는_경우를_정상적으로_확인한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-12-01 01:00:00")
 					.build()
 			);
@@ -275,7 +275,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 		void 루틴이_삭제된_경우를_정상적으로_확인한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
-				PUBLIC_MONDAY_ONLY_MORNING_ROUTINE(USER)
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
 					.createdAt("2024-11-29 01:00:00")
 					.scheduleModifiedAt("2024-12-01 01:00:00")
 					.deletedAt("2024-12-02 02:00:00")
