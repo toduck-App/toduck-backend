@@ -1,9 +1,12 @@
 package im.toduck.domain.routine.domain.service;
 
+import static im.toduck.fixtures.routine.RoutineFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -73,6 +76,46 @@ class RoutineServiceTest extends ServiceTest {
 				softly.assertThat(savedRoutine.getTitle()).isEqualTo(request.title());
 				softly.assertThat(savedRoutine.getUser()).isEqualTo(USER);
 			});
+		}
+	}
+
+	@Nested
+	@DisplayName("기록되지 않은 루틴 목록 조회 시")
+	class GetUnrecordedRoutinesForDateTest {
+		@Test
+		void 종일_루틴의_경우_수정_시각과_관계없이_당일_수정된_루틴은_조회되지_않는다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER)
+					.createdAt("2024-12-01 01:00:00")
+					.scheduleModifiedAt("2024-12-16 00:01:00")
+					.build()
+			);
+			LocalDate monday = LocalDate.parse("2024-12-16");
+
+			// when
+			List<Routine> unrecordedRoutines = routineService.getUnrecordedRoutinesForDate(USER, monday, List.of());
+
+			// then
+			assertThat(unrecordedRoutines).doesNotContain(ROUTINE);
+		}
+
+		@Test
+		void 특정_시간_루틴의_경우_해당_시간_이후_수정된_루틴은_조회되지_않는다() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER) //아침 7시 루틴
+					.createdAt("2024-12-01 01:00:00")
+					.scheduleModifiedAt("2024-12-16 06:00:00") // 아침 6시 수정
+					.build()
+			);
+			LocalDate monday = LocalDate.parse("2024-12-16");
+
+			// when
+			List<Routine> unrecordedRoutines = routineService.getUnrecordedRoutinesForDate(USER, monday, List.of());
+
+			// then
+			assertThat(unrecordedRoutines).doesNotContain(ROUTINE);
 		}
 	}
 }

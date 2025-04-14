@@ -22,6 +22,9 @@ public record MyRoutineAvailableListResponse(
 		@Schema(description = "루틴 카테고리", example = "PENCIL")
 		PlanCategory category,
 
+		@Schema(description = "루틴 색상(null 이면 없는 색상)", example = "#FCDCDF")
+		String color,
+
 		@Schema(description = "루틴 제목", example = "기상 후 이부자리 정리!")
 		String title,
 

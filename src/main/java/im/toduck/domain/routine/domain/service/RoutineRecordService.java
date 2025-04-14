@@ -1,7 +1,10 @@
 package im.toduck.domain.routine.domain.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,11 +51,27 @@ public class RoutineRecordService {
 			.orElse(false);
 	}
 
-	public void removeIncompletedFuturesByRoutine(final Routine routine) {
-		routineRecordRepository.deleteIncompletedFuturesByRoutine(routine);
+	@Transactional
+	public void removeIncompletedFuturesByRoutine(final Routine routine, final LocalDateTime targetDateTime) {
+		routineRecordRepository.deleteIncompletedFuturesByRoutine(routine, targetDateTime);
 	}
 
 	public void removeAllByRoutine(final Routine routine) {
 		routineRecordRepository.deleteAllByRoutine(routine);
+	}
+
+	public Set<LocalDate> getExistingRecordDates(
+		final Routine routine,
+		final LocalDateTime startTime,
+		final LocalDateTime endTime
+	) {
+		return routineRecordRepository.findAllByRoutineAndRecordAtBetween(routine, startTime, endTime)
+			.stream()
+			.map(record -> record.getRecordAt().toLocalDate())
+			.collect(Collectors.toSet());
+	}
+
+	public void saveAll(final List<RoutineRecord> newRecords) {
+		routineRecordRepository.saveAll(newRecords);
 	}
 }

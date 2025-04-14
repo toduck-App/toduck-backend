@@ -20,8 +20,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-@Schema(description = "루틴 생성 요청 DTO")
-public record RoutineCreateRequest(
+@Schema(description = "루틴 수정 요청 DTO")
+public record RoutineUpdateRequest(
 	@NotBlank(message = "제목은 비어있을 수 없습니다.")
 	@Size(max = 20, message = "제목은 40자를 초과할 수 없습니다.") // TODO: 확정 필요
 	@Schema(description = "루틴 제목", example = "아침 운동")
@@ -46,7 +46,7 @@ public record RoutineCreateRequest(
 
 	@JsonDeserialize(using = DayOfWeekListDeserializer.class)
 	@NotNull(message = "반복 요일은 null 일 수 없습니다.")
-	@NotEmpty(message = "반	복 요일은 최소 하나 이상 선택되어야 합니다.")
+	@NotEmpty(message = "반 복 요일은 최소 하나 이상 선택되어야 합니다.")
 	@Schema(description = "반복 요일", example = "[\"MONDAY\",\"TUESDAY\"]")
 	List<DayOfWeek> daysOfWeek,
 
@@ -56,6 +56,38 @@ public record RoutineCreateRequest(
 
 	@Schema(description = "메모", example = "30분 동안 조깅하기")
 	@Size(max = 40, message = "메모는 40자를 넘을 수 없습니다.")
-	String memo
+	String memo,
+
+	@Schema(description = "제목 변경 여부", example = "true")
+	@NotNull(message = "제목 변경 여부는 null일 수 없습니다.")
+	Boolean isTitleChanged,
+
+	@Schema(description = "카테고리 변경 여부", example = "true")
+	@NotNull(message = "카테고리 변경 여부는 null일 수 없습니다.")
+	Boolean isCategoryChanged,
+
+	@Schema(description = "색상 변경 여부", example = "true")
+	@NotNull(message = "색상 변경 여부는 null일 수 없습니다.")
+	Boolean isColorChanged,
+
+	@Schema(description = "시간 변경 여부", example = "true")
+	@NotNull(message = "시간 변경 여부는 null일 수 없습니다.")
+	Boolean isTimeChanged,
+
+	@Schema(description = "공개 여부 변경 상태", example = "true")
+	@NotNull(message = "공개 여부 변경 상태는 null일 수 없습니다.")
+	Boolean isPublicChanged,
+
+	@Schema(description = "반복 요일 변경 여부", example = "true")
+	@NotNull(message = "반복 요일 변경 여부는 null일 수 없습니다.")
+	Boolean isDaysOfWeekChanged,
+
+	@Schema(description = "알림 시간 변경 여부", example = "true")
+	@NotNull(message = "알림 시간 변경 여부는 null일 수 없습니다.")
+	Boolean isReminderMinutesChanged,
+
+	@Schema(description = "메모 변경 여부", example = "true")
+	@NotNull(message = "메모 변경 여부는 null일 수 없습니다.")
+	Boolean isMemoChanged
 ) {
 }

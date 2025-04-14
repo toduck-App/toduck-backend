@@ -8,6 +8,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,6 +74,22 @@ public class DaysOfWeekBitmask {
 
 	public static byte getDayBitmask(DayOfWeek day) {
 		return (byte)(1 << (day.getValue() - 1));
+	}
+
+	/**
+	 * 주어진 시작일과 종료일 사이에서 이 비트마스크에 포함된 요일에 해당하는 날짜들의 스트림을 반환합니다.
+	 *
+	 * @param startDate 시작일 (포함)
+	 * @param endDate 종료일 (포함)
+	 * @return 해당 요일에 맞는 날짜들의 스트림
+	 */
+	public Stream<LocalDate> streamMatchingDatesInRange(LocalDate startDate, LocalDate endDate) {
+		if (startDate.isAfter(endDate)) {
+			return Stream.empty();
+		}
+
+		return startDate.datesUntil(endDate.plusDays(1))
+			.filter(this::includesDayOf);
 	}
 
 	public byte getValue() {

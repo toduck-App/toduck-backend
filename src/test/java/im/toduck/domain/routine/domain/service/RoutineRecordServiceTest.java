@@ -1,7 +1,7 @@
 package im.toduck.domain.routine.domain.service;
 
-import static im.toduck.fixtures.RoutineFixtures.*;
-import static im.toduck.fixtures.RoutineRecordFixtures.*;
+import static im.toduck.fixtures.routine.RoutineFixtures.*;
+import static im.toduck.fixtures.routine.RoutineRecordFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.SoftAssertions.*;
 
@@ -45,7 +45,11 @@ class RoutineRecordServiceTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_MORNING_ROUTINE(USER)
+					.createdAt("2024-11-29 01:00:00")
+					.build()
+			);
 		}
 
 		@Test
@@ -74,13 +78,21 @@ class RoutineRecordServiceTest extends ServiceTest {
 
 		@BeforeEach
 		void setUp() {
-			ROUTINE = testFixtureBuilder.buildRoutine(MONDAY_ONLY_MORNING_ROUTINE(USER));
+			// given
+			ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER)
+					.createdAt("2024-12-01 01:00:00")
+					.scheduleModifiedAt("2024-12-16 00:01:00")
+					.build()
+			);
 		}
 
 		@Test
 		void 기록이_존재하는_경우에_정상적으로_변경된다() {
 			// given
-			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(COMPLETED_SYNCED_RECORD(ROUTINE));
+			RoutineRecord RECORD = testFixtureBuilder.buildRoutineRecord(
+				COMPLETED_RECORD(ROUTINE).recordAt("2024-12-12 07:00:00").build()
+			);
 			final LocalDate date = LocalDate.from(RECORD.getRecordAt());
 
 			// when
