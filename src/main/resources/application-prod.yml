@@ -6,3 +6,17 @@ decorator:
   datasource:
     p6spy:
       enable-logging: false
+
+oauth2:
+  client:
+    provider:
+      apple:
+        jwks-uri: ${OIDC_APPLE_JWKS_URI}
+        secret: ${OIDC_APPLE_SECRET_KEY}
+      google:
+        jwks-uri: https://www.googleapis.com
+        secret: googleSecret
+        issuer: https://accounts.google.com
+      kakao:
+        jwks-uri: ${OIDC_KAKAO_JWKS_URI}
+        secret: ${OIDC_KAKAO_SECRET_KEY}
