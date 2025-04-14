@@ -73,6 +73,7 @@ public class ScheduleMapper {
 			.daysOfWeek(convertDaysOfWeekBitmaskToDayOfWeekList(schedule.getDaysOfWeekBitmask()))
 			.time(schedule.getScheduleTime().getTime())
 			.location(schedule.getLocation())
+			.memo(schedule.getMemo())
 			.build();
 	}
 
