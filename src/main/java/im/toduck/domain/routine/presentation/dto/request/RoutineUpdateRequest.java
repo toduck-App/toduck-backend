@@ -27,7 +27,7 @@ public record RoutineUpdateRequest(
 	@Schema(description = "루틴 제목", example = "아침 운동")
 	String title,
 
-	@NotBlank(message = "카테고리는 비어있을 수 없습니다. (지정하지 않으려면 NONE)")
+	@NotNull(message = "카테고리는 비어있을 수 없습니다. (지정하지 않으려면 NONE)")
 	@Schema(description = "루틴 카테고리", example = "COMPUTER")
 	PlanCategory category,
 
