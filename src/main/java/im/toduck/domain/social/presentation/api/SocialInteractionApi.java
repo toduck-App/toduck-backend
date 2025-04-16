@@ -11,7 +11,6 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -119,7 +118,6 @@ public interface SocialInteractionApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = ReportCreateResponse.class,
 			description = "게시글 신고 성공, 빈 content 객체를 반환합니다."
 		),
 		errors = {
@@ -147,7 +145,6 @@ public interface SocialInteractionApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			responseClass = ReportCreateResponse.class,
 			description = "댓글 신고 성공, 빈 content 객체를 반환합니다."
 		),
 		errors = {
