@@ -243,7 +243,7 @@ CREATE TABLE block
     FOREIGN KEY (blocked_id) REFERENCES users (id)
 );
 
-CREATE TABLE report
+CREATE TABLE social_report
 (
     id          BIGINT PRIMARY KEY auto_increment,
     user_id     BIGINT                                                                                                        NOT NULL,
@@ -255,6 +255,20 @@ CREATE TABLE report
     deleted_at  DATETIME                                                                                                      NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (social_id) REFERENCES social (id)
+);
+
+CREATE TABLE comment_report
+(
+    id           BIGINT PRIMARY KEY auto_increment,
+    user_id      BIGINT                                                                                                        NOT NULL,
+    comment_id   BIGINT                                                                                                        NOT NULL,
+    report_type  ENUM ('NOT_RELATED_TO_SERVICE', 'PRIVACY_RISK', 'COMMERCIAL_ADVERTISEMENT', 'INAPPROPRIATE_CONTENT', 'OTHER') NOT NULL,
+    reason       VARCHAR(255)                                                                                                  NULL,
+    created_at   DATETIME                                                                                                      NOT NULL,
+    updated_at   DATETIME                                                                                                      NOT NULL,
+    deleted_at   DATETIME                                                                                                      NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (comment_id) REFERENCES comment (id)
 );
 
 CREATE TABLE diary

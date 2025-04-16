@@ -91,6 +91,8 @@ public enum ExceptionCode {
 	INVALID_SEARCH_KEYWORD(HttpStatus.BAD_REQUEST, 40417, "검색 키워드는 null일 수 없습니다."),
 	NOT_FOUND_PARENT_COMMENT(HttpStatus.NOT_FOUND, 40418, "부모 댓글을 찾을 수 없습니다."),
 	INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, 40419, "답글은 부모 댓글이 될 수 없습니다."),
+	CANNOT_REPORT_OWN_COMMENT(HttpStatus.FORBIDDEN, 40420, "자신의 댓글은 신고할 수 없습니다."),
+	ALREADY_REPORTED_COMMENT(HttpStatus.CONFLICT, 40421, "이미 신고된 댓글입니다."),
 
 	/* 405xx diary */
 	NOT_FOUND_DIARY(HttpStatus.NOT_FOUND, 40501, "일기를 찾을 수 없습니다."),
