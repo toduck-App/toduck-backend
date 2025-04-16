@@ -136,6 +136,11 @@ public class RoutineMapper {
 	private static UserProfileRoutineListResponse.UserProfileRoutineResponse toUserProfileRoutineRecordReadResponse(
 		final Routine routine
 	) {
+		DaysOfWeekBitmask daysOfWeekBitmask = routine.getDaysOfWeekBitmask();
+		List<DayOfWeek> daysOfWeek = daysOfWeekBitmask.getDaysOfWeek().stream()
+			.sorted()
+			.toList();
+
 		return UserProfileRoutineListResponse.UserProfileRoutineResponse.builder()
 			.routineId(routine.getId())
 			.category(routine.getCategory())
@@ -144,6 +149,7 @@ public class RoutineMapper {
 			.memo(routine.getMemoValue())
 			.time(routine.getTime())
 			.sharedCount(routine.getSharedCount())
+			.daysOfWeek(daysOfWeek)
 			.build();
 	}
 }
