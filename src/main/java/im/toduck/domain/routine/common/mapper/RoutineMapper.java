@@ -94,6 +94,7 @@ public class RoutineMapper {
 			.category(routine.getCategory())
 			.color(routine.getColorValue())
 			.title(routine.getTitle())
+			.memo(routine.getMemoValue())
 			.time(routine.getTime())
 			.isPublic(routine.getIsPublic())
 			.isInDeletedState(routine.isInDeletedState())
