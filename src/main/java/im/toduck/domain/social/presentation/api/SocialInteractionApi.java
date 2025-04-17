@@ -11,7 +11,6 @@ import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateResponse;
-import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -127,9 +126,37 @@ public interface SocialInteractionApi {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.CANNOT_REPORT_OWN_POST),
 		}
 	)
-	ResponseEntity<ApiResponse<ReportCreateResponse>> reportSocialBoard(
-		@RequestBody ReportCreateRequest request,
+	ResponseEntity<ApiResponse<Map<String, Object>>> reportSocialBoard(
+		@RequestBody @Valid ReportCreateRequest request,
 		@PathVariable Long socialId,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "댓글 신고",
+		description =
+			"지정된 댓글을 신고합니다. 신고 사유가 'OTHER(기타)'인 경우, 'reason' 필드가 반드시 입력되어야 하며, "
+				+ "'OTHER'가 아닐 경우 'reason'은 비워져 있어야 합니다. 신고 유형은 다음과 같습니다:\n"
+				+ "- NOT_RELATED_TO_SERVICE: 서비스와 관련 없는 내용\n"
+				+ "- PRIVACY_RISK: 개인정보 유출 위험\n"
+				+ "- COMMERCIAL_ADVERTISEMENT: 상업적 광고 및 홍보글\n"
+				+ "- INAPPROPRIATE_CONTENT: 욕설/비하/음란성 등 부적절한 내용\n"
+				+ "- OTHER: 기타"
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "댓글 신고 성공, 빈 content 객체를 반환합니다."
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_COMMENT),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.ALREADY_REPORTED_COMMENT),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.CANNOT_REPORT_OWN_COMMENT),
+		}
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> reportComment(
+		@RequestBody @Valid ReportCreateRequest request,
+		@PathVariable Long socialId,
+		@PathVariable Long commentId,
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 

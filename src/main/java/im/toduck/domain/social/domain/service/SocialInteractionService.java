@@ -14,15 +14,17 @@ import im.toduck.domain.social.common.mapper.SocialLikeMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.CommentLike;
+import im.toduck.domain.social.persistence.entity.CommentReport;
 import im.toduck.domain.social.persistence.entity.Like;
-import im.toduck.domain.social.persistence.entity.Report;
 import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.entity.SocialReport;
 import im.toduck.domain.social.persistence.repository.CommentImageFileRepository;
 import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
+import im.toduck.domain.social.persistence.repository.CommentReportRepository;
 import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.social.persistence.repository.LikeRepository;
-import im.toduck.domain.social.persistence.repository.ReportRepository;
+import im.toduck.domain.social.persistence.repository.SocialReportRepository;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -36,9 +38,10 @@ import lombok.extern.slf4j.Slf4j;
 public class SocialInteractionService {
 	private final CommentRepository commentRepository;
 	private final LikeRepository likeRepository;
-	private final ReportRepository reportRepository;
+	private final SocialReportRepository reportRepository;
 	private final CommentLikeRepository commentLikeRepository;
 	private final CommentImageFileRepository commentImageFileRepository;
+	private final CommentReportRepository commentReportRepository;
 
 	@Transactional
 	public Comment createComment(
@@ -138,18 +141,34 @@ public class SocialInteractionService {
 	}
 
 	@Transactional
-	public Report createReport(
+	public SocialReport createSocialReport(
 		final User user,
 		final Social social,
 		final ReportType reportType,
 		final String reason
 	) {
-		Report report = ReportMapper.toReport(user, social, reportType, reason);
+		SocialReport report = ReportMapper.toReport(user, social, reportType, reason);
 		return reportRepository.save(report);
 	}
 
+	@Transactional
+	public CommentReport createCommentReport(
+		final User user,
+		final Comment comment,
+		final ReportType reportType,
+		final String reason
+	) {
+		CommentReport report = ReportMapper.toCommentReport(user, comment, reportType, reason);
+		return commentReportRepository.save(report);
+	}
+
 	@Transactional(readOnly = true)
-	public boolean existsByUserAndSocial(final User user, final Social social) {
+	public boolean existsCommentReportByUserAndComment(final User user, final Comment comment) {
+		return commentReportRepository.existsByUserAndComment(user, comment);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean existsSocialReportByUserAndSocial(final User user, final Social social) {
 		return reportRepository.existsByUserAndSocial(user, social);
 	}
 
