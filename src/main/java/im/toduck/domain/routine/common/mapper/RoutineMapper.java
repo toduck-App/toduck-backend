@@ -73,12 +73,21 @@ public class RoutineMapper {
 		final Routine routine,
 		final boolean isCompleted
 	) {
+		DaysOfWeekBitmask daysOfWeekBitmask = routine.getDaysOfWeekBitmask();
+		List<DayOfWeek> daysOfWeek = daysOfWeekBitmask.getDaysOfWeek().stream()
+			.sorted()
+			.toList();
+
 		return MyRoutineRecordReadListResponse.MyRoutineReadResponse.builder()
 			.routineId(routine.getId())
-			.color(routine.getColorValue())
 			.category(routine.getCategory())
-			.time(routine.getTime())
+			.color(routine.getColorValue())
 			.title(routine.getTitle())
+			.memo(routine.getMemoValue())
+			.time(routine.getTime())
+			.isPublic(routine.getIsPublic())
+			.isInDeletedState(routine.isInDeletedState())
+			.daysOfWeek(daysOfWeek)
 			.isCompleted(isCompleted)
 			.build();
 	}
