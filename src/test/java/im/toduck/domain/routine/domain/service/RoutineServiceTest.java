@@ -83,7 +83,7 @@ class RoutineServiceTest extends ServiceTest {
 	@DisplayName("기록되지 않은 루틴 목록 조회 시")
 	class GetUnrecordedRoutinesForDateTest {
 		@Test
-		void 종일_루틴의_경우_수정_시각과_관계없이_당일_수정된_루틴은_조회되지_않는다() {
+		void 종일_루틴의_경우_수정_시각과_관계없이_당일_수정된_루틴은_조회_대상에_포함된다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
 				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER)
@@ -97,11 +97,11 @@ class RoutineServiceTest extends ServiceTest {
 			List<Routine> unrecordedRoutines = routineService.getUnrecordedRoutinesForDate(USER, monday, List.of());
 
 			// then
-			assertThat(unrecordedRoutines).doesNotContain(ROUTINE);
+			assertThat(unrecordedRoutines).contains(ROUTINE);
 		}
 
 		@Test
-		void 특정_시간_루틴의_경우_해당_시간_이후_수정된_루틴은_조회되지_않는다() {
+		void 특정_시간_루틴의_경우_수정_시간과_관계없이_당일_수정된_루틴은_조회_대상에_포함된다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
 				PUBLIC_MONDAY_ALLDAY_ROUTINE(USER) //아침 7시 루틴
@@ -115,7 +115,7 @@ class RoutineServiceTest extends ServiceTest {
 			List<Routine> unrecordedRoutines = routineService.getUnrecordedRoutinesForDate(USER, monday, List.of());
 
 			// then
-			assertThat(unrecordedRoutines).doesNotContain(ROUTINE);
+			assertThat(unrecordedRoutines).contains(ROUTINE);
 		}
 	}
 }

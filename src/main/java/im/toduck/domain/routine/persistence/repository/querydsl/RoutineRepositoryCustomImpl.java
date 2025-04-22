@@ -88,11 +88,6 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 		);
 	}
 
-	private BooleanExpression routineCreatedOnOrBeforeDate(final LocalDate date) {
-		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-		return qRoutine.createdAt.loe(endOfDay);
-	}
-
 	private BooleanExpression scheduleModifiedOnOrBeforeDate(final LocalDate date) {
 		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 		return qRoutine.scheduleModifiedAt.loe(endOfDay);
