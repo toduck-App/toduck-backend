@@ -1,8 +1,6 @@
 package im.toduck.domain.routine.domain.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,15 +38,7 @@ public class RoutineService {
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
 	) {
-		List<Routine> routines = routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
-
-		return routines.stream().filter(routine -> {
-			LocalDateTime compareTime = routine.isAllDay()
-				? date.minusDays(1).atTime(LocalTime.MAX)
-				: date.atTime(routine.getTime());
-
-			return !routine.getScheduleModifiedAt().isAfter(compareTime);
-		}).toList();
+		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
 	}
 
 	public Optional<Routine> getUserRoutine(final User user, final Long id) {
@@ -60,15 +50,7 @@ public class RoutineService {
 	}
 
 	public boolean canCreateRecordForDate(final Routine routine, final LocalDate date) {
-		if (routineRepository.isActiveForDate(routine, date)) {
-			LocalDateTime compareTime = routine.isAllDay()
-				? date.minusDays(1).atTime(LocalTime.MAX)
-				: date.atTime(routine.getTime());
-
-			return !routine.getScheduleModifiedAt().isAfter(compareTime);
-		}
-
-		return false;
+		return routineRepository.isActiveForDate(routine, date);
 	}
 
 	public List<Routine> getAvailableRoutine(final User user) {

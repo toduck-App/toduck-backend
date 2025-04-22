@@ -2,8 +2,6 @@ package im.toduck.domain.routine.domain.usecase;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -174,27 +172,15 @@ public class RoutineUseCase {
 		final LocalDateTime endTime
 	) {
 		Set<LocalDate> existingDates = routineRecordService.getExistingRecordDates(routine, startTime, endTime);
-		List<RoutineRecord> newRecords = new ArrayList<>();
 
 		LocalDate startDate = startTime.toLocalDate();
 		LocalDate endDate = endTime.toLocalDate();
 
-		routine.getDaysOfWeekBitmask().streamMatchingDatesInRange(startDate, endDate)
+		List<RoutineRecord> newRecords = routine.getDaysOfWeekBitmask()
+			.streamMatchingDatesInRange(startDate, endDate)
 			.filter(date -> !existingDates.contains(date))
-			.filter(date -> {
-				if (date.equals(startDate)) {
-					LocalTime timeToCompare = routine.isAllDay() ? LocalTime.MIN : routine.getTime();
-					return !date.atTime(timeToCompare).isBefore(startTime);
-				}
-				if (date.equals(endDate)) {
-					LocalTime timeToCompare = routine.isAllDay() ? LocalTime.MAX : routine.getTime();
-					return !date.atTime(timeToCompare).isAfter(endTime);
-				}
-
-				return true;
-			})
 			.map(date -> RoutineRecordMapper.toRoutineRecord(routine, date, false))
-			.forEach(newRecords::add);
+			.toList();
 
 		if (!newRecords.isEmpty()) {
 			routineRecordService.saveAll(newRecords);
