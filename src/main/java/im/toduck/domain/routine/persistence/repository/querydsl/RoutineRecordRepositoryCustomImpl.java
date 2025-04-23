@@ -67,7 +67,8 @@ public class RoutineRecordRepositoryCustomImpl implements RoutineRecordRepositor
 			.where(
 				qRecord.routine.eq(routine),
 				qRecord.recordAt.after(targetDateTime),
-				qRecord.isCompleted.isFalse()
+				qRecord.isCompleted.isFalse(),
+				qRecord.deletedAt.isNull()
 			)
 			.execute();
 	}

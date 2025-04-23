@@ -50,4 +50,12 @@ public class RoutineRecord extends BaseEntity {
 	public void changeCompletion(Boolean isCompleted) {
 		this.isCompleted = isCompleted;
 	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	public Boolean isInDeletedState() {
+		return deletedAt != null;
+	}
 }

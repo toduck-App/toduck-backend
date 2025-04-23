@@ -115,6 +115,21 @@ public class RoutineController implements RoutineApi {
 	}
 
 	@Override
+	@DeleteMapping("/{routineId}/individual")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<?>> deleteIndividualRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@PathVariable final Long routineId,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate date
+	) {
+		routineUseCase.deleteIndividualRoutine(userDetails.getUserId(), routineId, date);
+
+		return ResponseEntity.ok(
+			ApiResponse.createSuccessWithNoContent()
+		);
+	}
+
+	@Override
 	@DeleteMapping("/{routineId}")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<?>> deleteRoutine(

@@ -138,6 +138,27 @@ public interface RoutineApi {
 	);
 
 	@Operation(
+		summary = "개별 루틴 삭제",
+		description = "개별 루틴 기록을 삭제합니다. "
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "개별 루틴 삭제 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.ROUTINE_INVALID_DATE)
+		}
+	)
+	ResponseEntity<ApiResponse<?>> deleteIndividualRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "삭제할 루틴의 Id", required = true, example = "1")
+		@PathVariable final Long routineId,
+		@Parameter(description = "삭제할 개별 루틴이 포함되는 날짜 (형식: YYYY-MM-DD)", required = true, example = "2024-09-02")
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+	);
+
+	@Operation(
 		summary = "루틴 삭제",
 		description = "루틴을 삭제합니다. keepRecords 파라미터를 통해 이전 기록 유지 여부를 결정할 수 있습니다."
 	)

@@ -52,13 +52,17 @@ public class RoutineUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		List<RoutineRecord> routineRecords = routineRecordService.getRecords(user, date);
+		List<RoutineRecord> routineRecords = routineRecordService.getRecordsIncludingDeleted(user, date);
 		List<Routine> routines = routineService.getUnrecordedRoutinesForDate(user, date, routineRecords);
+		List<RoutineRecord> activeRoutineRecords = routineRecords.stream()
+			.filter(record -> !record.isInDeletedState())
+			.toList();
 
 		log.info("본인 루틴 기록 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
-		return RoutineMapper.toMyRoutineRecordReadListResponse(date, routines, routineRecords);
+		return RoutineMapper.toMyRoutineRecordReadListResponse(date, routines, activeRoutineRecords);
 	}
 
+	// FIXME: 동시성 문제 처리 필요
 	@Transactional
 	public void updateRoutineCompletion(
 		final Long userId,
@@ -152,6 +156,38 @@ public class RoutineUseCase {
 		log.info("루틴 삭제 성공(기록 포함 삭제) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 	}
 
+	// FIXME: 동시성 문제 처리 필요
+	@Transactional
+	public void deleteIndividualRoutine(
+		final Long userId,
+		final Long routineId,
+		final LocalDate date
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		if (routineRecordService.removeIfPresent(routine, date)) {
+			log.info(
+				"개별 루틴 삭제 성공(기존 기록 삭제) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}",
+				userId, routineId, date
+			);
+			return;
+		}
+
+		if (!routineService.canCreateRecordForDate(routine, date)) {
+			log.info("개별 루틴 삭제 실패(유효하지 않은 날짜) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
+			throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
+		}
+
+		routineRecordService.createAsDeleted(routine, date);
+		log.info(
+			"개별 루틴 삭제 성공(삭제 기록 생성) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}",
+			userId, routineId, date
+		);
+	}
+
 	/**
 	 * 특정 기간 동안 루틴에 대한 누락된 기록을 생성합니다.
 	 * <p>
@@ -171,7 +207,8 @@ public class RoutineUseCase {
 		final LocalDateTime startTime,
 		final LocalDateTime endTime
 	) {
-		Set<LocalDate> existingDates = routineRecordService.getExistingRecordDates(routine, startTime, endTime);
+		Set<LocalDate> existingDates
+			= routineRecordService.getExistingRecordDatesIncludingDeleted(routine, startTime, endTime);
 
 		LocalDate startDate = startTime.toLocalDate();
 		LocalDate endDate = endTime.toLocalDate();
