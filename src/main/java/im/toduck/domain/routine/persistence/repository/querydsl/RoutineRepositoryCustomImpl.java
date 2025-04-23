@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.TimePath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import im.toduck.domain.routine.persistence.entity.QRoutine;
@@ -72,20 +71,6 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 
 	private BooleanExpression routineNotDeleted() {
 		return qRoutine.deletedAt.isNull();
-	}
-
-	private BooleanExpression routineNotDeletedOrDeletedAfterDate(
-		final TimePath<LocalTime> timePath,
-		final LocalDate date
-	) {
-		return qRoutine.deletedAt.isNull().or(
-			Expressions.booleanTemplate(
-				"cast(concat({0}, ' ', cast({1} as time)) as timestamp) < {2}",
-				date,
-				timePath,
-				qRoutine.deletedAt
-			)
-		);
 	}
 
 	private BooleanExpression scheduleModifiedOnOrBeforeDate(final LocalDate date) {

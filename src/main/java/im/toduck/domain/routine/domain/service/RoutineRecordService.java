@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RoutineRecordService {
 	private final RoutineRecordRepository routineRecordRepository;
 
-	public List<RoutineRecord> getRecords(final User user, final LocalDate date) {
+	public List<RoutineRecord> getRecordsIncludingDeleted(final User user, final LocalDate date) {
 		return routineRecordRepository.findRoutineRecordsForUserAndDate(user, date);
 	}
 
@@ -34,6 +34,16 @@ public class RoutineRecordService {
 		final boolean isCompleted
 	) {
 		RoutineRecord routineRecord = RoutineRecordMapper.toRoutineRecord(routine, date, isCompleted);
+		routineRecordRepository.save(routineRecord);
+	}
+
+	@Transactional
+	public void createAsDeleted(
+		final Routine routine,
+		final LocalDate date
+	) {
+		RoutineRecord routineRecord = RoutineRecordMapper.toRoutineRecord(routine, date, false);
+		routineRecord.delete();
 		routineRecordRepository.save(routineRecord);
 	}
 
@@ -52,15 +62,30 @@ public class RoutineRecordService {
 	}
 
 	@Transactional
+	public boolean removeIfPresent(
+		final Routine routine,
+		final LocalDate date
+	) {
+		return routineRecordRepository.findByRoutineAndRecordDate(routine, date)
+			.map(record -> {
+				record.delete();
+				return true;
+			})
+			.orElse(false);
+	}
+
+	@Transactional
 	public void removeIncompletedFuturesByRoutine(final Routine routine, final LocalDateTime targetDateTime) {
 		routineRecordRepository.deleteIncompletedFuturesByRoutine(routine, targetDateTime);
 	}
 
+	@Transactional
 	public void removeAllByRoutine(final Routine routine) {
 		routineRecordRepository.deleteAllByRoutine(routine);
 	}
 
-	public Set<LocalDate> getExistingRecordDates(
+	@Transactional(readOnly = true)
+	public Set<LocalDate> getExistingRecordDatesIncludingDeleted(
 		final Routine routine,
 		final LocalDateTime startTime,
 		final LocalDateTime endTime

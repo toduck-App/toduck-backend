@@ -41,11 +41,9 @@ public class Routine extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// TODO: 변경 필요
 	@Enumerated(EnumType.STRING)
 	private PlanCategory category;
 
-	// TODO: 변경 필요
 	@Embedded
 	private PlanCategoryColor color;
 
