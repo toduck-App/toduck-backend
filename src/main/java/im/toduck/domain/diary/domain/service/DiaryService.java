@@ -62,6 +62,13 @@ public class DiaryService {
 	}
 
 	@Transactional
+	public void deleteAllDiariesByUser(final User user) {
+		List<Diary> diaries = diaryRepository.findAllByUser(user);
+
+		diaries.forEach(this::deleteDiary);
+	}
+
+	@Transactional
 	public void updateDiary(
 		User user,
 		Diary diary,

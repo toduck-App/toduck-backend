@@ -87,4 +87,13 @@ public class RoutineService {
 	public int getTotalRoutineShareCount(final User user) {
 		return routineRepository.sumRoutineSharedCountByUser(user);
 	}
+
+	@Transactional
+	public void deleteAllUnsharedRoutinesByUser(final User user) {
+		routineRepository.deleteAllUnsharedRoutinesByUser(user);
+	}
+
+	public List<Routine> findAllUnsharedRoutineByUser(User user) {
+		return routineRepository.findAllUnsharedRoutinesByUser(user);
+	}
 }
