@@ -63,6 +63,7 @@ public class MyPageController implements MyPageApi {
 
 	@Override
 	@DeleteMapping("/account")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteAccount(
 		@RequestBody @Valid UserDeleteRequest request,
 		@AuthenticationPrincipal CustomUserDetails userDetails
