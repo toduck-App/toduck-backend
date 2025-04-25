@@ -25,7 +25,7 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 	private final QRoutine qRoutine = QRoutine.routine;
 
 	@Override
-	public List<Routine> findUnrecordedRoutinesForDate(
+	public List<Routine> findUnrecordedRoutinesByDateMatchingDayOfWeek(
 		final User user,
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
@@ -38,6 +38,23 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 				routineNotRecorded(routineRecords),
 				routineMatchesDate(date),
 				routineNotDeleted()
+			)
+			.fetch();
+	}
+
+	@Override
+	public List<Routine> findRoutinesByDateBetween(
+		final User user,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		return queryFactory
+			.selectFrom(qRoutine)
+			.where(
+				qRoutine.user.eq(user),
+				routineNotDeleted(),
+				scheduleModifiedOnOrBeforeDate(startDate),
+				routineMatchesDateRange(startDate, endDate)
 			)
 			.fetch();
 	}
@@ -82,6 +99,17 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 		byte dayBitmask = DaysOfWeekBitmask.getDayBitmask(date.getDayOfWeek());
 		return Expressions.numberTemplate(
 			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, dayBitmask
+		).gt((byte)0);
+	}
+
+	/**
+	 * 루틴의 요일이 시작일부터 종료일까지의 기간 내 요일과 일치하는지 확인하는 조건
+	 */
+	private BooleanExpression routineMatchesDateRange(final LocalDate startDate, final LocalDate endDate) {
+		byte periodDaysBitmask = DaysOfWeekBitmask.getDaysOfWeekBitmaskValueInRange(startDate, endDate);
+
+		return Expressions.numberTemplate(
+			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, periodDaysBitmask
 		).gt((byte)0);
 	}
 }

@@ -2,11 +2,13 @@ package im.toduck.domain.routine.domain.usecase;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.routine.common.dto.DailyRoutineData;
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.common.mapper.RoutineRecordMapper;
 import im.toduck.domain.routine.domain.service.RoutineRecordService;
@@ -18,6 +20,7 @@ import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionReq
 import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadMultipleDatesResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.domain.user.domain.service.UserService;
@@ -32,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class RoutineUseCase {
+	private static final int MAX_ROUTINE_DATE_RANGE_DAYS = 13;
+
 	private final UserService userService;
 	private final RoutineService routineService;
 	private final RoutineRecordService routineRecordService;
@@ -53,13 +58,40 @@ public class RoutineUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		List<RoutineRecord> routineRecords = routineRecordService.getRecordsIncludingDeleted(user, date);
+
 		List<Routine> routines = routineService.getUnrecordedRoutinesForDate(user, date, routineRecords);
 		List<RoutineRecord> activeRoutineRecords = routineRecords.stream()
 			.filter(record -> !record.isInDeletedState())
 			.toList();
 
 		log.info("본인 루틴 기록 목록 조회 - UserId: {}, 조회한 날짜: {}", userId, date);
-		return RoutineMapper.toMyRoutineRecordReadListResponse(date, routines, activeRoutineRecords);
+		return RoutineMapper.toMyRoutineRecordReadListResponse(
+			DailyRoutineData.of(date, routines, activeRoutineRecords)
+		);
+	}
+
+	@Transactional(readOnly = true)
+	public MyRoutineRecordReadMultipleDatesResponse readMyRoutineRecordListMultipleDates(
+		final Long userId,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		if (startDate.isAfter(endDate) || ChronoUnit.DAYS.between(startDate, endDate) > MAX_ROUTINE_DATE_RANGE_DAYS) {
+			throw CommonException.from(ExceptionCode.EXCEED_ROUTINE_DATE_RANGE);
+		}
+
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		List<RoutineRecord> allRoutineRecords = routineRecordService.getRecordsBetweenDates(user, startDate, endDate);
+
+		List<DailyRoutineData> dailyRoutineDatas = routineService
+			.getRoutineDataByDateRange(user, startDate, endDate, allRoutineRecords);
+
+		log.info("본인 루틴 기록 기간 조회 - UserId: {}, 조회 기간: {} ~ {}", userId, startDate, endDate);
+		return RoutineMapper.toMyRoutineRecordReadMultipleDatesResponse(
+			startDate, endDate, dailyRoutineDatas
+		);
 	}
 
 	// FIXME: 동시성 문제 처리 필요
