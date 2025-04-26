@@ -46,7 +46,8 @@ class RoutineRepositoryTest extends RepositoryTest {
 			LocalDate monday = LocalDate.parse("2024-12-02");
 
 			// when
-			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, monday, List.of());
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(USER,
+				monday, List.of());
 
 			// then
 			assertThat(unrecordedRoutines).contains(ROUTINE);
@@ -64,7 +65,8 @@ class RoutineRepositoryTest extends RepositoryTest {
 			LocalDate monday = LocalDate.parse("2024-12-02");
 
 			// when
-			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, monday, List.of());
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(USER,
+				monday, List.of());
 
 			// then
 			assertThat(unrecordedRoutines).doesNotContain(ROUTINE);
@@ -88,7 +90,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 			LocalDate monday = LocalDate.parse("2024-12-02");
 
 			// when
-			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(
 				USER, monday, List.of(ROUTINE_RECORD1, ROUTINE_RECORD2)
 			);
 
@@ -121,7 +123,7 @@ class RoutineRepositoryTest extends RepositoryTest {
 			// when & then
 			assertSoftly(softly -> {
 				dates.forEach(date -> {
-					List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(
+					List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(
 						USER, LocalDate.parse(date), List.of()
 					);
 
@@ -148,7 +150,8 @@ class RoutineRepositoryTest extends RepositoryTest {
 			LocalDate weekday = LocalDate.parse("2024-12-02");
 
 			// when
-			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, weekday,
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(USER,
+				weekday,
 				List.of());
 
 			// then
@@ -168,7 +171,8 @@ class RoutineRepositoryTest extends RepositoryTest {
 			LocalDate monday = LocalDate.parse("2024-12-02");
 
 			// when
-			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, monday, List.of());
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(USER,
+				monday, List.of());
 
 			// then
 			assertThat(unrecordedRoutines).doesNotContain(ROUTINE);
@@ -192,7 +196,8 @@ class RoutineRepositoryTest extends RepositoryTest {
 			LocalDate monday = LocalDate.parse("2024-12-09");
 
 			// when
-			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesForDate(USER, monday, List.of());
+			List<Routine> unrecordedRoutines = routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(USER,
+				monday, List.of());
 
 			// then
 			assertThat(unrecordedRoutines).contains(ALLDAY_ROUTINE, ROUTINE);

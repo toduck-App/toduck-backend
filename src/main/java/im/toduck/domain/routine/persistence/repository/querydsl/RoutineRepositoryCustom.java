@@ -8,10 +8,16 @@ import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.user.persistence.entity.User;
 
 public interface RoutineRepositoryCustom {
-	List<Routine> findUnrecordedRoutinesForDate(
+	List<Routine> findUnrecordedRoutinesByDateMatchingDayOfWeek(
 		final User user,
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
+	);
+
+	List<Routine> findRoutinesByDateBetween(
+		final User user,
+		final LocalDate startDate,
+		final LocalDate endDate
 	);
 
 	boolean isActiveForDate(final Routine routine, final LocalDate date);

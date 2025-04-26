@@ -117,6 +117,8 @@ public enum ExceptionCode {
 		"요청된 날짜에 대한 루틴 변경이 불가능합니다. 루틴의 반복 요일과 현재 날짜를 확인하고 올바른 날짜로 다시 요청해 주세요."),
 	PRIVATE_ROUTINE(HttpStatus.FORBIDDEN, 43203, "비공개된 루틴입니다.",
 		"요청하신 루틴은 비공개 상태입니다. 접근 권한이 없는 경우 접근할 수 없습니다."),
+	EXCEED_ROUTINE_DATE_RANGE(HttpStatus.BAD_REQUEST, 40304, "기간 범위가 유효하지 않거나, 최대 조회 범위를 초과했습니다.",
+		"루틴 범위 조회는 14일로 제한됩니다."),
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
