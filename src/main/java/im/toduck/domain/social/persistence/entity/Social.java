@@ -46,7 +46,7 @@ public class Social extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private int likeCount;
 
-	@Column(nullable = false, length = 255)
+	@Column(nullable = false, length = 500)
 	private String content;
 
 	@Column(nullable = false)
