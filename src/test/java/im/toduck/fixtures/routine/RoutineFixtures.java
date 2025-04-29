@@ -78,8 +78,25 @@ public class RoutineFixtures {
 			.user(user)
 			.title("평일 루틴")
 			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(
-				List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,
+				List.of(DayOfWeek.MONDAY, java.time.DayOfWeek.TUESDAY, java.time.DayOfWeek.WEDNESDAY,
+					java.time.DayOfWeek.THURSDAY,
 					DayOfWeek.FRIDAY)))
+			.time(MORNING_TIME)
+			.color(PlanCategoryColor.from("#0000FF"))
+			.isPublic(true) // 수정: false -> true
+			.build();
+
+		return RoutineWithAuditInfo.builder()
+			.routine(routine);
+	}
+
+	public static RoutineWithAuditInfo.RoutineWithAuditInfoBuilder PUBLIC_TUESDAY_WEDNESDAY_THURSDAY_MORNING_ROUTINE(
+		User user) {
+		Routine routine = Routine.builder()
+			.user(user)
+			.title("평일 루틴")
+			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(
+				List.of(DayOfWeek.TUESDAY, java.time.DayOfWeek.WEDNESDAY, java.time.DayOfWeek.THURSDAY)))
 			.time(MORNING_TIME)
 			.color(PlanCategoryColor.from("#0000FF"))
 			.isPublic(true) // 수정: false -> true
@@ -108,7 +125,8 @@ public class RoutineFixtures {
 			.user(user)
 			.title("평일 루틴")
 			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(
-				List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,
+				List.of(DayOfWeek.MONDAY, java.time.DayOfWeek.TUESDAY, java.time.DayOfWeek.WEDNESDAY,
+					java.time.DayOfWeek.THURSDAY,
 					DayOfWeek.FRIDAY)))
 			.time(MORNING_TIME)
 			.color(PlanCategoryColor.from("#0000FF"))
@@ -123,7 +141,8 @@ public class RoutineFixtures {
 		Routine routine = Routine.builder()
 			.user(user)
 			.title("주말 루틴")
-			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)))
+			.daysOfWeekBitmask(
+				DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.SATURDAY, java.time.DayOfWeek.SUNDAY)))
 			.time(NOON_TIME)
 			.color(PlanCategoryColor.from("#00FF00"))
 			.isPublic(true)
@@ -137,7 +156,8 @@ public class RoutineFixtures {
 		Routine routine = Routine.builder()
 			.user(user)
 			.title("주말 루틴")
-			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)))
+			.daysOfWeekBitmask(
+				DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.SATURDAY, java.time.DayOfWeek.SUNDAY)))
 			.time(NOON_TIME)
 			.color(PlanCategoryColor.from("#00FF00"))
 			.isPublic(false)
@@ -152,7 +172,8 @@ public class RoutineFixtures {
 			.user(user)
 			.title("화목토 루틴")
 			.daysOfWeekBitmask(
-				DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.SATURDAY)))
+				DaysOfWeekBitmask.createByDayOfWeek(
+					List.of(DayOfWeek.TUESDAY, java.time.DayOfWeek.THURSDAY, java.time.DayOfWeek.SATURDAY)))
 			.time(NIGHT_TIME)
 			.color(PlanCategoryColor.from("#800080"))
 			.isPublic(true)
@@ -167,7 +188,8 @@ public class RoutineFixtures {
 			.user(user)
 			.title("화목토 루틴")
 			.daysOfWeekBitmask(
-				DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.SATURDAY)))
+				DaysOfWeekBitmask.createByDayOfWeek(
+					List.of(DayOfWeek.TUESDAY, java.time.DayOfWeek.THURSDAY, java.time.DayOfWeek.SATURDAY)))
 			.time(NIGHT_TIME)
 			.color(PlanCategoryColor.from("#800080"))
 			.isPublic(false)
@@ -181,7 +203,8 @@ public class RoutineFixtures {
 		Routine routine = Routine.builder()
 			.user(user)
 			.title("수금 루틴")
-			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)))
+			.daysOfWeekBitmask(
+				DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.WEDNESDAY, java.time.DayOfWeek.FRIDAY)))
 			.time(MORNING_TIME)
 			.color(PlanCategoryColor.from("#FFA500"))
 			.isPublic(true)
@@ -195,7 +218,8 @@ public class RoutineFixtures {
 		Routine routine = Routine.builder()
 			.user(user)
 			.title("수금 루틴")
-			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)))
+			.daysOfWeekBitmask(
+				DaysOfWeekBitmask.createByDayOfWeek(List.of(DayOfWeek.WEDNESDAY, java.time.DayOfWeek.FRIDAY)))
 			.time(MORNING_TIME)
 			.color(PlanCategoryColor.from("#FFA500"))
 			.isPublic(false)
@@ -210,7 +234,8 @@ public class RoutineFixtures {
 			.user(user)
 			.title("일요일 제외 매일 루틴")
 			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(
-				List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY,
+				List.of(DayOfWeek.MONDAY, java.time.DayOfWeek.TUESDAY, java.time.DayOfWeek.WEDNESDAY,
+					java.time.DayOfWeek.THURSDAY, java.time.DayOfWeek.FRIDAY,
 					DayOfWeek.SATURDAY)))
 			.time(NOON_TIME)
 			.color(PlanCategoryColor.from("#008080"))
@@ -226,7 +251,8 @@ public class RoutineFixtures {
 			.user(user)
 			.title("일요일 제외 매일 루틴")
 			.daysOfWeekBitmask(DaysOfWeekBitmask.createByDayOfWeek(
-				List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY,
+				List.of(DayOfWeek.MONDAY, java.time.DayOfWeek.TUESDAY, java.time.DayOfWeek.WEDNESDAY,
+					java.time.DayOfWeek.THURSDAY, java.time.DayOfWeek.FRIDAY,
 					DayOfWeek.SATURDAY)))
 			.time(NOON_TIME)
 			.color(PlanCategoryColor.from("#008080"))

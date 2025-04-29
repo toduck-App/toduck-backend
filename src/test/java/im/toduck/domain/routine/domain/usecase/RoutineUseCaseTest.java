@@ -361,7 +361,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		}
 
 		@Test
-		void 다중_날짜_조회_결과는_각_날짜별_단일_조회_결과와_동일해야_한다() {
+		void 다중_날짜_조회_결과는_각_날짜별_단일_조회_결과와_동일해야_한다_1() {
 			// given
 			// 1. 평일 루틴(월-금)
 			Routine weekdayRoutine = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
@@ -401,6 +401,63 @@ class RoutineUseCaseTest extends ServiceTest {
 			// 테스트 기간 설정 - 월요일부터 일요일까지 일주일
 			LocalDate startDate = LocalDate.parse("2024-12-02"); // 월요일
 			LocalDate endDate = LocalDate.parse("2024-12-08");   // 일요일
+
+			// when
+			// 1. 다중 날짜 조회 결과 가져오기
+			MyRoutineRecordReadMultipleDatesResponse multipleResponse =
+				routineUseCase.readMyRoutineRecordListMultipleDates(USER.getId(), startDate, endDate);
+
+			// 2. 각 날짜별 단일 조회 결과 가져오기
+			Map<LocalDate, Map<Long, Boolean>> singleResponsesMap = new HashMap<>();
+			LocalDate currentDate = startDate;
+			while (!currentDate.isAfter(endDate)) {
+				MyRoutineRecordReadListResponse singleResponse =
+					routineUseCase.readMyRoutineRecordList(USER.getId(), currentDate);
+
+				// 루틴 ID -> 완료 상태 맵핑
+				Map<Long, Boolean> routineStatusMap = singleResponse.routines().stream()
+					.collect(Collectors.toMap(
+						MyRoutineRecordReadListResponse.MyRoutineReadResponse::routineId,
+						MyRoutineRecordReadListResponse.MyRoutineReadResponse::isCompleted
+					));
+
+				singleResponsesMap.put(currentDate, routineStatusMap);
+				currentDate = currentDate.plusDays(1);
+			}
+
+			// then
+			// 단순화된 검증: 각 날짜의 루틴 존재 여부와 완료 상태만 검증
+			assertSoftly(softly -> {
+				for (MyRoutineRecordReadListResponse dateResponse : multipleResponse.dateRoutines()) {
+					LocalDate date = dateResponse.queryDate();
+					Map<Long, Boolean> expectedRoutines = singleResponsesMap.get(date);
+
+					// 1. 루틴 개수 검증
+					softly.assertThat(dateResponse.routines()).hasSize(expectedRoutines.size());
+
+					// 2. 각 루틴의 존재 여부와 완료 상태 검증
+					for (MyRoutineRecordReadListResponse.MyRoutineReadResponse routine : dateResponse.routines()) {
+						Long routineId = routine.routineId();
+						Boolean isCompleted = routine.isCompleted();
+
+						softly.assertThat(expectedRoutines).containsKey(routineId);
+						softly.assertThat(isCompleted).isEqualTo(expectedRoutines.get(routineId));
+					}
+				}
+			});
+		}
+
+		@Test
+		void 다중_날짜_조회_결과는_각_날짜별_단일_조회_결과와_동일해야_한다_2() {
+			// given
+			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
+				PUBLIC_TUESDAY_WEDNESDAY_THURSDAY_MORNING_ROUTINE(USER)
+					.createdAt("2025-04-29 20:00:00")
+					.build()
+			);
+
+			LocalDate startDate = LocalDate.parse("2025-04-27");
+			LocalDate endDate = LocalDate.parse("2025-05-03");
 
 			// when
 			// 1. 다중 날짜 조회 결과 가져오기
