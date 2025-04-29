@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
+import im.toduck.domain.mypage.presentation.dto.response.BlockedUsersResponse;
 import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -65,4 +66,18 @@ public interface MyPageApi {
 		@RequestBody @Valid ProfileImageUpdateRequest request,
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	);
+
+	@Operation(
+		summary = "차단한 유저 목록 조회",
+		description = "자신이 차단한 유저들의 목록을 조회합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "차단한 유저 목록 조회 성공, 차단한 유저들의 정보를 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<BlockedUsersResponse>> getBlockedUsers(
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	);
+
 }

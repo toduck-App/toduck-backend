@@ -1,5 +1,6 @@
 package im.toduck.builder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,12 @@ public class TestFixtureBuilder {
 
 	public User buildUser(final User user) {
 		return bs.userRepository().save(user);
+	}
+
+	public User buildDeletedUser(final User user, final LocalDateTime deletedAt) {
+		User saved = bs.userRepository().save(user);
+		ReflectionTestUtils.setField(saved, "deletedAt", deletedAt);
+		return bs.userRepository().save(saved);
 	}
 
 	public PhoneNumber buildPhoneNumber(final PhoneNumber phoneNumber) {

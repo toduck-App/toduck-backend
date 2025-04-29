@@ -1,5 +1,7 @@
 package im.toduck.domain.mypage.domain.service;
 
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,5 +29,10 @@ public class MyPageService {
 	@Transactional
 	public void updateProfileImage(User user, String imageUrl) {
 		userRepository.updateProfileImageUrl(user, imageUrl);
+	}
+
+	@Transactional(readOnly = true)
+	public List<User> getBlockedUsers(final User user) {
+		return userRepository.findBlockedUsersByUser(user);
 	}
 }
