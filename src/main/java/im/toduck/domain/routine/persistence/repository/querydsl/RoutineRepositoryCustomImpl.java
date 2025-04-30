@@ -53,7 +53,7 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			.where(
 				qRoutine.user.eq(user),
 				routineNotDeleted(),
-				scheduleModifiedOnOrBeforeDate(startDate),
+				scheduleModifiedOnOrBeforeDate(endDate),
 				routineMatchesDateRange(startDate, endDate)
 			)
 			.fetch();
@@ -97,6 +97,7 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 
 	private BooleanExpression routineMatchesDate(final LocalDate date) {
 		byte dayBitmask = DaysOfWeekBitmask.getDayBitmask(date.getDayOfWeek());
+
 		return Expressions.numberTemplate(
 			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, dayBitmask
 		).gt((byte)0);
