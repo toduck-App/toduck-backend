@@ -43,9 +43,9 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 			.set(qUser.deletedAt, LocalDateTime.now())
 			.where(qUser.id.eq(user.getId()))
 			.execute();
-  }
+	}
 
-  @Override
+	@Override
 	public List<User> findBlockedUsersByUser(User user) {
 		return queryFactory.select(qBlock.blocked)
 			.from(qBlock)

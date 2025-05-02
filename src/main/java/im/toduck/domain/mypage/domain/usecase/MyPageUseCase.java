@@ -80,7 +80,7 @@ public class MyPageUseCase {
 		// TODO. schedule 관련 삭제 추가
 
 		userService.softDelete(user);
-  }
+	}
 
 	@Transactional(readOnly = true)
 	public BlockedUsersResponse getBlockedUsers(final Long userId) {

@@ -91,7 +91,7 @@ public interface MyPageApi {
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	);
 
-  @Operation(
+	@Operation(
 		summary = "차단한 유저 목록 조회",
 		description = "자신이 차단한 유저들의 목록을 조회합니다."
 	)

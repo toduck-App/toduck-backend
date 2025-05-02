@@ -71,9 +71,9 @@ public class MyPageController implements MyPageApi {
 	) {
 		myPageUseCase.deleteAccount(userDetails.getUserId(), request);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
-  }
+	}
 
-  @Override
+	@Override
 	@GetMapping("/blocked-users")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<BlockedUsersResponse>> getBlockedUsers(

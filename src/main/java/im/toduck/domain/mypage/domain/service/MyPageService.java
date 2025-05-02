@@ -40,7 +40,7 @@ public class MyPageService {
 	public void recordUserDeletionLog(User user, UserDeleteRequest request) {
 		AccountDeletionLog accountDeletionLog = AccountDeletionLogMapper.toAccountDeletionLog(user, request);
 		accountDeletionLogRepository.save(accountDeletionLog);
-  }
+	}
 
 	@Transactional(readOnly = true)
 	public List<User> getBlockedUsers(final User user) {
