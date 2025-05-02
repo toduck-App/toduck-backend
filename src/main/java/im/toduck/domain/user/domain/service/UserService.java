@@ -87,4 +87,14 @@ public class UserService {
 	public boolean isBlockedUser(User blocker, User blockedUser) {
 		return blockRepository.existsByBlockerAndBlocked(blocker, blockedUser);
 	}
+
+	@Transactional
+	public void deleteAllBlocksByUser(User user) {
+		blockRepository.deleteAllByUser(user);
+	}
+
+	@Transactional
+	public void softDelete(User user) {
+		userRepository.softDelete(user);
+	}
 }
