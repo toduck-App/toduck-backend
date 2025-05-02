@@ -9,5 +9,7 @@ public interface UserRepositoryCustom {
 
 	void updateProfileImageUrl(User user, String imageUrl);
 
+	void softDelete(User user);
+
 	List<User> findBlockedUsersByUser(User user);
 }

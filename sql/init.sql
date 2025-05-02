@@ -310,3 +310,13 @@ CREATE TABLE concentration
     deleted_at          DATETIME                            NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+CREATE TABLE account_deletion_log
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    user_id     BIGINT                                                                                      NOT NULL,
+    reason_code ENUM ('HARD_TO_USE', 'NO_FEATURES', 'MANY_ERRORS', 'BETTER_APP', 'SWITCH_ACCOUNT', 'OTHER') NOT NULL,
+    reason_text VARCHAR(130)                                                                                NOT NULL,
+    created_at  DATETIME                                                                                    NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);

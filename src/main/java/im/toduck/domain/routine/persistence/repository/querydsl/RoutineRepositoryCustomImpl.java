@@ -86,6 +86,17 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 		return fetchOne != null;
 	}
 
+	@Override
+	public void deleteAllUnsharedRoutinesByUser(User user) {
+		queryFactory.update(qRoutine)
+			.set(qRoutine.deletedAt, LocalDateTime.now())
+			.where(
+				qRoutine.user.eq(user)
+					.and(qRoutine.sharedCount.eq(0))
+			)
+			.execute();
+	}
+
 	private BooleanExpression routineNotDeleted() {
 		return qRoutine.deletedAt.isNull();
 	}

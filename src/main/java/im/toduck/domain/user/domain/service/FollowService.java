@@ -30,6 +30,11 @@ public class FollowService {
 		followRepository.delete(follow);
 	}
 
+	@Transactional
+	public void deleteAllFollowsByUser(final User user) {
+		followRepository.deleteAllByUser(user);
+	}
+
 	@Transactional(readOnly = true)
 	public boolean isFollowing(final User follower, final User followed) {
 		return followRepository.existsByFollowerAndFollowed(follower, followed);

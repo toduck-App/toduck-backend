@@ -37,4 +37,7 @@ public interface RoutineRepository extends JpaRepository<Routine, Long>, Routine
 			+ "AND r.deletedAt IS NULL"
 	)
 	int sumRoutineSharedCountByUser(@Param("user") User user);
+
+	@Query("SELECT r FROM Routine r WHERE r.user = :user AND r.sharedCount = 0 AND r.deletedAt IS null")
+	List<Routine> findAllUnsharedRoutinesByUser(@Param("user") User user);
 }

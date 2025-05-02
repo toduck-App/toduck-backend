@@ -22,4 +22,5 @@ public interface RoutineRepositoryCustom {
 
 	boolean isActiveForDate(final Routine routine, final LocalDate date);
 
+	void deleteAllUnsharedRoutinesByUser(User user);
 }

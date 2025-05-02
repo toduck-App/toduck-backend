@@ -50,4 +50,9 @@ public class ConcentrationService {
 
 		return totalPercentage;
 	}
+
+	@Transactional
+	public void deleteAllConcentrationsByUser(User user) {
+		concentrationRepository.deleteAllByUser(user);
+	}
 }

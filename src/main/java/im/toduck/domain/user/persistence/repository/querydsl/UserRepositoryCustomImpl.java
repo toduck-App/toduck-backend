@@ -1,5 +1,6 @@
 package im.toduck.domain.user.persistence.repository.querydsl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -30,6 +31,16 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 	public void updateProfileImageUrl(User user, String imageUrl) {
 		queryFactory.update(qUser)
 			.set(qUser.imageUrl, imageUrl)
+			.where(qUser.id.eq(user.getId()))
+			.execute();
+	}
+
+	@Override
+	public void softDelete(User user) {
+		queryFactory.update(qUser)
+			.set(qUser.nickname, (String)null)
+			.set(qUser.imageUrl, (String)null)
+			.set(qUser.deletedAt, LocalDateTime.now())
 			.where(qUser.id.eq(user.getId()))
 			.execute();
 	}
