@@ -34,10 +34,14 @@ public class LayeredArchitectureTest {
 		)
 		.whereLayer(MAPPER.name()).mayOnlyBeAccessedByLayers(SERVICE.name(), USECASE.name())
 
+		// QueryDSL 제외
 		.ignoreDependency(JavaClass.Predicates.simpleNameStartingWith("Q"),
 			JavaClass.Predicates.resideInAnyPackage(".."))
-		.ignoreDependency(JavaClass.Predicates.resideInAPackage("..global.."),
-			JavaClass.Predicates.resideInAnyPackage(".."));
+		.ignoreDependency(
+			JavaClass.Predicates.resideInAPackage("..global..")
+				.or(JavaClass.Predicates.resideInAPackage("..common.dto..")),
+			JavaClass.Predicates.resideInAnyPackage("..")
+		);
 
 	@ArchTest
 	static final ArchRule 오직_Entity_레이어의_enum_만_DTO_에서_사용될_수_있다 =

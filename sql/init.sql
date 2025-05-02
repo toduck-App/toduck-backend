@@ -45,7 +45,7 @@ CREATE TABLE social
     user_id      BIGINT       NOT NULL,
     routine_id   BIGINT       NULL,
     title        VARCHAR(100) NULL,
-    content      VARCHAR(255) NOT NULL,
+    content      VARCHAR(500) NOT NULL,
     is_anonymous BOOLEAN      NOT NULL,
     like_count   int          NOT NULL DEFAULT 0,
     created_at   DATETIME     NOT NULL,
@@ -229,7 +229,8 @@ VALUES ('CONCENTRATION', NOW(), NOW()),
        ('MEMORY', NOW(), NOW()),
        ('IMPULSE', NOW(), NOW()),
        ('ANXIETY', NOW(), NOW()),
-       ('SLEEP', NOW(), NOW());
+       ('SLEEP', NOW(), NOW()),
+       ('GENERAL', NOW(), NOW());
 
 CREATE TABLE block
 (

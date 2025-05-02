@@ -1,5 +1,7 @@
 package im.toduck.domain.mypage.domain.service;
 
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,5 +40,10 @@ public class MyPageService {
 	public void recordUserDeletionLog(User user, UserDeleteRequest request) {
 		AccountDeletionLog accountDeletionLog = AccountDeletionLogMapper.toAccountDeletionLog(user, request);
 		accountDeletionLogRepository.save(accountDeletionLog);
+  }
+
+	@Transactional(readOnly = true)
+	public List<User> getBlockedUsers(final User user) {
+		return userRepository.findBlockedUsersByUser(user);
 	}
 }

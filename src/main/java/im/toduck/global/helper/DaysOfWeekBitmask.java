@@ -92,6 +92,43 @@ public class DaysOfWeekBitmask {
 			.filter(this::includesDayOf);
 	}
 
+	/**
+	 * 시작일부터 종료일까지의 기간에 포함된 모든 요일에 대한 비트마스크를 생성합니다.
+	 * 예: 월요일부터 수요일까지의 기간은 0000111 (0x07) 반환
+	 * 일주일 이상의 기간은 항상 0111111 (0x7F) 반환
+	 *
+	 * @param startDate 시작일 (포함)
+	 * @param endDate 종료일 (포함)
+	 * @return 기간에 포함된 모든 요일에 대한 비트마스크
+	 */
+	public static DaysOfWeekBitmask createFromDateRange(LocalDate startDate, LocalDate endDate) {
+		if (startDate.plusDays(6).isBefore(endDate) || startDate.plusDays(6).isEqual(endDate)) {
+			return new DaysOfWeekBitmask(DayBitmasks.ALL_DAYS);
+		}
+
+		byte bitmask = 0;
+		LocalDate current = startDate;
+
+		while (!current.isAfter(endDate)) {
+			bitmask |= getDayBitmask(current.getDayOfWeek());
+			current = current.plusDays(1);
+		}
+
+		return new DaysOfWeekBitmask(bitmask);
+	}
+
+	/**
+	 * 시작일부터 종료일까지의 기간에 포함된 모든 요일에 대한 비트마스크 값을 반환합니다.
+	 * 내부 구현을 숨기고 바이트 값만 필요한 경우 사용합니다.
+	 *
+	 * @param startDate 시작일 (포함)
+	 * @param endDate 종료일 (포함)
+	 * @return 기간에 포함된 모든 요일에 대한 비트마스크 값
+	 */
+	public static byte getDaysOfWeekBitmaskValueInRange(LocalDate startDate, LocalDate endDate) {
+		return createFromDateRange(startDate, endDate).getValue();
+	}
+
 	public byte getValue() {
 		return bitmask;
 	}

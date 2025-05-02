@@ -23,8 +23,18 @@ import lombok.extern.slf4j.Slf4j;
 public class RoutineRecordService {
 	private final RoutineRecordRepository routineRecordRepository;
 
+	@Transactional(readOnly = true)
 	public List<RoutineRecord> getRecordsIncludingDeleted(final User user, final LocalDate date) {
-		return routineRecordRepository.findRoutineRecordsForUserAndDate(user, date);
+		return routineRecordRepository.findAllByUserAndRecordAtDate(user, date);
+	}
+
+	@Transactional(readOnly = true)
+	public List<RoutineRecord> getRecordsBetweenDates(
+		final User user,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		return routineRecordRepository.findAllByUserAndRecordAtBetween(user, startDate, endDate);
 	}
 
 	@Transactional

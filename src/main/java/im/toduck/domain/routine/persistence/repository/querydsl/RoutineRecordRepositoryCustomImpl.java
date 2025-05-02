@@ -26,13 +26,25 @@ public class RoutineRecordRepositoryCustomImpl implements RoutineRecordRepositor
 	private final QRoutineRecord qRecord = QRoutineRecord.routineRecord;
 
 	@Override
-	public List<RoutineRecord> findRoutineRecordsForUserAndDate(User user, LocalDate date) {
+	public List<RoutineRecord> findAllByUserAndRecordAtDate(User user, LocalDate date) {
 		return queryFactory
 			.selectFrom(qRecord)
 			.join(qRecord.routine, qRoutine).fetchJoin()
 			.where(
 				qRoutine.user.eq(user),
 				recordAtBetween(date)
+			)
+			.fetch();
+	}
+
+	@Override
+	public List<RoutineRecord> findAllByUserAndRecordAtBetween(User user, LocalDate startDate, LocalDate endDate) {
+		return queryFactory
+			.selectFrom(qRecord)
+			.join(qRecord.routine, qRoutine).fetchJoin()
+			.where(
+				qRoutine.user.eq(user),
+				recordAtBetweenDates(startDate, endDate)
 			)
 			.fetch();
 	}
@@ -57,6 +69,13 @@ public class RoutineRecordRepositoryCustomImpl implements RoutineRecordRepositor
 		return qRecord.recordAt.between(
 			date.atStartOfDay(),
 			date.plusDays(1).atStartOfDay().minusNanos(1)
+		);
+	}
+
+	private BooleanExpression recordAtBetweenDates(LocalDate startDate, LocalDate endDate) {
+		return qRecord.recordAt.between(
+			startDate.atStartOfDay(),
+			endDate.plusDays(1).atStartOfDay().minusNanos(1)
 		);
 	}
 

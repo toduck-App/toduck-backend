@@ -52,7 +52,7 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 			);
 
 			// when
-			List<RoutineRecord> records = routineRecordRepository.findRoutineRecordsForUserAndDate(
+			List<RoutineRecord> records = routineRecordRepository.findAllByUserAndRecordAtDate(
 				USER,
 				LocalDate.from(RECORD.getRecordAt())
 			);
@@ -93,7 +93,7 @@ class RoutineRecordRepositoryTest extends RepositoryTest {
 			);
 
 			// when
-			List<RoutineRecord> records = routineRecordRepository.findRoutineRecordsForUserAndDate(
+			List<RoutineRecord> records = routineRecordRepository.findAllByUserAndRecordAtDate(
 				USER,
 				LocalDate.from(RECORD_WEEKLY1_1.getRecordAt())
 			);

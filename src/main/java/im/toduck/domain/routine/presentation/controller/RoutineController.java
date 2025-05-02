@@ -23,6 +23,7 @@ import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionReq
 import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadMultipleDatesResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -58,6 +59,21 @@ public class RoutineController implements RoutineApi {
 	) {
 		return ResponseEntity.ok(
 			ApiResponse.createSuccess(routineUseCase.readMyRoutineRecordList(userDetails.getUserId(), date))
+		);
+	}
+
+	@Override
+	@GetMapping("/me/dates")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<MyRoutineRecordReadMultipleDatesResponse>> getMyRoutineListMultipleDates(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.createSuccess(
+				routineUseCase.readMyRoutineRecordListMultipleDates(userDetails.getUserId(), startDate, endDate)
+			)
 		);
 	}
 

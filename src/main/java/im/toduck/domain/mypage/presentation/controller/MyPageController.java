@@ -17,6 +17,7 @@ import im.toduck.domain.mypage.presentation.api.MyPageApi;
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.request.UserDeleteRequest;
+import im.toduck.domain.mypage.presentation.dto.response.BlockedUsersResponse;
 import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -70,5 +71,15 @@ public class MyPageController implements MyPageApi {
 	) {
 		myPageUseCase.deleteAccount(userDetails.getUserId(), request);
 		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+  }
+
+  @Override
+	@GetMapping("/blocked-users")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<BlockedUsersResponse>> getBlockedUsers(
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	) {
+		BlockedUsersResponse response = myPageUseCase.getBlockedUsers(userDetails.getUserId());
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }

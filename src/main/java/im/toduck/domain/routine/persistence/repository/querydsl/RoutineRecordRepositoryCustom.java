@@ -10,7 +10,11 @@ import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.user.persistence.entity.User;
 
 public interface RoutineRecordRepositoryCustom {
-	List<RoutineRecord> findRoutineRecordsForUserAndDate(final User user, final LocalDate date);
+	List<RoutineRecord> findAllByUserAndRecordAtDate(final User user, final LocalDate date);
+
+	List<RoutineRecord> findAllByUserAndRecordAtBetween(
+		final User user, final LocalDate startDate, final LocalDate endDate
+	);
 
 	Optional<RoutineRecord> findByRoutineAndRecordDate(
 		final Routine routine,
