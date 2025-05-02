@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.mypage.domain.usecase.MyPageUseCase;
@@ -16,9 +17,13 @@ import im.toduck.domain.mypage.presentation.api.MyPageApi;
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.response.BlockedUsersResponse;
+import im.toduck.domain.mypage.presentation.dto.response.MyCommentsResponse;
 import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
+import im.toduck.global.annotation.valid.PaginationLimit;
 import im.toduck.global.presentation.ApiResponse;
+import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -67,6 +72,23 @@ public class MyPageController implements MyPageApi {
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	) {
 		BlockedUsersResponse response = myPageUseCase.getBlockedUsers(userDetails.getUserId());
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
+	}
+
+	@Override
+	@GetMapping("/comments")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<CursorPaginationResponse<MyCommentsResponse>>> getMyComments(
+		@AuthenticationPrincipal CustomUserDetails userDetails,
+		@Parameter(description = "조회를 시작할 커서 값") @RequestParam(required = false) Long cursor,
+		@Parameter(description = "한 페이지에 표시할 항목 수") @PaginationLimit @RequestParam(required = false) Integer limit
+	) {
+		CursorPaginationResponse<MyCommentsResponse> response = myPageUseCase.getMyComments(
+			userDetails.getUserId(),
+			cursor,
+			limit
+		);
+
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }
