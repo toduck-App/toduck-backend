@@ -3,6 +3,7 @@ package im.toduck.domain.mypage.domain.service;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,16 +11,20 @@ import im.toduck.domain.mypage.common.mapper.AccountDeletionLogMapper;
 import im.toduck.domain.mypage.persistence.entity.AccountDeletionLog;
 import im.toduck.domain.mypage.persistence.repository.AccountDeletionLogRepository;
 import im.toduck.domain.mypage.presentation.dto.request.UserDeleteRequest;
+import im.toduck.domain.mypage.presentation.dto.response.MyCommentsResponse;
+import im.toduck.domain.social.persistence.repository.CommentRepository;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
 	private final UserRepository userRepository;
+	private final CommentRepository commentRepository;
 	private final AccountDeletionLogRepository accountDeletionLogRepository;
 
 	@Transactional
@@ -45,5 +50,11 @@ public class MyPageService {
 	@Transactional(readOnly = true)
 	public List<User> getBlockedUsers(final User user) {
 		return userRepository.findBlockedUsersByUser(user);
+	}
+
+	@Transactional(readOnly = true)
+	public List<MyCommentsResponse> getMyCommentsResponse(final Long userId, final Long cursor, final int limit) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+		return commentRepository.findMyCommentsWithProjection(userId, cursor, pageRequest);
 	}
 }

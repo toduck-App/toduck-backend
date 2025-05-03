@@ -10,6 +10,7 @@ import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.request.ProfileImageUpdateRequest;
 import im.toduck.domain.mypage.presentation.dto.request.UserDeleteRequest;
 import im.toduck.domain.mypage.presentation.dto.response.BlockedUsersResponse;
+import im.toduck.domain.mypage.presentation.dto.response.MyCommentsResponse;
 import im.toduck.domain.mypage.presentation.dto.response.NickNameResponse;
 import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.user.domain.service.FollowService;
@@ -18,11 +19,15 @@ import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
+import im.toduck.global.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 
 @UseCase
 @RequiredArgsConstructor
 public class MyPageUseCase {
+	private static final int DEFAULT_COMMENT_PAGE_SIZE = 20;
+
 	private final UserService userService;
 	private final MyPageService myPageService;
 	private final FollowService followService;
@@ -89,5 +94,36 @@ public class MyPageUseCase {
 		List<User> blockedUsers = myPageService.getBlockedUsers(user);
 
 		return MyPageMapper.toBlockedUsersResponse(blockedUsers);
+	}
+
+	@Transactional(readOnly = true)
+	public CursorPaginationResponse<MyCommentsResponse> getMyComments(
+		final Long userId,
+		final Long cursor,
+		final Integer limit
+	) {
+
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_COMMENT_PAGE_SIZE);
+		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
+
+		List<MyCommentsResponse> comments = myPageService.getMyCommentsResponse(user.getId(), cursor, fetchLimit);
+
+		boolean hasMore = PaginationUtil.hasMore(comments, actualLimit);
+
+		Long nextCursor = PaginationUtil.getNextCursor(
+			hasMore,
+			comments,
+			actualLimit,
+			res -> res.comment().commentId()
+		);
+
+		List<MyCommentsResponse> pagedComments = comments.stream()
+			.limit(actualLimit)
+			.toList();
+
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, pagedComments);
 	}
 }
