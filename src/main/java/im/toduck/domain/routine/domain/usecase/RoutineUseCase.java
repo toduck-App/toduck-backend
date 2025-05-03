@@ -246,7 +246,7 @@ public class RoutineUseCase {
 		LocalDate endDate = endTime.toLocalDate();
 
 		List<RoutineRecord> newRecords = routine.getDaysOfWeekBitmask()
-			.streamMatchingDatesInRange(startDate, endDate)
+			.streamMatchingDatesInRange(startDate, endDate.minusDays(1))
 			.filter(date -> !existingDates.contains(date))
 			.map(date -> RoutineRecordMapper.toRoutineRecord(routine, date, false))
 			.toList();
