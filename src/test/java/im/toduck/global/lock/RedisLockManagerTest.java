@@ -44,7 +44,7 @@ class RedisLockManagerTest extends ServiceTest {
 		@Test
 		void 처음_시도하면_락_획득에_성공한다() {
 			// when
-			boolean result = redisLockManager.tryLock(TEST_KEY, TEST_VALUE, TIMEOUT);
+			boolean result = redisLockManager.acquireLock(TEST_KEY, TEST_VALUE, TIMEOUT);
 
 			// then
 			assertSoftly(softly -> {
@@ -57,10 +57,10 @@ class RedisLockManagerTest extends ServiceTest {
 		@Test
 		void 이미_락이_존재하면_획득에_실패한다() {
 			// given
-			redisLockManager.tryLock(TEST_KEY, "other-value", TIMEOUT);
+			redisLockManager.acquireLock(TEST_KEY, "other-value", TIMEOUT);
 
 			// when
-			boolean result = redisLockManager.tryLock(TEST_KEY, TEST_VALUE, TIMEOUT);
+			boolean result = redisLockManager.acquireLock(TEST_KEY, TEST_VALUE, TIMEOUT);
 
 			// then
 			assertThat(result).isFalse();
@@ -70,11 +70,11 @@ class RedisLockManagerTest extends ServiceTest {
 		void 타임아웃_이후에는_다시_락을_획득할_수_있다() throws InterruptedException {
 			// given
 			Duration shortTimeout = Duration.ofMillis(100);
-			redisLockManager.tryLock(TEST_KEY, "other-value", shortTimeout);
+			redisLockManager.acquireLock(TEST_KEY, "other-value", shortTimeout);
 
 			// when
 			Thread.sleep(150);
-			boolean result = redisLockManager.tryLock(TEST_KEY, TEST_VALUE, TIMEOUT);
+			boolean result = redisLockManager.acquireLock(TEST_KEY, TEST_VALUE, TIMEOUT);
 
 			// then
 			assertThat(result).isTrue();
@@ -88,10 +88,10 @@ class RedisLockManagerTest extends ServiceTest {
 		@Test
 		void 자신이_획득한_락은_해제할_수_있다() {
 			// given
-			redisLockManager.tryLock(TEST_KEY, TEST_VALUE, TIMEOUT);
+			redisLockManager.acquireLock(TEST_KEY, TEST_VALUE, TIMEOUT);
 
 			// when
-			boolean result = redisLockManager.unlock(TEST_KEY, TEST_VALUE);
+			boolean result = redisLockManager.releaseLock(TEST_KEY, TEST_VALUE);
 
 			// then
 			assertSoftly(softly -> {
@@ -104,10 +104,10 @@ class RedisLockManagerTest extends ServiceTest {
 		@Test
 		void 다른_값으로_설정된_락은_해제할_수_없다() {
 			// given
-			redisLockManager.tryLock(TEST_KEY, "other-value", TIMEOUT);
+			redisLockManager.acquireLock(TEST_KEY, "other-value", TIMEOUT);
 
 			// when
-			boolean result = redisLockManager.unlock(TEST_KEY, TEST_VALUE);
+			boolean result = redisLockManager.releaseLock(TEST_KEY, TEST_VALUE);
 
 			// then
 			assertSoftly(softly -> {
@@ -120,7 +120,7 @@ class RedisLockManagerTest extends ServiceTest {
 		@Test
 		void 존재하지_않는_락을_해제하려하면_실패한다() {
 			// when
-			boolean result = redisLockManager.unlock(TEST_KEY, TEST_VALUE);
+			boolean result = redisLockManager.releaseLock(TEST_KEY, TEST_VALUE);
 
 			// then
 			assertThat(result).isFalse();
@@ -144,7 +144,7 @@ class RedisLockManagerTest extends ServiceTest {
 				String value = "value-" + i;
 				executorService.submit(() -> {
 					try {
-						if (redisLockManager.tryLock(TEST_KEY, value, TIMEOUT)) {
+						if (redisLockManager.acquireLock(TEST_KEY, value, TIMEOUT)) {
 							successCount.incrementAndGet();
 						}
 					} finally {

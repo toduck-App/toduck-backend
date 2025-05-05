@@ -16,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 public class RedisLockManager {
 	private final StringRedisTemplate redisTemplate;
 
-	private static final String LOCK_PREFIX = "lock:";
-	private static final String UNLOCK_SCRIPT =
+	private static final String REDIS_LOCK_PREFIX = "lock:";
+	private static final String REDIS_UNLOCK_LUA_SCRIPT =
 		"if redis.call('get', KEYS[1]) == ARGV[1] then "
 			+ "   return redis.call('del', KEYS[1]) "
 			+ "else "
@@ -25,11 +25,11 @@ public class RedisLockManager {
 			+ "end";
 
 	private static final DefaultRedisScript<Long> UNLOCK_REDIS_SCRIPT =
-		new DefaultRedisScript<>(UNLOCK_SCRIPT, Long.class);
+		new DefaultRedisScript<>(REDIS_UNLOCK_LUA_SCRIPT, Long.class);
 
-	public boolean tryLock(String key, String value, Duration timeout) {
+	public boolean acquireLock(String key, String value, Duration timeout) {
 		try {
-			String lockKey = LOCK_PREFIX + key;
+			String lockKey = REDIS_LOCK_PREFIX + key;
 			return Boolean.TRUE.equals(
 				redisTemplate.opsForValue().setIfAbsent(lockKey, value, timeout)
 			);
@@ -39,9 +39,9 @@ public class RedisLockManager {
 		}
 	}
 
-	public boolean unlock(String key, String value) {
+	public boolean releaseLock(String key, String value) {
 		try {
-			String lockKey = LOCK_PREFIX + key;
+			String lockKey = REDIS_LOCK_PREFIX + key;
 			Long result = redisTemplate.execute(
 				UNLOCK_REDIS_SCRIPT,
 				Collections.singletonList(lockKey),

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
@@ -540,7 +541,16 @@ class RoutineUseCaseTest extends ServiceTest {
 			given(userService.getUserById(any(Long.class))).willReturn(Optional.ofNullable(USER));
 		}
 
+		@AfterEach
+		void cleanup() {
+			routineRecordRepository.deleteAll();
+			routineRepository.deleteAll();
+
+			reset(userService);
+		}
+
 		@Test
+		@Transactional(propagation = Propagation.NEVER)
 		void 기존_기록이_존재하는_경우에_완료_상태_변경이_성공한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
@@ -569,6 +579,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		}
 
 		@Test
+		@Transactional(propagation = Propagation.NEVER)
 		void 기존_기록이_존재하는_경우에_모_루틴의_반복요일에_변경이_있더라도_변경이_성공한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(
@@ -599,6 +610,7 @@ class RoutineUseCaseTest extends ServiceTest {
 		}
 
 		@Test
+		@Transactional(propagation = Propagation.NEVER)
 		void 기존_기록이_존재하지_않는_경우에_완료_상태_변경이_성공한다() {
 			// given
 			Routine ROUTINE = testFixtureBuilder.buildRoutineAndUpdateAuditFields(

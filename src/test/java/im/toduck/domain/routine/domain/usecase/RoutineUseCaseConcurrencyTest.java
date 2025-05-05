@@ -106,7 +106,7 @@ class RoutineUseCaseConcurrencyTest extends ServiceTest {
 		@Test
 		void 거의_동시에_여러_요청이_들어올때_루틴_기록이_중복_생성되지_않아야_한다() throws InterruptedException {
 			// given
-			int numberOfThreads = 5;
+			int numberOfThreads = 6;
 			ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
 			CountDownLatch startLatch = new CountDownLatch(1);
 			CountDownLatch endLatch = new CountDownLatch(numberOfThreads);
@@ -123,8 +123,8 @@ class RoutineUseCaseConcurrencyTest extends ServiceTest {
 					try {
 						startLatch.await(); // 모든 스레드가 준비될 때까지 대기
 
-						// 랜덤 지연 시간 (0-50ms)
-						Thread.sleep(random.nextInt(50));
+						// 랜덤 지연 시간 (0-10ms)
+						Thread.sleep(random.nextInt(10));
 
 						routineUseCase.updateRoutineCompletion(USER.getId(), routineId, request);
 						successCount.incrementAndGet();
@@ -202,7 +202,7 @@ class RoutineUseCaseConcurrencyTest extends ServiceTest {
 		@Test
 		void 거의_동시에_여러_요청이_들어올때_개별_루틴_삭제_기록이_중복_생성되지_않아야_한다() throws InterruptedException {
 			// given
-			int numberOfThreads = 5;
+			int numberOfThreads = 6;
 			ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
 			CountDownLatch startLatch = new CountDownLatch(1);
 			CountDownLatch endLatch = new CountDownLatch(numberOfThreads);
@@ -218,8 +218,8 @@ class RoutineUseCaseConcurrencyTest extends ServiceTest {
 					try {
 						startLatch.await(); // 모든 스레드가 준비될 때까지 대기
 
-						// 랜덤 지연 시간 (0-50ms)
-						Thread.sleep(random.nextInt(50));
+						// 랜덤 지연 시간 (0-10ms)
+						Thread.sleep(random.nextInt(10));
 
 						routineUseCase.deleteIndividualRoutine(USER.getId(), routineId, TEST_MONDAY_DATE);
 						successCount.incrementAndGet();

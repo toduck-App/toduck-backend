@@ -34,9 +34,9 @@ class DistributedLockTest extends ServiceTest {
 			String lockKey = "test-lock";
 			String expectedResult = "success";
 
-			given(redisLockManager.tryLock(eq(lockKey), anyString(), any(Duration.class)))
+			given(redisLockManager.acquireLock(eq(lockKey), anyString(), any(Duration.class)))
 				.willReturn(true);
-			given(redisLockManager.unlock(eq(lockKey), anyString()))
+			given(redisLockManager.releaseLock(eq(lockKey), anyString()))
 				.willReturn(true);
 
 			// when
@@ -45,8 +45,8 @@ class DistributedLockTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(result).isEqualTo(expectedResult);
-				verify(redisLockManager).tryLock(eq(lockKey), anyString(), any(Duration.class));
-				verify(redisLockManager).unlock(eq(lockKey), anyString());
+				verify(redisLockManager).acquireLock(eq(lockKey), anyString(), any(Duration.class));
+				verify(redisLockManager).releaseLock(eq(lockKey), anyString());
 			});
 		}
 
@@ -56,9 +56,9 @@ class DistributedLockTest extends ServiceTest {
 			String lockKey = "test-lock";
 			RuntimeException expectedException = new RuntimeException("작업 실패");
 
-			given(redisLockManager.tryLock(eq(lockKey), anyString(), any(Duration.class)))
+			given(redisLockManager.acquireLock(eq(lockKey), anyString(), any(Duration.class)))
 				.willReturn(true);
-			given(redisLockManager.unlock(eq(lockKey), anyString()))
+			given(redisLockManager.releaseLock(eq(lockKey), anyString()))
 				.willReturn(true);
 
 			// when & then
@@ -70,7 +70,7 @@ class DistributedLockTest extends ServiceTest {
 				.isInstanceOf(RuntimeException.class)
 				.hasMessage("작업 실패");
 
-			verify(redisLockManager).unlock(eq(lockKey), anyString());
+			verify(redisLockManager).releaseLock(eq(lockKey), anyString());
 		}
 
 		@Test
@@ -79,10 +79,10 @@ class DistributedLockTest extends ServiceTest {
 			String lockKey = "test-lock";
 			String expectedResult = "success";
 
-			given(redisLockManager.tryLock(eq(lockKey), anyString(), any(Duration.class)))
+			given(redisLockManager.acquireLock(eq(lockKey), anyString(), any(Duration.class)))
 				.willReturn(false)  // 첫 번째 시도 실패
 				.willReturn(true);  // 두 번째 시도 성공
-			given(redisLockManager.unlock(eq(lockKey), anyString()))
+			given(redisLockManager.releaseLock(eq(lockKey), anyString()))
 				.willReturn(true);
 
 			// when
@@ -91,8 +91,8 @@ class DistributedLockTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(result).isEqualTo(expectedResult);
-				verify(redisLockManager, times(2)).tryLock(eq(lockKey), anyString(), any(Duration.class));
-				verify(redisLockManager).unlock(eq(lockKey), anyString());
+				verify(redisLockManager, times(2)).acquireLock(eq(lockKey), anyString(), any(Duration.class));
+				verify(redisLockManager).releaseLock(eq(lockKey), anyString());
 			});
 		}
 
@@ -102,7 +102,7 @@ class DistributedLockTest extends ServiceTest {
 			String lockKey = "test-lock";
 			int maxRetries = 3;
 
-			given(redisLockManager.tryLock(eq(lockKey), anyString(), any(Duration.class)))
+			given(redisLockManager.acquireLock(eq(lockKey), anyString(), any(Duration.class)))
 				.willReturn(false);
 
 			// when & then
@@ -111,7 +111,7 @@ class DistributedLockTest extends ServiceTest {
 			)
 				.isInstanceOf(LockAcquisitionException.class);
 
-			verify(redisLockManager, times(maxRetries)).tryLock(eq(lockKey), anyString(), any(Duration.class));
+			verify(redisLockManager, times(maxRetries)).acquireLock(eq(lockKey), anyString(), any(Duration.class));
 		}
 
 		@Test
@@ -149,9 +149,9 @@ class DistributedLockTest extends ServiceTest {
 			String lockKey = "test-lock";
 			AtomicInteger counter = new AtomicInteger(0);
 
-			given(redisLockManager.tryLock(eq(lockKey), anyString(), any(Duration.class)))
+			given(redisLockManager.acquireLock(eq(lockKey), anyString(), any(Duration.class)))
 				.willReturn(true);
-			given(redisLockManager.unlock(eq(lockKey), anyString()))
+			given(redisLockManager.releaseLock(eq(lockKey), anyString()))
 				.willReturn(true);
 
 			// when
@@ -160,8 +160,8 @@ class DistributedLockTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(counter.get()).isEqualTo(1);
-				verify(redisLockManager).tryLock(eq(lockKey), anyString(), any(Duration.class));
-				verify(redisLockManager).unlock(eq(lockKey), anyString());
+				verify(redisLockManager).acquireLock(eq(lockKey), anyString(), any(Duration.class));
+				verify(redisLockManager).releaseLock(eq(lockKey), anyString());
 			});
 		}
 
@@ -172,9 +172,9 @@ class DistributedLockTest extends ServiceTest {
 			Duration timeout = Duration.ofSeconds(5);
 			AtomicInteger counter = new AtomicInteger(0);
 
-			given(redisLockManager.tryLock(eq(lockKey), anyString(), eq(timeout)))
+			given(redisLockManager.acquireLock(eq(lockKey), anyString(), eq(timeout)))
 				.willReturn(true);
-			given(redisLockManager.unlock(eq(lockKey), anyString()))
+			given(redisLockManager.releaseLock(eq(lockKey), anyString()))
 				.willReturn(true);
 
 			// when
@@ -183,8 +183,8 @@ class DistributedLockTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(counter.get()).isEqualTo(1);
-				verify(redisLockManager).tryLock(eq(lockKey), anyString(), eq(timeout));
-				verify(redisLockManager).unlock(eq(lockKey), anyString());
+				verify(redisLockManager).acquireLock(eq(lockKey), anyString(), eq(timeout));
+				verify(redisLockManager).releaseLock(eq(lockKey), anyString());
 			});
 		}
 	}

@@ -1,6 +1,5 @@
 package im.toduck.domain.routine.domain.usecase;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -112,24 +111,23 @@ public class RoutineUseCase {
 		boolean isCompleted = request.isCompleted();
 
 		String lockKey = "routine:" + routineId + ":date:" + date;
-		distributedLock.executeWithLock(lockKey, Duration.ofSeconds(3), 10, () -> {
+		distributedLock.executeWithLock(lockKey, () -> {
 			if (routineRecordService.updateIfPresent(routine, date, isCompleted)) {
-				log.info(
-					"루틴 상태 변경 성공(기록 수정) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}, 완료상태: {}",
+				log.info("루틴 상태 변경 성공(기록 수정) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}, 완료상태: {}",
 					userId, routineId, date, isCompleted
 				);
-			} else {
-				if (!routineService.canCreateRecordForDate(routine, date)) {
-					log.info("루틴 상태 변경 실패 - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
-					throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
-				}
-
-				routineRecordService.create(routine, date, isCompleted);
-				log.info(
-					"루틴 상태 변경 성공(기록 생성) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}, 완료상태: {}",
-					userId, routineId, date, isCompleted
-				);
+				return;
 			}
+
+			if (!routineService.canCreateRecordForDate(routine, date)) {
+				log.info("루틴 상태 변경 실패 - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
+				throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
+			}
+
+			routineRecordService.create(routine, date, isCompleted);
+			log.info(
+				"루틴 상태 변경 성공(기록 생성) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}, 완료상태: {}", userId, routineId, date, isCompleted
+			);
 		});
 	}
 
@@ -204,24 +202,19 @@ public class RoutineUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
 		String lockKey = "routine:" + routineId + ":date:" + date;
-		distributedLock.executeWithLock(lockKey, Duration.ofSeconds(3), 10, () -> {
+		distributedLock.executeWithLock(lockKey, () -> {
 			if (routineRecordService.removeIfPresent(routine, date)) {
-				log.info(
-					"개별 루틴 삭제 성공(기존 기록 삭제) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}",
-					userId, routineId, date
-				);
-			} else {
-				if (!routineService.canCreateRecordForDate(routine, date)) {
-					log.info("개별 루틴 삭제 실패(유효하지 않은 날짜) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
-					throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
-				}
-
-				routineRecordService.createAsDeleted(routine, date);
-				log.info(
-					"개별 루틴 삭제 성공(삭제 기록 생성) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}",
-					userId, routineId, date
-				);
+				log.info("개별 루틴 삭제 성공(기존 기록 삭제) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
+				return;
 			}
+
+			if (!routineService.canCreateRecordForDate(routine, date)) {
+				log.info("개별 루틴 삭제 실패(유효하지 않은 날짜) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
+				throw CommonException.from(ExceptionCode.ROUTINE_INVALID_DATE);
+			}
+
+			routineRecordService.createAsDeleted(routine, date);
+			log.info("개별 루틴 삭제 성공(삭제 기록 생성) - 사용자 Id: {}, 루틴 Id: {}, 루틴 날짜: {}", userId, routineId, date);
 		});
 	}
 
