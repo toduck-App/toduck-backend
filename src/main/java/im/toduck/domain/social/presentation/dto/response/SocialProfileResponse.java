@@ -23,6 +23,9 @@ public record SocialProfileResponse(
 	@Schema(description = "총 루틴 공유 수", example = "1304")
 	int totalRoutineShareCount,
 
+	@Schema(description = "작성한 댓글 수", example = "42")
+	int commentCount,
+
 	@Schema(description = "현재 사용자의 프로필인지 여부", example = "false")
 	boolean isMe,
 
