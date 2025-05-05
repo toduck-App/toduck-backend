@@ -56,7 +56,7 @@ public class SocialProfileUseCase {
 		int followerCount = followService.countFollowers(profileUserId);
 		int postCount = socialBoardService.countSocialPostsByUserId(profileUserId);
 		int totalRoutineShareCount = routineService.getTotalRoutineShareCount(profileUser);
-		int commentCount = socialInteractionService.countActiveCommentsByUser(profileUser);
+		int totalCommentCount = socialInteractionService.countActiveCommentsByUser(profileUser);
 		boolean isMe = profileUserId.equals(authUserId);
 		boolean isFollowing = !isMe && followService.isFollowing(authUser, profileUser);
 
@@ -67,7 +67,7 @@ public class SocialProfileUseCase {
 			followerCount,
 			postCount,
 			totalRoutineShareCount,
-			commentCount,
+			totalCommentCount,
 			isMe,
 			isFollowing
 		);
