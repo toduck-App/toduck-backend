@@ -33,6 +33,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
 import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.fixtures.social.SocialFixtures;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.presentation.dto.response.CursorPaginationResponse;
 import jakarta.persistence.EntityManager;
@@ -85,7 +86,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 			// profileUser가 작성한 게시글 생성 (postCount)
 			for (int i = 0; i < postCount; i++) {
 				testFixtureBuilder.buildSocial(
-					im.toduck.fixtures.social.SocialFixtures.SINGLE_SOCIAL(PROFILE_USER, false));
+					SocialFixtures.SINGLE_SOCIAL(PROFILE_USER, false));
 			}
 
 			// when

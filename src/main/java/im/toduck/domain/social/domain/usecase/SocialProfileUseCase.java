@@ -56,16 +56,18 @@ public class SocialProfileUseCase {
 		int followerCount = followService.countFollowers(profileUserId);
 		int postCount = socialBoardService.countSocialPostsByUserId(profileUserId);
 		int totalRoutineShareCount = routineService.getTotalRoutineShareCount(profileUser);
+		int totalCommentCount = socialInteractionService.countActiveCommentsByUser(profileUser);
 		boolean isMe = profileUserId.equals(authUserId);
 		boolean isFollowing = !isMe && followService.isFollowing(authUser, profileUser);
 
 		log.info("프로필 조회 - 요청자 UserId: {}, 대상 UserId: {}", authUserId, profileUserId);
 		return SocialProfileMapper.toSocialProfileResponse(
-			profileUser.getNickname(),
+			profileUser,
 			followingCount,
 			followerCount,
 			postCount,
 			totalRoutineShareCount,
+			totalCommentCount,
 			isMe,
 			isFollowing
 		);

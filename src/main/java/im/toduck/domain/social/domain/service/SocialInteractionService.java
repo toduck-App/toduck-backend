@@ -235,5 +235,10 @@ public class SocialInteractionService {
 	public int countCommentsBySocial(final Social social) {
 		return commentRepository.countBySocial(social);
 	}
+
+	@Transactional(readOnly = true)
+	public int countActiveCommentsByUser(final User user) {
+		return commentRepository.countActiveCommentsByUser(user);
+	}
 }
 
