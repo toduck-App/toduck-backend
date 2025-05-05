@@ -11,7 +11,10 @@ import com.tngtech.archunit.lang.ArchRule;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.lock.DistributedLock;
 
-@AnalyzeClasses(packages = "im.toduck.domain", importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(
+	packages = {"im.toduck.domain", "im.toduck.global.lock"},
+	importOptions = ImportOption.DoNotIncludeTests.class
+)
 public class UseCaseRulesTest {
 	@ArchTest
 	static final ArchRule UseCase_클래스는_UseCase_어노테이션을_가진다 =
@@ -24,5 +27,6 @@ public class UseCaseRulesTest {
 		methods()
 			.that().areDeclaredIn(DistributedLock.class)
 			.should().onlyBeCalled().byClassesThat().resideInAPackage(USECASE.getFullPackageName())
+			.orShould().beDeclaredIn(DistributedLock.class)
 			.because("분산 락(DistributedLock) 메서드는 오직 UseCase 계층에서만 호출되어야 합니다.");
 }
