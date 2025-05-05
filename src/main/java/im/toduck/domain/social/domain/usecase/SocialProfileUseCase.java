@@ -61,7 +61,7 @@ public class SocialProfileUseCase {
 
 		log.info("프로필 조회 - 요청자 UserId: {}, 대상 UserId: {}", authUserId, profileUserId);
 		return SocialProfileMapper.toSocialProfileResponse(
-			profileUser.getNickname(),
+			profileUser,
 			followingCount,
 			followerCount,
 			postCount,

@@ -1,13 +1,14 @@
 package im.toduck.domain.social.common.mapper;
 
 import im.toduck.domain.social.presentation.dto.response.SocialProfileResponse;
+import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SocialProfileMapper {
 	public static SocialProfileResponse toSocialProfileResponse(
-		final String nickname,
+		final User profileUser,
 		final int followingCount,
 		final int followerCount,
 		final int postCount,
@@ -17,7 +18,8 @@ public class SocialProfileMapper {
 
 	) {
 		return SocialProfileResponse.builder()
-			.nickname(nickname)
+			.nickname(profileUser.getNickname())
+			.profileImageUrl(profileUser.getImageUrl())
 			.followingCount(followingCount)
 			.followerCount(followerCount)
 			.postCount(postCount)
