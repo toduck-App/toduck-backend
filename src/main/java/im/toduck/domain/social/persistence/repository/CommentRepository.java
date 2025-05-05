@@ -25,4 +25,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
 
 	@Query("SELECT COUNT(c) FROM Comment c WHERE c.user = :user AND c.deletedAt IS NULL")
 	int countActiveCommentsByUser(@Param("user") User user);
-} 
+}
