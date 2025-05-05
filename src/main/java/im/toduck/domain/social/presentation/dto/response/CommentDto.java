@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
+@Schema(description = "댓글 정보 DTO")
 @Builder
 public record CommentDto(
 	@Schema(description = "댓글 ID", example = "2")
