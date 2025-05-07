@@ -27,6 +27,14 @@ public class RedisLockManager {
 	private static final DefaultRedisScript<Long> UNLOCK_REDIS_SCRIPT =
 		new DefaultRedisScript<>(REDIS_UNLOCK_LUA_SCRIPT, Long.class);
 
+	/**
+	 * Attempts to acquire a distributed lock in Redis with the specified key, value, and expiration timeout.
+	 *
+	 * @param key the identifier for the lock
+	 * @param value the unique value to associate with the lock
+	 * @param timeout the duration before the lock expires automatically
+	 * @return {@code true} if the lock was successfully acquired; {@code false} otherwise
+	 */
 	public boolean acquireLock(String key, String value, Duration timeout) {
 		try {
 			String lockKey = REDIS_LOCK_PREFIX + key;
@@ -39,6 +47,13 @@ public class RedisLockManager {
 		}
 	}
 
+	/**
+	 * Releases a distributed lock in Redis if the provided value matches the current lock value.
+	 *
+	 * @param key   the identifier for the lock
+	 * @param value the expected value of the lock for verification
+	 * @return {@code true} if the lock was successfully released; {@code false} otherwise
+	 */
 	public boolean releaseLock(String key, String value) {
 		try {
 			String lockKey = REDIS_LOCK_PREFIX + key;

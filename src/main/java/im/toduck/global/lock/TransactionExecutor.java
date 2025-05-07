@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransactionExecutor {
 
 	/**
-	 * 새로운 트랜잭션 컨텍스트에서 주어진 작업을 실행합니다.
+	 * Executes the given task within a new transaction context and returns its result.
 	 *
-	 * @param supplier 실행할 작업
-	 * @return 작업 실행 결과
-	 * @param <T> 반환 타입
+	 * @param supplier the task to execute
+	 * @param <T> the type of the result
+	 * @return the result of the executed task
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public <T> T executeInNewTransaction(Supplier<T> supplier) {

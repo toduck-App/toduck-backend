@@ -43,6 +43,14 @@ public class RoutineUseCase {
 	private final RoutineRecordService routineRecordService;
 	private final DistributedLock distributedLock;
 
+	/**
+	 * Creates a new routine for the specified user.
+	 *
+	 * @param userId the ID of the user for whom the routine is created
+	 * @param request the routine creation request containing routine details
+	 * @return the response containing information about the created routine
+	 * @throws CommonException if the user is not found
+	 */
 	@Transactional
 	public RoutineCreateResponse createRoutine(final Long userId, final RoutineCreateRequest request) {
 		User user = userService.getUserById(userId)
@@ -72,6 +80,15 @@ public class RoutineUseCase {
 		);
 	}
 
+	/**
+	 * Retrieves a user's routine records for each day within a specified date range.
+	 *
+	 * @param userId the ID of the user whose routine records are to be retrieved
+	 * @param startDate the start date of the range (inclusive)
+	 * @param endDate the end date of the range (inclusive)
+	 * @return a response containing daily routine data for the specified date range
+	 * @throws CommonException if the user is not found or the date range is invalid
+	 */
 	@Transactional(readOnly = true)
 	public MyRoutineRecordReadMultipleDatesResponse readMyRoutineRecordListMultipleDates(
 		final Long userId,
@@ -96,6 +113,16 @@ public class RoutineUseCase {
 		);
 	}
 
+	/**
+	 * Updates the completion status of a user's routine for a specific date, creating a new record if one does not exist.
+	 *
+	 * Acquires a distributed lock to ensure concurrency safety for the given routine and date. If a record exists for the date, its completion status is updated; otherwise, a new record is created if allowed. Throws an exception if the date is invalid for the routine.
+	 *
+	 * @param userId the ID of the user
+	 * @param routineId the ID of the routine
+	 * @param request contains the target date and completion status
+	 * @throws CommonException if the user or routine is not found, or if the date is invalid for the routine
+	 */
 	@Transactional
 	public void updateRoutineCompletion(
 		final Long userId,
@@ -131,6 +158,14 @@ public class RoutineUseCase {
 		});
 	}
 
+	/**
+	 * Retrieves detailed information for a specific routine belonging to a user.
+	 *
+	 * @param userId the ID of the user
+	 * @param routineId the ID of the routine
+	 * @return a detailed response containing routine information
+	 * @throws CommonException if the user or routine is not found
+	 */
 	@Transactional(readOnly = true)
 	public RoutineDetailResponse readDetail(final Long userId, final Long routineId) {
 		User user = userService.getUserById(userId)
@@ -169,6 +204,17 @@ public class RoutineUseCase {
 		log.info("루틴 수정 성공 - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 	}
 
+	/**
+	 * Deletes a routine for a user, with an option to retain or remove associated routine records.
+	 *
+	 * If {@code keepRecords} is true, removes only incomplete future routine records and preserves historical incomplete records before deleting the routine. If false, deletes all routine records along with the routine.
+	 *
+	 * @param userId the ID of the user
+	 * @param routineId the ID of the routine to delete
+	 * @param keepRecords whether to retain historical routine records
+	 *
+	 * @throws CommonException if the user or routine is not found
+	 */
 	@Transactional
 	public void deleteRoutine(final Long userId, final Long routineId, final boolean keepRecords) {
 		User user = userService.getUserById(userId)
@@ -190,6 +236,16 @@ public class RoutineUseCase {
 		log.info("루틴 삭제 성공(기록 포함 삭제) - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
 	}
 
+	/**
+	 * Deletes an individual routine record for a specific date, ensuring concurrency safety.
+	 *
+	 * If a routine record exists for the given date, it is removed. If not, and the date is valid for the routine, a deleted record is created for that date. The operation is performed within a distributed lock to prevent concurrent modifications for the same routine and date.
+	 *
+	 * @param userId the ID of the user
+	 * @param routineId the ID of the routine
+	 * @param date the date of the routine record to delete
+	 * @throws CommonException if the user or routine is not found, or if the date is invalid for the routine
+	 */
 	@Transactional
 	public void deleteIndividualRoutine(
 		final Long userId,
