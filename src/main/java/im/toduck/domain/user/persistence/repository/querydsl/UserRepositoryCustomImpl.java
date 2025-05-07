@@ -40,6 +40,10 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 		queryFactory.update(qUser)
 			.set(qUser.nickname, (String)null)
 			.set(qUser.imageUrl, (String)null)
+			.set(qUser.phoneNumber, (String)null)
+			.set(qUser.loginId, (String)null)
+			.set(qUser.password, (String)null)
+			.set(qUser.email, (String)null)
 			.set(qUser.deletedAt, LocalDateTime.now())
 			.where(qUser.id.eq(user.getId()))
 			.execute();
