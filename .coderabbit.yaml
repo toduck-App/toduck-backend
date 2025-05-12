@@ -26,7 +26,7 @@ reviews:
     ignore_title_keywords: [ ]
     labels: [ ]
     drafts: false
-    base_branches: [ ]
+    base_branches: [ "develop" ]
 
   tools:
     shellcheck:
@@ -85,7 +85,7 @@ knowledge_base:
   issues:
     scope: auto
   jira:
-    project_keys: [] # 필요한 경우 Jira 프로젝트 키 추가
+    project_keys: [ ] # 필요한 경우 Jira 프로젝트 키 추가
   docs:
     spring_references: # Spring 관련 문서 참조 추가
       enabled: true
