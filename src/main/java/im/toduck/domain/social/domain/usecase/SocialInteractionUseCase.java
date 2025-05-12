@@ -1,7 +1,9 @@
 package im.toduck.domain.social.domain.usecase;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.notification.domain.event.CommentNotificationEvent;
 import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
@@ -32,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class SocialInteractionUseCase {
+	private final ApplicationEventPublisher eventPublisher;
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
 	private final UserService userService;
@@ -52,6 +55,13 @@ public class SocialInteractionUseCase {
 		socialInteractionService.addCommentImageFile(request.imageUrl(), comment);
 
 		log.info("소셜 게시글 댓글 생성 - UserId: {}, SocialBoardId: {}, CommentId: {}", userId, socialId, comment.getId());
+		if (!socialBoard.getUser().getId().equals(userId)) {
+			eventPublisher.publishEvent(
+				CommentNotificationEvent.of(
+					socialBoard.getUser().getId(), user.getNickname(), request.content(), socialId
+				)
+			);
+		}
 		return CommentMapper.toCommentCreateResponse(comment);
 	}
 
