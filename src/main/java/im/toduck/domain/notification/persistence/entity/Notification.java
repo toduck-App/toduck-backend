@@ -1,18 +1,11 @@
 package im.toduck.domain.notification.persistence.entity;
 
-import java.util.Arrays;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-
+import im.toduck.domain.notification.common.converter.NotificationDataConverter;
 import im.toduck.domain.notification.domain.data.NotificationData;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,7 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,9 +53,8 @@ public class Notification extends BaseEntity {
 	@Column(length = 1024)
 	private String actionUrl;
 
-	@JdbcTypeCode(SqlTypes.JSON)
+	@Convert(converter = NotificationDataConverter.class)
 	@Column(name = "data", columnDefinition = "json")
-	@Getter(AccessLevel.NONE)
 	private NotificationData data;
 
 	@Column(nullable = false)
@@ -74,25 +65,6 @@ public class Notification extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean isSent;
-
-	private static final ObjectMapper objectMapper;
-
-	static {
-		objectMapper = new ObjectMapper();
-
-		Arrays.stream(NotificationType.values()).forEach(type -> {
-			Class<? extends NotificationData> dataClass = type.getDataClass();
-			if (dataClass != null) {
-				objectMapper.registerSubtypes(new NamedType(dataClass, type.name()));
-			}
-		});
-
-		objectMapper.activateDefaultTyping(
-			objectMapper.getPolymorphicTypeValidator(),
-			ObjectMapper.DefaultTyping.NON_FINAL,
-			JsonTypeInfo.As.PROPERTY
-		);
-	}
 
 	@Builder
 	private Notification(
@@ -125,21 +97,5 @@ public class Notification extends BaseEntity {
 
 	public void markAsSent() {
 		this.isSent = true;
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T extends NotificationData> T getTypedData() {
-		if (data == null) {
-			return null;
-		}
-
-		Class<? extends NotificationData> dataClass = type.getDataClass();
-		if (dataClass.isInstance(data)) {
-			return (T)data;
-		}
-
-		throw new ClassCastException(
-			"NotificationType " + type + "에 맞는 데이터 타입으로 변환할 수 없습니다. 실제 타입: " + data.getClass().getName()
-		);
 	}
 }

@@ -2,9 +2,10 @@ package im.toduck.domain.notification.presentation.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import im.toduck.domain.notification.persistence.entity.NotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,8 +36,9 @@ public record NotificationDto(
 	@Schema(description = "읽음 여부", example = "false")
 	Boolean isRead,
 
-	@Schema(description = "생성 시간", example = "2025-05-08T12:30:45")
-	@JsonSerialize(using = LocalTimeSerializer.class)
+	@Schema(description = "생성 시간", example = "2025-05-08 12:30:45")
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm")
 	LocalDateTime createdAt
 ) {
 }

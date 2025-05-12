@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class NotificationMapper {
 
 	public static NotificationDto toNotificationDto(final Notification notification) {
-		NotificationData data = notification.getTypedData();
+		NotificationData data = notification.getData();
 
 		return NotificationDto.builder()
 			.id(notification.getId())
