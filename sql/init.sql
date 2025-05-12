@@ -320,3 +320,52 @@ CREATE TABLE account_deletion_log
     created_at  DATETIME                                                                                    NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+CREATE TABLE device_token (
+                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                              user_id BIGINT NOT NULL,
+                              token VARCHAR(512) NOT NULL,
+                              device_type ENUM('IOS') NOT NULL,
+                              created_at DATETIME NOT NULL,
+                              updated_at DATETIME NOT NULL,
+                              deleted_at DATETIME DEFAULT NULL,
+                              FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE notification_setting (
+                                      id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                      user_id BIGINT NOT NULL,
+                                      all_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      notification_method ENUM('SOUND_ONLY', 'VIBRATION_ONLY') NOT NULL DEFAULT 'SOUND_ONLY',
+                                      notice_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      home_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      concentration_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      diary_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      social_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      created_at DATETIME NOT NULL,
+                                      updated_at DATETIME NOT NULL,
+                                      deleted_at DATETIME DEFAULT NULL,
+                                      FOREIGN KEY (user_id) REFERENCES users (id),
+                                      UNIQUE KEY notification_setting_user_id_unique (user_id)
+);
+
+CREATE TABLE notification (
+                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                              user_id BIGINT NOT NULL,
+                              type ENUM('COMMENT', 'REPLY', 'REPLY_ON_MY_POST', 'LIKE_POST', 'LIKE_COMMENT', 'FOLLOW',
+             'SCHEDULE_REMINDER', 'ROUTINE_REMINDER', 'DIARY_REMINDER', 'INACTIVITY_REMINDER',
+             'ROUTINE_SHARE_MILESTONE') NOT NULL,
+                              in_app_title VARCHAR(100) NOT NULL,
+                              in_app_body VARCHAR(500) NOT NULL,
+                              push_title VARCHAR(100) NOT NULL,
+                              push_body VARCHAR(500) NOT NULL,
+                              action_url VARCHAR(1024) DEFAULT NULL,
+                              data JSON DEFAULT NULL,
+                              is_read BOOLEAN NOT NULL DEFAULT FALSE,
+                              is_in_app_shown BOOLEAN NOT NULL DEFAULT FALSE,
+                              is_sent BOOLEAN NOT NULL DEFAULT FALSE,
+                              created_at DATETIME NOT NULL,
+                              updated_at DATETIME NOT NULL,
+                              deleted_at DATETIME DEFAULT NULL,
+                              FOREIGN KEY (user_id) REFERENCES users (id)
+);

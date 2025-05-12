@@ -20,3 +20,5 @@ oauth2:
       kakao:
         jwks-uri: ${OIDC_KAKAO_JWKS_URI}
         secret: ${OIDC_KAKAO_SECRET_KEY}
+firebase:
+  config-path: serviceAccountKey.json
