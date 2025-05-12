@@ -13,8 +13,8 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
     open-in-view: false
 
 decorator:
