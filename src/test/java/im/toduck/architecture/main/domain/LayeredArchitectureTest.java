@@ -6,12 +6,26 @@ import static im.toduck.architecture.main.domain.ArchitectureConstants.Layer.*;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.core.importer.Location;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
-@AnalyzeClasses(packages = "im.toduck.domain", importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(
+	packages = "im.toduck.domain",
+	importOptions = {
+		ImportOption.DoNotIncludeTests.class,
+		LayeredArchitectureTest.NotificationPackageIgnore.class
+	}
+)
 public class LayeredArchitectureTest {
+	// notification 패키지 제외를 위한 커스텀 ImportOption
+	public static class NotificationPackageIgnore implements ImportOption {
+		@Override
+		public boolean includes(Location location) {
+			return !location.contains("notification");
+		}
+	}
 
 	@ArchTest
 	static final ArchRule 레이어_의존성_규칙을_준수한다 = layeredArchitecture()

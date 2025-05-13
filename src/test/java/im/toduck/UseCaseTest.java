@@ -6,12 +6,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import im.toduck.builder.BuilderSupporter;
 import im.toduck.builder.TestFixtureBuilder;
 import im.toduck.domain.auth.common.helper.OAuthOidcHelper;
 import im.toduck.domain.auth.domain.service.JwtService;
 import im.toduck.domain.auth.domain.service.NickNameGenerateService;
 import im.toduck.domain.user.domain.service.UserService;
+import im.toduck.infra.push.FirebaseConfig;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -31,4 +34,10 @@ public abstract class UseCaseTest {
 
 	@MockBean
 	protected NickNameGenerateService nickNameGenerateService;
+
+	@MockBean
+	private FirebaseMessaging firebaseMessaging;
+
+	@MockBean
+	private FirebaseConfig firebaseConfig;
 }

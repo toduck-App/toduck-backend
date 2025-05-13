@@ -120,6 +120,9 @@ public enum ExceptionCode {
 	EXCEED_ROUTINE_DATE_RANGE(HttpStatus.BAD_REQUEST, 43204, "기간 범위가 유효하지 않거나, 최대 조회 범위를 초과했습니다.",
 		"루틴 범위 조회는 14일로 제한됩니다."),
 
+	/* 407xx */
+	NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND, 40701, "해당 알림을 찾을 수 없습니다."),
+
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),
 	METHOD_FORBIDDEN(HttpStatus.METHOD_NOT_ALLOWED, 49902, "지원하지 않는 HTTP 메서드를 사용합니다."),

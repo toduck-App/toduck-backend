@@ -6,13 +6,17 @@ import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataR
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTypeExcludeFilter;
 import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import im.toduck.builder.BuilderSupporter;
 import im.toduck.builder.TestFixtureBuilder;
 import im.toduck.global.config.querydsl.QueryDslConfig;
+import im.toduck.infra.push.FirebaseConfig;
 
 /**
  * 이 추상 클래스는 JPA와 Redis 기능을 모두 필요로 하는 리포지토리 테스트를 위한 기본 구성을 제공합니다.
@@ -44,4 +48,10 @@ public abstract class RepositoryTest {
 
 	@Autowired
 	protected TestFixtureBuilder testFixtureBuilder;
+
+	@MockBean
+	private FirebaseMessaging firebaseMessaging;
+
+	@MockBean
+	private FirebaseConfig firebaseConfig;
 }

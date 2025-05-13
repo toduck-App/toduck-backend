@@ -13,8 +13,8 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
     open-in-view: false
 
 decorator:
@@ -47,4 +47,5 @@ oauth2:
       kakao:
         jwks-uri: ${OIDC_KAKAO_JWKS_URI}
         secret: ${OIDC_KAKAO_SECRET_KEY}
-
+firebase:
+  config-path: serviceAccountKey.json

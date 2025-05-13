@@ -93,6 +93,9 @@ dependencies {
     /* CoolSMS */
     implementation 'net.nurigo:sdk:4.3.0'
 
+    /* FCM */
+    implementation 'com.google.firebase:firebase-admin:9.4.3'
+
     /* Feign */
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
@@ -155,7 +158,7 @@ checkstyleMain.source = fileTree('src/main/java')
 // submodule 에서 민감정보 이동
 tasks.register('copyPrivate', Copy) {
     from 'toduck-backend-private'
-    include "*.properties"
+    include "*.properties", "*.json"
     into 'src/main/resources'
 }
 processResources.dependsOn('copyPrivate')

@@ -44,6 +44,7 @@ out/
 
 ### application*.properties ###
 src/main/resources/*.properties
+src/main/resources/*.json
 
 ### docker ###
 docker-infra/*
