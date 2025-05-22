@@ -1,8 +1,14 @@
 package im.toduck.domain.notification.domain.event;
 
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import im.toduck.domain.notification.domain.data.NotificationData;
 import im.toduck.domain.notification.persistence.entity.NotificationType;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * 알림 이벤트의 기본 추상 클래스.
@@ -11,21 +17,23 @@ import lombok.Getter;
  * @param <T> 알림에 필요한 추가 데이터 타입 (NotificationData 상속)
  */
 @Getter
-public abstract class NotificationEvent<T extends NotificationData> {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class NotificationEvent<T extends NotificationData> implements Serializable {
 	/**
 	 * 알림을 받을 사용자의 ID
 	 */
-	private final Long userId;
+	private Long userId;
 
 	/**
 	 * 알림의 유형
 	 */
-	private final NotificationType type;
+	private NotificationType type;
 
 	/**
 	 * 알림 유형별 구체적인 데이터
 	 */
-	private final T data;
+	private T data;
 
 	/**
 	 * 알림 이벤트 생성자
