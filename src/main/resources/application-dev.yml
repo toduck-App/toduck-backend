@@ -2,12 +2,12 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://toduck_mysql/toduck?allowPublicKeyRetrieval=true&useSSL=false
-    username: user
-    password: abcd1234@
+    username: ${DEV_MYSQL_USERNAME}
+    password: ${DEV_MYSQL_PASSWORD}
   data.redis:
     host: todcuk_redis
     port: 6379
-    password: abcd1234@
+    password: ${DEV_REDIS_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none
@@ -19,8 +19,8 @@ spring:
   rabbitmq:
     host: toduck_rabbitmq
     port: 5672
-    username: ${RABBITMQ_USER}
-    password: ${RABBITMQ_PASSWORD}
+    username: ${DEV_RABBITMQ_USER}
+    password: ${DEV_RABBITMQ_PASSWORD}
     listener:
       simple:
         concurrency: 3
