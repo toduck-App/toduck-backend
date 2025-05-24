@@ -58,7 +58,7 @@ public class SocialInteractionUseCase {
 		if (!socialBoard.getUser().getId().equals(userId)) {
 			eventPublisher.publishEvent(
 				CommentNotificationEvent.of(
-					socialBoard.getUser().getId(), user.getNickname(), request.content(), socialId
+					socialBoard.getUser().getId(), user.getId(), user.getNickname(), request.content(), socialId
 				)
 			);
 		}

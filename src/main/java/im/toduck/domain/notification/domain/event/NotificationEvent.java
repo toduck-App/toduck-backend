@@ -1,7 +1,11 @@
 package im.toduck.domain.notification.domain.event;
 
 import java.io.Serializable;
+import java.util.Optional;
 
+import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import im.toduck.domain.notification.domain.data.NotificationData;
@@ -26,6 +30,17 @@ public abstract class NotificationEvent<T extends NotificationData> implements S
 	private Long userId;
 
 	/**
+	 * 알림 전송을 트리거하는 사용자의 ID, 전송자가 없는 경우 null
+	 */
+	@Nullable
+	private Long senderId;
+
+	@JsonIgnore
+	public Optional<Long> getOptionalSenderId() {
+		return Optional.ofNullable(senderId);
+	}
+
+	/**
 	 * 알림의 유형
 	 */
 	private NotificationType type;
@@ -44,6 +59,22 @@ public abstract class NotificationEvent<T extends NotificationData> implements S
 	 */
 	protected NotificationEvent(final Long userId, final NotificationType type, final T data) {
 		this.userId = userId;
+		this.senderId = null;
+		this.type = type;
+		this.data = data;
+	}
+
+	/**
+	 * 알림 이벤트 생성자
+	 *
+	 * @param userId 알림을 받을 사용자의 ID
+	 * @param senderId 알림을 받을 사용자의 ID
+	 * @param type 알림 유형
+	 * @param data 알림 관련 추가 데이터
+	 */
+	protected NotificationEvent(final Long userId, final Long senderId, final NotificationType type, final T data) {
+		this.userId = userId;
+		this.senderId = senderId;
 		this.type = type;
 		this.data = data;
 	}

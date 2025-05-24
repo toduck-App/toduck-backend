@@ -18,6 +18,12 @@ public record NotificationDto(
 	@Schema(description = "알림 ID", example = "1")
 	Long id,
 
+	@Schema(description = "발신자 사용자 ID (시스템 발신시 null)", example = "123")
+	Long senderId,
+
+	@Schema(description = "발신자 프로필 이미지 URL (시스템 발신시 null)", example = "https://example.com/profile.jpg")
+	String senderImageUrl,
+
 	@Schema(description = "알림 타입", example = "COMMENT")
 	NotificationType type,
 

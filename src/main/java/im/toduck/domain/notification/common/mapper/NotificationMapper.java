@@ -21,6 +21,8 @@ public class NotificationMapper {
 
 		return NotificationDto.builder()
 			.id(notification.getId())
+			.senderId(notification.getSenderId())
+			.senderImageUrl(notification.getSenderProfileImageUrl())
 			.type(notification.getType())
 			.title(notification.getInAppTitle())
 			.body(notification.getInAppBody())
@@ -55,12 +57,14 @@ public class NotificationMapper {
 
 	public static <T extends NotificationData> Notification toNotification(
 		final User user,
+		final User sender,
 		final NotificationEvent<T> event
 	) {
 		boolean isInAppShown = event.getType().isDefaultInAppShown();
 
 		return Notification.builder()
 			.user(user)
+			.sender(sender)
 			.type(event.getType())
 			.inAppTitle(event.getInAppTitle())
 			.inAppBody(event.getInAppBody())
