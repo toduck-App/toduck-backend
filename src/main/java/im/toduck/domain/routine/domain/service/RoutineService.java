@@ -1,17 +1,25 @@
 package im.toduck.domain.routine.domain.service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.routine.common.dto.DailyRoutineData;
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +40,56 @@ public class RoutineService {
 		);
 	}
 
+	@Transactional(readOnly = true)
 	public List<Routine> getUnrecordedRoutinesForDate(
 		final User user,
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
 	) {
-		// TODO: 여기에선 삭제되면 조회되면 안됨, 근데 삭제 시점 미래 기준으로는 조회가 안되는거고 과거 시점이면 조회가 되어야함
-		return routineRepository.findUnrecordedRoutinesForDate(user, date, routineRecords);
+		return routineRepository.findUnrecordedRoutinesByDateMatchingDayOfWeek(user, date, routineRecords);
+	}
+
+	@Transactional(readOnly = true)
+	public List<DailyRoutineData> getRoutineDataByDateRange(
+		final User user,
+		final LocalDate startDate,
+		final LocalDate endDate,
+		final List<RoutineRecord> routineRecords
+	) {
+		List<Routine> periodRoutines = routineRepository.findRoutinesByDateBetween(
+			user, startDate, endDate
+		);
+
+		Map<LocalDate, List<RoutineRecord>> recordsByDate = routineRecords.stream()
+			.collect(Collectors.groupingBy(record -> record.getRecordAt().toLocalDate()));
+
+		List<DailyRoutineData> result = new ArrayList<>();
+		LocalDate currentDate = startDate;
+
+		while (!currentDate.isAfter(endDate)) {
+			final LocalDate date = currentDate;
+
+			List<RoutineRecord> dateRoutineRecords = recordsByDate.getOrDefault(date, Collections.emptyList());
+
+			Set<Long> recordedRoutineIds = dateRoutineRecords.stream()
+				.map(record -> record.getRoutine().getId())
+				.collect(Collectors.toSet());
+
+			List<Routine> dateUnrecordedRoutines = periodRoutines.stream()
+				.filter(routine -> !recordedRoutineIds.contains(routine.getId()))
+				.filter(routine -> routine.getDaysOfWeekBitmask().includesDayOf(date))
+				.filter(routine -> !routine.getScheduleModifiedAt().isAfter(date.atTime(LocalTime.MAX)))
+				.toList();
+
+			List<RoutineRecord> activeDateRoutineRecords = dateRoutineRecords.stream()
+				.filter(record -> !record.isInDeletedState())
+				.toList();
+
+			result.add(DailyRoutineData.of(date, dateUnrecordedRoutines, activeDateRoutineRecords));
+			currentDate = currentDate.plusDays(1);
+		}
+
+		return result;
 	}
 
 	public Optional<Routine> getUserRoutine(final User user, final Long id) {
@@ -67,6 +118,12 @@ public class RoutineService {
 	}
 
 	@Transactional
+	public void updateFields(final Routine routine, final RoutineUpdateRequest request) {
+		routine.updateFromRequest(request);
+		routineRepository.save(routine);
+	}
+
+	@Transactional
 	public void remove(final Routine routine) {
 		routine.delete();
 		routineRepository.save(routine);
@@ -80,5 +137,14 @@ public class RoutineService {
 	@Transactional(readOnly = true)
 	public int getTotalRoutineShareCount(final User user) {
 		return routineRepository.sumRoutineSharedCountByUser(user);
+	}
+
+	@Transactional
+	public void deleteAllUnsharedRoutinesByUser(final User user) {
+		routineRepository.deleteAllUnsharedRoutinesByUser(user);
+	}
+
+	public List<Routine> findAllUnsharedRoutineByUser(User user) {
+		return routineRepository.findAllUnsharedRoutinesByUser(user);
 	}
 }

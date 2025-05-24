@@ -27,8 +27,9 @@ public record RoutineCreateRequest(
 	@Schema(description = "루틴 제목", example = "아침 운동")
 	String title,
 
-	@Schema(description = "루틴 카테고리 (카테고리 없으면 null)", example = "EXERCISE")
-	PlanCategory category, // TODO: 확정 필요
+	@NotNull(message = "카테고리는 비어있을 수 없습니다. (지정하지 않으려면 NONE)")
+	@Schema(description = "루틴 카테고리", example = "COMPUTER")
+	PlanCategory category,
 
 	@Schema(description = "루틴 색상 (색상 없으면 null)", example = "#FF5733")
 	@Pattern(regexp = HEX_COLOR_CODE_REGEX, message = "색상은 유효한 Hex code 여야 합니다.")

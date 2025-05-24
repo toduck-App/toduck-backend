@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.TimePath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import im.toduck.domain.routine.persistence.entity.QRoutine;
@@ -26,7 +25,7 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 	private final QRoutine qRoutine = QRoutine.routine;
 
 	@Override
-	public List<Routine> findUnrecordedRoutinesForDate(
+	public List<Routine> findUnrecordedRoutinesByDateMatchingDayOfWeek(
 		final User user,
 		final LocalDate date,
 		final List<RoutineRecord> routineRecords
@@ -35,10 +34,28 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			.selectFrom(qRoutine)
 			.where(
 				qRoutine.user.eq(user),
-				routineCreatedOnOrBeforeDate(date),
+				scheduleModifiedOnOrBeforeDate(date),
 				routineNotRecorded(routineRecords),
 				routineMatchesDate(date),
-				routineNotDeletedOrDeletedAfterDate(qRoutine.time, date))
+				routineNotDeleted()
+			)
+			.fetch();
+	}
+
+	@Override
+	public List<Routine> findRoutinesByDateBetween(
+		final User user,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		return queryFactory
+			.selectFrom(qRoutine)
+			.where(
+				qRoutine.user.eq(user),
+				routineNotDeleted(),
+				scheduleModifiedOnOrBeforeDate(endDate),
+				routineMatchesDateRange(startDate, endDate)
+			)
 			.fetch();
 	}
 
@@ -60,38 +77,51 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			.from(qRoutine)
 			.where(
 				qRoutine.eq(routine),
-				routineCreatedOnOrBeforeDate(date),
+				scheduleModifiedOnOrBeforeDate(date),
 				routineMatchesDate(date),
-				routineNotDeletedOrDeletedAfterDate(qRoutine.time, date)
+				routineNotDeleted()
 			)
 			.fetchFirst();
 
 		return fetchOne != null;
 	}
 
-	private BooleanExpression routineNotDeletedOrDeletedAfterDate(
-		final TimePath<LocalTime> timePath,
-		final LocalDate date
-	) {
-		return qRoutine.deletedAt.isNull().or(
-			Expressions.booleanTemplate(
-				"cast(concat({0}, ' ', cast({1} as time)) as timestamp) < {2}",
-				date,
-				timePath,
-				qRoutine.deletedAt
+	@Override
+	public void deleteAllUnsharedRoutinesByUser(User user) {
+		queryFactory.update(qRoutine)
+			.set(qRoutine.deletedAt, LocalDateTime.now())
+			.where(
+				qRoutine.user.eq(user)
+					.and(qRoutine.sharedCount.eq(0))
 			)
-		);
+			.execute();
 	}
 
-	private BooleanExpression routineCreatedOnOrBeforeDate(final LocalDate date) {
+	private BooleanExpression routineNotDeleted() {
+		return qRoutine.deletedAt.isNull();
+	}
+
+	private BooleanExpression scheduleModifiedOnOrBeforeDate(final LocalDate date) {
 		LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-		return qRoutine.createdAt.loe(endOfDay);
+		return qRoutine.scheduleModifiedAt.loe(endOfDay);
 	}
 
 	private BooleanExpression routineMatchesDate(final LocalDate date) {
 		byte dayBitmask = DaysOfWeekBitmask.getDayBitmask(date.getDayOfWeek());
+
 		return Expressions.numberTemplate(
 			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, dayBitmask
+		).gt((byte)0);
+	}
+
+	/**
+	 * 루틴의 요일이 시작일부터 종료일까지의 기간 내 요일과 일치하는지 확인하는 조건
+	 */
+	private BooleanExpression routineMatchesDateRange(final LocalDate startDate, final LocalDate endDate) {
+		byte periodDaysBitmask = DaysOfWeekBitmask.getDaysOfWeekBitmaskValueInRange(startDate, endDate);
+
+		return Expressions.numberTemplate(
+			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, periodDaysBitmask
 		).gt((byte)0);
 	}
 }

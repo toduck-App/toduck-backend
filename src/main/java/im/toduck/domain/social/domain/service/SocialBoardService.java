@@ -92,6 +92,12 @@ public class SocialBoardService {
 	}
 
 	@Transactional
+	public void deleteAllSocialBoardsByUser(User user) {
+		List<Social> socials = socialRepository.findAllByUser(user);
+		socials.forEach(this::deleteSocialBoard);
+	}
+
+	@Transactional
 	public void updateSocialBoard(
 		final User user,
 		final Social socialBoard,

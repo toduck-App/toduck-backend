@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "report")
+@Table(name = "social_report")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Report extends BaseEntity {
+public class SocialReport extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +42,7 @@ public class Report extends BaseEntity {
 	private String reason;
 
 	@Builder
-	public Report(User user, Social social, ReportType reportType, String reason) {
+	public SocialReport(User user, Social social, ReportType reportType, String reason) {
 		this.user = user;
 		this.social = social;
 		this.reportType = reportType;

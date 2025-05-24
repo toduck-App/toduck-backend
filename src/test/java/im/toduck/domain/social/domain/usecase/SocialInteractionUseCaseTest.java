@@ -36,6 +36,7 @@ import im.toduck.domain.social.presentation.dto.response.CommentLikeCreateRespon
 import im.toduck.domain.social.presentation.dto.response.ReportCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialLikeCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.domain.user.persistence.repository.BlockRepository;
 import im.toduck.fixtures.social.CommentFixtures;
 import im.toduck.fixtures.user.UserFixtures;
 import im.toduck.global.exception.CommonException;
@@ -65,6 +66,9 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private CommentImageFileRepository commentImageFileRepository;
+
+	@Autowired
+	private BlockRepository blockRepository;
 
 	@BeforeEach
 	public void setUp() {
@@ -431,7 +435,11 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		@Test
 		void 게시글을_성공적으로_신고한다() {
 			// given
-			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.OTHER,
+				"부적절한 내용입니다.",
+				true
+			);
 
 			// when
 			ReportCreateResponse response = socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(),
@@ -446,10 +454,15 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			// given
 			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(USER, true));
 
-			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.OTHER,
+				"부적절한 내용입니다.",
+				true
+			);
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request))
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.CANNOT_REPORT_OWN_POST.getMessage());
 		}
@@ -457,11 +470,16 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		@Test
 		void 이미_신고된_게시글을_다시_신고하면_예외가_발생한다() {
 			// given
-			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.OTHER,
+				"부적절한 내용입니다.",
+				true
+			);
 			socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request);
 
 			// when & then
-			assertThatThrownBy(() -> socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request))
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.reportSocial(USER.getId(), SOCIAL_BOARD.getId(), request))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.ALREADY_REPORTED.getMessage());
 		}
@@ -470,7 +488,11 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 		void 존재하지_않는_게시글을_신고하면_예외가_발생한다() {
 			// given
 			Long nonExistentSocialId = -1L;
-			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.OTHER,
+				"부적절한 내용입니다.",
+				true
+			);
 
 			// when & then
 			assertThatThrownBy(() -> socialInteractionUseCase.reportSocial(USER.getId(), nonExistentSocialId, request))
@@ -485,7 +507,11 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			testFixtureBuilder.buildBlock(BLOCK_USER(USER, BLOCK_USER));
 			Social BLOCKED_USER_SOCIAL = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(BLOCK_USER, false));
 
-			ReportCreateRequest request = new ReportCreateRequest(ReportType.OTHER, "부적절한 내용입니다.", true);
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.OTHER,
+				"부적절한 내용입니다.",
+				true
+			);
 
 			// when
 			ReportCreateResponse response =
@@ -619,6 +645,127 @@ public class SocialInteractionUseCaseTest extends ServiceTest {
 			assertThatThrownBy(() -> socialInteractionUseCase.deleteCommentLike(nonExistentUserId, COMMENT.getId()))
 				.isInstanceOf(CommonException.class)
 				.hasMessage(ExceptionCode.NOT_FOUND_USER.getMessage());
+		}
+	}
+
+	@Nested
+	class ReportCommentTest {
+
+		User COMMENT_AUTHOR;
+		Social SOCIAL_BOARD;
+		Comment COMMENT;
+
+		@BeforeEach
+		void setUp() {
+			COMMENT_AUTHOR = testFixtureBuilder.buildUser(GENERAL_USER());
+			SOCIAL_BOARD = testFixtureBuilder.buildSocial(SINGLE_SOCIAL(COMMENT_AUTHOR, false));
+			COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(COMMENT_AUTHOR, SOCIAL_BOARD));
+		}
+
+		@Test
+		void 댓글을_성공적으로_신고한다() {
+			// given
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.INAPPROPRIATE_CONTENT,
+				"욕설이 포함되어 있습니다.",
+				true
+			);
+
+			// when
+			ReportCreateResponse response = socialInteractionUseCase.reportComment(USER.getId(), COMMENT.getId(),
+				request);
+
+			// then
+			assertThat(response.reportId()).isNotNull();
+		}
+
+		@Test
+		void 자신의_댓글을_신고하려고_하면_예외를_발생시킨다() {
+			// given
+			Comment MY_COMMENT = testFixtureBuilder.buildComment(SINGLE_COMMENT(USER, SOCIAL_BOARD));
+
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.INAPPROPRIATE_CONTENT,
+				null,
+				false
+			);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.reportComment(USER.getId(), MY_COMMENT.getId(), request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.CANNOT_REPORT_OWN_COMMENT.getMessage());
+		}
+
+		@Test
+		void 이미_신고된_댓글을_다시_신고하면_예외가_발생한다() {
+			// given
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.PRIVACY_RISK,
+				null,
+				false
+			);
+			socialInteractionUseCase.reportComment(USER.getId(), COMMENT.getId(), request);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.reportComment(USER.getId(), COMMENT.getId(), request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.ALREADY_REPORTED_COMMENT.getMessage());
+		}
+
+		@Test
+		void 존재하지_않는_댓글을_신고하면_예외가_발생한다() {
+			// given
+			Long nonExistentCommentId = -1L;
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.COMMERCIAL_ADVERTISEMENT,
+				null,
+				true
+			);
+
+			// when & then
+			assertThatThrownBy(
+				() -> socialInteractionUseCase.reportComment(USER.getId(), nonExistentCommentId, request))
+				.isInstanceOf(CommonException.class)
+				.hasMessage(ExceptionCode.NOT_FOUND_COMMENT.getMessage());
+		}
+
+		@Test
+		void 댓글_작성자_차단을_요청하면_작성자가_차단된다() {
+			// given
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.NOT_RELATED_TO_SERVICE,
+				null,
+				true  // blockAuthor = true
+			);
+
+			// when
+			ReportCreateResponse response = socialInteractionUseCase.reportComment(USER.getId(), COMMENT.getId(),
+				request);
+
+			// then
+			assertThat(response.reportId()).isNotNull();
+			assertThat(blockRepository.existsByBlockerAndBlocked(USER, COMMENT_AUTHOR)).isTrue();
+		}
+
+		@Test
+		void 댓글_작성자가_이미_차단된_경우_예외를_발생시키지_않는다() {
+			// given
+			testFixtureBuilder.buildBlock(BLOCK_USER(USER, COMMENT_AUTHOR));
+
+			ReportCreateRequest request = new ReportCreateRequest(
+				ReportType.INAPPROPRIATE_CONTENT,
+				null,
+				true
+			);
+
+			// when
+			ReportCreateResponse response =
+				socialInteractionUseCase.reportComment(USER.getId(), COMMENT.getId(), request);
+
+			// then
+			assertThat(response.reportId()).isNotNull();
 		}
 	}
 

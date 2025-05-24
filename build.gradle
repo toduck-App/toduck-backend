@@ -50,6 +50,7 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:3.3.1'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.1'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
     /* Lombok */
     compileOnly 'org.projectlombok:lombok:1.18.32'
@@ -92,6 +93,9 @@ dependencies {
 
     /* CoolSMS */
     implementation 'net.nurigo:sdk:4.3.0'
+
+    /* FCM */
+    implementation 'com.google.firebase:firebase-admin:9.4.3'
 
     /* Feign */
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
@@ -155,7 +159,7 @@ checkstyleMain.source = fileTree('src/main/java')
 // submodule 에서 민감정보 이동
 tasks.register('copyPrivate', Copy) {
     from 'toduck-backend-private'
-    include "*.properties"
+    include "*.properties", "*.json"
     into 'src/main/resources'
 }
 processResources.dependsOn('copyPrivate')

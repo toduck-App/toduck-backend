@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import im.toduck.domain.diary.persistence.entity.Diary;
+import im.toduck.domain.user.persistence.entity.User;
 import jakarta.validation.constraints.NotNull;
 
 @Repository
@@ -16,4 +17,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 	Diary findByUserIdAndDate(Long userId, @NotNull(message = "날짜는 비어있을 수 없습니다.") LocalDate date);
 
 	int countByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+
+	List<Diary> findAllByUser(User user);
 }

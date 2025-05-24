@@ -22,8 +22,7 @@ CREATE TABLE routine
 (
     id               BIGINT PRIMARY KEY auto_increment,
     user_id          BIGINT                                              NOT NULL,
--- TODO: 8. routine 의 이모지 필드 enum 값 필요
-    category         ENUM ('STUDY', 'EXERCISE', 'FOOD', 'SLEEP', 'PLAY') NULL,
+    category     ENUM ('COMPUTER', 'FOOD', 'PENCIL', 'RED_BOOK', 'YELLOW_BOOK', 'SLEEP', 'POWER', 'PEOPLE', 'MEDICINE', 'TALK', 'HEART', 'VEHICLE', 'NONE') DEFAULT NULL,
 -- TODO: 4. routine 테이블의 color enum 값 필요
     color            VARCHAR(10)                                         NULL,
     time             TIME                                                NULL,
@@ -32,6 +31,7 @@ CREATE TABLE routine
     is_public        BOOLEAN                                             NOT NULL,
     reminder_minutes INT UNSIGNED                                        NULL,
     memo             TEXT                                                NULL,
+    schedule_modified_at DATETIME                                        NOT NULL,
     shared_count     INT UNSIGNED       DEFAULT 0                        NOT NULL,
     created_at       DATETIME                                            NOT NULL,
     updated_at       DATETIME                                            NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE social
     user_id      BIGINT       NOT NULL,
     routine_id   BIGINT       NULL,
     title        VARCHAR(100) NULL,
-    content      VARCHAR(255) NOT NULL,
+    content      VARCHAR(500) NOT NULL,
     is_anonymous BOOLEAN      NOT NULL,
     like_count   int          NOT NULL DEFAULT 0,
     created_at   DATETIME     NOT NULL,
@@ -163,7 +163,7 @@ CREATE TABLE schedule
     is_all_day   BOOLEAN      NOT NULL,
     time         TIME                                                                                                                                       DEFAULT NULL,
     days_of_week TINYINT                                                                                                                                    DEFAULT NULL,
-    alarm        ENUM ('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY')                                                                                                 DEFAULT NULL,
+    alarm        ENUM ('TEN_MINUTE', 'ONE_HOUR', 'THIRTY_MINUTE')                                                                                                 DEFAULT NULL,
     location     VARCHAR(255)                                                                                                                               DEFAULT NULL,
     memo         VARCHAR(255)                                                                                                                               DEFAULT NULL,
     user_id      BIGINT       NOT NULL,
@@ -229,7 +229,8 @@ VALUES ('CONCENTRATION', NOW(), NOW()),
        ('MEMORY', NOW(), NOW()),
        ('IMPULSE', NOW(), NOW()),
        ('ANXIETY', NOW(), NOW()),
-       ('SLEEP', NOW(), NOW());
+       ('SLEEP', NOW(), NOW()),
+       ('GENERAL', NOW(), NOW());
 
 CREATE TABLE block
 (
@@ -243,7 +244,7 @@ CREATE TABLE block
     FOREIGN KEY (blocked_id) REFERENCES users (id)
 );
 
-CREATE TABLE report
+CREATE TABLE social_report
 (
     id          BIGINT PRIMARY KEY auto_increment,
     user_id     BIGINT                                                                                                        NOT NULL,
@@ -255,6 +256,20 @@ CREATE TABLE report
     deleted_at  DATETIME                                                                                                      NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (social_id) REFERENCES social (id)
+);
+
+CREATE TABLE comment_report
+(
+    id           BIGINT PRIMARY KEY auto_increment,
+    user_id      BIGINT                                                                                                        NOT NULL,
+    comment_id   BIGINT                                                                                                        NOT NULL,
+    report_type  ENUM ('NOT_RELATED_TO_SERVICE', 'PRIVACY_RISK', 'COMMERCIAL_ADVERTISEMENT', 'INAPPROPRIATE_CONTENT', 'OTHER') NOT NULL,
+    reason       VARCHAR(255)                                                                                                  NULL,
+    created_at   DATETIME                                                                                                      NOT NULL,
+    updated_at   DATETIME                                                                                                      NOT NULL,
+    deleted_at   DATETIME                                                                                                      NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (comment_id) REFERENCES comment (id)
 );
 
 CREATE TABLE diary
@@ -294,4 +309,64 @@ CREATE TABLE concentration
     updated_at          DATETIME                            NOT NULL,
     deleted_at          DATETIME                            NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE account_deletion_log
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    user_id     BIGINT                                                                                      NOT NULL,
+    reason_code ENUM ('HARD_TO_USE', 'NO_FEATURES', 'MANY_ERRORS', 'BETTER_APP', 'SWITCH_ACCOUNT', 'OTHER') NOT NULL,
+    reason_text VARCHAR(130)                                                                                NOT NULL,
+    created_at  DATETIME                                                                                    NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE device_token (
+                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                              user_id BIGINT NOT NULL,
+                              token VARCHAR(512) NOT NULL,
+                              device_type ENUM('IOS') NOT NULL,
+                              created_at DATETIME NOT NULL,
+                              updated_at DATETIME NOT NULL,
+                              deleted_at DATETIME DEFAULT NULL,
+                              FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE notification_setting (
+                                      id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                      user_id BIGINT NOT NULL,
+                                      all_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      notification_method ENUM('SOUND_ONLY', 'VIBRATION_ONLY') NOT NULL DEFAULT 'SOUND_ONLY',
+                                      notice_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      home_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      concentration_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      diary_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      social_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                                      created_at DATETIME NOT NULL,
+                                      updated_at DATETIME NOT NULL,
+                                      deleted_at DATETIME DEFAULT NULL,
+                                      FOREIGN KEY (user_id) REFERENCES users (id),
+                                      UNIQUE KEY notification_setting_user_id_unique (user_id)
+);
+
+CREATE TABLE notification (
+                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                              user_id BIGINT NOT NULL,
+                              sender_id BIGINT DEFAULT NULL,
+                              type ENUM('COMMENT', 'REPLY', 'REPLY_ON_MY_POST', 'LIKE_POST', 'LIKE_COMMENT', 'FOLLOW',
+             'SCHEDULE_REMINDER', 'ROUTINE_REMINDER', 'DIARY_REMINDER', 'INACTIVITY_REMINDER',
+             'ROUTINE_SHARE_MILESTONE') NOT NULL,
+                              in_app_title VARCHAR(100) NOT NULL,
+                              in_app_body VARCHAR(500) NOT NULL,
+                              push_title VARCHAR(100) NOT NULL,
+                              push_body VARCHAR(500) NOT NULL,
+                              action_url VARCHAR(1024) DEFAULT NULL,
+                              data JSON DEFAULT NULL,
+                              is_read BOOLEAN NOT NULL DEFAULT FALSE,
+                              is_in_app_shown BOOLEAN NOT NULL DEFAULT FALSE,
+                              is_sent BOOLEAN NOT NULL DEFAULT FALSE,
+                              created_at DATETIME NOT NULL,
+                              updated_at DATETIME NOT NULL,
+                              deleted_at DATETIME DEFAULT NULL,
+                              FOREIGN KEY (user_id) REFERENCES users (id)
 );

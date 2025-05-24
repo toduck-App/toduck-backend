@@ -20,8 +20,10 @@ import im.toduck.domain.routine.domain.usecase.RoutineUseCase;
 import im.toduck.domain.routine.presentation.api.RoutineApi;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadMultipleDatesResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -61,6 +63,21 @@ public class RoutineController implements RoutineApi {
 	}
 
 	@Override
+	@GetMapping("/me/dates")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<MyRoutineRecordReadMultipleDatesResponse>> getMyRoutineListMultipleDates(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.createSuccess(
+				routineUseCase.readMyRoutineRecordListMultipleDates(userDetails.getUserId(), startDate, endDate)
+			)
+		);
+	}
+
+	@Override
 	@PutMapping("/{routineId}/completion")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<?>> putRoutineCompletion(
@@ -95,6 +112,36 @@ public class RoutineController implements RoutineApi {
 	) {
 		return ResponseEntity.ok(
 			ApiResponse.createSuccess(routineUseCase.readMyAvailableRoutineList(userDetails.getUserId()))
+		);
+	}
+
+	@Override
+	@PutMapping("/{routineId}")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<?>> putRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@PathVariable final Long routineId,
+		@RequestBody @Valid final RoutineUpdateRequest request
+	) {
+		routineUseCase.updateRoutine(userDetails.getUserId(), routineId, request);
+
+		return ResponseEntity.ok(
+			ApiResponse.createSuccessWithNoContent()
+		);
+	}
+
+	@Override
+	@DeleteMapping("/{routineId}/individual")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<?>> deleteIndividualRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@PathVariable final Long routineId,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate date
+	) {
+		routineUseCase.deleteIndividualRoutine(userDetails.getUserId(), routineId, date);
+
+		return ResponseEntity.ok(
+			ApiResponse.createSuccessWithNoContent()
 		);
 	}
 

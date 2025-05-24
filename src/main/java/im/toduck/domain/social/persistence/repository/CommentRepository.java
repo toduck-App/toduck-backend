@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.repository.querydsl.CommentRepositoryCustom;
+import im.toduck.domain.user.persistence.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public interface CommentRepository extends JpaRepository<Comment, Long>, CommentRepositoryCustom {
 	@Query("SELECT c FROM Comment c "
 		+ "WHERE c.social = :social "
 		+ "ORDER BY "
@@ -20,4 +22,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	List<Comment> findAllBySocial(Social socialBoard);
 
 	int countBySocial(Social social);
+
+	@Query("SELECT COUNT(c) FROM Comment c WHERE c.user = :user AND c.deletedAt IS NULL")
+	int countActiveCommentsByUser(@Param("user") User user);
 }

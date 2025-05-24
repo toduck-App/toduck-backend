@@ -2,6 +2,7 @@ package im.toduck.domain.concentration.presentation.dto.response;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
@@ -15,6 +16,7 @@ public record ConcentrationResponse(
 	Long id,
 
 	@JsonSerialize(using = LocalDateSerializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Schema(description = "집중 날짜", example = "2025-03-12")
 	LocalDate date,
 

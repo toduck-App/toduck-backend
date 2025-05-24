@@ -1,7 +1,9 @@
 package im.toduck.domain.social.domain.usecase;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.notification.domain.event.CommentNotificationEvent;
 import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
@@ -10,9 +12,10 @@ import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentLike;
+import im.toduck.domain.social.persistence.entity.CommentReport;
 import im.toduck.domain.social.persistence.entity.Like;
-import im.toduck.domain.social.persistence.entity.Report;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.entity.SocialReport;
 import im.toduck.domain.social.presentation.dto.request.CommentCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.ReportCreateRequest;
 import im.toduck.domain.social.presentation.dto.response.CommentCreateResponse;
@@ -31,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class SocialInteractionUseCase {
+	private final ApplicationEventPublisher eventPublisher;
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
 	private final UserService userService;
@@ -51,6 +55,13 @@ public class SocialInteractionUseCase {
 		socialInteractionService.addCommentImageFile(request.imageUrl(), comment);
 
 		log.info("소셜 게시글 댓글 생성 - UserId: {}, SocialBoardId: {}, CommentId: {}", userId, socialId, comment.getId());
+		if (!socialBoard.getUser().getId().equals(userId)) {
+			eventPublisher.publishEvent(
+				CommentNotificationEvent.of(
+					socialBoard.getUser().getId(), user.getId(), user.getNickname(), request.content(), socialId
+				)
+			);
+		}
 		return CommentMapper.toCommentCreateResponse(comment);
 	}
 
@@ -119,17 +130,18 @@ public class SocialInteractionUseCase {
 	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
 		if (user.equals(socialBoard.getUser())) {
-			log.warn("자신의 게시글을 신고할 수 없습니다. UserId: {}, SocialBoardId: {}", userId, socialId);
+			log.warn("자신의 게시글을 신고할 수 없습니다. UserId: {}, SocialBoardId: {}", user.getId(), socialId);
 			throw CommonException.from(ExceptionCode.CANNOT_REPORT_OWN_POST);
 		}
 
-		boolean alreadyReported = socialInteractionService.existsByUserAndSocial(user, socialBoard);
+		boolean alreadyReported = socialInteractionService.existsSocialReportByUserAndSocial(user, socialBoard);
 		if (alreadyReported) {
-			log.warn("이미 신고된 게시글 - UserId: {}, SocialBoardId: {}", userId, socialId);
+			log.warn("이미 신고된 게시글 - UserId: {}, SocialBoardId: {}", user.getId(), socialId);
 			throw CommonException.from(ExceptionCode.ALREADY_REPORTED);
 		}
 
@@ -137,10 +149,44 @@ public class SocialInteractionUseCase {
 			blockAuthorIfNotAlreadyBlocked(user, socialBoard.getUser());
 		}
 
-		Report report = socialInteractionService.createReport(user, socialBoard, request.reportType(),
+		SocialReport report = socialInteractionService.createSocialReport(user, socialBoard, request.reportType(),
 			request.reason());
 
-		log.info("게시글 신고 - UserId: {}, SocialBoardId: {}, ReportId: {}", userId, socialId, report.getId());
+		log.info("게시글 신고 - UserId: {}, SocialBoardId: {}, ReportId: {}", user.getId(), socialId, report.getId());
+		return ReportMapper.toReportCreateResponse(report);
+	}
+
+	@Transactional
+	public ReportCreateResponse reportComment(
+		final Long userId,
+		final Long commentId,
+		final ReportCreateRequest request
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		Comment comment = socialInteractionService.getCommentById(commentId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_COMMENT));
+
+		if (user.equals(comment.getUser())) {
+			log.warn("자신의 댓글을 신고할 수 없습니다. UserId: {}, CommentId: {}", user.getId(), commentId);
+			throw CommonException.from(ExceptionCode.CANNOT_REPORT_OWN_COMMENT);
+		}
+
+		boolean alreadyReported = socialInteractionService.existsCommentReportByUserAndComment(user, comment);
+		if (alreadyReported) {
+			log.warn("이미 신고된 댓글 - UserId: {}, CommentId: {}", user.getId(), commentId);
+			throw CommonException.from(ExceptionCode.ALREADY_REPORTED_COMMENT);
+		}
+
+		if (request.blockAuthor()) {
+			blockAuthorIfNotAlreadyBlocked(user, comment.getUser());
+		}
+
+		CommentReport report = socialInteractionService.createCommentReport(user, comment, request.reportType(),
+			request.reason());
+
+		log.info("댓글 신고 - UserId: {}, CommentId: {}, ReportId: {}", user.getId(), commentId, report.getId());
 		return ReportMapper.toReportCreateResponse(report);
 	}
 

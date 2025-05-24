@@ -13,9 +13,27 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
     open-in-view: false
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        concurrency: 3
+        max-concurrency: 10
+        prefetch: 5
+        default-requeue-rejected: false
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          max-interval: 10000
+          multiplier: 2
+        acknowledge-mode: auto
 
 decorator:
   datasource:
@@ -47,4 +65,5 @@ oauth2:
       kakao:
         jwks-uri: ${OIDC_KAKAO_JWKS_URI}
         secret: ${OIDC_KAKAO_SECRET_KEY}
-
+firebase:
+  config-path: serviceAccountKey.json

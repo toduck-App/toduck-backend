@@ -73,7 +73,10 @@ public record ScheduleHeadResponse(
 		LocalTime time,
 
 		@Schema(description = "장소", example = "일정 장소")
-		String location
+		String location,
+
+		@Schema(description = "메모", example = "일정 메모")
+		String memo
 	) {
 		@Schema(description = "일정 기록 DTO")
 		public record ScheduleRecordDto(

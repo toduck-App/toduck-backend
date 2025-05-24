@@ -5,13 +5,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
+import im.toduck.domain.routine.common.dto.DailyRoutineData;
 import im.toduck.domain.routine.persistence.entity.Routine;
-import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.routine.persistence.vo.RoutineMemo;
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadMultipleDatesResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
@@ -47,16 +48,32 @@ public class RoutineMapper {
 			.build();
 	}
 
-	public static MyRoutineRecordReadListResponse toMyRoutineRecordReadListResponse(
-		final LocalDate queryDate,
-		final List<Routine> routines,
-		final List<RoutineRecord> routineRecords
+	public static MyRoutineRecordReadMultipleDatesResponse toMyRoutineRecordReadMultipleDatesResponse(
+		final LocalDate startDate,
+		final LocalDate endDate,
+		final List<DailyRoutineData> dailyRoutineDatas
 	) {
-		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> routineResponses = routines.stream()
+		List<MyRoutineRecordReadListResponse> dateRoutines = dailyRoutineDatas.stream()
+			.map(RoutineMapper::toMyRoutineRecordReadListResponse)
+			.toList();
+
+		return MyRoutineRecordReadMultipleDatesResponse.builder()
+			.startDate(startDate)
+			.endDate(endDate)
+			.dateRoutines(dateRoutines)
+			.build();
+	}
+
+	public static MyRoutineRecordReadListResponse toMyRoutineRecordReadListResponse(
+		final DailyRoutineData dailyRoutineData
+	) {
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> routineResponses = dailyRoutineData.routines()
+			.stream()
 			.map(routine -> toMyRoutineRecordReadResponse(routine, INCOMPLETE_STATUS))
 			.toList();
 
-		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> recordResponses = routineRecords.stream()
+		List<MyRoutineRecordReadListResponse.MyRoutineReadResponse> recordResponses = dailyRoutineData.routineRecords()
+			.stream()
 			.map(record -> toMyRoutineRecordReadResponse(record.getRoutine(), record.getIsCompleted()))
 			.toList();
 
@@ -64,7 +81,7 @@ public class RoutineMapper {
 			Stream.concat(routineResponses.stream(), recordResponses.stream()).toList();
 
 		return MyRoutineRecordReadListResponse.builder()
-			.queryDate(queryDate)
+			.queryDate(dailyRoutineData.date())
 			.routines(combinedResponses)
 			.build();
 	}
@@ -73,11 +90,21 @@ public class RoutineMapper {
 		final Routine routine,
 		final boolean isCompleted
 	) {
+		DaysOfWeekBitmask daysOfWeekBitmask = routine.getDaysOfWeekBitmask();
+		List<DayOfWeek> daysOfWeek = daysOfWeekBitmask.getDaysOfWeek().stream()
+			.sorted()
+			.toList();
+
 		return MyRoutineRecordReadListResponse.MyRoutineReadResponse.builder()
 			.routineId(routine.getId())
+			.category(routine.getCategory())
 			.color(routine.getColorValue())
-			.time(routine.getTime())
 			.title(routine.getTitle())
+			.memo(routine.getMemoValue())
+			.time(routine.getTime())
+			.isPublic(routine.getIsPublic())
+			.isInDeletedState(routine.isInDeletedState())
+			.daysOfWeek(daysOfWeek)
 			.isCompleted(isCompleted)
 			.build();
 	}
@@ -93,6 +120,7 @@ public class RoutineMapper {
 			.category(routine.getCategory())
 			.color(routine.getColorValue())
 			.title(routine.getTitle())
+			.memo(routine.getMemoValue())
 			.time(routine.getTime())
 			.isPublic(routine.getIsPublic())
 			.isInDeletedState(routine.isInDeletedState())
@@ -116,6 +144,7 @@ public class RoutineMapper {
 		return MyRoutineAvailableListResponse.MyRoutineAvailableResponse.builder()
 			.routineId(routine.getId())
 			.category(routine.getCategory())
+			.color(routine.getColorValue())
 			.title(routine.getTitle())
 			.memo(routine.getMemoValue())
 			.build();
@@ -134,13 +163,20 @@ public class RoutineMapper {
 	private static UserProfileRoutineListResponse.UserProfileRoutineResponse toUserProfileRoutineRecordReadResponse(
 		final Routine routine
 	) {
+		DaysOfWeekBitmask daysOfWeekBitmask = routine.getDaysOfWeekBitmask();
+		List<DayOfWeek> daysOfWeek = daysOfWeekBitmask.getDaysOfWeek().stream()
+			.sorted()
+			.toList();
+
 		return UserProfileRoutineListResponse.UserProfileRoutineResponse.builder()
 			.routineId(routine.getId())
 			.category(routine.getCategory())
+			.color(routine.getColorValue())
 			.title(routine.getTitle())
 			.memo(routine.getMemoValue())
 			.time(routine.getTime())
 			.sharedCount(routine.getSharedCount())
+			.daysOfWeek(daysOfWeek)
 			.build();
 	}
 }

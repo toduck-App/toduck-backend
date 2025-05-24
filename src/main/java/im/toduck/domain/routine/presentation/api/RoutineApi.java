@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.routine.presentation.dto.request.RoutineCreateRequest;
 import im.toduck.domain.routine.presentation.dto.request.RoutinePutCompletionRequest;
+import im.toduck.domain.routine.presentation.dto.request.RoutineUpdateRequest;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineAvailableListResponse;
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadListResponse;
+import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadMultipleDatesResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
@@ -57,6 +59,24 @@ public interface RoutineApi {
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
 		@Parameter(description = "조회할 루틴의 날짜 (형식: YYYY-MM-DD)", required = true, example = "2024-09-02")
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+	);
+
+	@Operation(
+		summary = "여러 날짜에 대한 본인 루틴 기록 목록 조회",
+		description = "지정된 기간 내 자신의 루틴 기록 목록을 날짜별로 조회합니다. 최대 조회 가능 기간은 31일입니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = MyRoutineRecordReadMultipleDatesResponse.class,
+			description = "여러 날짜에 대한 루틴 목록 조회 성공, 각 날짜별로 루틴 정보를 포함하는 목록을 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<MyRoutineRecordReadMultipleDatesResponse>> getMyRoutineListMultipleDates(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "조회 시작 날짜 (형식: YYYY-MM-DD)", required = true, example = "2024-09-01")
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+		@Parameter(description = "조회 종료 날짜 (형식: YYYY-MM-DD)", required = true, example = "2024-09-07")
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
 	);
 
 	@Operation(
@@ -110,6 +130,51 @@ public interface RoutineApi {
 	)
 	ResponseEntity<ApiResponse<MyRoutineAvailableListResponse>> getMyAvailableRoutineList(
 		@AuthenticationPrincipal final CustomUserDetails userDetails
+	);
+
+	@Operation(
+		summary = "루틴 수정",
+		description = """
+			루틴의 내용을 수정합니다.
+			1. 모든 필드는 수정 여부와 관계없이 항상 전체 데이터를 전송해야 합니다.
+			2. 각 필드의 변경 여부는 is{FieldName}Changed 필드를 통해 명시적으로 표시해야 합니다.
+			3. null 값은 유효한 데이터로 취급될 수 있으며(예: 카테고리 삭제), 변경 여부 필드를 통해 의도적인 수정인지 구분합니다.
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "루틴 수정 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE)
+		}
+	)
+	ResponseEntity<ApiResponse<?>> putRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "수정할 루틴의 Id", required = true, example = "1")
+		@PathVariable final Long routineId,
+		@RequestBody @Valid final RoutineUpdateRequest request
+	);
+
+	@Operation(
+		summary = "개별 루틴 삭제",
+		description = "개별 루틴 기록을 삭제합니다. "
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "개별 루틴 삭제 성공"
+		),
+		errors = {
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_ROUTINE),
+			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.ROUTINE_INVALID_DATE)
+		}
+	)
+	ResponseEntity<ApiResponse<?>> deleteIndividualRoutine(
+		@AuthenticationPrincipal final CustomUserDetails userDetails,
+		@Parameter(description = "삭제할 루틴의 Id", required = true, example = "1")
+		@PathVariable final Long routineId,
+		@Parameter(description = "삭제할 개별 루틴이 포함되는 날짜 (형식: YYYY-MM-DD)", required = true, example = "2024-09-02")
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
 	);
 
 	@Operation(
