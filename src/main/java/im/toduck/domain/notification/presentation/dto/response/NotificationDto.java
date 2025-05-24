@@ -38,7 +38,7 @@ public record NotificationDto(
 
 	@Schema(description = "생성 시간", example = "2025-05-08 12:30:45")
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-ddTHH:mm")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	LocalDateTime createdAt
 ) {
 }
