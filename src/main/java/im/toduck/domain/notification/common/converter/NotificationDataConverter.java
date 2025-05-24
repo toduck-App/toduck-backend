@@ -1,15 +1,12 @@
 package im.toduck.domain.notification.common.converter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
 
+import im.toduck.domain.notification.common.serializer.NotificationMapperFactory;
 import im.toduck.domain.notification.domain.data.NotificationData;
-import im.toduck.domain.notification.persistence.entity.NotificationType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,23 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Converter
 public class NotificationDataConverter implements AttributeConverter<NotificationData, String> {
-	private static final ObjectMapper objectMapper;
-
-	static {
-		objectMapper = new ObjectMapper();
-
-		Arrays.stream(NotificationType.values())
-			.filter(type -> type.getDataClass() != null)
-			.forEach(type -> objectMapper.registerSubtypes(
-				new NamedType(type.getDataClass(), type.name())
-			));
-
-		objectMapper.activateDefaultTyping(
-			objectMapper.getPolymorphicTypeValidator(),
-			ObjectMapper.DefaultTyping.NON_FINAL,
-			JsonTypeInfo.As.PROPERTY
-		);
-	}
+	private static final ObjectMapper objectMapper = NotificationMapperFactory.createObjectMapper();
 
 	@Override
 	public String convertToDatabaseColumn(NotificationData attribute) {

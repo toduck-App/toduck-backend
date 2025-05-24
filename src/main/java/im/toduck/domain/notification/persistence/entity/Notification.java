@@ -34,6 +34,10 @@ public class Notification extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "sender_id", nullable = true)
+	private User sender;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private NotificationType type;
@@ -69,6 +73,7 @@ public class Notification extends BaseEntity {
 	@Builder
 	private Notification(
 		final User user,
+		final User sender,
 		final NotificationType type,
 		final String inAppTitle,
 		final String inAppBody,
@@ -79,6 +84,7 @@ public class Notification extends BaseEntity {
 		final NotificationData notificationData
 	) {
 		this.user = user;
+		this.sender = sender;
 		this.type = type;
 		this.inAppTitle = inAppTitle;
 		this.inAppBody = inAppBody;
@@ -97,5 +103,21 @@ public class Notification extends BaseEntity {
 
 	public void markAsSent() {
 		this.isSent = true;
+	}
+
+	public Long getSenderId() {
+		if (sender == null) {
+			return null;
+		}
+
+		return sender.getId();
+	}
+
+	public String getSenderProfileImageUrl() {
+		if (sender == null) {
+			return null;
+		}
+
+		return sender.getImageUrl();
 	}
 }

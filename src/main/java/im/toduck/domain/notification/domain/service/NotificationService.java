@@ -30,7 +30,11 @@ public class NotificationService {
 		User user = userService.getUserById(event.getUserId())
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		Notification notification = NotificationMapper.toNotification(user, event);
+		User sender = event.getOptionalSenderId()
+			.flatMap(userService::getUserById)
+			.orElse(null);
+
+		Notification notification = NotificationMapper.toNotification(user, sender, event);
 
 		return notificationRepository.save(notification);
 	}

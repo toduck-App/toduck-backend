@@ -352,6 +352,7 @@ CREATE TABLE notification_setting (
 CREATE TABLE notification (
                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
                               user_id BIGINT NOT NULL,
+                              sender_id BIGINT DEFAULT NULL,
                               type ENUM('COMMENT', 'REPLY', 'REPLY_ON_MY_POST', 'LIKE_POST', 'LIKE_COMMENT', 'FOLLOW',
              'SCHEDULE_REMINDER', 'ROUTINE_REMINDER', 'DIARY_REMINDER', 'INACTIVITY_REMINDER',
              'ROUTINE_SHARE_MILESTONE') NOT NULL,

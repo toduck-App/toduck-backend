@@ -2,18 +2,28 @@ package im.toduck.domain.notification.domain.event;
 
 import im.toduck.domain.notification.domain.data.CommentNotificationData;
 import im.toduck.domain.notification.persistence.entity.NotificationType;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentNotificationEvent extends NotificationEvent<CommentNotificationData> {
 
-	private CommentNotificationEvent(Long userId, CommentNotificationData data) {
-		super(userId, NotificationType.COMMENT, data);
+	private CommentNotificationEvent(Long userId, Long senderId, CommentNotificationData data) {
+		super(userId, senderId, NotificationType.COMMENT, data);
 	}
 
-	public static CommentNotificationEvent of(Long userId, String commenterName, String commentContent, Long postId) {
+	public static CommentNotificationEvent of(
+		Long userId,
+		Long senderId,
+		String commenterName,
+		String commentContent,
+		Long postId
+	) {
 		return new CommentNotificationEvent(
 			userId,
+			senderId,
 			CommentNotificationData.of(commenterName, commentContent, postId)
 		);
 	}
