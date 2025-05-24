@@ -9,6 +9,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class FollowNotificationData extends AbstractNotificationData {
-	// TODO: 필요한 필드 추가
-	// 예상 필드: 팔로우한 사용자 ID, 사용자 이름 등
+	private String followerName;
+
+	private FollowNotificationData(String followerName) {
+		this.followerName = followerName;
+	}
+
+	public static FollowNotificationData of(String followerName) {
+		return new FollowNotificationData(followerName);
+	}
 }

@@ -4,8 +4,10 @@ import static im.toduck.domain.social.presentation.dto.response.SocialCategoryRe
 
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.notification.domain.event.RoutineShareMilestoneNotificationEvent;
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.domain.service.RoutineService;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -37,7 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SocialProfileUseCase {
 	private static final int DEFAULT_PROFILE_SOCIAL_PAGE_SIZE = 10;
+	private static final int ROUTINE_SHARE_MILESTONE = 100;
 
+	private final ApplicationEventPublisher eventPublisher;
 	private final UserService userService;
 	private final FollowService followService;
 	private final SocialBoardService socialBoardService;
@@ -159,7 +163,19 @@ public class SocialProfileUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
 
 		RoutineCreateResponse routineCreateResponse = routineService.create(user, request);
-		routineService.incrementSharedCountAtomically(sourceRoutine);
+
+		int newSharedCount = routineService.incrementSharedCountAndGetNewCount(sourceRoutine);
+		if (newSharedCount == ROUTINE_SHARE_MILESTONE) {
+			eventPublisher.publishEvent(
+				RoutineShareMilestoneNotificationEvent.of(
+					sourceRoutine.getUser().getId(),
+					sourceRoutine.getTitle(),
+					newSharedCount
+				)
+			);
+			log.info("루틴 공유 마일스톤 달성 - 루틴 ID: {}, 공유 횟수: {}", sourceRoutineId, newSharedCount);
+		}
+
 		return routineCreateResponse;
 	}
 }

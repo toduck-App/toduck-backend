@@ -1,5 +1,8 @@
 package im.toduck.domain.user.domain.usecase;
 
+import org.springframework.context.ApplicationEventPublisher;
+
+import im.toduck.domain.notification.domain.event.FollowNotificationEvent;
 import im.toduck.domain.user.domain.service.FollowService;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -15,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserFollowUseCase {
 
+	private final ApplicationEventPublisher eventPublisher;
 	private final UserService userService;
 	private final FollowService followService;
 
@@ -37,6 +41,14 @@ public class UserFollowUseCase {
 
 		followService.followUser(follower, followed);
 		log.info("팔로우 성공 - FollowerId: {}, FollowedUserId: {}", followerId, followedUserId);
+
+		eventPublisher.publishEvent(
+			FollowNotificationEvent.of(
+				followedUserId,
+				followerId,
+				follower.getNickname()
+			)
+		);
 	}
 
 	@Transactional
