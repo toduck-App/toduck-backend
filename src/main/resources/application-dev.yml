@@ -17,8 +17,8 @@ spring:
         format_sql: false
     open-in-view: false
   rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
+    host: toduck_rabbitmq
+    port: 5672
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
     listener:
