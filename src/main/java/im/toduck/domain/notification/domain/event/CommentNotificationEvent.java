@@ -2,9 +2,12 @@ package im.toduck.domain.notification.domain.event;
 
 import im.toduck.domain.notification.domain.data.CommentNotificationData;
 import im.toduck.domain.notification.persistence.entity.NotificationType;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentNotificationEvent extends NotificationEvent<CommentNotificationData> {
 
 	private CommentNotificationEvent(Long userId, CommentNotificationData data) {

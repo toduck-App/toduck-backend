@@ -29,3 +29,18 @@ services:
       - "${REDIS_HOST_PORT}:6379"
     environment:
       TZ: Asia/Seoul
+
+  rabbitmq:
+    image: rabbitmq:4.1-management
+    container_name: todcuk_rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq
+    restart: always

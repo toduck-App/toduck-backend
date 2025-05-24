@@ -1,5 +1,6 @@
 package im.toduck;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
@@ -15,6 +16,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import im.toduck.builder.BuilderSupporter;
 import im.toduck.builder.TestFixtureBuilder;
+import im.toduck.domain.notification.messaging.NotificationMessagePublisher;
 import im.toduck.global.config.querydsl.QueryDslConfig;
 import im.toduck.infra.push.FirebaseConfig;
 
@@ -54,4 +56,10 @@ public abstract class RepositoryTest {
 
 	@MockBean
 	private FirebaseConfig firebaseConfig;
+
+	@MockBean
+	private RabbitTemplate rabbitTemplate;
+
+	@MockBean
+	private NotificationMessagePublisher notificationMessagePublisher;
 }

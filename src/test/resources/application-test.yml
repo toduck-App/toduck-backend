@@ -17,6 +17,14 @@ spring:
     auto:
       false # test 환경에서 aop 를 사용하지 않도록 설정
 
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+    template:
+      exchange: ""
+      routing-key: ""
+
 decorator:
   datasource:
     p6spy:
