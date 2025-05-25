@@ -19,12 +19,13 @@ public class CommentNotificationEvent extends NotificationEvent<CommentNotificat
 		Long senderId,
 		String commenterName,
 		String commentContent,
-		Long postId
+		Long postId,
+		Long commentId
 	) {
 		return new CommentNotificationEvent(
 			userId,
 			senderId,
-			CommentNotificationData.of(commenterName, commentContent, postId)
+			CommentNotificationData.of(commenterName, commentContent, postId, commentId)
 		);
 	}
 
@@ -50,6 +51,6 @@ public class CommentNotificationEvent extends NotificationEvent<CommentNotificat
 
 	@Override
 	public String getActionUrl() {
-		return "toduck://post?postId=" + getData().getPostId();
+		return "toduck://post?postId=" + getData().getPostId() + "&commentId=" + getData().getCommentId();
 	}
 }

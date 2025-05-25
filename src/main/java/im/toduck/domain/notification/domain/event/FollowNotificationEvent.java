@@ -43,11 +43,11 @@ public class FollowNotificationEvent extends NotificationEvent<FollowNotificatio
 
 	@Override
 	public String getPushBody() {
-		return getPushTitle();
+		return getInAppBody();
 	}
 
 	@Override
 	public String getActionUrl() {
-		return "toduck://notification";
+		return "toduck://profile?user=" + getSenderId();
 	}
 }

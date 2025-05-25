@@ -94,7 +94,7 @@ public class SocialInteractionUseCase {
 				);
 			}
 		} else {
-			// 일반 댓글인 경우 (기존 로직)
+			// 일반 댓글인 경우
 			if (!socialBoard.getUser().getId().equals(userId)) {
 				eventPublisher.publishEvent(
 					CommentNotificationEvent.of(
@@ -102,7 +102,8 @@ public class SocialInteractionUseCase {
 						user.getId(),
 						user.getNickname(),
 						request.content(),
-						socialId
+						socialId,
+						comment.getId()
 					)
 				);
 			}
