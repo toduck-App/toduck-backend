@@ -163,7 +163,7 @@ CREATE TABLE schedule
     is_all_day   BOOLEAN      NOT NULL,
     time         TIME                                                                                                                                       DEFAULT NULL,
     days_of_week TINYINT                                                                                                                                    DEFAULT NULL,
-    alarm        ENUM ('TEN_MINUTE', 'ONE_HOUR', 'THIRTY_MINUTE')                                                                                                 DEFAULT NULL,
+    alarm        ENUM ('TEN_MINUTE', 'ONE_HOUR', 'ONE_DAY')                                                                                                 DEFAULT NULL,
     location     VARCHAR(255)                                                                                                                               DEFAULT NULL,
     memo         VARCHAR(255)                                                                                                                               DEFAULT NULL,
     user_id      BIGINT       NOT NULL,
