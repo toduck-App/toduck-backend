@@ -4,6 +4,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.notification.domain.event.CommentNotificationEvent;
+import im.toduck.domain.notification.domain.event.LikeCommentNotificationEvent;
+import im.toduck.domain.notification.domain.event.LikePostNotificationEvent;
+import im.toduck.domain.notification.domain.event.ReplyNotificationEvent;
+import im.toduck.domain.notification.domain.event.ReplyOnMyPostNotificationEvent;
 import im.toduck.domain.social.common.mapper.CommentLikeMapper;
 import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.ReportMapper;
@@ -55,13 +59,55 @@ public class SocialInteractionUseCase {
 		socialInteractionService.addCommentImageFile(request.imageUrl(), comment);
 
 		log.info("소셜 게시글 댓글 생성 - UserId: {}, SocialBoardId: {}, CommentId: {}", userId, socialId, comment.getId());
-		if (!socialBoard.getUser().getId().equals(userId)) {
-			eventPublisher.publishEvent(
-				CommentNotificationEvent.of(
-					socialBoard.getUser().getId(), user.getId(), user.getNickname(), request.content(), socialId
-				)
-			);
+
+		// 알림 발행 로직
+		if (parentComment != null) {
+			// 답글인 경우
+			Long parentCommentUserId = parentComment.getUser().getId();
+			Long postOwnerId = socialBoard.getUser().getId();
+
+			if (!parentCommentUserId.equals(userId)) {
+				// 내 댓글에 답글
+				eventPublisher.publishEvent(
+					ReplyNotificationEvent.of(
+						parentCommentUserId,
+						user.getId(),
+						user.getNickname(),
+						request.content(),
+						socialId,
+						parentComment.getId()
+					)
+				);
+			}
+
+			if (!postOwnerId.equals(userId) && !postOwnerId.equals(parentCommentUserId)) {
+				// 내 게시글의 내 댓글에 답글
+				eventPublisher.publishEvent(
+					ReplyOnMyPostNotificationEvent.of(
+						postOwnerId,
+						user.getId(),
+						user.getNickname(),
+						request.content(),
+						socialId,
+						parentComment.getId()
+					)
+				);
+			}
+		} else {
+			// 일반 댓글인 경우 (기존 로직)
+			if (!socialBoard.getUser().getId().equals(userId)) {
+				eventPublisher.publishEvent(
+					CommentNotificationEvent.of(
+						socialBoard.getUser().getId(),
+						user.getId(),
+						user.getNickname(),
+						request.content(),
+						socialId
+					)
+				);
+			}
 		}
+
 		return CommentMapper.toCommentCreateResponse(comment);
 	}
 
@@ -105,6 +151,18 @@ public class SocialInteractionUseCase {
 		Like like = socialInteractionService.createSocialLike(user, socialBoard);
 
 		log.info("소셜 게시글 좋아요 생성 - UserId: {}, SocialBoardId: {}, LikeId: {}", userId, socialId, like.getId());
+
+		if (!socialBoard.getUser().getId().equals(userId)) {
+			eventPublisher.publishEvent(
+				LikePostNotificationEvent.of(
+					socialBoard.getUser().getId(),
+					user.getId(),
+					user.getNickname(),
+					socialId
+				)
+			);
+		}
+
 		return SocialLikeMapper.toSocialLikeCreateResponse(like);
 	}
 
@@ -206,6 +264,19 @@ public class SocialInteractionUseCase {
 		CommentLike commentLike = socialInteractionService.createCommentLike(user, comment);
 
 		log.info("댓글 좋아요 생성 - UserId: {}, CommentId: {}, LikeId: {}", userId, commentId, commentLike.getId());
+
+		if (!comment.getUser().getId().equals(userId)) {
+			eventPublisher.publishEvent(
+				LikeCommentNotificationEvent.of(
+					comment.getUser().getId(),
+					user.getId(),
+					user.getNickname(),
+					comment.getSocial().getId(),
+					commentId
+				)
+			);
+		}
+
 		return CommentLikeMapper.toCommentLikeCreateResponse(commentLike);
 	}
 
