@@ -48,6 +48,6 @@ public class FollowNotificationEvent extends NotificationEvent<FollowNotificatio
 
 	@Override
 	public String getActionUrl() {
-		return "toduck://profile?user=" + getSenderId();
+		return "toduck://profile?userId=" + getSenderId();
 	}
 }
