@@ -1,5 +1,6 @@
 package im.toduck.domain.notification.domain.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +9,19 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ReplyNotificationData extends AbstractNotificationData {
-	// TODO: 필요한 필드 추가
-	// 예상 필드: 답글 작성자 ID, 답글 작성자 이름, 답글 내용, 원 댓글 ID, 게시글 ID 등
+	private String replierName;
+	private String replyContent;
+	private Long postId;
+	private Long commentId;
+
+	public static ReplyNotificationData of(
+		final String replierName,
+		final String replyContent,
+		final Long postId,
+		final Long commentId
+	) {
+		return new ReplyNotificationData(replierName, replyContent, postId, commentId);
+	}
 }

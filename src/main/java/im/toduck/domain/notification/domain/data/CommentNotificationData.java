@@ -14,12 +14,14 @@ public class CommentNotificationData extends AbstractNotificationData {
 	private String commenterName;
 	private String commentContent;
 	private Long postId;
+	private Long commentId;
 
 	public static CommentNotificationData of(
 		final String commenterName,
 		final String commentContent,
-		final Long postId
+		final Long postId,
+		final Long commentId
 	) {
-		return new CommentNotificationData(commenterName, commentContent, postId);
+		return new CommentNotificationData(commenterName, commentContent, postId, commentId);
 	}
 }

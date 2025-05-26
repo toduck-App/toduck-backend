@@ -1,6 +1,6 @@
 package im.toduck.domain.notification.domain.event;
 
-import im.toduck.domain.notification.domain.data.CommentNotificationData;
+import im.toduck.domain.notification.domain.data.ReplyOnMyPostNotificationData;
 import im.toduck.domain.notification.persistence.entity.NotificationType;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,35 +8,35 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommentNotificationEvent extends NotificationEvent<CommentNotificationData> {
+public class ReplyOnMyPostNotificationEvent extends NotificationEvent<ReplyOnMyPostNotificationData> {
 
-	private CommentNotificationEvent(Long userId, Long senderId, CommentNotificationData data) {
-		super(userId, senderId, NotificationType.COMMENT, data);
+	private ReplyOnMyPostNotificationEvent(Long userId, Long senderId, ReplyOnMyPostNotificationData data) {
+		super(userId, senderId, NotificationType.REPLY_ON_MY_POST, data);
 	}
 
-	public static CommentNotificationEvent of(
+	public static ReplyOnMyPostNotificationEvent of(
 		Long userId,
 		Long senderId,
-		String commenterName,
-		String commentContent,
+		String replierName,
+		String replyContent,
 		Long postId,
 		Long commentId
 	) {
-		return new CommentNotificationEvent(
+		return new ReplyOnMyPostNotificationEvent(
 			userId,
 			senderId,
-			CommentNotificationData.of(commenterName, commentContent, postId, commentId)
+			ReplyOnMyPostNotificationData.of(replierName, replyContent, postId, commentId)
 		);
 	}
 
 	@Override
 	public String getInAppTitle() {
-		return getData().getCommenterName() + "님이 내 게시물에 댓글을 남겼어요.";
+		return getData().getReplierName() + "님이 내 게시글에 대댓글을 남겼어요.";
 	}
 
 	@Override
 	public String getInAppBody() {
-		return getData().getCommentContent();
+		return getData().getReplyContent();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package im.toduck.domain.notification.domain.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +9,15 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class LikePostNotificationData extends AbstractNotificationData {
-	// TODO: 필요한 필드 추가
-	// 예상 필드: 좋아요 누른 사용자 ID, 사용자 이름, 게시글 ID 등
+	private String likerName;
+	private Long postId;
+
+	public static LikePostNotificationData of(
+		final String likerName,
+		final Long postId
+	) {
+		return new LikePostNotificationData(likerName, postId);
+	}
 }

@@ -17,10 +17,10 @@ spring:
         format_sql: true
     open-in-view: false
   rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USER}
-    password: ${RABBITMQ_PASSWORD}
+    host: localhost
+    port: 5672
+    username: user
+    password: abcd1234@
     listener:
       simple:
         concurrency: 3

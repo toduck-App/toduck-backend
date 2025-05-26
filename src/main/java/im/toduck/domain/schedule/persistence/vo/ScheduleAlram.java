@@ -1,7 +1,7 @@
 package im.toduck.domain.schedule.persistence.vo;
 
 public enum ScheduleAlram {
-	TEN_MINUTE,
-	ONE_HOUR,
-	THIRTY_MINUTE,
+	TEN_MINUTE, // 10분전
+	ONE_HOUR, // 1시간전
+	ONE_DAY, // 1일전
 }

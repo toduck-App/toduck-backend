@@ -9,6 +9,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class RoutineShareMilestoneData extends AbstractNotificationData {
-	// TODO: 필요한 필드 추가
-	// 예상 필드: 루틴 ID, 루틴 제목, 공유 횟수 등
+	private String routineTitle;
+	private Integer shareCount;
+
+	private RoutineShareMilestoneData(String routineTitle, Integer shareCount) {
+		this.routineTitle = routineTitle;
+		this.shareCount = shareCount;
+	}
+
+	public static RoutineShareMilestoneData of(String routineTitle, Integer shareCount) {
+		return new RoutineShareMilestoneData(routineTitle, shareCount);
+	}
 }
