@@ -16,7 +16,7 @@ public record SocialCreateRequest(
 	String title,
 
 	@NotBlank(message = "내용은 공백일 수 없습니다.")
-	@Size(max = 255, message = "내용은 255자 이하여야 합니다.")
+	@Size(max = 500, message = "내용은 500자 이하여야 합니다.")
 	@Schema(description = "게시글 내용", example = "어제 잠들기 전 새로운 루틴을 추가했다👀")
 	String content,
 
