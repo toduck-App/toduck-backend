@@ -979,6 +979,59 @@ class ScheduleUseCaseTest extends ServiceTest {
 				});
 
 			}
+
+			@Test
+			void 성공_특정날짜가_해당_일정의_startDate_일때_논리적오류가없다() {
+				//given
+				Schedule savedSchedule = testFixtureBuilder.buildSchedule(
+					DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+						LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+
+				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(null)
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+					.scheduleId(savedSchedule.getId())
+					.queryDate(LocalDate.of(2025, 1, 5))
+					.scheduleData(updateScheduleData)
+					.isOneDayDeleted(true)
+					.build();
+
+				// when
+				ScheduleIdResponse scheduleIdResponse = scheduleUsecase.updateSchedule(savedUser.getId(), request);
+
+				// then
+				Schedule updatedSchedule = scheduleRepository.findById(scheduleIdResponse.scheduleId()).get();
+				assertSoftly(softly -> {
+					// 수정된 일정이 잘 만들어 지는가
+					softly.assertThat(updatedSchedule.getTitle()).isEqualTo(updateScheduleData.title());
+					softly.assertThat(updatedSchedule.getCategory()).isEqualTo(updateScheduleData.category());
+					softly.assertThat(updatedSchedule.getScheduleDate().getStartDate())
+						.isEqualTo(updateScheduleData.startDate());
+					softly.assertThat(updatedSchedule.getScheduleDate().getEndDate())
+						.isEqualTo(updateScheduleData.endDate());
+					softly.assertThat(updatedSchedule.getScheduleTime().getIsAllDay())
+						.isEqualTo(updateScheduleData.isAllDay());
+					softly.assertThat(updatedSchedule.getColor().getValue()).isEqualTo(updateScheduleData.color());
+					softly.assertThat(updatedSchedule.getScheduleTime().getTime()).isEqualTo(updateScheduleData.time());
+					softly.assertThat(updatedSchedule.getScheduleTime().getAlarm())
+						.isEqualTo(updateScheduleData.alarm());
+					softly.assertThat(updatedSchedule.getLocation()).isEqualTo(updateScheduleData.location());
+					softly.assertThat(updatedSchedule.getMemo()).isEqualTo(updateScheduleData.memo());
+					softly.assertThat(updatedSchedule.getDaysOfWeekBitmask()).isNull();
+				});
+			}
 		}
 
 		@Nested
