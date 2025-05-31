@@ -108,9 +108,10 @@ public class ScheduleModifyService {
 		// 특정 날짜가 시작일이라면 해당 일정 삭제
 		if (schedule.getScheduleDate().getStartDate().equals(request.queryDate())) {
 			scheduleRepository.delete(schedule);
+		} else {
+			// 특정 날짜가 시작일이 아니라면 종료일을 특정 날짜 하루 전으로 변경
+			schedule.changeEndDate(request.queryDate().minusDays(1));
 		}
-		// 특정 날짜가 시작일이 아니라면 종료일을 특정 날짜 하루 전으로 변경
-		schedule.changeEndDate(request.queryDate().minusDays(1));
 
 		// 새로운 일정 생성
 		Schedule newSchedule = ScheduleMapper.toSchedule(schedule.getUser(), request.scheduleData());
