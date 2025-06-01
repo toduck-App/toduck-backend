@@ -42,7 +42,9 @@ public class ScheduleTime {
 				throw new VoException("종일 여부가 true 이면 시간은 null 이어야 합니다.");
 			}
 			if (alarm != null) {
-				throw new VoException("종일 여부가 true 이면 알람은 null 이어야 합니다.");
+				if (!alarm.equals(ScheduleAlram.ONE_DAY)) {
+					throw new VoException("종일 여부가 true 이면 알람은 1일전이거나 null 이어야 합니다.");
+				}
 			}
 		} else if (time == null) {
 			throw new VoException("종일 여부가 false 이면 시간은 필수입니다.");

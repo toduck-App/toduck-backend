@@ -78,6 +78,20 @@ class ScheduleUseCaseTest extends ServiceTest {
 			.memo("일정 메모")
 			.build();
 
+		private final ScheduleCreateRequest successAllDayAlarmOneDayRequest = ScheduleCreateRequest.builder()
+			.title("종일 일정")
+			.category(PlanCategory.COMPUTER)
+			.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+			.endDate(LocalDate.of(2025, 1, 1))
+			.isAllDay(true)
+			.color("#FFFFFF")
+			.time(null)
+			.daysOfWeek(List.of(DayOfWeek.MONDAY))
+			.alarm(ScheduleAlram.ONE_DAY)
+			.location("일정 장소")
+			.memo("일정 메모")
+			.build();
+
 		@BeforeEach
 		void setUp() {
 			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
@@ -106,6 +120,18 @@ class ScheduleUseCaseTest extends ServiceTest {
 			//then
 			assertSoftly(softly -> {
 				softly.assertThat(response.scheduleId()).isNotNull();
+			});
+		}
+
+		@Test
+		void 종일_일정에서_알람은_null이거나_1일전이어야_성공한다() {
+			// given -> when
+			ScheduleIdResponse result = scheduleUsecase.createSchedule(savedUser.getId(),
+				successAllDayAlarmOneDayRequest);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(result.scheduleId()).isNotNull();
 			});
 		}
 
@@ -157,7 +183,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			}
 
 			@Test
-			void 종일_여부가_true인데_알람이_null이_아니면_실패한다() {
+			void 종일_여부가_true인데_알람이_null이거나_1일전이_아니면_실패한다() {
 				// given
 				ScheduleCreateRequest isAllDayTrueAlarmNonNULLRequest = ERROR_TRUE_IS_ALL_DAY_ALARM_NON_NULL_REQUEST();
 
