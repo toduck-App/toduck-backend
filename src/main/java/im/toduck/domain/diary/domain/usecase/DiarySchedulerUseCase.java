@@ -22,7 +22,7 @@ public class DiarySchedulerUseCase {
 	private final UserService userService;
 	private final NotificationMessagePublisher notificationMessagePublisher;
 
-	@Scheduled(cron = "0 0 22 * * *")
+	@Scheduled(cron = "0 0 22 * * *", zone = "Asia/Seoul")
 	@SchedulerLock(name = "DiarySchedulerUseCase_sendDailyDiaryReminder", lockAtMostFor = "9m", lockAtLeastFor = "1m")
 	@Transactional(readOnly = true)
 	public void sendDailyDiaryReminder() {
