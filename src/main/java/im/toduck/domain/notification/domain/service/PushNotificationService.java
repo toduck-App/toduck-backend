@@ -29,7 +29,7 @@ public class PushNotificationService {
 	public void sendPushNotification(final Notification notification) {
 		Long userId = notification.getUser().getId();
 
-		List<DeviceToken> deviceTokens = deviceTokenService.getUserDeviceTokens(userId);
+		List<DeviceToken> deviceTokens = deviceTokenService.getUserDeviceTokens(notification.getUser());
 
 		if (deviceTokens.isEmpty()) {
 			log.info("등록된 디바이스 토큰 없음 - 사용자: {}", userId);

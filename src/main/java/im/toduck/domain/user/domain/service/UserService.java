@@ -1,5 +1,6 @@
 package im.toduck.domain.user.domain.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -26,6 +27,11 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public Optional<User> getUserById(Long id) {
 		return userRepository.findById(id);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Long> getAllActiveUserIds() {
+		return userRepository.findAllActiveUserIds();
 	}
 
 	@Transactional(readOnly = true)

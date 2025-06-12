@@ -20,6 +20,14 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 	private final QBlock qBlock = QBlock.block;
 
 	@Override
+	public List<Long> findAllActiveUserIds() {
+		return queryFactory.select(qUser.id)
+			.from(qUser)
+			.where(qUser.deletedAt.isNull())
+			.fetch();
+	}
+
+	@Override
 	public void updateNickname(User user, String nickname) {
 		queryFactory.update(qUser)
 			.set(qUser.nickname, nickname)

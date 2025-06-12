@@ -14,7 +14,11 @@ import im.toduck.domain.notification.persistence.entity.NotificationSetting;
 import im.toduck.domain.notification.presentation.dto.request.NotificationSettingUpdateRequest;
 import im.toduck.domain.notification.presentation.dto.response.NotificationListResponse;
 import im.toduck.domain.notification.presentation.dto.response.NotificationSettingResponse;
+import im.toduck.domain.user.domain.service.UserService;
+import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,16 +30,23 @@ public class NotificationUseCase {
 	private final DeviceTokenService deviceTokenService;
 	private final NotificationSettingService notificationSettingService;
 	private final NotificationService notificationService;
+	private final UserService userService;
 
 	@Transactional
 	public void registerDeviceToken(final Long userId, final String token, final DeviceType deviceType) {
-		deviceTokenService.registerDeviceToken(userId, token, deviceType);
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		deviceTokenService.registerDeviceToken(user, token, deviceType);
 		log.info("디바이스 토큰 등록 성공 - UserId: {}, DeviceType: {}", userId, deviceType);
 	}
 
 	@Transactional
 	public void removeDeviceToken(final Long userId, final String token) {
-		deviceTokenService.removeDeviceToken(userId, token);
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		deviceTokenService.removeDeviceToken(user, token);
 		log.info("디바이스 토큰 삭제 성공 - UserId: {}", userId);
 	}
 

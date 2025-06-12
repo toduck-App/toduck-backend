@@ -5,6 +5,8 @@ import java.util.List;
 import im.toduck.domain.user.persistence.entity.User;
 
 public interface UserRepositoryCustom {
+	List<Long> findAllActiveUserIds();
+
 	void updateNickname(User user, String nickname);
 
 	void updateProfileImageUrl(User user, String imageUrl);
