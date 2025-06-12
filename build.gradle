@@ -63,6 +63,10 @@ dependencies {
     /* Redis */
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.3.1'
 
+    /* ShedLock */
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:5.10.2'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-redis-spring:5.10.2'
+
     /* QueryDSL */
     implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
