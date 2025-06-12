@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
 import im.toduck.domain.notification.domain.event.DiaryReminderNotificationEvent;
 import im.toduck.domain.notification.messaging.NotificationMessagePublisher;
 import im.toduck.domain.user.domain.service.UserService;
@@ -21,6 +23,7 @@ public class DiarySchedulerUseCase {
 	private final NotificationMessagePublisher notificationMessagePublisher;
 
 	@Scheduled(cron = "0 0 22 * * *")
+	@SchedulerLock(name = "DiarySchedulerUseCase_sendDailyDiaryReminder", lockAtMostFor = "9m", lockAtLeastFor = "1m")
 	@Transactional(readOnly = true)
 	public void sendDailyDiaryReminder() {
 		log.info("일기 작성 유도 알림 발송 시작");
