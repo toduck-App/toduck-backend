@@ -81,17 +81,17 @@ public class ScheduleModifyService {
 	}
 
 	// 특정 날짜의 일정 기록이 있는지 확인하고 있으면 soft delete, 없으면 soft delete된 일정 기록 생성
-	private void softDeleteScheduleRecord(LocalDate request, Schedule schedule) {
+	private void softDeleteScheduleRecord(LocalDate requestQueryDate, Schedule schedule) {
 		scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
-				request,
+				requestQueryDate,
 				schedule.getId())
 			.ifPresentOrElse(scheduleRecord -> {
 				scheduleRecordRepository.softDeleteByScheduleIdAndRecordDate(
 					schedule.getId(),
-					request);
+					requestQueryDate);
 			}, () -> {
 				ScheduleRecord softDeletedScheduleRecord = ScheduleRecordMapper
-					.toSoftDeletedScheduleRecord(schedule, request);
+					.toSoftDeletedScheduleRecord(schedule, requestQueryDate);
 				scheduleRecordRepository.save(softDeletedScheduleRecord);
 			});
 	}
@@ -108,9 +108,10 @@ public class ScheduleModifyService {
 		// 특정 날짜가 시작일이라면 해당 일정 삭제
 		if (schedule.getScheduleDate().getStartDate().equals(request.queryDate())) {
 			scheduleRepository.delete(schedule);
+		} else {
+			// 특정 날짜가 시작일이 아니라면 종료일을 특정 날짜 하루 전으로 변경
+			schedule.changeEndDate(request.queryDate().minusDays(1));
 		}
-		// 특정 날짜가 시작일이 아니라면 종료일을 특정 날짜 하루 전으로 변경
-		schedule.changeEndDate(request.queryDate().minusDays(1));
 
 		// 새로운 일정 생성
 		Schedule newSchedule = ScheduleMapper.toSchedule(schedule.getUser(), request.scheduleData());
