@@ -67,3 +67,16 @@ oauth2:
         secret: ${OIDC_KAKAO_SECRET_KEY}
 firebase:
   config-path: serviceAccountKey.json
+
+
+management:
+  metrics:
+    tags:
+      application: toduck
+  endpoints:
+    web:
+      exposure:
+        include: "health, info, metrics, prometheus"
+        exclude: "env, beans, mappings, configprops, scheduledtasks, threaddump, shutdown"
+  server:
+    port: ${SPRING_METRICS_PORT}

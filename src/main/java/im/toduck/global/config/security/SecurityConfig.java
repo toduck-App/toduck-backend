@@ -29,6 +29,7 @@ public class SecurityConfig {
 		"/exception-codes"};
 	private static final String[] PUBLIC_ENDPOINTS = {"/", "/error"};
 	private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/users/find/**"};
+	private static final String[] ATUATOR_ENDPOINTS = {"/actuator/**"};
 
 	private final CorsConfigurationSource corsConfigurationSource;
 	private final AccessDeniedHandler accessDeniedHandler;
@@ -45,6 +46,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(
 				request -> defaultAuthorizeHttpRequests(request)
 					.requestMatchers(SWAGGER_ENDPOINTS).permitAll()
+					.requestMatchers(ATUATOR_ENDPOINTS).permitAll()
 					.anyRequest().authenticated()
 			).build();
 	}
