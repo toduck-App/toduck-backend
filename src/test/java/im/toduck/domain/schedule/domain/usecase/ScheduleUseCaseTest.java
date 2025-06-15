@@ -36,6 +36,7 @@ import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
+import jakarta.persistence.EntityManager;
 
 class ScheduleUseCaseTest extends ServiceTest {
 
@@ -44,6 +45,9 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 	@Autowired
 	private ScheduleRepository scheduleRepository;
+
+	@Autowired
+	private EntityManager em;
 
 	@Autowired
 	private ScheduleRecordRepository scheduleRecordRepository;
@@ -1081,6 +1085,77 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 				});
 
+			}
+
+			@Test
+			void 성공_querydate가_일정의_startDate와_같아도_에러없이_수정된다() {
+				// given
+				Schedule savedSchedule = testFixtureBuilder.buildSchedule(
+					DEFAULT_REPEATABLE_SCHEDULE(testFixtureBuilder.buildUser(GENERAL_USER()),
+						LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
+				ScheduleRecord scheduleRecord1 = testFixtureBuilder.buildScheduleRecord(
+					IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 10), savedSchedule));
+				ScheduleRecord scheduleRecord2 = testFixtureBuilder.buildScheduleRecord(
+					IS_NOT_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 20), savedSchedule));
+
+				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
+					.title("일정 제목")
+					.category(PlanCategory.COMPUTER)
+					.startDate(LocalDate.of(2025, 1, 1)) // 필수 값
+					.endDate(LocalDate.of(2025, 1, 1))
+					.isAllDay(false)
+					.color("#FFFFFF")
+					.time(LocalTime.of(10, 30))
+					.daysOfWeek(null)
+					.alarm(ScheduleAlram.TEN_MINUTE)
+					.location("일정 장소")
+					.memo("일정 메모")
+					.build();
+
+				ScheduleModifyRequest request = ScheduleModifyRequest.builder()
+					.scheduleId(savedSchedule.getId())
+					.queryDate(LocalDate.of(2025, 1, 1)) // startDate와 동일한 날짜
+					.scheduleData(updateScheduleData)
+					.isOneDayDeleted(false)
+					.build();
+				// when
+				ScheduleIdResponse scheduleIdResponse = scheduleUsecase.updateSchedule(savedUser.getId(), request);
+				// then
+				Optional<Schedule> preSchedule = scheduleRepository.findById(savedSchedule.getId());
+				Schedule updatedSchedule = scheduleRepository.findById(scheduleIdResponse.scheduleId()).get();
+				Optional<ScheduleRecord> completedScheduleRecord = scheduleRecordRepository.findById(
+					scheduleRecord1.getId());
+				Optional<ScheduleRecord> notCompletedScheduleRecord = scheduleRecordRepository
+					.findById(scheduleRecord2.getId());
+				Optional<ScheduleRecord> softDeletedScheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
+					LocalDate.of(2025, 1, 1),
+					savedSchedule.getId());
+				assertSoftly(softly -> {
+					// 수정된 일정이 잘 만들어 지는가
+					softly.assertThat(updatedSchedule.getTitle()).isEqualTo(updateScheduleData.title());
+					softly.assertThat(updatedSchedule.getCategory()).isEqualTo(updateScheduleData.category());
+					softly.assertThat(updatedSchedule.getScheduleDate().getStartDate())
+						.isEqualTo(updateScheduleData.startDate());
+					softly.assertThat(updatedSchedule.getScheduleDate().getEndDate())
+						.isEqualTo(updateScheduleData.endDate());
+					softly.assertThat(updatedSchedule.getScheduleTime().getIsAllDay())
+						.isEqualTo(updateScheduleData.isAllDay());
+					softly.assertThat(updatedSchedule.getColor().getValue()).isEqualTo(updateScheduleData.color());
+					softly.assertThat(updatedSchedule.getScheduleTime().getTime()).isEqualTo(updateScheduleData.time());
+					softly.assertThat(updatedSchedule.getScheduleTime().getAlarm())
+						.isEqualTo(updateScheduleData.alarm());
+					softly.assertThat(updatedSchedule.getLocation()).isEqualTo(updateScheduleData.location());
+					softly.assertThat(updatedSchedule.getMemo()).isEqualTo(updateScheduleData.memo());
+					softly.assertThat(updatedSchedule.getDaysOfWeekBitmask()).isNull();
+
+					// 기존 일정 기록은 완료 되었다면 삭제되면 안된다. 미완료 기록만 삭제된다
+					softly.assertThat(completedScheduleRecord).isPresent();
+					softly.assertThat(notCompletedScheduleRecord).isEmpty();
+
+					// 기존 일정의 마감 일자가 쿼리 일자 하루 전으로 변경된다.
+					softly.assertThat(preSchedule)
+						.isEmpty();
+				});
 			}
 
 			@Test
