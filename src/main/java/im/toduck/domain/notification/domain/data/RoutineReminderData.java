@@ -1,5 +1,6 @@
 package im.toduck.domain.notification.domain.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +9,19 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class RoutineReminderData extends AbstractNotificationData {
-	// TODO: 필요한 필드 추가
-	// 예상 필드: 루틴 ID, 루틴 제목, 루틴 시작 시간, 남은 시간 등
+	private Long routineId;
+	private String routineTitle;
+	private Integer reminderMinutes;
+	private boolean isAllDay;
+
+	public static RoutineReminderData of(
+		final Long routineId,
+		final String routineTitle,
+		final Integer reminderMinutes,
+		final boolean isAllDay
+	) {
+		return new RoutineReminderData(routineId, routineTitle, reminderMinutes, isAllDay);
+	}
 }

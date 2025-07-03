@@ -6,11 +6,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.routine.common.dto.DailyRoutineData;
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.common.mapper.RoutineRecordMapper;
+import im.toduck.domain.routine.domain.event.RoutineCreatedEvent;
+import im.toduck.domain.routine.domain.event.RoutineDeletedEvent;
+import im.toduck.domain.routine.domain.event.RoutineUpdatedEvent;
 import im.toduck.domain.routine.domain.service.RoutineRecordService;
 import im.toduck.domain.routine.domain.service.RoutineService;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -41,7 +45,9 @@ public class RoutineUseCase {
 	private final UserService userService;
 	private final RoutineService routineService;
 	private final RoutineRecordService routineRecordService;
+
 	private final DistributedLock distributedLock;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public RoutineCreateResponse createRoutine(final Long userId, final RoutineCreateRequest request) {
@@ -51,6 +57,8 @@ public class RoutineUseCase {
 		RoutineCreateResponse routineCreateResponse = routineService.create(user, request);
 
 		log.info("루틴 생성 - UserId: {}, RoutineId:{}", userId, routineCreateResponse.routineId());
+
+		eventPublisher.publishEvent(new RoutineCreatedEvent(routineCreateResponse.routineId(), user));
 		return routineCreateResponse;
 	}
 
@@ -167,6 +175,15 @@ public class RoutineUseCase {
 		routineService.updateFields(routine, request);
 
 		log.info("루틴 수정 성공 - 사용자 Id: {}, 루틴 Id: {}", userId, routineId);
+
+		eventPublisher.publishEvent(new RoutineUpdatedEvent(
+			routineId,
+			user,
+			request.isTimeChanged(),
+			request.isDaysOfWeekChanged(),
+			request.isReminderMinutesChanged(),
+			request.isTitleChanged()
+		));
 	}
 
 	@Transactional
@@ -175,6 +192,8 @@ public class RoutineUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Routine routine = routineService.getUserRoutineIncludingDeleted(user, routineId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		eventPublisher.publishEvent(new RoutineDeletedEvent(routineId));
 
 		if (keepRecords) {
 			LocalDateTime deletionTime = LocalDateTime.now();

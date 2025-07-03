@@ -52,6 +52,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
+    /* Quartz Scheduler */
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
     /* Lombok */
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
