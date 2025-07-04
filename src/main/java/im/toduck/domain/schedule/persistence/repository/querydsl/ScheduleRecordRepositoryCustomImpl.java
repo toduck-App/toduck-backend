@@ -79,14 +79,14 @@ public class ScheduleRecordRepositoryCustomImpl implements ScheduleRecordReposit
 	@Override
 	public Optional<ScheduleRecord> findScheduleRecordByRecordDateAndScheduleId(
 		LocalDate localDate,
-		Long aLong) {
+		Long scheduleId) {
 		return Optional.ofNullable(
 			queryFactory
 				.select(scheduleRecord)
 				.from(scheduleRecord)
 				.leftJoin(scheduleRecord.schedule, schedule).fetchJoin()
 				.where(
-					scheduleRecord.schedule.id.eq(aLong)
+					scheduleRecord.schedule.id.eq(scheduleId)
 						.and(scheduleRecord.recordDate.eq(localDate))
 				)
 				.fetchOne());

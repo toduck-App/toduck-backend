@@ -12,19 +12,13 @@ import lombok.NoArgsConstructor;
 public class ScheduleRecordMapper {
 
 	public static ScheduleRecord toScheduleRecord(Schedule schedule, ScheduleCompleteRequest scheduleCompleteRequest) {
-		return ScheduleRecord.builder()
-			.recordDate(scheduleCompleteRequest.queryDate())
-			.isCompleted(scheduleCompleteRequest.isComplete())
-			.schedule(schedule)
-			.build();
+		return ScheduleRecord
+			.create(schedule, scheduleCompleteRequest.queryDate());
 	}
 
 	public static ScheduleRecord toSoftDeletedScheduleRecord(Schedule schedule, LocalDate queryDate) {
-		ScheduleRecord scheduleRecord = ScheduleRecord.builder()
-			.isCompleted(false)
-			.recordDate(queryDate)
-			.schedule(schedule)
-			.build();
+		ScheduleRecord scheduleRecord = ScheduleRecord
+			.create(schedule, queryDate);
 		scheduleRecord.softDelete();
 		return scheduleRecord;
 	}

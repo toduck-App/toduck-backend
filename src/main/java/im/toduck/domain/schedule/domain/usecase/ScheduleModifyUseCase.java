@@ -3,10 +3,10 @@ package im.toduck.domain.schedule.domain.usecase;
 import java.time.LocalDate;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import im.toduck.domain.schedule.domain.service.ScheduleModifyService;
 import im.toduck.domain.schedule.domain.service.ScheduleReadService;
-import im.toduck.domain.schedule.domain.service.ScheduleRecordService;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
@@ -24,54 +24,52 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @UseCase
+@Validated
 @RequiredArgsConstructor
 @Slf4j
-public class ScheduleUseCase {
+public class ScheduleModifyUseCase {
 	private final ScheduleReadService scheduleReadService;
 	private final UserService userService;
-	private final ScheduleRecordService scheduleRecordService;
 	private final ScheduleModifyService scheduleModifyService;
 
 	@Transactional
-	public ScheduleIdResponse createSchedule(Long userId,
-		ScheduleCreateRequest request) {
-		User user = userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		return scheduleReadService.createSchedule(user, request);
+	public ScheduleIdResponse createSchedule(final Long userId, final ScheduleCreateRequest request) {
+		User user = userService.validateUserById(userId);
+
+		Schedule schedule = Schedule.create(user, request);
+
+		return ScheduleIdResponse.of(scheduleModifyService.save(schedule));
 	}
 
 	@Transactional(readOnly = true)
 	public ScheduleHeadResponse getRangeSchedule(Long userId, LocalDate startDate, LocalDate endDate) {
-		User user = userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		User user = userService.validateUserById(userId);
+
 		return scheduleReadService.getRangeSchedule(user, startDate, endDate);
 	}
 
 	@Transactional(readOnly = true)
 	public ScheduleInfoResponse getSchedule(Long userId, Long scheduleRecordId) {
-		userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		userService.validateUserById(userId);
+
 		return scheduleReadService.getSchedule(scheduleRecordId);
 	}
 
 	@Transactional
 	public void completeSchedule(Long userId, ScheduleCompleteRequest scheduleCompleteRequest) {
-		userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		Schedule schedule = scheduleReadService.getScheduleById(scheduleCompleteRequest.scheduleId())
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
-		scheduleRecordService.getScheduleRecordWithSchedule(userId, scheduleCompleteRequest)
-			.ifPresentOrElse((scheduleRecord) -> {
-				scheduleRecordService.completeScheduleRecord(scheduleRecord, scheduleCompleteRequest);
-			}, () -> {
-				scheduleRecordService.createScheduleRecord(schedule, scheduleCompleteRequest);
-			});
+		userService.validateUserById(userId);
+
+		Schedule schedule = scheduleReadService.validateScheduleById(scheduleCompleteRequest.scheduleId());
+
+		schedule.completeSchedule(scheduleCompleteRequest);
+
+		scheduleModifyService.save(schedule);
 	}
 
 	@Transactional
 	public void deleteSchedule(Long userId, ScheduleDeleteRequest scheduleDeleteRequest) {
-		userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		userService.validateUserById(userId);
+
 		Schedule schedule = scheduleReadService.getScheduleById(scheduleDeleteRequest.scheduleId())
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
 
@@ -96,8 +94,8 @@ public class ScheduleUseCase {
 
 	@Transactional
 	public ScheduleIdResponse updateSchedule(Long userId, ScheduleModifyRequest request) {
-		userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		userService.validateUserById(userId);
+
 		Schedule schedule = scheduleReadService.getScheduleById(request.scheduleId())
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
 

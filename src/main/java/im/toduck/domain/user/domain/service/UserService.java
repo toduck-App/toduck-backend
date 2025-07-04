@@ -30,6 +30,12 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
+	public User validateUserById(Long id) {
+		return userRepository.findById(id)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+	}
+
+	@Transactional(readOnly = true)
 	public List<Long> getAllActiveUserIds() {
 		return userRepository.findAllActiveUserIds();
 	}
