@@ -12,18 +12,12 @@ public class ScheduleRecordFixtures {
 	private static final Boolean IS_NOT_COMPLETE = false;
 
 	public static ScheduleRecord IS_COMPLETE_SCHEDULE_RECORD(LocalDate recordDate, Schedule schedule) {
-		return ScheduleRecord.builder()
-			.isCompleted(IS_COMPLETE)
-			.schedule(schedule)
-			.recordDate(recordDate)
-			.build();
+		ScheduleRecord scheduleRecord = ScheduleRecord.create(schedule, recordDate);
+		scheduleRecord.changeComplete(IS_COMPLETE);
+		return scheduleRecord;
 	}
 
 	public static ScheduleRecord IS_NOT_COMPLETE_SCHEDULE_RECORD(LocalDate recordDate, Schedule schedule) {
-		return ScheduleRecord.builder()
-			.isCompleted(IS_NOT_COMPLETE)
-			.schedule(schedule)
-			.recordDate(recordDate)
-			.build();
+		return ScheduleRecord.create(schedule, recordDate);
 	}
 }
