@@ -1,6 +1,11 @@
 package im.toduck.domain.schedule.persistence.entity;
 
+import static jakarta.persistence.CascadeType.*;
+import static java.util.Objects.*;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -10,6 +15,7 @@ import im.toduck.domain.routine.persistence.vo.PlanCategoryColor;
 import im.toduck.domain.schedule.common.converter.ScheduleDaysOfWeekBitmaskConverter;
 import im.toduck.domain.schedule.persistence.vo.ScheduleDate;
 import im.toduck.domain.schedule.persistence.vo.ScheduleTime;
+import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
@@ -26,7 +32,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +42,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "schedule")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE schedule SET deleted_at = NOW() where id=?")
 @SQLRestriction(value = "deleted_at is NULL")
 public class Schedule extends BaseEntity {
@@ -72,6 +80,9 @@ public class Schedule extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
+	@OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = {PERSIST, MERGE})
+	private List<ScheduleRecord> scheduleRecords = new ArrayList<>();
+
 	@Builder
 	public Schedule(String title,
 		PlanCategory category,
@@ -93,22 +104,57 @@ public class Schedule extends BaseEntity {
 		this.user = user;
 	}
 
-	public void changeEndDate(LocalDate localDate) {
-		this.scheduleDate.changeEndDate(localDate);
+	public static Schedule create(User user, ScheduleCreateRequest request) {
+		Schedule schedule = new Schedule();
+
+		modifyInfo(schedule, request);
+		schedule.user = requireNonNull(user);
+
+		return schedule;
 	}
 
-	public void updateInfo(ScheduleCreateRequest updateDto) {
+	public void completeSchedule(ScheduleCompleteRequest request) {
+		ScheduleRecord scheduleRecord = this.scheduleRecords.stream()
+			.filter(sr -> isCompleteRecordTarget(request.queryDate(), sr))
+			.findFirst()
+			.orElseGet(() -> {
+				ScheduleRecord create = ScheduleRecord.create(this, request.queryDate());
+				this.scheduleRecords.add(create);
+				return create;
+			});
+
+		scheduleRecord.changeComplete(request.isComplete());
+	}
+
+	private static boolean isCompleteRecordTarget(LocalDate queryDate, ScheduleRecord sr) {
+		return sr.getRecordDate().equals(queryDate) && sr.getDeletedAt() == null;
+	}
+
+	private boolean isSingleNonRepeatableSchedule() {
+		return this.getScheduleDate().getStartDate().equals(this.getScheduleDate().getEndDate())
+			&& this.daysOfWeekBitmask == null;
+	}
+
+	public void minusOneQueryDate(LocalDate queryDate) {
+		this.scheduleDate = ScheduleDate.of(this.getScheduleDate().getStartDate(), queryDate.minusDays(1));
+	}
+
+	public void updateInfo(ScheduleCreateRequest request) {
+		modifyInfo(this, request);
+	}
+
+	private static void modifyInfo(Schedule schedule, ScheduleCreateRequest request) {
 		DaysOfWeekBitmask daysOfWeekBitmask = null;
-		if (updateDto.daysOfWeek() != null) {
-			daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(updateDto.daysOfWeek());
+		if (request.daysOfWeek() != null) {
+			daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
 		}
-		this.title = updateDto.title();
-		this.category = updateDto.category();
-		this.color = PlanCategoryColor.from(updateDto.color());
-		this.scheduleDate = ScheduleDate.from(updateDto.startDate(), updateDto.endDate());
-		this.scheduleTime = ScheduleTime.from(updateDto.isAllDay(), updateDto.time(), updateDto.alarm());
-		this.daysOfWeekBitmask = daysOfWeekBitmask;
-		this.location = updateDto.location();
-		this.memo = updateDto.memo();
+		schedule.title = request.title();
+		schedule.category = request.category();
+		schedule.color = PlanCategoryColor.from(request.color());
+		schedule.scheduleDate = ScheduleDate.of(request.startDate(), request.endDate());
+		schedule.scheduleTime = ScheduleTime.of(request.isAllDay(), request.time(), request.alarm());
+		schedule.daysOfWeekBitmask = daysOfWeekBitmask;
+		schedule.location = request.location();
+		schedule.memo = request.memo();
 	}
 }

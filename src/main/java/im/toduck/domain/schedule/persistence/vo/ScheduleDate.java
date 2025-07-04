@@ -6,12 +6,14 @@ import im.toduck.global.exception.VoException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScheduleDate {
 	@Column(nullable = false)
 	private LocalDate startDate;
@@ -25,18 +27,16 @@ public class ScheduleDate {
 		this.endDate = endDate;
 	}
 
-	public static ScheduleDate from(LocalDate startDate, LocalDate endDate) {
+	public static ScheduleDate of(LocalDate startDate, LocalDate endDate) {
 		return new ScheduleDate(startDate, endDate);
 	}
 
 	private void validate(LocalDate startDate, LocalDate endDate) {
+		if (startDate == null || endDate == null) {
+			throw new VoException("일정의 시작일과 종료일은 null이 될 수 없습니다.");
+		}
 		if (startDate.isAfter(endDate)) {
 			throw new VoException("시작일은 종료일보다 이전이어야 합니다.");
 		}
-	}
-
-	public void changeEndDate(LocalDate localDate) {
-		validate(this.startDate, localDate);
-		this.endDate = localDate;
 	}
 }

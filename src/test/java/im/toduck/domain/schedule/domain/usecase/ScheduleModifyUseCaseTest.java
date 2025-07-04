@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.person.persistence.entity.PlanCategory;
@@ -38,10 +39,11 @@ import im.toduck.global.exception.ExceptionCode;
 import im.toduck.global.exception.VoException;
 import jakarta.persistence.EntityManager;
 
-class ScheduleUseCaseTest extends ServiceTest {
+@Transactional
+class ScheduleModifyUseCaseTest extends ServiceTest {
 
 	@Autowired
-	private ScheduleUseCase scheduleUsecase;
+	private ScheduleModifyUseCase scheduleModifyUsecase;
 
 	@Autowired
 	private ScheduleRepository scheduleRepository;
@@ -104,7 +106,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 		@Test
 		void 성공적으로_생성한다() {
 			// given ->when
-			ScheduleIdResponse result = scheduleUsecase.createSchedule(savedUser.getId(),
+			ScheduleIdResponse result = scheduleModifyUsecase.createSchedule(savedUser.getId(),
 				successScheduleCreateRequest);
 
 			// then
@@ -119,7 +121,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			ScheduleCreateRequest request = DAYS_OF_WEEK_NULL_REQUEST();
 
 			//when
-			ScheduleIdResponse response = scheduleUsecase.createSchedule(savedUser.getId(), request);
+			ScheduleIdResponse response = scheduleModifyUsecase.createSchedule(savedUser.getId(), request);
 
 			//then
 			assertSoftly(softly -> {
@@ -130,7 +132,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 		@Test
 		void 종일_일정에서_알람은_null이거나_1일전이어야_성공한다() {
 			// given -> when
-			ScheduleIdResponse result = scheduleUsecase.createSchedule(savedUser.getId(),
+			ScheduleIdResponse result = scheduleModifyUsecase.createSchedule(savedUser.getId(),
 				successAllDayAlarmOneDayRequest);
 
 			// then
@@ -151,7 +153,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 				assertSoftly(softly -> {
 					softly.assertThatThrownBy(
-							() -> scheduleUsecase.createSchedule(savedUser.getId() + NOISE_USER_ID,
+							() -> scheduleModifyUsecase.createSchedule(savedUser.getId() + NOISE_USER_ID,
 								successScheduleCreateRequest))
 						.isInstanceOf(CommonException.class)
 						.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_USER.getHttpStatus())
@@ -168,7 +170,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				//when -> then
 				assertSoftly(softly -> {
 					softly.assertThatThrownBy(
-							() -> scheduleUsecase.createSchedule(savedUser.getId(), isAllDayTrueTimeNonNULLRequest))
+							() -> scheduleModifyUsecase.createSchedule(savedUser.getId(), isAllDayTrueTimeNonNULLRequest))
 						.isInstanceOf(VoException.class);
 				});
 			}
@@ -181,7 +183,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				//when -> then
 				assertSoftly(softly -> {
 					softly.assertThatThrownBy(
-							() -> scheduleUsecase.createSchedule(savedUser.getId(), isAllDayFalseTimeNULLRequest))
+							() -> scheduleModifyUsecase.createSchedule(savedUser.getId(), isAllDayFalseTimeNULLRequest))
 						.isInstanceOf(VoException.class);
 				});
 			}
@@ -194,7 +196,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				//when -> then
 				assertSoftly(softly -> {
 					softly.assertThatThrownBy(
-							() -> scheduleUsecase.createSchedule(savedUser.getId(), isAllDayTrueAlarmNonNULLRequest))
+							() -> scheduleModifyUsecase.createSchedule(savedUser.getId(), isAllDayTrueAlarmNonNULLRequest))
 						.isInstanceOf(VoException.class);
 				});
 			}
@@ -207,7 +209,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 				//when -> then
 				assertSoftly(softly -> {
 					softly.assertThatThrownBy(
-							() -> scheduleUsecase.createSchedule(savedUser.getId(), startDateGreaterThanEndDateRequest))
+							() -> scheduleModifyUsecase.createSchedule(savedUser.getId(),
+								startDateGreaterThanEndDateRequest))
 						.isInstanceOf(VoException.class);
 				});
 			}
@@ -244,7 +247,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 						LESS_THAN_QUERY_END_DATE)))); // 반복 있는 기간 일정
 
 			// when
-			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+			ScheduleHeadResponse scheduleHeadResponse = scheduleModifyUsecase.getRangeSchedule(savedUser.getId(),
 				QUERY_START_DATE, QUERY_END_DATE);
 
 			// then
@@ -269,7 +272,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.buildScheduleRecord(IS_NOT_COMPLETE_SCHEDULE_RECORD(LESS_THAN_QUERY_END_DATE, savedSchedule));
 
 			// when
-			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+			ScheduleHeadResponse scheduleHeadResponse = scheduleModifyUsecase.getRangeSchedule(savedUser.getId(),
 				QUERY_START_DATE, QUERY_END_DATE);
 			// then
 			assertSoftly(softly -> {
@@ -295,7 +298,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 					DEFAULT_NON_REPEATABLE_SCHEDULE(savedUser, GREATER_THAN_QUERY_END_DATE,
 						GREATER_THAN_QUERY_END_DATE));
 			// when
-			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+			ScheduleHeadResponse scheduleHeadResponse = scheduleModifyUsecase.getRangeSchedule(savedUser.getId(),
 				QUERY_START_DATE, QUERY_END_DATE);
 			// then
 			assertSoftly(softly -> {
@@ -317,7 +320,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.buildScheduleRecord(IS_NOT_COMPLETE_SCHEDULE_RECORD(GREATER_THAN_QUERY_END_DATE, savedSchedule));
 
 			// when
-			ScheduleHeadResponse scheduleHeadResponse = scheduleUsecase.getRangeSchedule(savedUser.getId(),
+			ScheduleHeadResponse scheduleHeadResponse = scheduleModifyUsecase.getRangeSchedule(savedUser.getId(),
 				QUERY_START_DATE, QUERY_END_DATE);
 			// then
 			assertSoftly(softly -> {
@@ -349,7 +352,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 1), savedSchedule));
 
 			// when
-			ScheduleInfoResponse scheduleInfoResponse = scheduleUsecase.getSchedule(savedUser.getId(),
+			ScheduleInfoResponse scheduleInfoResponse = scheduleModifyUsecase.getSchedule(savedUser.getId(),
 				savedScheduleRecord.getId());
 
 			// then
@@ -369,7 +372,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> scheduleUsecase.getSchedule(savedUser.getId(), 9999L))
+				softly.assertThatThrownBy(() -> scheduleModifyUsecase.getSchedule(savedUser.getId(), 9999L))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE_RECORD.getHttpStatus())
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE_RECORD.getErrorCode())
@@ -394,6 +397,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 					savedUser,
 					MOCK_DATE,
 					MOCK_DATE));
+			entityManager.flush();
+			entityManager.clear();
 		}
 
 		@Test
@@ -408,9 +413,14 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.isComplete(true)
 				.queryDate(MOCK_DATE)
 				.build();
+			entityManager.flush();
+			entityManager.clear();
 
 			// when
-			scheduleUsecase.completeSchedule(savedUser.getId(), request);
+			scheduleModifyUsecase.completeSchedule(savedUser.getId(), request);
+			entityManager.flush();
+			entityManager.clear();
+
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
 				MOCK_DATE,
@@ -425,7 +435,6 @@ class ScheduleUseCaseTest extends ServiceTest {
 		@Test
 		void 성공_해당날짜_일정기록이_없으면_일정_기록이_생성된다() {
 			//given
-
 			ScheduleCompleteRequest request = ScheduleCompleteRequest.builder()
 				.scheduleId(savedSchedule.getId())
 				.isComplete(true)
@@ -433,7 +442,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.completeSchedule(savedUser.getId(), request);
+			scheduleModifyUsecase.completeSchedule(savedUser.getId(), request);
 
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
@@ -441,7 +450,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				savedSchedule.getId());
 
 			assertSoftly(softly -> {
-				softly.assertThat(scheduleRecord.orElse(null)).isNotNull();
+				softly.assertThat(scheduleRecord.get()).isNotNull();
 				softly.assertThat(scheduleRecord.get().getSchedule().getId()).isEqualTo(savedSchedule.getId());
 			});
 		}
@@ -457,7 +466,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> scheduleUsecase.completeSchedule(savedUser.getId() + 1, request))
+				softly.assertThatThrownBy(() -> scheduleModifyUsecase.completeSchedule(savedUser.getId() + 1, request))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_USER.getHttpStatus())
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_USER.getErrorCode())
@@ -477,7 +486,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> scheduleUsecase.completeSchedule(savedUser.getId(), request))
+				softly.assertThatThrownBy(() -> scheduleModifyUsecase.completeSchedule(savedUser.getId(), request))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE.getHttpStatus())
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE.getErrorCode())
@@ -503,6 +512,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
 			ScheduleRecord savedScheduleRecord = testFixtureBuilder
 				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 1), savedSchedule));
+			entityManager.flush();
+			entityManager.clear();
 
 			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
 				.scheduleId(savedSchedule.getId())
@@ -511,7 +522,9 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			entityManager.flush();
+			entityManager.clear();
 
 			// then
 			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
@@ -536,7 +549,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
 
 			// then
 			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
@@ -553,6 +566,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 1)));
 			ScheduleRecord savedScheduleRecord = testFixtureBuilder
 				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 10), savedSchedule));
+			entityManager.flush();
+			entityManager.clear();
 
 			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
 				.scheduleId(savedSchedule.getId())
@@ -561,7 +576,9 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			entityManager.flush();
+			entityManager.clear();
 
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findById(savedScheduleRecord.getId());
@@ -585,7 +602,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
 
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordByRecordDateAndScheduleId(
@@ -617,7 +634,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
 
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(
@@ -651,6 +668,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 					LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 30)));
 			ScheduleRecord savedScheduleRecord = testFixtureBuilder
 				.buildScheduleRecord(IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 1), savedSchedule));
+			entityManager.flush();
+			entityManager.clear();
 
 			ScheduleDeleteRequest request = ScheduleDeleteRequest.builder()
 				.scheduleId(savedSchedule.getId())
@@ -659,7 +678,9 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			entityManager.flush();
+			entityManager.clear();
 
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findById(savedScheduleRecord.getId());
@@ -689,7 +710,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
 
 			// then
 			Optional<ScheduleRecord> scheduleRecord = scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(
@@ -746,9 +767,9 @@ class ScheduleUseCaseTest extends ServiceTest {
 				.queryDate(QUERY_END_DATE)
 				.build();
 			// when
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request2);
-			scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request3);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request2);
+			scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request3);
 
 			// then
 			Optional<Schedule> schedule = scheduleRepository.findById(savedSchedule.getId());
@@ -773,7 +794,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> scheduleUsecase.deleteSchedule(9999L, request))
+				softly.assertThatThrownBy(() -> scheduleModifyUsecase.deleteSchedule(9999L, request))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_USER.getHttpStatus())
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_USER.getErrorCode())
@@ -793,7 +814,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 			// when -> then
 			assertSoftly(softly -> {
 				softly.assertThatThrownBy(
-						() -> scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(), request))
+						() -> scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(),
+							request))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE.getHttpStatus())
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE.getErrorCode())
@@ -817,7 +839,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 			assertSoftly(softly -> {
 
 				softly.assertThatThrownBy(
-						() -> scheduleUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(),
+						() -> scheduleModifyUsecase.deleteSchedule(testFixtureBuilder.buildUser(GENERAL_USER()).getId(),
 							request))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus",
@@ -872,7 +894,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 					.isOneDayDeleted(true)
 					.build();
 				// when
-				scheduleUsecase.updateSchedule(savedUser.getId(), request);
+				scheduleModifyUsecase.updateSchedule(savedUser.getId(), request);
 
 				// then
 				Schedule schedule = scheduleRepository.findById(savedSchedule.getId()).get();
@@ -923,7 +945,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 				// when -> then
 				assertSoftly(softly -> {
-					softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(savedUser.getId(), request))
+					softly.assertThatThrownBy(() -> scheduleModifyUsecase.updateSchedule(savedUser.getId(), request))
 						.isInstanceOf(CommonException.class)
 						.hasFieldOrPropertyWithValue("errorCode",
 							ExceptionCode.ONE_DAY__NONREPEATABLE_SCHEDULE_CANNOT_AFTER_DATE_UPDATE.getErrorCode());
@@ -967,7 +989,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 					.isOneDayDeleted(true)
 					.build();
 				// when
-				ScheduleIdResponse scheduleIdResponse = scheduleUsecase.updateSchedule(savedUser.getId(), request);
+				ScheduleIdResponse scheduleIdResponse = scheduleModifyUsecase.updateSchedule(savedUser.getId(),
+					request);
 
 				// then
 				Schedule preSchedule = scheduleRepository.findById(savedSchedule.getId()).get();
@@ -1024,6 +1047,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 					IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 10), savedSchedule));
 				ScheduleRecord scheduleRecord2 = testFixtureBuilder.buildScheduleRecord(
 					IS_NOT_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 20), savedSchedule));
+				entityManager.flush();
+				entityManager.clear();
 
 				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
 					.title("일정 제목")
@@ -1046,7 +1071,11 @@ class ScheduleUseCaseTest extends ServiceTest {
 					.isOneDayDeleted(false)
 					.build();
 				// when
-				ScheduleIdResponse scheduleIdResponse = scheduleUsecase.updateSchedule(savedUser.getId(), request);
+				ScheduleIdResponse scheduleIdResponse = scheduleModifyUsecase.updateSchedule(savedUser.getId(),
+					request);
+				entityManager.flush();
+				entityManager.clear();
+
 				// then
 				Schedule preSchedule = scheduleRepository.findById(savedSchedule.getId()).get();
 				Schedule updatedSchedule = scheduleRepository.findById(scheduleIdResponse.scheduleId()).get();
@@ -1097,6 +1126,8 @@ class ScheduleUseCaseTest extends ServiceTest {
 					IS_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 10), savedSchedule));
 				ScheduleRecord scheduleRecord2 = testFixtureBuilder.buildScheduleRecord(
 					IS_NOT_COMPLETE_SCHEDULE_RECORD(LocalDate.of(2025, 1, 20), savedSchedule));
+				entityManager.flush();
+				entityManager.clear();
 
 				ScheduleCreateRequest updateScheduleData = ScheduleCreateRequest.builder()
 					.title("일정 제목")
@@ -1119,7 +1150,11 @@ class ScheduleUseCaseTest extends ServiceTest {
 					.isOneDayDeleted(false)
 					.build();
 				// when
-				ScheduleIdResponse scheduleIdResponse = scheduleUsecase.updateSchedule(savedUser.getId(), request);
+				ScheduleIdResponse scheduleIdResponse = scheduleModifyUsecase.updateSchedule(savedUser.getId(),
+					request);
+				entityManager.flush();
+				entityManager.clear();
+
 				// then
 				Optional<Schedule> preSchedule = scheduleRepository.findById(savedSchedule.getId());
 				Schedule updatedSchedule = scheduleRepository.findById(scheduleIdResponse.scheduleId()).get();
@@ -1187,7 +1222,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 				// when -> then
 				assertSoftly(softly -> {
-					softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(savedUser.getId(), request))
+					softly.assertThatThrownBy(() -> scheduleModifyUsecase.updateSchedule(savedUser.getId(), request))
 						.isInstanceOf(CommonException.class)
 						.hasFieldOrPropertyWithValue("errorCode",
 							ExceptionCode.PERIOD_SCHEDULE_CANNOT_AFTER_DATE_UPDATE.getErrorCode());
@@ -1222,7 +1257,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(9999L, request))
+				softly.assertThatThrownBy(() -> scheduleModifyUsecase.updateSchedule(9999L, request))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_USER.getHttpStatus())
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_USER.getErrorCode())
@@ -1257,7 +1292,7 @@ class ScheduleUseCaseTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> scheduleUsecase.updateSchedule(savedUser.getId(), request))
+				softly.assertThatThrownBy(() -> scheduleModifyUsecase.updateSchedule(savedUser.getId(), request))
 					.isInstanceOf(CommonException.class)
 					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.NOT_FOUND_SCHEDULE.getHttpStatus())
 					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.NOT_FOUND_SCHEDULE.getErrorCode())
