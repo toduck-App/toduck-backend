@@ -34,6 +34,8 @@ public class RoutineReminderBatchSchedulerUseCase {
 		LocalDate today = currentDateTime.toLocalDate();
 		LocalDate tomorrow = today.plusDays(1);
 
+		log.info("일일 루틴 알림 배치 작업 시작 - 현재시간: {}", currentDateTime);
+
 		routineRepository.findActiveRoutinesWithReminderForDates(today, tomorrow)
 			.forEach(routine -> routineReminderSchedulerService.scheduleRoutineReminders(routine, currentDateTime));
 
