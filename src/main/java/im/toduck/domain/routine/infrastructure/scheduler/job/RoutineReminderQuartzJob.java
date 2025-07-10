@@ -3,20 +3,20 @@ package im.toduck.domain.routine.infrastructure.scheduler.job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 import im.toduck.domain.notification.domain.event.RoutineReminderNotificationEvent;
 import im.toduck.domain.notification.messaging.NotificationMessagePublisher;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RoutineReminderQuartzJob extends QuartzJobBean {
 
-	private final NotificationMessagePublisher notificationMessagePublisher;
+	@Autowired
+	private NotificationMessagePublisher notificationMessagePublisher;
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {

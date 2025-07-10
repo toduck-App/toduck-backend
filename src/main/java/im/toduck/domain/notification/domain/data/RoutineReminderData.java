@@ -1,5 +1,7 @@
 package im.toduck.domain.notification.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,7 @@ public class RoutineReminderData extends AbstractNotificationData {
 	private Long routineId;
 	private String routineTitle;
 	private Integer reminderMinutes;
+	@JsonProperty("allDay")
 	private boolean isAllDay;
 
 	public static RoutineReminderData of(

@@ -4,18 +4,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 import im.toduck.domain.routine.domain.service.RoutineReminderSchedulerService;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
+import im.toduck.global.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
+@UseCase
 @RequiredArgsConstructor
 public class RoutineReminderBatchSchedulerUseCase {
 
