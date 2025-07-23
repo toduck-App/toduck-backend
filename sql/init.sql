@@ -309,7 +309,7 @@ CREATE TABLE keywords
 CREATE TABLE keywords_user
 (
     id          BIGINT PRIMARY KEY auto_increment,
-    user_id     BIGINT  NOT NULL,
+    user_id     BIGINT                                                      NOT NULL,
     category    ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
     keyword     VARCHAR(255)                                                NOT NULL,
     count       BIGINT                                                      NOT NULL DEFAULT 0,
