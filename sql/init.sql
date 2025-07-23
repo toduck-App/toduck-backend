@@ -297,6 +297,38 @@ CREATE TABLE diary_image_file
     FOREIGN KEY (diary_id) REFERENCES diary (id) ON DELETE CASCADE
 );
 
+CREATE TABLE keywords
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    category    ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
+    keyword     VARCHAR(255)                                                NOT NULL,
+    created_at  DATETIME                                                    NOT NULL,
+    UNIQUE KEY uniq_category_keyword (category, keyword)
+);
+
+CREATE TABLE keywords_user
+(
+    id          BIGINT PRIMARY KEY auto_increment,
+    user_id     BIGINT  NOT NULL,
+    category    ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
+    keyword     VARCHAR(255)                                                NOT NULL,
+    count       BIGINT                                                      NOT NULL DEFAULT 0,
+    created_at  DATETIME                                                    NOT NULL,
+    updated_at  DATETIME                                                    NOT NULL,
+    deleted_at  DATETIME                                                    NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE diary_keywords
+(
+    diary_id BIGINT     NOT NULL,
+    keyword_id BIGINT   NOT NULL,
+    checked BOOLEAN     NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(diary_id, keyword_id),
+    FOREIGN KEY (diary_id) REFERENCES diary(id) ON DELETE CASCADE,
+    FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE
+);
+
 CREATE TABLE concentration
 (
     id                  BIGINT PRIMARY KEY auto_increment,
