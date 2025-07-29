@@ -297,7 +297,7 @@ CREATE TABLE diary_image_file
     FOREIGN KEY (diary_id) REFERENCES diary (id) ON DELETE CASCADE
 );
 
-CREATE TABLE keywords
+CREATE TABLE master_keywords
 (
     id          BIGINT PRIMARY KEY auto_increment,
     category    ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
@@ -306,7 +306,7 @@ CREATE TABLE keywords
     UNIQUE KEY uniq_category_keyword (category, keyword)
 );
 
-CREATE TABLE keywords_user
+CREATE TABLE user_keywords
 (
     id          BIGINT PRIMARY KEY auto_increment,
     user_id     BIGINT                                                      NOT NULL,
