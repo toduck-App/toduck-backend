@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import im.toduck.domain.diary.persistence.entity.KeywordCategory;
+import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
@@ -122,5 +124,14 @@ public class TestFixtureBuilder {
 			.followed(followed)
 			.build();
 		return bs.followRepository().save(follow);
+	}
+
+	public MasterKeyword buildMasterKeyword(KeywordCategory keywordCategory, String keyword) {
+		MasterKeyword masterKeyword = MasterKeyword.builder()
+			.category(keywordCategory)
+			.keyword(keyword)
+			.createdAt(LocalDateTime.now())
+			.build();
+		return bs.masterKeywordRepository().save(masterKeyword);
 	}
 }

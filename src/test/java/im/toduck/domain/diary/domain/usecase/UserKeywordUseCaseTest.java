@@ -2,8 +2,8 @@ package im.toduck.domain.diary.domain.usecase;
 
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +18,12 @@ import im.toduck.domain.diary.domain.service.UserKeywordService;
 import im.toduck.domain.diary.persistence.entity.KeywordCategory;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.diary.persistence.entity.UserKeyword;
+import im.toduck.domain.diary.persistence.repository.MasterKeywordRepository;
 import im.toduck.domain.diary.persistence.repository.UserKeywordRepository;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
+import jakarta.transaction.Transactional;
 
 class UserKeywordUseCaseTest extends ServiceTest {
 
@@ -35,7 +39,11 @@ class UserKeywordUseCaseTest extends ServiceTest {
 	@Autowired
 	private MasterKeywordService masterKeywordService;
 
+	@Autowired
+	private MasterKeywordRepository masterKeywordRepository;
+
 	@Nested
+	@Transactional
 	@DisplayName("사용자 키워드 초기 설정")
 	class setupKeyword {
 		private User savedUser;
@@ -48,22 +56,14 @@ class UserKeywordUseCaseTest extends ServiceTest {
 		@Test
 		void 성공적으로_생성한다() {
 			// given
-			List<MasterKeyword> masterKeywords = List.of(
-				MasterKeyword.builder()
-					.category(KeywordCategory.PLACE)
-					.keyword("학교")
-					.createdAt(LocalDateTime.now())
-					.build(),
-				MasterKeyword.builder()
-					.category(KeywordCategory.SITUATION)
-					.keyword("요리")
-					.createdAt(LocalDateTime.now())
-					.build(),
-				MasterKeyword.builder()
-					.category(KeywordCategory.RESULT)
-					.keyword("불편한 대화")
-					.createdAt(LocalDateTime.now())
-					.build()
+			MasterKeyword mk1 = masterKeywordRepository.save(
+				testFixtureBuilder.buildMasterKeyword(KeywordCategory.PLACE, "학교")
+			);
+			MasterKeyword mk2 = masterKeywordRepository.save(
+				testFixtureBuilder.buildMasterKeyword(KeywordCategory.SITUATION, "요리")
+			);
+			MasterKeyword mk3 = masterKeywordRepository.save(
+				testFixtureBuilder.buildMasterKeyword(KeywordCategory.RESULT, "불편한 대화")
 			);
 
 			// when
@@ -72,7 +72,6 @@ class UserKeywordUseCaseTest extends ServiceTest {
 			// then
 			List<UserKeyword> userKeywords = userKeywordRepository.findAll();
 			List<MasterKeyword> savedMasterKeywords = masterKeywordService.findAll();
-
 			assertThat(userKeywords).hasSize(savedMasterKeywords.size());
 
 			assertThat(userKeywords)
@@ -88,6 +87,31 @@ class UserKeywordUseCaseTest extends ServiceTest {
 
 			assertThat(userKeywordValues)
 				.containsExactlyInAnyOrderElementsOf(masterKeywordValues);
+		}
+
+		@Test
+		void 이미_생성된_경우_예외를_던진다() {
+			// given
+			MasterKeyword mk1 = masterKeywordRepository.save(
+				testFixtureBuilder.buildMasterKeyword(KeywordCategory.PLACE, "학교")
+			);
+			MasterKeyword mk2 = masterKeywordRepository.save(
+				testFixtureBuilder.buildMasterKeyword(KeywordCategory.SITUATION, "요리")
+			);
+			MasterKeyword mk3 = masterKeywordRepository.save(
+				testFixtureBuilder.buildMasterKeyword(KeywordCategory.RESULT, "불편한 대화")
+			);
+			userKeywordUsecase.setupKeyword(savedUser.getId());
+
+			List<UserKeyword> userKeywords = userKeywordRepository.findAll();
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> userKeywordUsecase.setupKeyword(savedUser.getId()))
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.ALREADY_SETUP_KEYWORD.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.ALREADY_SETUP_KEYWORD.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.ALREADY_SETUP_KEYWORD.getMessage());
+			});
 		}
 	}
 }
