@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
@@ -18,6 +19,7 @@ import lombok.Getter;
 	@UniqueConstraint(name = "uniq_category_keyword", columnNames = {"category", "keyword"})
 })
 @Getter
+@Builder
 public class MasterKeyword {
 
 	@Id
