@@ -308,14 +308,14 @@ CREATE TABLE master_keywords
 
 CREATE TABLE user_keywords
 (
-    id          BIGINT PRIMARY KEY auto_increment,
-    user_id     BIGINT                                                      NOT NULL,
-    category    ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
-    keyword     VARCHAR(255)                                                NOT NULL,
-    count       BIGINT                                                      NOT NULL DEFAULT 0,
-    created_at  DATETIME                                                    NOT NULL,
-    updated_at  DATETIME                                                    NOT NULL,
-    deleted_at  DATETIME                                                    NULL,
+    id                  BIGINT PRIMARY KEY auto_increment,
+    user_id             BIGINT                                                      NOT NULL,
+    category            ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
+    keyword             VARCHAR(255)                                                NOT NULL,
+    keyword_count       BIGINT                                                      NOT NULL DEFAULT 0,
+    created_at          DATETIME                                                    NOT NULL,
+    updated_at          DATETIME                                                    NOT NULL,
+    deleted_at          DATETIME                                                    NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 

@@ -43,7 +43,7 @@ public class UserKeyword extends BaseEntity {
 	@Column(nullable = false, length = 255)
 	private String keyword;
 
-	@Column(nullable = false)
+	@Column(name = "keyword_count", nullable = false)
 	private Long count = 0L;
 
 	@Builder

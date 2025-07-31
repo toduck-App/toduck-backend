@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.diary.domain.usecase.UserKeywordUseCase;
 import im.toduck.domain.diary.presentation.api.UserKeywordApi;
-import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreate;
+import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreateRequest;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -40,7 +40,7 @@ public class UserKeywordController implements UserKeywordApi {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> createKeyword(
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
-		@RequestBody @Valid final UserKeywordCreate request
+		@RequestBody @Valid final UserKeywordCreateRequest request
 	) {
 		userKeywordUseCase.createKeyword(userDetails.getUserId(), request);
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "유저 키워드 생성 요청 DTO")
-public record UserKeywordCreate(
+public record UserKeywordCreateRequest(
 	@NotNull(message = "카테고리는 비어있을 수 없습니다.")
 	@Schema(description = "카테고리", example = "PLACE")
 	KeywordCategory keywordCategory,

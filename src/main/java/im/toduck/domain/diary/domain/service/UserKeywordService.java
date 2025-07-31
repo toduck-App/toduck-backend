@@ -9,7 +9,7 @@ import im.toduck.domain.diary.common.mapper.UserKeywordMapper;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.diary.persistence.entity.UserKeyword;
 import im.toduck.domain.diary.persistence.repository.UserKeywordRepository;
-import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreate;
+import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,12 +34,12 @@ public class UserKeywordService {
 	}
 
 	@Transactional
-	public boolean existKeyword(final User user, final UserKeywordCreate request) {
+	public boolean existKeyword(final User user, final UserKeywordCreateRequest request) {
 		return userKeywordRepository.existsByUserAndKeyword(user, request.keyword());
 	}
 
 	@Transactional
-	public void createKeyword(final User user, final UserKeywordCreate request) {
+	public void createKeyword(final User user, final UserKeywordCreateRequest request) {
 		UserKeyword newKeyword = UserKeyword.builder()
 			.user(user)
 			.category(request.keywordCategory())

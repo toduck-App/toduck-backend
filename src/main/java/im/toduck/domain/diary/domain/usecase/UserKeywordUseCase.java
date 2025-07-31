@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.diary.domain.service.MasterKeywordService;
 import im.toduck.domain.diary.domain.service.UserKeywordService;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
-import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreate;
+import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreateRequest;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -39,7 +39,7 @@ public class UserKeywordUseCase {
 	}
 
 	@Transactional
-	public void createKeyword(final Long userId, final UserKeywordCreate request) {
+	public void createKeyword(final Long userId, final UserKeywordCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreate;
+import im.toduck.domain.diary.presentation.dto.request.UserKeywordCreateRequest;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -57,6 +57,6 @@ public interface UserKeywordApi {
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> createKeyword(
 		@AuthenticationPrincipal final CustomUserDetails userDetails,
-		@RequestBody @Valid final UserKeywordCreate request
+		@RequestBody @Valid final UserKeywordCreateRequest request
 	);
 }
