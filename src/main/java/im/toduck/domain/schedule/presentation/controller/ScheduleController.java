@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import im.toduck.domain.schedule.domain.usecase.ScheduleUseCase;
+import im.toduck.domain.schedule.domain.usecase.ScheduleModifyUseCase;
 import im.toduck.domain.schedule.presentation.api.ScheduleApi;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCompleteRequest;
 import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/v1/schedules")
 public class ScheduleController implements ScheduleApi {
-	private final ScheduleUseCase scheduleUseCase;
+	private final ScheduleModifyUseCase scheduleModifyUseCase;
 
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
@@ -40,8 +40,9 @@ public class ScheduleController implements ScheduleApi {
 		@RequestBody @Valid ScheduleCreateRequest request,
 		@AuthenticationPrincipal CustomUserDetails user
 	) {
+		ScheduleIdResponse response = scheduleModifyUseCase.createSchedule(user.getUserId(), request);
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(scheduleUseCase.createSchedule(user.getUserId(), request)));
+			.body(ApiResponse.createSuccess(response));
 	}
 
 	@GetMapping
@@ -52,7 +53,8 @@ public class ScheduleController implements ScheduleApi {
 		@RequestParam LocalDate endDate
 	) {
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(scheduleUseCase.getRangeSchedule(user.getUserId(), startDate, endDate)));
+			.body(ApiResponse.createSuccess(
+				scheduleModifyUseCase.getRangeSchedule(user.getUserId(), startDate, endDate)));
 	}
 
 	@GetMapping("/{scheduleRecordId}")
@@ -62,7 +64,7 @@ public class ScheduleController implements ScheduleApi {
 		@RequestParam Long scheduleRecordId
 	) {
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(scheduleUseCase.getSchedule(user.getUserId(), scheduleRecordId)));
+			.body(ApiResponse.createSuccess(scheduleModifyUseCase.getSchedule(user.getUserId(), scheduleRecordId)));
 	}
 
 	@PostMapping("/is-complete")
@@ -71,7 +73,7 @@ public class ScheduleController implements ScheduleApi {
 		@AuthenticationPrincipal CustomUserDetails user,
 		@RequestBody ScheduleCompleteRequest scheduleCompleteRequest
 	) {
-		scheduleUseCase.completeSchedule(user.getUserId(), scheduleCompleteRequest);
+		scheduleModifyUseCase.completeSchedule(user.getUserId(), scheduleCompleteRequest);
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
 
@@ -81,7 +83,7 @@ public class ScheduleController implements ScheduleApi {
 		@AuthenticationPrincipal CustomUserDetails user,
 		@RequestBody @Valid ScheduleDeleteRequest scheduleDeleteRequest
 	) {
-		scheduleUseCase.deleteSchedule(user.getUserId(), scheduleDeleteRequest);
+		scheduleModifyUseCase.deleteSchedule(user.getUserId(), scheduleDeleteRequest);
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
 
@@ -92,6 +94,6 @@ public class ScheduleController implements ScheduleApi {
 		@RequestBody @Valid ScheduleModifyRequest request
 	) {
 		return ResponseEntity.ok()
-			.body(ApiResponse.createSuccess(scheduleUseCase.updateSchedule(user.getUserId(), request)));
+			.body(ApiResponse.createSuccess(scheduleModifyUseCase.updateSchedule(user.getUserId(), request)));
 	}
 }
