@@ -102,6 +102,7 @@ public enum ExceptionCode {
 	/* 406xx keyword */
 	ALREADY_SETUP_KEYWORD(HttpStatus.CONFLICT, 40601, "이미 초기화된 유저입니다."),
 	ALREADY_EXISTS_KEYWORD(HttpStatus.CONFLICT, 40602, "이미 존재하는 키워드입니다."),
+	NOT_FOUND_KEYWORD(HttpStatus.NOT_FOUND, 40603, "존재하지 않는 키워드입니다."),
 
 	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",

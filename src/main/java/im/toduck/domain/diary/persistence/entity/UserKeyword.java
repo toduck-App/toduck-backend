@@ -56,4 +56,10 @@ public class UserKeyword extends BaseEntity {
 		this.keyword = keyword;
 		this.count = count != null ? count : 0L;
 	}
+
+	public void restore(KeywordCategory newCategory) {
+		this.deletedAt = null;
+		this.category = newCategory;
+		this.count = 0L;
+	}
 }

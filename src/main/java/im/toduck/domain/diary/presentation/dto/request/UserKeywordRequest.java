@@ -4,9 +4,11 @@ import im.toduck.domain.diary.persistence.entity.KeywordCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 @Schema(description = "유저 키워드 생성 요청 DTO")
-public record UserKeywordCreateRequest(
+public record UserKeywordRequest(
 	@NotNull(message = "카테고리는 비어있을 수 없습니다.")
 	@Schema(description = "카테고리", example = "PLACE")
 	KeywordCategory keywordCategory,
