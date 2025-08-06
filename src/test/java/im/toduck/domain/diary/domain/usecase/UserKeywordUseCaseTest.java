@@ -21,6 +21,8 @@ import im.toduck.domain.diary.persistence.entity.UserKeyword;
 import im.toduck.domain.diary.persistence.repository.MasterKeywordRepository;
 import im.toduck.domain.diary.persistence.repository.UserKeywordRepository;
 import im.toduck.domain.diary.presentation.dto.request.UserKeywordRequest;
+import im.toduck.domain.diary.presentation.dto.response.UserKeywordListResponse;
+import im.toduck.domain.diary.presentation.dto.response.UserKeywordResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -231,6 +233,68 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				// then
 				List<UserKeyword> userKeywords = userKeywordRepository.findAll();
 				assertThat(userKeywords.size()).isEqualTo(0);
+			}
+		}
+	}
+
+	@Nested
+	@Transactional
+	@DisplayName("특정 사용자 키워드 목록 반환")
+	class getKeyword {
+		private User savedUser;
+		UserKeywordRequest userKeywordRequest, userKeywordRequest2;
+
+		@BeforeEach
+		void setUp() {
+			savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+			userKeywordRequest = UserKeywordRequest.builder()
+				.keywordCategory(KeywordCategory.PLACE)
+				.keyword("서울역")
+				.build();
+			userKeywordRequest2 = UserKeywordRequest.builder()
+				.keywordCategory(KeywordCategory.SITUATION)
+				.keyword("요리")
+				.build();
+		}
+
+		@Nested
+		@DisplayName("성공 케이스")
+		class Success {
+
+			@Test
+			@DisplayName("특정 사용자의 키워드 목록을 성공적으로 가져온다")
+			void 특정_사용자의_키워드_목록을_성공적으로_가져온다() {
+				// given
+				userKeywordUsecase.createKeyword(savedUser.getId(), userKeywordRequest);
+				userKeywordUsecase.createKeyword(savedUser.getId(), userKeywordRequest2);
+
+				// when
+				UserKeywordListResponse userKeywordListResponse = userKeywordUsecase.getKeywords(savedUser.getId());
+
+				// then
+				assertThat(userKeywordListResponse).isNotNull();
+				assertThat(userKeywordListResponse.userKeywordDtos()).hasSize(2);
+
+				// DTO 내용 검증
+				List<KeywordCategory> categories = userKeywordListResponse.userKeywordDtos()
+					.stream()
+					.map(UserKeywordResponse::category)
+					.toList();
+
+				List<String> keywords = userKeywordListResponse.userKeywordDtos()
+					.stream()
+					.map(UserKeywordResponse::keyword)
+					.toList();
+
+				boolean allCountZero = userKeywordListResponse.userKeywordDtos()
+					.stream()
+					.allMatch(dto -> dto.count() == 0);
+
+				assertThat(categories)
+					.containsExactlyInAnyOrder(KeywordCategory.PLACE, KeywordCategory.SITUATION);
+				assertThat(keywords)
+					.containsExactlyInAnyOrder("서울역", "요리");
+				assertThat(allCountZero).isTrue();
 			}
 		}
 	}

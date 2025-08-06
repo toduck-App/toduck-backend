@@ -10,6 +10,8 @@ import im.toduck.domain.diary.domain.service.UserKeywordService;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.diary.persistence.entity.UserKeyword;
 import im.toduck.domain.diary.presentation.dto.request.UserKeywordRequest;
+import im.toduck.domain.diary.presentation.dto.response.UserKeywordListResponse;
+import im.toduck.domain.diary.presentation.dto.response.UserKeywordResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -71,5 +73,13 @@ public class UserKeywordUseCase {
 		}
 
 		userKeywordService.deleteKeyword(user, request);
+	}
+
+	@Transactional(readOnly = true)
+	public UserKeywordListResponse getKeywords(final Long userId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		List<UserKeywordResponse> userKeywords = userKeywordService.getUserKeywordsById(userId);
+		return UserKeywordListResponse.toListUserKeywordResponse(userKeywords);
 	}
 }

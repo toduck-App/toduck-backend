@@ -1,5 +1,6 @@
 package im.toduck.domain.diary.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +28,6 @@ public interface UserKeywordRepository extends JpaRepository<UserKeyword, Long> 
 		nativeQuery = true
 	)
 	Optional<UserKeyword> findByUserAndKeywordIncludingDeleted(User user, String keyword);
+
+	List<UserKeyword> findByUserId(Long userId);
 }

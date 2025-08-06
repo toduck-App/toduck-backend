@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import im.toduck.domain.diary.presentation.dto.request.UserKeywordRequest;
+import im.toduck.domain.diary.presentation.dto.response.UserKeywordListResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -78,6 +79,23 @@ public interface UserKeywordApi {
 	)
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteKeyword(
 		@RequestBody @Valid final UserKeywordRequest request,
+		@AuthenticationPrincipal final CustomUserDetails userDetails
+	);
+
+	@Operation(
+		summary = "사용자 키워드 검색",
+		description = """
+				1. 해당 사용자의 키워드 목록을 가져옵니다.
+			"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "키워드 생성 성공, 해당 사용자의 키워드 목록을 반환합니다."
+		),
+		errors = {
+		}
+	)
+	public ResponseEntity<ApiResponse<UserKeywordListResponse>> getKeyword(
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	);
 }

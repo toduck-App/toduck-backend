@@ -11,6 +11,7 @@ import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.diary.persistence.entity.UserKeyword;
 import im.toduck.domain.diary.persistence.repository.UserKeywordRepository;
 import im.toduck.domain.diary.presentation.dto.request.UserKeywordRequest;
+import im.toduck.domain.diary.presentation.dto.response.UserKeywordResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -73,4 +74,16 @@ public class UserKeywordService {
 		keyword.restore(request.keywordCategory());
 	}
 
+	@Transactional(readOnly = true)
+	public List<UserKeywordResponse> getUserKeywordsById(final Long userId) {
+		List<UserKeyword> keywords = userKeywordRepository.findByUserId(userId);
+
+		return keywords.stream()
+			.map(uk -> new UserKeywordResponse(
+				uk.getCategory(),
+				uk.getKeyword(),
+				uk.getCount()
+			))
+			.toList();
+	}
 }
