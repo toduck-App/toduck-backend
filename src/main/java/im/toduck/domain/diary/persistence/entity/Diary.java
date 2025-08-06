@@ -58,6 +58,9 @@ public class Diary extends BaseEntity {
 	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DiaryImage> diaryImages = new ArrayList<>();
 
+	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<DiaryKeyword> diaryKeywords = new ArrayList<>();
+
 	@Builder
 	private Diary(User user,
 		LocalDate date,

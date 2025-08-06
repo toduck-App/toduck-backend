@@ -321,12 +321,17 @@ CREATE TABLE user_keywords
 
 CREATE TABLE diary_keywords
 (
-    diary_id BIGINT     NOT NULL,
-    keyword_id BIGINT   NOT NULL,
-    checked BOOLEAN     NOT NULL DEFAULT FALSE,
-    PRIMARY KEY(diary_id, keyword_id),
+    id                  BIGINT      PRIMARY KEY AUTO_INCREMENT,
+    diary_id            BIGINT      NOT NULL,
+    user_keyword_id     BIGINT      NOT NULL,
+    checked             BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at          DATETIME    NOT NULL,
+    updated_at          DATETIME    NOT NULL,
+    deleted_at          DATETIME    NULL,
+
+    UNIQUE KEY uniq_diary_keyword (diary_id, keyword_id),
     FOREIGN KEY (diary_id) REFERENCES diary(id) ON DELETE CASCADE,
-    FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE
+    FOREIGN KEY (user_keyword_id) REFERENCES user_keywords(id) ON DELETE CASCADE
 );
 
 CREATE TABLE concentration
