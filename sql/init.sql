@@ -539,7 +539,7 @@ CREATE TABLE routine_reminder_job (
                                       job_key VARCHAR(255) NOT NULL,
                                       created_at DATETIME NOT NULL,
                                       updated_at DATETIME NOT NULL,
-                                      deleted_at DATETIME NOT NULL,
+                                      deleted_at DATETIME NULL,
                                       FOREIGN KEY (routine_id) REFERENCES routine(id),
                                       FOREIGN KEY (user_id) REFERENCES users(id),
                                       UNIQUE KEY uk_routine_reminder_date_time (routine_id, reminder_date, reminder_time),
