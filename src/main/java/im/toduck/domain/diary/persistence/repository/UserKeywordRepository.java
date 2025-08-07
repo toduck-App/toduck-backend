@@ -30,4 +30,6 @@ public interface UserKeywordRepository extends JpaRepository<UserKeyword, Long> 
 	Optional<UserKeyword> findByUserAndKeywordIncludingDeleted(User user, String keyword);
 
 	List<UserKeyword> findByUserId(Long userId);
+
+	List<UserKeyword> findByUserIdAndIdIn(Long userId, List<Long> keywordIds);
 }

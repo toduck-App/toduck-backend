@@ -87,4 +87,14 @@ public class UserKeywordService {
 			))
 			.toList();
 	}
+
+	@Transactional(readOnly = true)
+	public List<UserKeyword> getUserKeywordsByIds(Long userId, List<Long> keywordIds) {
+		List<UserKeyword> userKeywords = userKeywordRepository.findByUserIdAndIdIn(userId, keywordIds);
+
+		if (userKeywords.size() != keywordIds.size()) {
+			throw CommonException.from(ExceptionCode.INVALID_KEYWORD_ID);
+		}
+		return userKeywords;
+	}
 }

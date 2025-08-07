@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "diary_keywords")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE diary SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE diary_keywords SET deleted_at = NOW() where id=?")
 @SQLRestriction(value = "deleted_at is NULL")
 public class DiaryKeyword extends BaseEntity {
 

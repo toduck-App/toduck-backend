@@ -99,10 +99,13 @@ public enum ExceptionCode {
 	UNAUTHORIZED_ACCESS_DIARY(HttpStatus.FORBIDDEN, 40502, "일기에 접근 권한이 없습니다."),
 	EXISTS_DATE_DIARY(HttpStatus.CONFLICT, 40503, "이미 해당 날짜에 일기가 존재합니다."),
 
-	/* 406xx keyword */
+	/* 406xx userKeyword */
 	ALREADY_SETUP_KEYWORD(HttpStatus.CONFLICT, 40601, "이미 초기화된 유저입니다."),
 	ALREADY_EXISTS_KEYWORD(HttpStatus.CONFLICT, 40602, "이미 존재하는 키워드입니다."),
 	NOT_FOUND_KEYWORD(HttpStatus.NOT_FOUND, 40603, "존재하지 않는 키워드입니다."),
+
+	/* 407xx diaryKeyword */
+	INVALID_KEYWORD_ID(HttpStatus.BAD_REQUEST, 40701, "유효하지 않은 키워드 ID입니다."),
 
 	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",
