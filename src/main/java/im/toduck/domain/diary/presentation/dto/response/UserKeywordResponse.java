@@ -6,6 +6,9 @@ import lombok.Builder;
 
 @Builder
 public record UserKeywordResponse(
+	@Schema(description = "키워드 ID", example = "1")
+	Long id,
+
 	@Schema(description = "카테고리", example = "PLACE")
 	KeywordCategory category,
 

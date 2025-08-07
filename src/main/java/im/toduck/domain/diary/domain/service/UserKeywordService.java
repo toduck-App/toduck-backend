@@ -80,6 +80,7 @@ public class UserKeywordService {
 
 		return keywords.stream()
 			.map(uk -> new UserKeywordResponse(
+				uk.getId(),
 				uk.getCategory(),
 				uk.getKeyword(),
 				uk.getCount()
