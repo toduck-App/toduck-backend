@@ -31,7 +31,10 @@ public record DiaryResponse(
 	String memo,
 
 	@Schema(description = "일기 이미지 목록")
-	List<DiaryImageDto> diaryImages
+	List<DiaryImageDto> diaryImages,
+
+	@Schema(description = "연결된 키워드 목록")
+	List<DiaryKeywordDto> diaryKeywords
 ) {
 
 }

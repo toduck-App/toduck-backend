@@ -4,6 +4,7 @@ import java.util.List;
 
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
+import im.toduck.domain.diary.presentation.dto.response.DiaryKeywordDto;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
@@ -35,6 +36,9 @@ public class DiaryMapper {
 			diary.getMemo(),
 			diary.getDiaryImages().stream()
 				.map(DiaryImageFileMapper::fromDiaryImage)
+				.toList(),
+			diary.getDiaryKeywords().stream()
+				.map(DiaryKeywordDto::from)
 				.toList()
 		);
 	}
