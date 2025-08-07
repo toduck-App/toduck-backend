@@ -17,6 +17,7 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.quartz.auto-startup", havingValue = "true", matchIfMissing = true)
 public class RoutineReminderSchedulerService {
 
 	private final Scheduler scheduler;
@@ -41,15 +43,20 @@ public class RoutineReminderSchedulerService {
 	private static final LocalTime BATCH_EXECUTION_TIME = LocalTime.of(3, 58);
 
 	@Transactional
-	public void scheduleRoutineReminders(final Routine routine, final LocalDateTime currentDateTime) {
+	public void scheduleRoutineReminders(
+		final Routine routine,
+		final LocalDateTime currentDateTime,
+		final boolean isBatchScheduling
+	) {
 		try {
 			LocalDateTime nextBatchTime = calculateNextBatchExecutionTime(currentDateTime);
 			LocalDate currentDate = currentDateTime.toLocalDate();
 			LocalDate endDate = nextBatchTime.toLocalDate().plusDays(1);
 
-			scheduleRemindersInDateRange(routine, currentDate, endDate, currentDateTime, nextBatchTime);
+			LocalDateTime scheduleUntil = isBatchScheduling ? nextBatchTime : nextBatchTime.plusDays(1);
+			scheduleRemindersInDateRange(routine, currentDate, endDate, currentDateTime, scheduleUntil);
 
-			log.debug("루틴 알림 스케줄링 완료 - RoutineId: {}", routine.getId());
+			log.debug("루틴 알림 스케줄링 완료 - RoutineId: {}, isBatch: {}", routine.getId(), isBatchScheduling);
 		} catch (Exception e) {
 			log.error("루틴 알림 스케줄링 실패 - RoutineId: {}", routine.getId(), e);
 			throw new RuntimeException("루틴 알림 스케줄링 중 오류가 발생했습니다", e);

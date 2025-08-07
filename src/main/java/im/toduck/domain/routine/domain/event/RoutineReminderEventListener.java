@@ -3,6 +3,7 @@ package im.toduck.domain.routine.domain.event;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -10,16 +11,19 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import im.toduck.domain.routine.domain.service.RoutineReminderSchedulerService;
 import im.toduck.domain.routine.domain.service.RoutineService;
+import im.toduck.domain.user.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.quartz.auto-startup", havingValue = "true", matchIfMissing = true)
 public class RoutineReminderEventListener {
 
 	private final RoutineService routineService;
 	private final RoutineReminderSchedulerService routineReminderSchedulerService;
+	private final UserService userService;
 
 	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -27,10 +31,11 @@ public class RoutineReminderEventListener {
 		log.info("루틴 생성 이벤트 처리 시작 - RoutineId: {}", event.getRoutineId());
 
 		try {
-			routineService.getUserRoutine(event.getUser(), event.getRoutineId())
+			userService.getUserById(event.getUserId())
+				.flatMap(user -> routineService.getUserRoutine(user, event.getRoutineId()))
 				.ifPresent(routine -> {
 					LocalDateTime currentDateTime = LocalDateTime.now();
-					routineReminderSchedulerService.scheduleRoutineReminders(routine, currentDateTime);
+					routineReminderSchedulerService.scheduleRoutineReminders(routine, currentDateTime, false);
 				});
 		} catch (Exception e) {
 			log.error("루틴 생성 이벤트 처리 중 오류 발생 - RoutineId: {}", event.getRoutineId(), e);
@@ -44,16 +49,16 @@ public class RoutineReminderEventListener {
 
 		try {
 			if (event.isReminderRelatedChanged()) {
-				// 오늘부터의 알림을 모두 취소
 				routineReminderSchedulerService.cancelFutureRoutineReminders(
 					event.getRoutineId(), LocalDate.now()
 				);
 
-				// 새로운 설정으로 알림 재등록
-				routineService.getUserRoutine(event.getUser(), event.getRoutineId())
+				userService.getUserById(event.getUserId())
+					.flatMap(user -> routineService.getUserRoutine(user, event.getRoutineId()))
 					.ifPresent(routine -> {
 						LocalDateTime currentDateTime = LocalDateTime.now();
-						routineReminderSchedulerService.scheduleRoutineReminders(routine, currentDateTime);
+						routineReminderSchedulerService.scheduleRoutineReminders(routine, currentDateTime,
+							false);
 					});
 			}
 		} catch (Exception e) {

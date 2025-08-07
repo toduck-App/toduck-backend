@@ -1,15 +1,14 @@
 package im.toduck.domain.routine.domain.event;
 
-import im.toduck.domain.user.persistence.entity.User;
 import lombok.Getter;
 
 @Getter
 public class RoutineCreatedEvent {
 	private final Long routineId;
-	private final User user;
+	private final Long userId;
 
-	public RoutineCreatedEvent(Long routineId, User user) {
+	public RoutineCreatedEvent(Long routineId, Long userId) {
 		this.routineId = routineId;
-		this.user = user;
+		this.userId = userId;
 	}
 }

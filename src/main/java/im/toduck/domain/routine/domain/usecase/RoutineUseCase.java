@@ -58,7 +58,7 @@ public class RoutineUseCase {
 
 		log.info("루틴 생성 - UserId: {}, RoutineId:{}", userId, routineCreateResponse.routineId());
 
-		eventPublisher.publishEvent(new RoutineCreatedEvent(routineCreateResponse.routineId(), user));
+		eventPublisher.publishEvent(new RoutineCreatedEvent(routineCreateResponse.routineId(), userId));
 		return routineCreateResponse;
 	}
 
@@ -178,7 +178,7 @@ public class RoutineUseCase {
 
 		eventPublisher.publishEvent(new RoutineUpdatedEvent(
 			routineId,
-			user,
+			userId,
 			request.isTimeChanged(),
 			request.isDaysOfWeekChanged(),
 			request.isReminderMinutesChanged(),

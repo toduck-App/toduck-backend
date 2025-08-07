@@ -1,12 +1,11 @@
 package im.toduck.domain.routine.domain.event;
 
-import im.toduck.domain.user.persistence.entity.User;
 import lombok.Getter;
 
 @Getter
 public class RoutineUpdatedEvent {
 	private final Long routineId;
-	private final User user;
+	private final Long userId;
 	private final boolean isTimeChanged;
 	private final boolean isDaysOfWeekChanged;
 	private final boolean isReminderMinutesChanged;
@@ -14,14 +13,14 @@ public class RoutineUpdatedEvent {
 
 	public RoutineUpdatedEvent(
 		Long routineId,
-		User user,
+		Long userId,
 		boolean isTimeChanged,
 		boolean isDaysOfWeekChanged,
 		boolean isReminderMinutesChanged,
 		boolean isTitleChanged
 	) {
 		this.routineId = routineId;
-		this.user = user;
+		this.userId = userId;
 		this.isTimeChanged = isTimeChanged;
 		this.isDaysOfWeekChanged = isDaysOfWeekChanged;
 		this.isReminderMinutesChanged = isReminderMinutesChanged;
