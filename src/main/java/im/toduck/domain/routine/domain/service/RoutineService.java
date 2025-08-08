@@ -153,4 +153,9 @@ public class RoutineService {
 	public List<Routine> findAllUnsharedRoutineByUser(User user) {
 		return routineRepository.findAllUnsharedRoutinesByUser(user);
 	}
+
+	@Transactional(readOnly = true)
+	public List<Routine> findActiveRoutinesWithReminderForDates(LocalDate startDate, LocalDate endDate) {
+		return routineRepository.findActiveRoutinesWithReminderForDates(startDate, endDate);
+	}
 }

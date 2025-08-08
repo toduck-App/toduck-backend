@@ -13,9 +13,7 @@ import im.toduck.domain.schedule.persistence.entity.Schedule;
 import im.toduck.domain.schedule.persistence.entity.ScheduleRecord;
 import im.toduck.domain.schedule.persistence.repository.ScheduleRecordRepository;
 import im.toduck.domain.schedule.persistence.repository.ScheduleRepository;
-import im.toduck.domain.schedule.presentation.dto.request.ScheduleCreateRequest;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleHeadResponse;
-import im.toduck.domain.schedule.presentation.dto.response.ScheduleIdResponse;
 import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
@@ -27,13 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class ScheduleReadService {
 	private final ScheduleRepository scheduleRepository;
 	private final ScheduleRecordRepository scheduleRecordRepository;
-
-	@Transactional
-	public ScheduleIdResponse createSchedule(User user, ScheduleCreateRequest request) {
-		Schedule schedule = ScheduleMapper.toSchedule(user, request);
-		Schedule save = scheduleRepository.save(schedule);
-		return ScheduleMapper.toScheduleIdResponse(save);
-	}
 
 	@Transactional(readOnly = true)
 	public ScheduleHeadResponse getRangeSchedule(User user, LocalDate startDate, LocalDate endDate) {
@@ -56,5 +47,10 @@ public class ScheduleReadService {
 
 	public Optional<Schedule> getScheduleById(Long scheduleId) {
 		return scheduleRepository.findById(scheduleId);
+	}
+
+	public Schedule validateScheduleById(Long scheduleId) {
+		return scheduleRepository.findById(scheduleId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
 	}
 }

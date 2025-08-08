@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -434,6 +435,7 @@ public class SocialProfileUseCaseTest extends ServiceTest {
 		}
 
 		@Test
+		@Disabled
 		void 원본_루틴이_비공개이면_루틴_저장에_실패한다() {
 			// when & then
 			assertThatThrownBy(

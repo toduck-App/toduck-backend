@@ -18,6 +18,7 @@ import im.toduck.infra.push.FirebaseConfig;
 import im.toduck.infra.redis.forbidden.ForbiddenTokenService;
 import im.toduck.infra.redis.refresh.RefreshTokenService;
 import im.toduck.infra.sms.VerifiyCodeUtil;
+import jakarta.persistence.EntityManager;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -52,4 +53,7 @@ public abstract class ServiceTest {
 
 	@MockBean
 	private NotificationMessagePublisher notificationMessagePublisher;
+
+	@Autowired
+	protected EntityManager entityManager;
 }

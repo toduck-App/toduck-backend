@@ -97,6 +97,23 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 			.execute();
 	}
 
+	@Override
+	public List<Routine> findActiveRoutinesWithReminderForDates(LocalDate startDate, LocalDate endDate) {
+		return queryFactory
+			.selectFrom(qRoutine)
+			.where(
+				routineNotDeleted(),
+				hasReminderEnabled(),
+				routineMatchesDateRange(startDate, endDate)
+			)
+			.fetch();
+	}
+
+	private BooleanExpression hasReminderEnabled() {
+		return qRoutine.reminderMinutes.isNotNull()
+			.and(qRoutine.reminderMinutes.gt(0));
+	}
+
 	private BooleanExpression routineNotDeleted() {
 		return qRoutine.deletedAt.isNull();
 	}
