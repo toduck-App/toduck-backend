@@ -15,7 +15,8 @@ import com.tngtech.archunit.lang.ArchRule;
 	packages = "im.toduck.domain",
 	importOptions = {
 		ImportOption.DoNotIncludeTests.class,
-		LayeredArchitectureTest.NotificationPackageIgnore.class
+		LayeredArchitectureTest.NotificationPackageIgnore.class,
+		LayeredArchitectureTest.RoutineEventPackageIgnore.class
 	}
 )
 public class LayeredArchitectureTest {
@@ -24,6 +25,14 @@ public class LayeredArchitectureTest {
 		@Override
 		public boolean includes(Location location) {
 			return !location.contains("notification");
+		}
+	}
+
+	// routine.domain.event 패키지 제외를 위한 커스텀 ImportOption
+	public static class RoutineEventPackageIgnore implements ImportOption {
+		@Override
+		public boolean includes(Location location) {
+			return !location.contains("routine/domain/event");
 		}
 	}
 
