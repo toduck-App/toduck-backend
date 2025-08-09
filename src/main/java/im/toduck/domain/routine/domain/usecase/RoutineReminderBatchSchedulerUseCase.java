@@ -30,7 +30,7 @@ public class RoutineReminderBatchSchedulerUseCase {
 		lockAtMostFor = "55m",
 		lockAtLeastFor = "1m"
 	)
-	@Transactional(readOnly = true)
+	@Transactional
 	public void scheduleDailyRoutineReminders() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		LocalDate today = currentDateTime.toLocalDate();
