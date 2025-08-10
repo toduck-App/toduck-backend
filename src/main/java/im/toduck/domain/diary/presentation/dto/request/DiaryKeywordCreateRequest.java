@@ -4,7 +4,9 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 @Schema(description = "일기에 선택된 키워드 생성 요청 DTO")
 public record DiaryKeywordCreateRequest(
 	@NotNull(message = "일기 ID는 비어있을 수 없습니다.")
