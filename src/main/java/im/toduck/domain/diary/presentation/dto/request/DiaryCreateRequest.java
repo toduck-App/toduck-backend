@@ -10,7 +10,9 @@ import im.toduck.domain.user.persistence.entity.Emotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 @Schema(description = "다이어리 생성 요청 DTO")
 public record DiaryCreateRequest(
 	@NotNull(message = "날짜는 비어있을 수 없습니다.")
