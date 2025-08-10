@@ -206,7 +206,7 @@ class UserKeywordUseCaseTest extends ServiceTest {
 	@DisplayName("키워드 삭제")
 	class deleteKeyword {
 		private User savedUser;
-		UserKeywordRequest userKeywordRequest;
+		private UserKeywordRequest userKeywordRequest;
 
 		@BeforeEach
 		void setUp() {
@@ -242,7 +242,7 @@ class UserKeywordUseCaseTest extends ServiceTest {
 	@DisplayName("특정 사용자 키워드 목록 반환")
 	class getKeyword {
 		private User savedUser;
-		UserKeywordRequest userKeywordRequest, userKeywordRequest2;
+		private UserKeywordRequest userKeywordRequest, userKeywordRequest2;
 
 		@BeforeEach
 		void setUp() {
