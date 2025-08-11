@@ -83,7 +83,7 @@ public interface UserKeywordApi {
 	);
 
 	@Operation(
-		summary = "사용자 키워드 검색",
+		summary = "사용자 키워드 조회",
 		description = """
 			<b>1. 해당 사용자의 키워드 목록을 가져옵니다.</b><br/>
 			"""
@@ -91,7 +91,7 @@ public interface UserKeywordApi {
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
 			responseClass = UserKeywordListResponse.class,
-			description = "키워드 생성 성공, 해당 사용자의 키워드 목록을 반환합니다."
+			description = "키워드 조회 성공, 해당 사용자의 키워드 목록을 반환합니다."
 		),
 		errors = {
 		}

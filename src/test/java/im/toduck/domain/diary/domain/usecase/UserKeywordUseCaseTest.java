@@ -76,7 +76,7 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				userKeywordUsecase.setupKeyword(savedUser.getId());
 
 				// then
-				List<UserKeyword> userKeywords = userKeywordRepository.findAll();
+				List<UserKeyword> userKeywords = userKeywordRepository.findByUserId(savedUser.getId());
 				List<MasterKeyword> savedMasterKeywords = masterKeywordService.findAll();
 				assertThat(userKeywords).hasSize(savedMasterKeywords.size());
 
@@ -147,7 +147,7 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				userKeywordUsecase.createKeyword(savedUser.getId(), userKeywordRequest);
 
 				// then
-				List<UserKeyword> userKeywords = userKeywordRepository.findAll();
+				List<UserKeyword> userKeywords = userKeywordRepository.findByUserId(savedUser.getId());
 				assertThat(userKeywords).hasSize(1);
 
 				UserKeyword createdKeyword = userKeywords.get(0);
@@ -167,7 +167,7 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				userKeywordUsecase.createKeyword(savedUser.getId(), userKeywordRequest2);
 
 				// then
-				List<UserKeyword> userKeywords = userKeywordRepository.findAll();
+				List<UserKeyword> userKeywords = userKeywordRepository.findByUserId(savedUser.getId());
 				assertThat(userKeywords).hasSize(1);
 
 				UserKeyword createdKeyword = userKeywords.get(0);
@@ -227,7 +227,7 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				userKeywordUsecase.deleteKeyword(savedUser.getId(), userKeywordRequest);
 
 				// then
-				List<UserKeyword> userKeywords = userKeywordRepository.findAll();
+				List<UserKeyword> userKeywords = userKeywordRepository.findByUserId(savedUser.getId());
 				assertThat(userKeywords.size()).isEqualTo(0);
 			}
 		}

@@ -98,7 +98,7 @@ class DiaryKeywordUseCaseTest extends ServiceTest {
 				.build();
 
 			// when
-			diaryKeywordUseCase.createDiaryKeyword(diaryId, diaryKeywordCreateRequest);
+			diaryKeywordUseCase.createDiaryKeyword(savedUser.getId(), diaryKeywordCreateRequest);
 
 			// then
 			List<DiaryKeyword> diaryKeywords = diaryKeywordRepository.findByDiaryId(diaryId);
