@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.diary.domain.service.MasterKeywordService;
@@ -26,7 +27,6 @@ import im.toduck.domain.diary.presentation.dto.response.UserKeywordResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
-import jakarta.transaction.Transactional;
 
 @Transactional
 class UserKeywordUseCaseTest extends ServiceTest {
@@ -187,13 +187,13 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				// given
 				userKeywordUsecase.createKeyword(savedUser.getId(), userKeywordRequest);
 
-				try {
-					// when
-					userKeywordUsecase.createKeyword(savedUser.getId(), userKeywordRequest2);
-				} catch (CommonException e) {
-					// then
-					assertThat(e.getMessage()).isEqualTo("이미 존재하는 키워드입니다.");
-				}
+				org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+						userKeywordUsecase.createKeyword(savedUser.getId(), userKeywordRequest2)
+					)
+					.isInstanceOf(CommonException.class)
+					.hasFieldOrPropertyWithValue("httpStatus", ExceptionCode.ALREADY_EXISTS_KEYWORD.getHttpStatus())
+					.hasFieldOrPropertyWithValue("errorCode", ExceptionCode.ALREADY_EXISTS_KEYWORD.getErrorCode())
+					.hasFieldOrPropertyWithValue("message", ExceptionCode.ALREADY_EXISTS_KEYWORD.getMessage());
 			}
 		}
 	}
