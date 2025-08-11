@@ -10,10 +10,7 @@ public record DiaryKeywordDto(
 	Long keywordId,
 
 	@Schema(description = "키워드 이름", example = "행복")
-	String keywordName,
-
-	@Schema(description = "핵심 키워드", example = "true")
-	boolean checked
+	String keywordName
 ) {
 	public static DiaryKeywordDto from(DiaryKeyword diaryKeyword) {
 		return DiaryKeywordDto.builder()
