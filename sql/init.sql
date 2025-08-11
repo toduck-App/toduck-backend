@@ -329,7 +329,7 @@ CREATE TABLE diary_keywords
     updated_at          DATETIME    NOT NULL,
     deleted_at          DATETIME    NULL,
 
-    UNIQUE KEY uniq_diary_keyword (diary_id, keyword_id),
+    UNIQUE KEY uniq_diary_keyword (diary_id, user_keyword_id),
     FOREIGN KEY (diary_id) REFERENCES diary(id) ON DELETE CASCADE,
     FOREIGN KEY (user_keyword_id) REFERENCES user_keywords(id) ON DELETE CASCADE
 );
