@@ -28,6 +28,7 @@ import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import jakarta.transaction.Transactional;
 
+@Transactional
 class UserKeywordUseCaseTest extends ServiceTest {
 
 	@Autowired
@@ -46,7 +47,6 @@ class UserKeywordUseCaseTest extends ServiceTest {
 	private MasterKeywordRepository masterKeywordRepository;
 
 	@Nested
-	@Transactional
 	@DisplayName("사용자 키워드 초기 설정")
 	class setupKeyword {
 		private User savedUser;
@@ -118,7 +118,6 @@ class UserKeywordUseCaseTest extends ServiceTest {
 	}
 
 	@Nested
-	@Transactional
 	@DisplayName("사용자 키워드 생성")
 	class createKeyword {
 		private User savedUser;
@@ -200,7 +199,6 @@ class UserKeywordUseCaseTest extends ServiceTest {
 	}
 
 	@Nested
-	@Transactional
 	@DisplayName("키워드 삭제")
 	class deleteKeyword {
 		private User savedUser;
@@ -236,7 +234,6 @@ class UserKeywordUseCaseTest extends ServiceTest {
 	}
 
 	@Nested
-	@Transactional
 	@DisplayName("특정 사용자 키워드 목록 반환")
 	class getKeyword {
 		private User savedUser;

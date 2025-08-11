@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.diary.domain.service.DiaryKeywordService;
@@ -27,6 +28,7 @@ import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
 
+@Transactional
 class DiaryKeywordUseCaseTest extends ServiceTest {
 
 	@Autowired
