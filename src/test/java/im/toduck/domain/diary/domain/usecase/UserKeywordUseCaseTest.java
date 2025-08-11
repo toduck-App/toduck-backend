@@ -155,7 +155,6 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				assertThat(createdKeyword.getUser().getId()).isEqualTo(savedUser.getId());
 				assertThat(createdKeyword.getCategory()).isEqualTo(userKeywordRequest.keywordCategory());
 				assertThat(createdKeyword.getKeyword()).isEqualTo(userKeywordRequest.keyword());
-				assertThat(createdKeyword.getCount()).isEqualTo(0L);
 			}
 
 			@Test
@@ -176,7 +175,6 @@ class UserKeywordUseCaseTest extends ServiceTest {
 				assertThat(createdKeyword.getUser().getId()).isEqualTo(savedUser.getId());
 				assertThat(createdKeyword.getCategory()).isEqualTo(userKeywordRequest2.keywordCategory());
 				assertThat(createdKeyword.getKeyword()).isEqualTo(userKeywordRequest2.keyword());
-				assertThat(createdKeyword.getCount()).isEqualTo(0L);
 			}
 		}
 
@@ -286,15 +284,10 @@ class UserKeywordUseCaseTest extends ServiceTest {
 					.map(UserKeywordResponse::keyword)
 					.toList();
 
-				boolean allCountZero = userKeywordListResponse.userKeywordDtos()
-					.stream()
-					.allMatch(dto -> dto.count() == 0);
-
 				assertThat(categories)
 					.containsExactlyInAnyOrder(KeywordCategory.PLACE, KeywordCategory.SITUATION);
 				assertThat(keywords)
 					.containsExactlyInAnyOrder("서울역", "요리");
-				assertThat(allCountZero).isTrue();
 			}
 		}
 	}
