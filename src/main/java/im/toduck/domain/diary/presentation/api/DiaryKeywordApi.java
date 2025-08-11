@@ -23,10 +23,10 @@ public interface DiaryKeywordApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			description = "일기 생성 성공. 빈 content 객체를 반환합니다."
+			description = "일기 키워드 생성 성공. 빈 content 객체를 반환합니다."
 		)
 	)
-	public ResponseEntity<ApiResponse<Map<String, Object>>> createDiaryKeyword(
+	ResponseEntity<ApiResponse<Map<String, Object>>> createDiaryKeyword(
 		@RequestBody @Valid final DiaryKeywordCreateRequest request,
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	);
