@@ -324,7 +324,6 @@ CREATE TABLE diary_keywords
     id                  BIGINT      PRIMARY KEY AUTO_INCREMENT,
     diary_id            BIGINT      NOT NULL,
     user_keyword_id     BIGINT      NOT NULL,
-    checked             BOOLEAN     NOT NULL DEFAULT FALSE,
     created_at          DATETIME    NOT NULL,
     updated_at          DATETIME    NOT NULL,
     deleted_at          DATETIME    NULL,

@@ -4,7 +4,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import im.toduck.global.base.entity.BaseEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -37,13 +36,9 @@ public class DiaryKeyword extends BaseEntity {
 	@JoinColumn(name = "user_keyword_id", nullable = false)
 	private UserKeyword userKeyword;
 
-	@Column(nullable = false)
-	private boolean checked = false;
-
 	@Builder
-	private DiaryKeyword(Diary diary, UserKeyword userKeyword, boolean checked) {
+	private DiaryKeyword(Diary diary, UserKeyword userKeyword) {
 		this.diary = diary;
 		this.userKeyword = userKeyword;
-		this.checked = checked;
 	}
 }

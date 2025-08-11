@@ -25,7 +25,7 @@ public class DiaryKeywordUseCase {
 	private final UserKeywordService userKeywordService;
 
 	@Transactional
-	public void createDiaryKeyword(final Long userId, @Valid DiaryKeywordCreateRequest request) {
+	public void createDiaryKeyword(final Long userId, @Valid final DiaryKeywordCreateRequest request) {
 		Diary diary = diaryService.getDiaryByIdAndUserId(userId, request.diaryId());
 
 		List<UserKeyword> userKeywords = userKeywordService.getUserKeywordsByIds(userId, request.keywordIds());

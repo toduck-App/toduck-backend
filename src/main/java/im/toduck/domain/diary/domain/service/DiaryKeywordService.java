@@ -25,7 +25,6 @@ public class DiaryKeywordService {
 			.map(uk -> DiaryKeyword.builder()
 				.diary(diary)
 				.userKeyword(uk)
-				.checked(false)
 				.build()
 			).toList();
 

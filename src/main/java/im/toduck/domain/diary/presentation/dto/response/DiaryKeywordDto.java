@@ -19,7 +19,6 @@ public record DiaryKeywordDto(
 		return DiaryKeywordDto.builder()
 			.keywordId(diaryKeyword.getUserKeyword().getId())
 			.keywordName(diaryKeyword.getUserKeyword().getKeyword())
-			.checked(diaryKeyword.isChecked())
 			.build();
 	}
 }
