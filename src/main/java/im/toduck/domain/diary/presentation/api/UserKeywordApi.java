@@ -71,7 +71,7 @@ public interface UserKeywordApi {
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			description = "키워드 생성 성공, 빈 content 객체를 반환합니다."
+			description = "키워드 삭제 성공, 빈 content 객체를 반환합니다."
 		),
 		errors = {
 			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.NOT_FOUND_KEYWORD)
