@@ -1,7 +1,6 @@
 package im.toduck.domain.diary.persistence.entity;
 
-import java.time.LocalDateTime;
-
+import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -25,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class MasterKeyword {
+public class MasterKeyword extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +36,4 @@ public class MasterKeyword {
 
 	@Column(nullable = false, length = 255)
 	private String keyword;
-
-	@Column(name = "created_at", nullable = false)
-	private LocalDateTime createdAt;
 }

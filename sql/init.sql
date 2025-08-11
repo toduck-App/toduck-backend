@@ -302,7 +302,9 @@ CREATE TABLE master_keywords
     id          BIGINT PRIMARY KEY auto_increment,
     category    ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
     keyword     VARCHAR(255)                                                NOT NULL,
-    created_at  DATETIME                                                    NOT NULL,
+    created_at          DATETIME                                            NOT NULL,
+    updated_at          DATETIME                                            NOT NULL,
+    deleted_at          DATETIME                                            NULL,
     UNIQUE KEY uniq_category_keyword (category, keyword)
 );
 
@@ -312,7 +314,6 @@ CREATE TABLE user_keywords
     user_id             BIGINT                                                      NOT NULL,
     category            ENUM('FREQUENT', 'PERSON', 'PLACE', 'SITUATION', 'RESULT')  NOT NULL,
     keyword             VARCHAR(255)                                                NOT NULL,
-    keyword_count       BIGINT                                                      NOT NULL DEFAULT 0,
     created_at          DATETIME                                                    NOT NULL,
     updated_at          DATETIME                                                    NOT NULL,
     deleted_at          DATETIME                                                    NULL,

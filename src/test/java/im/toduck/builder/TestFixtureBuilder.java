@@ -130,7 +130,6 @@ public class TestFixtureBuilder {
 		MasterKeyword masterKeyword = MasterKeyword.builder()
 			.category(keywordCategory)
 			.keyword(keyword)
-			.createdAt(LocalDateTime.now())
 			.build();
 		return bs.masterKeywordRepository().save(masterKeyword);
 	}
