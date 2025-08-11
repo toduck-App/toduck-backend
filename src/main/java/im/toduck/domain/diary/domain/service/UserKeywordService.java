@@ -49,7 +49,6 @@ public class UserKeywordService {
 			.user(user)
 			.category(request.keywordCategory())
 			.keyword(request.keyword())
-			.count(0L)
 			.build();
 
 		userKeywordRepository.save(newKeyword);
@@ -82,8 +81,7 @@ public class UserKeywordService {
 			.map(uk -> new UserKeywordResponse(
 				uk.getId(),
 				uk.getCategory(),
-				uk.getKeyword(),
-				uk.getCount()
+				uk.getKeyword()
 			))
 			.toList();
 	}

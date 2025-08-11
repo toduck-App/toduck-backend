@@ -48,26 +48,20 @@ public class UserKeyword extends BaseEntity {
 	@Column(nullable = false, length = 255)
 	private String keyword;
 
-	@Column(name = "keyword_count", nullable = false)
-	private Long count = 0L;
-
 	@OneToMany(mappedBy = "userKeyword", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DiaryKeyword> diaryKeywords = new ArrayList<>();
 
 	@Builder
 	private UserKeyword(User user,
 		KeywordCategory category,
-		String keyword,
-		Long count) {
+		String keyword) {
 		this.user = user;
 		this.category = category;
 		this.keyword = keyword;
-		this.count = count != null ? count : 0L;
 	}
 
 	public void restore(KeywordCategory newCategory) {
 		this.deletedAt = null;
 		this.category = newCategory;
-		this.count = 0L;
 	}
 }

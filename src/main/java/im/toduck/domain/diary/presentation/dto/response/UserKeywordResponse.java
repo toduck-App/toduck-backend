@@ -13,10 +13,7 @@ public record UserKeywordResponse(
 	KeywordCategory category,
 
 	@Schema(description = "키워드", example = "회사")
-	String keyword,
-
-	@Schema(description = "사용 횟수", example = "3")
-	Long count
+	String keyword
 ) {
 
 }

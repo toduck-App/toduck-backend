@@ -14,7 +14,6 @@ public class UserKeywordMapper {
 			.user(user)
 			.category(masterKeyword.getCategory())
 			.keyword(masterKeyword.getKeyword())
-			.count(0L)
 			.build();
 	}
 }
