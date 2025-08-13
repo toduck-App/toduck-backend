@@ -82,9 +82,9 @@ public class DiaryController implements DiaryApi {
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 
+	@Override
 	@GetMapping("/count")
 	@PreAuthorize("isAuthenticated()")
-	@Override
 	public ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
 		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user
