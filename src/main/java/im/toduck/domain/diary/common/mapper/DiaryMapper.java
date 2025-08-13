@@ -1,11 +1,13 @@
 package im.toduck.domain.diary.common.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
@@ -45,5 +47,9 @@ public class DiaryMapper {
 
 	public static MonthDiaryResponse toMonthDiaryResponse(int thisMonthCount, int lastMonthCount) {
 		return new MonthDiaryResponse(thisMonthCount - lastMonthCount);
+	}
+
+	public static DiaryStreakResponse toDiaryStreak(Integer consecutiveDays, LocalDate lastDiaryDate) {
+		return DiaryStreakResponse.toDiaryStreak(consecutiveDays, lastDiaryDate);
 	}
 }

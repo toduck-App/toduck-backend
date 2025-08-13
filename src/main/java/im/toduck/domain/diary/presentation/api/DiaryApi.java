@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
+import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
@@ -146,6 +147,23 @@ public interface DiaryApi {
 	)
 	ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
 		@RequestParam("yearMonth") YearMonth yearMonth,
+		@AuthenticationPrincipal CustomUserDetails user
+	);
+
+	@Operation(
+		summary = "일기 스트릭과 최근에 작성한 일기 날짜",
+		description =
+			"""
+				<b>해당 유저의 일기 스트릭과 최근에 작성한 일기 날짜를 반환합니다.</b>
+				"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = DiaryStreakResponse.class,
+			description = "일기 스트릭 조회 성공, 해당 유저의 일기 스트릭과 최근에 작성한 일기 날짜를 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<DiaryStreakResponse>> getDiaryStreak(
 		@AuthenticationPrincipal CustomUserDetails user
 	);
 }

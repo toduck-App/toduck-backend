@@ -115,4 +115,14 @@ public class DiaryService {
 
 		return diaryRepository.countByUserIdAndDateBetween(userId, startDate, endDate);
 	}
+
+	@Transactional(readOnly = true)
+	public Integer getConsecutiveDays(Long userId) {
+		return diaryRepository.findRecentConsecutiveDays(userId);
+	}
+
+	@Transactional(readOnly = true)
+	public LocalDate getLastDiaryDate(Long userId) {
+		return diaryRepository.findLastDiaryDate(userId);
+	}
 }
