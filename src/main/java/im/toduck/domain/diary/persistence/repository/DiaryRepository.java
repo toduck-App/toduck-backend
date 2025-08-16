@@ -13,7 +13,7 @@ import im.toduck.domain.user.persistence.entity.User;
 import jakarta.validation.constraints.NotNull;
 
 @Repository
-public interface DiaryRepository extends JpaRepository<Diary, Long> {
+public interface DiaryRepository extends JpaRepository<Diary, Long>, DiaryRepositoryCustom {
 	List<Diary> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);
 
 	Diary findByUserIdAndDate(Long userId, @NotNull(message = "날짜는 비어있을 수 없습니다.") LocalDate date);
@@ -23,36 +23,28 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 	List<Diary> findAllByUser(User user);
 
 	@Query(value = """
-		SELECT consecutive_count
-		FROM (
-			SELECT
-				grp,
-				COUNT(*) AS consecutive_count,
-				MAX(date) AS latest_date_in_group
-			FROM (
-				SELECT
-					DATE_SUB(date, INTERVAL (ROW_NUMBER() OVER (ORDER BY date)) DAY) AS grp,
-					date
-				FROM diary
-				WHERE user_id = :userId
-			) AS sub
-			GROUP BY grp
-			ORDER BY latest_date_in_group DESC
-			LIMIT 1
-		) AS grouped
+		SELECT
+			CASE
+				WHEN MAX(diary_date) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+			THEN (
+				SELECT COUNT(*) AS consecutive_count
+					FROM (
+						SELECT
+							DATE_SUB(diary_date, INTERVAL (ROW_NUMBER() OVER (ORDER BY diary_date)) DAY) AS grp,
+							diary_date
+						FROM diary
+						WHERE user_id = :userId
+					) AS sub
+					GROUP BY grp
+					ORDER BY grp DESC
+					LIMIT 1
+				)
+				ELSE 0
+			END AS consecutive_count
+		FROM diary
+		WHERE user_id = :userId
 		""",
 		nativeQuery = true
 	)
 	Integer findRecentConsecutiveDays(@Param("userId") Long userId);
-
-	@Query(value = """
-		SELECT date
-		FROM diary
-		WHERE user_id = :userId
-		ORDER BY date DESC
-		LIMIT 1
-		""",
-		nativeQuery = true
-	)
-	LocalDate findLastDiaryDate(@Param("userId") Long userId);
 }
