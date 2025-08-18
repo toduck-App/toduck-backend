@@ -48,6 +48,12 @@ public class RoutineReminderSchedulerService {
 		final LocalDateTime currentDateTime,
 		final boolean isBatchScheduling
 	) {
+		if (routine.getReminderMinutes() == null || routine.getReminderMinutes() <= 0) {
+			log.debug("리마인더가 비활성화된 루틴 스킵 - RoutineId: {}, reminderMinutes: {}",
+				routine.getId(), routine.getReminderMinutes());
+			return;
+		}
+
 		try {
 			LocalDateTime nextBatchTime = calculateNextBatchExecutionTime(currentDateTime);
 			LocalDate currentDate = currentDateTime.toLocalDate();
