@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import feign.Param;
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.user.persistence.entity.User;
 import jakarta.validation.constraints.NotNull;
