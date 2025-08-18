@@ -297,6 +297,15 @@ CREATE TABLE diary_image_file
     FOREIGN KEY (diary_id) REFERENCES diary (id) ON DELETE CASCADE
 );
 
+CREATE TABLE diary_streak
+(
+    id              BIGINT PRIMARY KEY auto_increment,
+    user_id         BIGINT                              NOT NULL,
+    streak          BIGINT                              NOT NULL,
+    last_diary_date DATETIME                            NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
 CREATE TABLE concentration
 (
     id                  BIGINT PRIMARY KEY auto_increment,
@@ -528,8 +537,6 @@ CREATE INDEX idx_qrtz_ft_j_g ON qrtz_FIRED_TRIGGERS(sched_name, job_name, job_gr
 CREATE INDEX idx_qrtz_ft_jg ON qrtz_FIRED_TRIGGERS(sched_name, job_group);
 CREATE INDEX idx_qrtz_ft_t_g ON qrtz_FIRED_TRIGGERS(sched_name, trigger_name, trigger_group);
 CREATE INDEX idx_qrtz_ft_tg ON qrtz_FIRED_TRIGGERS(sched_name, trigger_group);
-
-CREATE INDEX idx_diary_user_date ON diary(user_id, diary_date);
 
 -- 루틴 알림 작업 기록 테이블
 CREATE TABLE routine_reminder_job (
