@@ -301,7 +301,7 @@ CREATE TABLE diary_streak
 (
     id              BIGINT PRIMARY KEY auto_increment,
     user_id         BIGINT                              NOT NULL,
-    streak          BIGINT                              NOT NULL,
+    streak          BIGINT                              NOT NULL DEFAULT 0,
     last_diary_date DATETIME                            NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
