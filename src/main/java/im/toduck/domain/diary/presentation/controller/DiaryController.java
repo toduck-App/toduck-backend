@@ -21,7 +21,6 @@ import im.toduck.domain.diary.presentation.api.DiaryApi;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
-import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
@@ -44,7 +43,7 @@ public class DiaryController implements DiaryApi {
 	) {
 		diaryUseCase.createDiary(userDetails.getUserId(), request);
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
-	}
+	} // TODO : 생성하는 경우에 DiaryStreak 최신화
 
 	@Override
 	@DeleteMapping("/{diaryId}")
@@ -94,15 +93,5 @@ public class DiaryController implements DiaryApi {
 
 		return ResponseEntity.ok()
 			.body(ApiResponse.createSuccess(monthDiaryCount));
-	}
-
-	@Override
-	@GetMapping("/streak")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<DiaryStreakResponse>> getDiaryStreak(
-		@AuthenticationPrincipal CustomUserDetails user
-	) {
-		DiaryStreakResponse response = diaryUseCase.getDiaryStreak(user.getUserId());
-		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }

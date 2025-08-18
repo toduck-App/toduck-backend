@@ -1,6 +1,5 @@
 package im.toduck.domain.diary.domain.usecase;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
-import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
 import im.toduck.domain.diary.presentation.dto.response.MonthDiaryResponse;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -86,7 +84,7 @@ public class DiaryUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public DiaryListResponse getDiariesByMonth(final Long userId, YearMonth yearMonth) {
+	public DiaryListResponse getDiariesByMonth(final Long userId, final YearMonth yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, yearMonth);
@@ -94,7 +92,7 @@ public class DiaryUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public MonthDiaryResponse getDiaryCountByMonth(Long userId, YearMonth yearMonth) {
+	public MonthDiaryResponse getDiaryCountByMonth(final Long userId, final YearMonth yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
@@ -106,15 +104,5 @@ public class DiaryUseCase {
 		int lastMonthCount = diaryService.getDiaryCountByMonth(userId, previousMonth.getYear(),
 			previousMonth.getMonthValue());
 		return DiaryMapper.toMonthDiaryResponse(thisMonthCount, lastMonthCount);
-	}
-
-	@Transactional(readOnly = true)
-	public DiaryStreakResponse getDiaryStreak(Long userId) {
-		User user = userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-
-		Integer consecutiveDays = diaryService.getConsecutiveDays(userId);
-		LocalDate lastDiaryDate = diaryService.getLastDiaryDate(userId);
-		return DiaryMapper.toDiaryStreak(consecutiveDays, lastDiaryDate);
 	}
 }
