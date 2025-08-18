@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class DiaryRepositoryCustomImpl implements DiaryRepositoryCustom {
+public class DiaryRepositoryImpl implements DiaryRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 
