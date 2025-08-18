@@ -27,7 +27,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long>, DiaryReposi
 			CASE
 				WHEN MAX(diary_date) >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
 				THEN (
-					SELECT COUNT(*) AS consecutive_count
+					SELECT CAST(COUNT(*) AS SIGNED) AS consecutive_count
 					FROM (
 						SELECT
 							DATE_SUB(diary_date, INTERVAL (ROW_NUMBER() OVER (ORDER BY diary_date)) DAY) AS grp,
