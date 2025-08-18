@@ -1,7 +1,7 @@
 package im.toduck.domain.diary.domain.usecase;
 
 import static im.toduck.fixtures.user.UserFixtures.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.SoftAssertions.*;
 
 import java.time.LocalDate;
 
@@ -117,8 +117,10 @@ class DiaryUseCaseTest extends ServiceTest {
 			DiaryStreakResponse diaryStreakResponse = diaryUseCase.getDiaryStreak(savedUser.getId());
 
 			// then
-			assertEquals(Integer.valueOf(5), diaryStreakResponse.consecutiveDays());
-			assertEquals(today, diaryStreakResponse.lastDiaryDate());
+			assertSoftly(softly -> {
+				softly.assertThat(diaryStreakResponse.consecutiveDays()).isEqualTo(5);
+				softly.assertThat(diaryStreakResponse.lastDiaryDate()).isEqualTo(today);
+			});
 		}
 
 		@Test
@@ -133,8 +135,10 @@ class DiaryUseCaseTest extends ServiceTest {
 			DiaryStreakResponse diaryStreakResponse = diaryUseCase.getDiaryStreak(savedUser.getId());
 
 			// then
-			assertEquals(Integer.valueOf(4), diaryStreakResponse.consecutiveDays());
-			assertEquals(today.minusDays(1), diaryStreakResponse.lastDiaryDate());
+			assertSoftly(softly -> {
+				softly.assertThat(diaryStreakResponse.consecutiveDays()).isEqualTo(4);
+				softly.assertThat(diaryStreakResponse.lastDiaryDate()).isEqualTo(today.minusDays(1));
+			});
 		}
 
 		@Test
@@ -147,8 +151,10 @@ class DiaryUseCaseTest extends ServiceTest {
 			DiaryStreakResponse diaryStreakResponse = diaryUseCase.getDiaryStreak(savedUser.getId());
 
 			// then
-			assertEquals(Integer.valueOf(2), diaryStreakResponse.consecutiveDays());
-			assertEquals(today, diaryStreakResponse.lastDiaryDate());
+			assertSoftly(softly -> {
+				softly.assertThat(diaryStreakResponse.consecutiveDays()).isEqualTo(2);
+				softly.assertThat(diaryStreakResponse.lastDiaryDate()).isEqualTo(today);
+			});
 		}
 
 		@Test
@@ -160,8 +166,10 @@ class DiaryUseCaseTest extends ServiceTest {
 			DiaryStreakResponse diaryStreakResponse = diaryUseCase.getDiaryStreak(savedUser.getId());
 
 			// then
-			assertEquals(Integer.valueOf(1), diaryStreakResponse.consecutiveDays());
-			assertEquals(today, diaryStreakResponse.lastDiaryDate());
+			assertSoftly(softly -> {
+				softly.assertThat(diaryStreakResponse.consecutiveDays()).isEqualTo(1);
+				softly.assertThat(diaryStreakResponse.lastDiaryDate()).isEqualTo(today);
+			});
 		}
 
 		@Test
@@ -173,8 +181,10 @@ class DiaryUseCaseTest extends ServiceTest {
 			DiaryStreakResponse diaryStreakResponse = diaryUseCase.getDiaryStreak(savedUser.getId());
 
 			// then
-			assertEquals(Integer.valueOf(1), diaryStreakResponse.consecutiveDays());
-			assertEquals(today.minusDays(1), diaryStreakResponse.lastDiaryDate());
+			assertSoftly(softly -> {
+				softly.assertThat(diaryStreakResponse.consecutiveDays()).isEqualTo(1);
+				softly.assertThat(diaryStreakResponse.lastDiaryDate()).isEqualTo(today.minusDays(1));
+			});
 		}
 
 		@Test
@@ -188,8 +198,10 @@ class DiaryUseCaseTest extends ServiceTest {
 			DiaryStreakResponse diaryStreakResponse = diaryUseCase.getDiaryStreak(savedUser.getId());
 
 			// then
-			assertEquals(Integer.valueOf(0), diaryStreakResponse.consecutiveDays());
-			assertEquals(today.minusDays(2), diaryStreakResponse.lastDiaryDate());
+			assertSoftly(softly -> {
+				softly.assertThat(diaryStreakResponse.consecutiveDays()).isEqualTo(0);
+				softly.assertThat(diaryStreakResponse.lastDiaryDate()).isEqualTo(today.minusDays(2));
+			});
 		}
 
 		@Test
@@ -204,8 +216,10 @@ class DiaryUseCaseTest extends ServiceTest {
 			DiaryStreakResponse diaryStreakResponse = diaryUseCase.getDiaryStreak(savedUser.getId());
 
 			// then
-			assertEquals(Integer.valueOf(1), diaryStreakResponse.consecutiveDays());
-			assertEquals(today, diaryStreakResponse.lastDiaryDate());
+			assertSoftly(softly -> {
+				softly.assertThat(diaryStreakResponse.consecutiveDays()).isEqualTo(1);
+				softly.assertThat(diaryStreakResponse.lastDiaryDate()).isEqualTo(today);
+			});
 		}
 	}
 
