@@ -23,11 +23,18 @@ import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
 import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.domain.user.persistence.repository.UserRepository;
 
 @Transactional
 @Testcontainers
 @ActiveProfiles("mysql-test")
 class DiaryUseCaseTest extends ServiceTest {
+
+	@Autowired
+	DiaryUseCase diaryUseCase;
+
+	@Autowired
+	UserRepository userRepository;
 
 	@Container
 	static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
@@ -43,9 +50,6 @@ class DiaryUseCaseTest extends ServiceTest {
 		registry.add("spring.datasource.username", mysql::getUsername);
 		registry.add("spring.datasource.password", mysql::getPassword);
 	}
-
-	@Autowired
-	DiaryUseCase diaryUseCase;
 
 	@Nested
 	@DisplayName("일기 스트릭 조회 시")
@@ -204,4 +208,57 @@ class DiaryUseCaseTest extends ServiceTest {
 			assertEquals(today, diaryStreakResponse.lastDiaryDate());
 		}
 	}
+
+	// @Nested
+	// @DisplayName("대량 데이터 성능 테스트")
+	// class LargeDatasetPerformanceTest {
+	// 	private User savedUser;
+	//
+	// 	@BeforeEach
+	// 	void setUp() {
+	// 		savedUser = testFixtureBuilder.buildUser(GENERAL_USER());
+	//
+	// 		IntStream.range(0, 1000)
+	// 			.forEach(i -> {
+	// 				User user =
+	// 					testFixtureBuilder.buildUser(GENERAL_USER());
+	//
+	// 				LocalDate startDate = LocalDate.now().minusYears(3);
+	// 				IntStream.range(0, 100)
+	// 					.forEach(j -> {
+	// 						diaryUseCase.createDiary(
+	// 							user.getId(),
+	// 							DiaryCreateRequest.builder()
+	// 								.date(startDate.plusDays(j))
+	// 								.emotion(Emotion.HAPPY)
+	// 								.title("테스트 제목" + j)
+	// 								.memo("테스트 내용" + j)
+	// 								.build()
+	// 						);
+	// 					});
+	// 			});
+	// 	}
+	//
+	// 	@Test
+	// 	@DisplayName("100명 사용자 데이터 생성 후 스트릭 조회 성능 테스트")
+	// 	void testDiaryStreakPerformance() throws InterruptedException {
+	// 		long totalTime = 0;
+	// 		int iterations = 100;
+	//
+	// 		for (int i = 0; i < iterations; i++) {
+	// 			long startTime = System.nanoTime();
+	//
+	// 			List<User> users = userRepository.findAll();
+	// 			User randomUser = users.get(ThreadLocalRandom.current().nextInt(users.size()));
+	//
+	// 			diaryUseCase.getDiaryStreak(randomUser.getId());
+	//
+	// 			long duration = System.nanoTime() - startTime;
+	// 			totalTime += duration;
+	// 		}
+	//
+	// 		double avgMs = (totalTime / (double)iterations) / 1_000_000;
+	// 		System.out.printf("평균 실행 시간 : %.2f ms%n", avgMs);
+	// 	}
+	// }
 }
