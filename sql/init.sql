@@ -303,7 +303,8 @@ CREATE TABLE diary_streak
     user_id         BIGINT                              NOT NULL,
     streak          BIGINT                              NOT NULL DEFAULT 0,
     last_diary_date DATETIME                            NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    INDEX idx_user_id (user_id)
 );
 
 CREATE TABLE concentration

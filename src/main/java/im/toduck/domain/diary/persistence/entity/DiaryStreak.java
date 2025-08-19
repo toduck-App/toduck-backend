@@ -45,4 +45,12 @@ public class DiaryStreak {
 		this.streak = streak;
 		this.lastDiaryDate = lastDiaryDate;
 	}
+
+	public void updateStreak(Long streak) {
+		this.streak = streak;
+	}
+
+	public void updateLastDiaryDate(LocalDate lastDiaryDate) {
+		this.lastDiaryDate = lastDiaryDate;
+	}
 }

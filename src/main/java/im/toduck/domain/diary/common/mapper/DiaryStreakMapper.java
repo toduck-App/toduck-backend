@@ -1,7 +1,10 @@
 package im.toduck.domain.diary.common.mapper;
 
+import java.time.LocalDate;
+
 import im.toduck.domain.diary.persistence.entity.DiaryStreak;
 import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
+import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -10,16 +13,21 @@ public class DiaryStreakMapper {
 	public static DiaryStreakResponse toDiaryStreakResponse(
 		final DiaryStreak diaryStreak
 	) {
-		if (diaryStreak == null) {
-			return DiaryStreakResponse.builder()
-				.consecutiveDays(0L)
-				.lastDiaryDate(null)
-				.build();
-		}
-
 		return DiaryStreakResponse.builder()
-			.consecutiveDays(diaryStreak.getStreak())
+			.streak(diaryStreak.getStreak())
 			.lastDiaryDate(diaryStreak.getLastDiaryDate())
+			.build();
+	}
+
+	public static DiaryStreak toDiaryStreak(
+		final User user,
+		final Long streak,
+		final LocalDate today
+	) {
+		return DiaryStreak.builder()
+			.user(user)
+			.streak(streak)
+			.lastDiaryDate(today)
 			.build();
 	}
 }
