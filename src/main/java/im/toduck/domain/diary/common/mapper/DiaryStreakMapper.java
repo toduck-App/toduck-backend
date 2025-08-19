@@ -19,6 +19,13 @@ public class DiaryStreakMapper {
 			.build();
 	}
 
+	public static DiaryStreakResponse toDiaryStreakResponseEmpty() {
+		return DiaryStreakResponse.builder()
+			.streak(0L)
+			.lastDiaryDate(null)
+			.build();
+	}
+
 	public static DiaryStreak toDiaryStreak(
 		final User user,
 		final Long streak,

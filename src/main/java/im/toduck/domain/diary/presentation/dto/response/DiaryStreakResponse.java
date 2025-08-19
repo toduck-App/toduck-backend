@@ -13,10 +13,4 @@ public record DiaryStreakResponse(
 	@Schema(description = "마지막 작성 날짜", example = "2025-08-12")
 	LocalDate lastDiaryDate
 ) {
-	public static DiaryStreakResponse empty() {
-		return DiaryStreakResponse.builder()
-			.streak(0L)
-			.lastDiaryDate(null)
-			.build();
-	}
 }

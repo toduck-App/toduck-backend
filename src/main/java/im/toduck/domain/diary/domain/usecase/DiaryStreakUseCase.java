@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.diary.common.mapper.DiaryStreakMapper;
 import im.toduck.domain.diary.domain.service.DiaryStreakService;
 import im.toduck.domain.diary.persistence.entity.DiaryStreak;
 import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
@@ -39,7 +40,7 @@ public class DiaryStreakUseCase {
 			&& streak > 0) {
 			Optional<DiaryStreak> optionalDiaryStreak = diaryStreakService.getDiaryStreak(userId);
 			if (optionalDiaryStreak.isEmpty()) {
-				return DiaryStreakResponse.empty();
+				return DiaryStreakMapper.toDiaryStreakResponseEmpty();
 			}
 			DiaryStreak diaryStreak = optionalDiaryStreak.get();
 			diaryStreakService.updateDiaryStreak(diaryStreak, 0L, diaryStreak.getLastDiaryDate());

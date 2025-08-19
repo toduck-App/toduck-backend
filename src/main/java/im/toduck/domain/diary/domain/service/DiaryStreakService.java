@@ -27,7 +27,7 @@ public class DiaryStreakService {
 		Optional<DiaryStreak> diaryStreak = diaryStreakRepository.findByUser_Id(userId);
 		return diaryStreak
 			.map(DiaryStreakMapper::toDiaryStreakResponse)
-			.orElse(DiaryStreakResponse.empty());
+			.orElseGet(DiaryStreakMapper::toDiaryStreakResponseEmpty);
 	}
 
 	@Transactional
