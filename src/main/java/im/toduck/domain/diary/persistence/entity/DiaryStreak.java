@@ -17,7 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "diary_streak")
+@Table(name = "diary_streak", uniqueConstraints = {
+	@jakarta.persistence.UniqueConstraint(name = "uk_diary_streak_user", columnNames = "user_id")})
 @Getter
 @NoArgsConstructor
 public class DiaryStreak {
@@ -36,11 +37,7 @@ public class DiaryStreak {
 	private LocalDate lastDiaryDate;
 
 	@Builder
-	private DiaryStreak(
-		User user,
-		Long streak,
-		LocalDate lastDiaryDate
-	) {
+	private DiaryStreak(User user, Long streak, LocalDate lastDiaryDate) {
 		this.user = user;
 		this.streak = streak;
 		this.lastDiaryDate = lastDiaryDate;

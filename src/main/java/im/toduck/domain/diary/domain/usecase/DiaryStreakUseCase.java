@@ -57,7 +57,7 @@ public class DiaryStreakUseCase {
 		Optional<DiaryStreak> optionalDiaryStreak = diaryStreakService.getDiaryStreak(user.getId());
 
 		if (optionalDiaryStreak.isEmpty()) {
-			if (requestDate == today) {
+			if (today.isEqual(requestDate)) {
 				diaryStreakService.createDiaryStreak(user, 1L, today);
 			}
 			return;
