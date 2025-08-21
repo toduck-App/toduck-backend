@@ -2,6 +2,8 @@ package im.toduck.domain.diary.domain.usecase;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import im.toduck.domain.diary.domain.service.DiaryKeywordService;
 import im.toduck.domain.diary.domain.service.DiaryService;
 import im.toduck.domain.diary.domain.service.UserKeywordService;
@@ -9,7 +11,6 @@ import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.persistence.entity.UserKeyword;
 import im.toduck.domain.diary.presentation.dto.request.DiaryKeywordCreateRequest;
 import im.toduck.global.annotation.UseCase;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
