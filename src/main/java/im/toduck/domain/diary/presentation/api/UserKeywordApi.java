@@ -21,27 +21,6 @@ import jakarta.validation.Valid;
 @Tag(name = "UserKeyword")
 public interface UserKeywordApi {
 	@Operation(
-		summary = "사용자 키워드 초기 설정",
-		description = """
-			<b>1. 현재 로그인한 사용자의 키워드가 비어 있는 경우에만 실행됩니다.</b><br/>
-			<b>2. 마스터 키워드를 기반으로 user_keywords 테이블에 데이터를 복사합니다.</b><br/>
-			<b>3. 성공 시 content는 비어 있는 객체를 반환합니다.</b><br/>
-			<b>4. 이미 초기 설정이 돼있으면(키워드가 하나라도 있으면) ALREADY_SETUP_KEYWORD 예외를 반환합니다.</b><br/>
-			"""
-	)
-	@ApiResponseExplanations(
-		success = @ApiSuccessResponseExplanation(
-			description = "키워드 생성 성공, 빈 content 객체를 반환합니다."
-		),
-		errors = {
-			@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.ALREADY_SETUP_KEYWORD)
-		}
-	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> setupUserKeyword(
-		@AuthenticationPrincipal final CustomUserDetails userDetails
-	);
-
-	@Operation(
 		summary = "사용자 키워드 생성",
 		description = """
 			<b>1. 해당 사용자에게 키워드를 생성합니다.</b><br/>

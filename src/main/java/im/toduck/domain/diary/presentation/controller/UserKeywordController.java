@@ -29,16 +29,6 @@ public class UserKeywordController implements UserKeywordApi {
 	private final UserKeywordUseCase userKeywordUseCase;
 
 	@Override
-	@PostMapping("/setup")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> setupUserKeyword(
-		@AuthenticationPrincipal final CustomUserDetails userDetails
-	) {
-		userKeywordUseCase.setupKeyword(userDetails.getUserId());
-		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
-	}
-
-	@Override
 	@PostMapping("/create")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> createKeyword(
@@ -69,6 +59,4 @@ public class UserKeywordController implements UserKeywordApi {
 		UserKeywordListResponse response = userKeywordUseCase.getKeywords(userDetails.getUserId());
 		return ResponseEntity.ok().body(ApiResponse.createSuccess(response));
 	}
-
-	// 이미 가입된 사람들 중에 키워드 없는 사람들한테도 키워드 넣어줘야함
 }

@@ -38,7 +38,6 @@ public class UserKeywordUseCase {
 		}
 
 		List<MasterKeyword> masterKeywords = masterKeywordService.findAll();
-
 		userKeywordService.setupKeywordsFromMaster(user, masterKeywords);
 	}
 
