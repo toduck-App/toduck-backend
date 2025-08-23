@@ -27,7 +27,8 @@ public interface UserKeywordRepository extends JpaRepository<UserKeyword, Long> 
 			LIMIT 1""",
 		nativeQuery = true
 	)
-	Optional<UserKeyword> findByUserAndKeywordIncludingDeleted(User user, String keyword);
+	Optional<UserKeyword> findByUserAndKeywordIncludingDeleted(User user,
+		String keyword); // 논리적으로 삭제된 키워드 복구를 위한 nativeQuery
 
 	List<UserKeyword> findByUserId(Long userId);
 
