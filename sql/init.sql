@@ -408,23 +408,6 @@ CREATE TABLE notification (
                               FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
--- 기존 사용자들 중 키워드 세팅이 안된 경우 키워드 세팅
-START TRANSACTION;
-
-INSERT INTO user_keywords (user_id, category, keyword, created_at, updated_at)
-SELECT u.id, mk.category, mk.keyword, NOW(), NOW()
-FROM users u
-JOIN master_keywords mk
-    ON mk.deleted_at IS NULL
-WHERE u.deleted_at IS NULL
-    AND NOT EXISTS (
-        SELECT 1
-        FROM user_keywords uk
-        WHERE uk.user_id = u.id
-    );
-
-COMMIT;
-
 -- 마스터 키워드 세팅
 INSERT IGNORE INTO master_keywords (category, keyword, created_at, updated_at)
 VALUES
@@ -506,3 +489,20 @@ VALUES
     ('RESULT', '지침', NOW(), NOW()),
     ('RESULT', '답답', NOW(), NOW()),
     ('RESULT', '짜증', NOW(), NOW());
+
+-- 기존 사용자들 중 키워드 세팅이 안된 경우 키워드 세팅
+START TRANSACTION;
+
+INSERT INTO user_keywords (user_id, category, keyword, created_at, updated_at)
+SELECT u.id, mk.category, mk.keyword, NOW(), NOW()
+FROM users u
+JOIN master_keywords mk
+    ON mk.deleted_at IS NULL
+WHERE u.deleted_at IS NULL
+    AND NOT EXISTS (
+        SELECT 1
+        FROM user_keywords uk
+        WHERE uk.user_id = u.id
+    );
+
+COMMIT;
