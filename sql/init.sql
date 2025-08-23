@@ -407,3 +407,102 @@ CREATE TABLE notification (
                               deleted_at DATETIME DEFAULT NULL,
                               FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+-- 기존 사용자들 중 키워드 세팅이 안된 경우 키워드 세팅
+START TRANSACTION;
+
+INSERT INTO user_keywords (user_id, category, keyword, created_at, updated_at)
+SELECT u.id, mk.category, mk.keyword, NOW(), NOW()
+FROM users u
+JOIN master_keywords mk
+    ON mk.deleted_at IS NULL
+WHERE u.deleted_at IS NULL
+    AND NOT EXISTS (
+        SELECT 1
+        FROM user_keywords uk
+        WHERE uk.user_id = u.id
+    );
+
+COMMIT;
+
+-- 마스터 키워드 세팅
+INSERT IGNORE INTO master_keywords (category, keyword, created_at, updated_at)
+VALUES
+    -- PERSON 카테고리 (사람)
+    ('PERSON', '가족', NOW(), NOW()),
+    ('PERSON', '부모님', NOW(), NOW()),
+    ('PERSON', '형제/자매', NOW(), NOW()),
+    ('PERSON', '배우자', NOW(), NOW()),
+    ('PERSON', '자녀', NOW(), NOW()),
+    ('PERSON', '연인', NOW(), NOW()),
+    ('PERSON', '친구', NOW(), NOW()),
+    ('PERSON', '팀원', NOW(), NOW()),
+    ('PERSON', '선/후배', NOW(), NOW()),
+    ('PERSON', '동료', NOW(), NOW()),
+    ('PERSON', '교수님', NOW(), NOW()),
+    ('PERSON', '상사', NOW(), NOW()),
+    ('PERSON', '새로운 사람', NOW(), NOW()),
+
+    -- PLACE 카테고리 (장소)
+    ('PLACE', '집', NOW(), NOW()),
+    ('PLACE', '회사', NOW(), NOW()),
+    ('PLACE', '학교', NOW(), NOW()),
+    ('PLACE', '카페', NOW(), NOW()),
+    ('PLACE', '공원', NOW(), NOW()),
+    ('PLACE', '마트', NOW(), NOW()),
+    ('PLACE', '지하철', NOW(), NOW()),
+    ('PLACE', '버스', NOW(), NOW()),
+    ('PLACE', '자동차', NOW(), NOW()),
+    ('PLACE', '병원', NOW(), NOW()),
+    ('PLACE', '공연장', NOW(), NOW()),
+    ('PLACE', '여행지', NOW(), NOW()),
+    ('PLACE', '도서관', NOW(), NOW()),
+    ('PLACE', '식당', NOW(), NOW()),
+
+    -- SITUATION 카테고리 (상황)
+    ('SITUATION', '공부', NOW(), NOW()),
+    ('SITUATION', '작업', NOW(), NOW()),
+    ('SITUATION', '발표', NOW(), NOW()),
+    ('SITUATION', '보고', NOW(), NOW()),
+    ('SITUATION', '독서', NOW(), NOW()),
+    ('SITUATION', '게임', NOW(), NOW()),
+    ('SITUATION', '산책', NOW(), NOW()),
+    ('SITUATION', '청소', NOW(), NOW()),
+    ('SITUATION', '요리', NOW(), NOW()),
+    ('SITUATION', '운동', NOW(), NOW()),
+    ('SITUATION', '쇼핑', NOW(), NOW()),
+    ('SITUATION', '실수', NOW(), NOW()),
+    ('SITUATION', '새로운 시작', NOW(), NOW()),
+    ('SITUATION', '집중력 최고', NOW(), NOW()),
+    ('SITUATION', '무기력', NOW(), NOW()),
+    ('SITUATION', '물건 분실', NOW(), NOW()),
+    ('SITUATION', '중독적', NOW(), NOW()),
+    ('SITUATION', '감정 조절', NOW(), NOW()),
+    ('SITUATION', '규칙적인 하루', NOW(), NOW()),
+    ('SITUATION', '약속', NOW(), NOW()),
+    ('SITUATION', '뒹굴뒹굴', NOW(), NOW()),
+    ('SITUATION', '날씨의 영향', NOW(), NOW()),
+    ('SITUATION', '특별한 일 없음', NOW(), NOW()),
+    ('SITUATION', '집중력 저하', NOW(), NOW()),
+
+    -- RESULT 카테고리 (결과/느낌)
+    ('RESULT', '칭찬을 받음', NOW(), NOW()),
+    ('RESULT', '훈훈', NOW(), NOW()),
+    ('RESULT', '기분 좋은 대화', NOW(), NOW()),
+    ('RESULT', '오해', NOW(), NOW()),
+    ('RESULT', '스스로 기억해냄', NOW(), NOW()),
+    ('RESULT', '소중한 만남', NOW(), NOW()),
+    ('RESULT', '불편한 대화', NOW(), NOW()),
+    ('RESULT', '생산적 하루', NOW(), NOW()),
+    ('RESULT', '작은 성과', NOW(), NOW()),
+    ('RESULT', '계획 완료', NOW(), NOW()),
+    ('RESULT', '계획 실패', NOW(), NOW()),
+    ('RESULT', '기분 전환', NOW(), NOW()),
+    ('RESULT', '목표 달성', NOW(), NOW()),
+    ('RESULT', '건망증', NOW(), NOW()),
+    ('RESULT', '예기치 못한 일', NOW(), NOW()),
+    ('RESULT', '뿌듯', NOW(), NOW()),
+    ('RESULT', '설렘', NOW(), NOW()),
+    ('RESULT', '지침', NOW(), NOW()),
+    ('RESULT', '답답', NOW(), NOW()),
+    ('RESULT', '짜증', NOW(), NOW());
