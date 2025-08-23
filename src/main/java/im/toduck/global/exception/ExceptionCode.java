@@ -99,6 +99,9 @@ public enum ExceptionCode {
 	UNAUTHORIZED_ACCESS_DIARY(HttpStatus.FORBIDDEN, 40502, "일기에 접근 권한이 없습니다."),
 	EXISTS_DATE_DIARY(HttpStatus.CONFLICT, 40503, "이미 해당 날짜에 일기가 존재합니다."),
 
+	/* 408xx diary_streak */
+	NOT_FOUND_DIARY_STREAK(HttpStatus.NOT_FOUND, 40801, "일기 스트릭을 찾을 수 없습니다."),
+
 	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",
 		"일정 기록을 찾을 수 없을 때 발생하는 오류입니다."),

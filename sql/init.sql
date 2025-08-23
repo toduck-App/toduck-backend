@@ -297,6 +297,16 @@ CREATE TABLE diary_image_file
     FOREIGN KEY (diary_id) REFERENCES diary (id) ON DELETE CASCADE
 );
 
+CREATE TABLE diary_streak
+(
+    id              BIGINT PRIMARY KEY auto_increment,
+    user_id         BIGINT                              NOT NULL,
+    streak          BIGINT                              NOT NULL DEFAULT 0,
+    last_diary_date DATETIME                            NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    UNIQUE KEY uk_diary_streak_user_id (user_id)
+);
+
 CREATE TABLE concentration
 (
     id                  BIGINT PRIMARY KEY auto_increment,

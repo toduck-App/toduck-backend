@@ -84,7 +84,7 @@ public class DiaryUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public DiaryListResponse getDiariesByMonth(final Long userId, YearMonth yearMonth) {
+	public DiaryListResponse getDiariesByMonth(final Long userId, final YearMonth yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		List<DiaryResponse> diaries = diaryService.getDiariesByMonth(userId, yearMonth);
@@ -92,7 +92,7 @@ public class DiaryUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public MonthDiaryResponse getDiaryCountByMonth(Long userId, YearMonth yearMonth) {
+	public MonthDiaryResponse getDiaryCountByMonth(final Long userId, final YearMonth yearMonth) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
