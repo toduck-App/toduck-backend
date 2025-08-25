@@ -29,7 +29,7 @@ public record DiaryUpdateRequest(
 	String memo,
 
 	@Nullable
-	@Size(max = 2, message = "이미지는 최대 2개까지만 등록할 수 있습니다.")
+	@Size(max = 5, message = "이미지는 최대 5개까지만 등록할 수 있습니다.")
 	@Schema(description = "변경된 이미지 URL 목록", example = "[\"https://cdn.app/image1.jpg\"]")
 	List<String> diaryImageUrls
 ) {
