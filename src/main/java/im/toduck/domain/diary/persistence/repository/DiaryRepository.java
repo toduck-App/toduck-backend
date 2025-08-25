@@ -2,6 +2,7 @@ package im.toduck.domain.diary.persistence.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 	int countByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 
 	List<Diary> findAllByUser(User user);
+
+	Optional<Diary> getDiaryByUserIdAndId(Long userId, Long diaryId);
 }

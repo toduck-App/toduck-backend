@@ -32,7 +32,7 @@ public record DiaryCreateRequest(
 	@Schema(description = "문장 기록", example = "출근 전에 지갑을 두고 나오는 바람에 다시 돌아갔다")
 	String memo,
 
-	@Size(max = 2, message = "이미지는 최대 2개까지만 등록할 수 있습니다.")
+	@Size(max = 5, message = "이미지는 최대 5개까지만 등록할 수 있습니다.")
 	@Schema(description = "이미지 URL 목록", example = "[\"https://cdn.toduck.app/image1.jpg\"]")
 	List<String> diaryImageUrls
 ) {

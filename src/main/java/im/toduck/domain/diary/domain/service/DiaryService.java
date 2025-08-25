@@ -19,6 +19,8 @@ import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -115,5 +117,11 @@ public class DiaryService {
 		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()).plusDays(1);
 
 		return diaryRepository.countByUserIdAndDateBetween(userId, startDate, endDate);
+	}
+
+	@Transactional(readOnly = true)
+	public Diary getDiaryByIdAndUserId(Long userId, Long diaryId) {
+		return diaryRepository.getDiaryByUserIdAndId(userId, diaryId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_DIARY));
 	}
 }
