@@ -4,6 +4,28 @@ spring:
       toduck-backend
   profiles: # 로컬이든 prod 이든 활성화할 properties
     active: sms
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never # 테이블은 SQL로 직접 생성
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: ToduckScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: qrtz_
+            isClustered: true
+            clusterCheckinInterval: 20000
+            misfireThreshold: 60000
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8

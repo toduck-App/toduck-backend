@@ -103,7 +103,10 @@ public enum ExceptionCode {
 	ALREADY_SETUP_KEYWORD(HttpStatus.CONFLICT, 40601, "이미 초기화된 유저입니다."),
 	ALREADY_EXISTS_KEYWORD(HttpStatus.CONFLICT, 40602, "이미 존재하는 키워드입니다."),
 	NOT_FOUND_KEYWORD(HttpStatus.NOT_FOUND, 40603, "존재하지 않는 키워드입니다."),
-
+  
+	/* 408xx diary_streak */
+	NOT_FOUND_DIARY_STREAK(HttpStatus.NOT_FOUND, 40801, "일기 스트릭을 찾을 수 없습니다."),
+  
 	/* 409xx diaryKeyword */
 	INVALID_KEYWORD_ID(HttpStatus.BAD_REQUEST, 40901, "유효하지 않은 키워드 ID입니다."),
 

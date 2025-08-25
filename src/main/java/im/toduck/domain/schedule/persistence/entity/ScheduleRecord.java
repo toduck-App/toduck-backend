@@ -13,14 +13,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "schedule_record")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScheduleRecord extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,11 +36,13 @@ public class ScheduleRecord extends BaseEntity {
 	@JoinColumn(name = "schedule_id", nullable = false)
 	private Schedule schedule;
 
-	@Builder
-	private ScheduleRecord(Boolean isCompleted, LocalDate recordDate, Schedule schedule) {
-		this.isCompleted = isCompleted;
-		this.recordDate = recordDate;
-		this.schedule = schedule;
+	public static ScheduleRecord create(Schedule schedule, LocalDate queryDate) {
+		ScheduleRecord scheduleRecord = new ScheduleRecord();
+		scheduleRecord.isCompleted = false;
+		scheduleRecord.recordDate = queryDate;
+		scheduleRecord.schedule = schedule;
+
+		return scheduleRecord;
 	}
 
 	public void changeComplete(Boolean complete) {

@@ -24,6 +24,8 @@ spring:
     template:
       exchange: ""
       routing-key: ""
+  quartz:
+    auto-startup: false
 
 decorator:
   datasource:

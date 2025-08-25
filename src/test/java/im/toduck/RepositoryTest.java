@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -45,6 +46,9 @@ import im.toduck.infra.push.FirebaseConfig;
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
 @AutoConfigureDataRedis
 @ActiveProfiles("test")
+@TestPropertySource(properties = {
+	"spring.quartz.auto-startup=false"
+})
 @Import(value = {TestFixtureBuilder.class, BuilderSupporter.class, QueryDslConfig.class})
 public abstract class RepositoryTest {
 

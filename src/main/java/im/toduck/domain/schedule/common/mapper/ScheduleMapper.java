@@ -27,8 +27,8 @@ public class ScheduleMapper {
 			daysOfWeekBitmask = DaysOfWeekBitmask.createByDayOfWeek(request.daysOfWeek());
 		}
 		PlanCategoryColor planCategoryColor = PlanCategoryColor.from(request.color());
-		ScheduleTime scheduleTime = ScheduleTime.from(request.isAllDay(), request.time(), request.alarm());
-		ScheduleDate scheduleDate = ScheduleDate.from(request.startDate(), request.endDate());
+		ScheduleTime scheduleTime = ScheduleTime.of(request.isAllDay(), request.time(), request.alarm());
+		ScheduleDate scheduleDate = ScheduleDate.of(request.startDate(), request.endDate());
 
 		return new Schedule(
 			request.title(),
@@ -106,7 +106,7 @@ public class ScheduleMapper {
 	}
 
 	public static Schedule copyToSchedule(Schedule schedule, LocalDate queryDate) {
-		ScheduleDate from = ScheduleDate.from(queryDate, queryDate);
+		ScheduleDate from = ScheduleDate.of(queryDate, queryDate);
 
 		return new Schedule(
 			schedule.getTitle(),
