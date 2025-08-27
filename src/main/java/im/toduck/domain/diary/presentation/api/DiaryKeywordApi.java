@@ -19,7 +19,11 @@ import jakarta.validation.Valid;
 public interface DiaryKeywordApi {
 	@Operation(
 		summary = "일기 키워드 생성",
-		description = "선택된 키워드를 일기에 저장합니다."
+		description = """
+			선택된 키워드를 일기에 저장합니다.
+
+			기존 값들을 삭제하고 새로운 값들을 저장합니다.
+			"""
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
