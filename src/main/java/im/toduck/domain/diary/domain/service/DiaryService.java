@@ -106,6 +106,7 @@ public class DiaryService {
 			.toList();
 	}
 
+	@Transactional(readOnly = true)
 	public Diary getDiaryByDate(Long userId, LocalDate date) {
 		return diaryRepository.findByUserIdAndDate(userId, date);
 	}
