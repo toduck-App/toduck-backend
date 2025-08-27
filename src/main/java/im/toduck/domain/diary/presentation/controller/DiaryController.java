@@ -1,5 +1,6 @@
 package im.toduck.domain.diary.presentation.controller;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import im.toduck.domain.diary.domain.usecase.DiaryStreakUseCase;
 import im.toduck.domain.diary.domain.usecase.DiaryUseCase;
 import im.toduck.domain.diary.presentation.api.DiaryApi;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
@@ -34,6 +36,8 @@ public class DiaryController implements DiaryApi {
 
 	private final DiaryUseCase diaryUseCase;
 
+	private final DiaryStreakUseCase diaryStreakUseCase;
+
 	@Override
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
@@ -42,6 +46,7 @@ public class DiaryController implements DiaryApi {
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	) {
 		diaryUseCase.createDiary(userDetails.getUserId(), request);
+		diaryStreakUseCase.updateStreak(userDetails.getUserId(), request.date(), LocalDate.now());
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
 
@@ -82,9 +87,9 @@ public class DiaryController implements DiaryApi {
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 
+	@Override
 	@GetMapping("/count")
 	@PreAuthorize("isAuthenticated()")
-	@Override
 	public ResponseEntity<ApiResponse<MonthDiaryResponse>> getDiaryCountByMonth(
 		@RequestParam("yearMonth") YearMonth yearMonth,
 		@AuthenticationPrincipal CustomUserDetails user

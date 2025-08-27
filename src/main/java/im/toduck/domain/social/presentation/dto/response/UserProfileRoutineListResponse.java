@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
+import im.toduck.domain.routine.presentation.vo.RoutineReminderTime;
 import im.toduck.global.serializer.DayOfWeekListSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -47,7 +48,10 @@ public record UserProfileRoutineListResponse(
 		@JsonSerialize(using = LocalTimeSerializer.class)
 		@JsonFormat(pattern = "HH:mm")
 		@Schema(description = "루틴 시간 (null 이면 종일 루틴)", type = "string", example = "07:30")
-		LocalTime time
+		LocalTime time,
+
+		@Schema(description = "루틴 리마인더 시간 (null이면 알림 없음)", example = "THIRTY_MINUTE")
+		RoutineReminderTime reminderTime
 	) {
 	}
 }

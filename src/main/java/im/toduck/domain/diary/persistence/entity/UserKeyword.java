@@ -1,13 +1,11 @@
 package im.toduck.domain.diary.persistence.entity;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import im.toduck.domain.user.persistence.entity.Emotion;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
@@ -28,12 +26,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "diary")
+@Table(name = "user_keywords")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE diary SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE user_keywords SET deleted_at = NOW() where id=?")
 @SQLRestriction(value = "deleted_at is NULL")
-public class Diary extends BaseEntity {
+public class UserKeyword extends BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -42,51 +41,27 @@ public class Diary extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(name = "diary_date", nullable = false)
-	private LocalDate date;
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private Emotion emotion;
+	private KeywordCategory category;
 
-	@Column(length = 50)
-	private String title;
+	@Column(nullable = false, length = 255)
+	private String keyword;
 
-	@Column(length = 2048)
-	private String memo;
-
-	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<DiaryImage> diaryImages = new ArrayList<>();
-
-	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "userKeyword", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DiaryKeyword> diaryKeywords = new ArrayList<>();
 
 	@Builder
-	private Diary(User user,
-		LocalDate date,
-		Emotion emotion,
-		String title,
-		String memo) {
+	private UserKeyword(User user,
+		KeywordCategory category,
+		String keyword) {
 		this.user = user;
-		this.date = date;
-		this.emotion = emotion;
-		this.title = title;
-		this.memo = memo;
+		this.category = category;
+		this.keyword = keyword;
 	}
 
-	public boolean isOwner(User requestingUser) {
-		return this.user.getId().equals(requestingUser.getId());
-	}
-
-	public void updateEmotion(Emotion emotion) {
-		this.emotion = emotion;
-	}
-
-	public void updateTitle(String title) {
-		this.title = title;
-	}
-
-	public void updateMemo(String memo) {
-		this.memo = memo;
+	public void restore(KeywordCategory newCategory) {
+		this.deletedAt = null;
+		this.category = newCategory;
 	}
 }

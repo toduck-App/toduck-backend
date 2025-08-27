@@ -3,6 +3,8 @@ package im.toduck.builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import im.toduck.domain.diary.persistence.repository.MasterKeywordRepository;
+import im.toduck.domain.diary.persistence.repository.UserKeywordRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.schedule.persistence.repository.ScheduleRecordRepository;
@@ -67,6 +69,12 @@ public class BuilderSupporter {
 	@Autowired
 	private FollowRepository followRepository;
 
+	@Autowired
+	private MasterKeywordRepository masterKeywordRepository;
+
+	@Autowired
+	private UserKeywordRepository userKeywordRepository;
+
 	public UserRepository userRepository() {
 		return userRepository;
 	}
@@ -127,4 +135,11 @@ public class BuilderSupporter {
 		return followRepository;
 	}
 
+	public MasterKeywordRepository masterKeywordRepository() {
+		return masterKeywordRepository;
+	}
+
+	public UserKeywordRepository userKeywordRepository() {
+		return userKeywordRepository;
+	}
 }

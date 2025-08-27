@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
+import im.toduck.domain.routine.presentation.vo.RoutineReminderTime;
 import im.toduck.global.serializer.DayOfWeekListSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -44,6 +45,9 @@ public record RoutineDetailResponse(
 	List<DayOfWeek> daysOfWeek,
 
 	@Schema(description = "루틴 메모", example = "눈 뜨자마자 이부자리 정리하는 사람은 성공한다더라..")
-	String memo
+	String memo,
+
+	@Schema(description = "루틴 리마인더 시간 (null이면 알림 없음)", example = "THIRTY_MINUTE")
+	RoutineReminderTime reminderTime
 ) {
 }

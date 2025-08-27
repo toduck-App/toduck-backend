@@ -1,12 +1,18 @@
 package im.toduck.domain.auth.domain.usecase;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.auth.domain.service.NickNameGenerateService;
 import im.toduck.domain.auth.presentation.dto.request.SignUpRequest;
+import im.toduck.domain.diary.domain.service.MasterKeywordService;
+import im.toduck.domain.diary.domain.service.UserKeywordService;
+import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.domain.service.UserService;
+import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -23,6 +29,8 @@ public class GeneralSignUpUseCase {
 	private final PhoneNumberService phoneNumberService;
 	private final PasswordEncoder passwordEncoder;
 	private final NickNameGenerateService nickNameGenerateService;
+	private final UserKeywordService userKeywordService;
+	private final MasterKeywordService masterKeywordService;
 
 	public void sendVerifiedCodeToPhoneNumber(String phoneNumber) {
 		userService.findUserByPhoneNumber(phoneNumber).ifPresent(user -> {
@@ -58,5 +66,11 @@ public class GeneralSignUpUseCase {
 		userService.registerGeneralUser(
 			UserMapper.toGeneralUser(nickname, request.loginId(), encodedPassword, request.phoneNumber()));
 		phoneNumberService.deleteVerifiedPhoneNumber(request.phoneNumber());
+
+		User newUser = userService.getUserByLoginId(request.loginId())
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		List<MasterKeyword> masterKeywords = masterKeywordService.findAll();
+		userKeywordService.setupKeywordsFromMaster(newUser, masterKeywords);
 	}
 }
