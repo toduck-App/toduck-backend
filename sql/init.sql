@@ -339,7 +339,7 @@ CREATE TABLE diary_streak
     id              BIGINT PRIMARY KEY auto_increment,
     user_id         BIGINT                              NOT NULL,
     streak          BIGINT                              NOT NULL DEFAULT 0,
-    last_diary_date DATETIME                            NULL,
+    last_diary_date DATE                                NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
     UNIQUE KEY uk_diary_streak_user_id (user_id)
 );
