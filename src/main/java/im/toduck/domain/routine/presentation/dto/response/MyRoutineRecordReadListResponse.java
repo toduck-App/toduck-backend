@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import im.toduck.domain.person.persistence.entity.PlanCategory;
+import im.toduck.domain.routine.presentation.vo.RoutineReminderTime;
 import im.toduck.global.serializer.DayOfWeekListSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -62,7 +63,10 @@ public record MyRoutineRecordReadListResponse(
 		String memo,
 
 		@Schema(description = "루틴 완료 여부", example = "true")
-		Boolean isCompleted
+		Boolean isCompleted,
+
+		@Schema(description = "루틴 리마인더 시간 (null이면 알림 없음)", example = "THIRTY_MINUTE")
+		RoutineReminderTime reminderTime
 	) {
 	}
 }

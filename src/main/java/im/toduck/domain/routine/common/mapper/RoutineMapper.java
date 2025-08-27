@@ -15,6 +15,7 @@ import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadLis
 import im.toduck.domain.routine.presentation.dto.response.MyRoutineRecordReadMultipleDatesResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.routine.presentation.dto.response.RoutineDetailResponse;
+import im.toduck.domain.routine.presentation.vo.RoutineReminderTime;
 import im.toduck.domain.social.presentation.dto.response.UserProfileRoutineListResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
@@ -106,6 +107,7 @@ public class RoutineMapper {
 			.isInDeletedState(routine.isInDeletedState())
 			.daysOfWeek(daysOfWeek)
 			.isCompleted(isCompleted)
+			.reminderTime(RoutineReminderTime.fromMinutes(routine.getReminderMinutes()))
 			.build();
 	}
 
@@ -125,6 +127,7 @@ public class RoutineMapper {
 			.isPublic(routine.getIsPublic())
 			.isInDeletedState(routine.isInDeletedState())
 			.daysOfWeek(daysOfWeek)
+			.reminderTime(RoutineReminderTime.fromMinutes(routine.getReminderMinutes()))
 			.build();
 	}
 
@@ -147,6 +150,7 @@ public class RoutineMapper {
 			.color(routine.getColorValue())
 			.title(routine.getTitle())
 			.memo(routine.getMemoValue())
+			.reminderTime(RoutineReminderTime.fromMinutes(routine.getReminderMinutes()))
 			.build();
 	}
 
@@ -177,6 +181,7 @@ public class RoutineMapper {
 			.time(routine.getTime())
 			.sharedCount(routine.getSharedCount())
 			.daysOfWeek(daysOfWeek)
+			.reminderTime(RoutineReminderTime.fromMinutes(routine.getReminderMinutes()))
 			.build();
 	}
 }
