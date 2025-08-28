@@ -9,4 +9,6 @@ import im.toduck.domain.diary.persistence.entity.DiaryKeyword;
 public interface DiaryKeywordRepository extends JpaRepository<DiaryKeyword, Long> {
 
 	List<DiaryKeyword> findByDiaryId(Long diaryId);
+
+	void deleteByDiaryId(Long diaryId);
 }
