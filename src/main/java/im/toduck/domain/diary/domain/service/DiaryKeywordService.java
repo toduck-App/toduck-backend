@@ -21,6 +21,8 @@ public class DiaryKeywordService {
 
 	@Transactional
 	public void createDiaryKeywords(Diary diary, List<UserKeyword> userKeywords) {
+		diaryKeywordRepository.deleteByDiaryId(diary.getId());
+
 		List<DiaryKeyword> diaryKeywords = userKeywords.stream()
 			.map(uk -> DiaryKeyword.builder()
 				.diary(diary)
