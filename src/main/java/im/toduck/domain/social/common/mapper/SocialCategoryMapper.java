@@ -1,6 +1,8 @@
 package im.toduck.domain.social.common.mapper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import im.toduck.domain.social.persistence.entity.SocialCategory;
 import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse;
@@ -22,5 +24,17 @@ public class SocialCategoryMapper {
 			.socialCategoryId(socialCategory.getId())
 			.name(socialCategory.getName())
 			.build();
+	}
+
+	public static Map<Long, List<SocialCategoryDto>> toCategoryDtoMap(
+		Map<Long, List<SocialCategory>> categoriesEntityMap
+	) {
+		return categoriesEntityMap.entrySet().stream()
+			.collect(Collectors.toMap(
+				Map.Entry::getKey,
+				entry -> entry.getValue().stream()
+					.map(SocialCategoryMapper::toSocialCategoryDto)
+					.toList()
+			));
 	}
 }

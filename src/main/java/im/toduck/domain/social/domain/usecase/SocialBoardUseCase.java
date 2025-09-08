@@ -12,7 +12,6 @@ import im.toduck.domain.social.common.mapper.CommentMapper;
 import im.toduck.domain.social.common.mapper.SocialCategoryMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.domain.service.SocialBoardService;
-import im.toduck.domain.social.domain.service.SocialCategoryService;
 import im.toduck.domain.social.domain.service.SocialInteractionService;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentImageFile;
@@ -27,6 +26,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.
 import im.toduck.domain.social.presentation.dto.response.SocialCreateResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialWithDetailsDto;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -41,21 +41,22 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class SocialBoardUseCase {
+
 	private static final int DEFAULT_SOCIAL_PAGE_SIZE = 10;
 
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
 	private final UserService userService;
 	private final RoutineService routineService;
-	private final SocialCategoryService socialCategoryService;
 
 	@Transactional
 	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-		Routine routine = findRoutineForCreate(user, request.routineId());
+		Routine routine = findPublicRoutineIfPresent(user, request.routineId());
 
 		Social socialBoard = socialBoardService.createSocialBoard(user, routine, request);
+
 		List<SocialCategory> socialCategories = socialBoardService.findSocialCategoriesByIds(
 			request.socialCategoryIds());
 		socialBoardService.addSocialCategoryLinks(request.socialCategoryIds(), socialCategories, socialBoard);
@@ -65,72 +66,27 @@ public class SocialBoardUseCase {
 		return SocialMapper.toSocialCreateResponse(socialBoard);
 	}
 
-	private Routine findRoutineForCreate(final User user, final Long routineId) {
-		if (routineId == null) {
-			return null;
-		}
-
-		return findAndValidateRoutine(user, routineId);
-	}
-
 	@Transactional
-	public void updateSocialBoard(
-		final Long userId,
-		final Long socialId,
-		final SocialUpdateRequest request
-	) {
+	public void updateSocialBoard(final Long userId, final Long socialId, final SocialUpdateRequest request) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+		validateBoardOwnership(socialBoard, user);
 
-		if (!isBoardOwner(socialBoard, user)) {
-			log.warn("권한이 없는 유저가 소셜 게시판 수정 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
-			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
-		}
-
-		Routine routine = findRoutineForUpdate(user, request.routineId());
-
+		Routine routine = findPublicRoutineIfPresent(user, request.routineId());
 		socialBoardService.updateSocialBoard(user, socialBoard, routine, request);
+
 		log.info("소셜 게시글 수정 - UserId: {}, SocialBoardId: {}", userId, socialId);
 	}
 
-	private boolean isBoardOwner(final Social socialBoard, final User user) {
-		return socialBoard.isOwner(user);
-	}
-
-	private Routine findRoutineForUpdate(
-		final User user,
-		final Long routineId
-	) {
-		if (routineId == null) {
-			return null;
-		}
-
-		return findAndValidateRoutine(user, routineId);
-	}
-
-	private Routine findAndValidateRoutine(final User user, final Long routineId) {
-		Routine routine = routineService.getUserRoutine(user, routineId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
-
-		if (!routine.getIsPublic()) {
-			throw CommonException.from(ExceptionCode.PRIVATE_ROUTINE);
-		}
-		return routine;
-	}
-
 	@Transactional
-	public void deleteSocialBoard(Long userId, Long socialId) {
+	public void deleteSocialBoard(final Long userId, final Long socialId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-
-		if (!isBoardOwner(socialBoard, user)) {
-			log.warn("권한이 없는 유저가 소셜 게시판 삭제 시도 - UserId: {}, SocialBoardId: {}", user.getId(), socialBoard.getId());
-			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
-		}
+		validateBoardOwnership(socialBoard, user);
 
 		socialBoardService.deleteSocialBoard(socialBoard);
 		log.info("소셜 게시글 삭제 - UserId: {}, SocialBoardId: {}", userId, socialId);
@@ -142,13 +98,7 @@ public class SocialBoardUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Social socialBoard = socialBoardService.getSocialById(socialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
-
-		boolean isBlockedUser = userService.isBlockedUser(user, socialBoard.getUser());
-		if (isBlockedUser) {
-			log.warn("차단된 사용자에 대한 게시글 접근 시도 - UserId: {}, BlockedUserId: {}, SocialBoardId: {}", userId,
-				socialBoard.getUser().getId(), socialId);
-			throw CommonException.from(ExceptionCode.BLOCKED_USER_SOCIAL_ACCESS);
-		}
+		validateNotBlockedUser(user, socialBoard, socialId);
 
 		List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(socialBoard);
 		List<Comment> comments = socialInteractionService.getCommentsBySocial(socialBoard);
@@ -168,81 +118,48 @@ public class SocialBoardUseCase {
 	) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+		validateCategories(userId, categoryIds);
 
 		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
 		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
 
+		List<SocialWithDetailsDto> socialDetails = socialBoardService.getSocialsWithDetails(
+			cursor, fetchLimit, user.getId(), categoryIds
+		);
+
+		CursorPaginationResponse<SocialResponse> response = buildSocialPaginationResponse(
+			socialDetails, actualLimit
+		);
+
+		log.info("소셜 게시글 목록 조회 성공 - UserId: {}, 조회된 게시글: {}개", userId, response.results().size());
+		return response;
+	}
+
+	@Transactional(readOnly = true)
+	public CursorPaginationResponse<SocialResponse> searchSocials(
+		final Long userId,
+		final String keyword,
+		final Long cursor,
+		final Integer limit,
+		final List<Long> categoryIds
+	) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		validateCategories(userId, categoryIds);
 
-		List<Social> socialBoards = socialBoardService.getSocials(cursor, fetchLimit, user.getId(), categoryIds);
-		boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
-		Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
+		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
+		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
 
-		List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
+		List<SocialWithDetailsDto> searchDetails = socialBoardService.searchSocialsWithDetails(
+			user.getId(), keyword, cursor, fetchLimit, categoryIds
+		);
 
-		log.info("소셜 게시글 목록 조회 성공 - UserId: {}, HasMore: {}, NextCursor: {}", userId, hasMore, nextCursor);
-		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
-	}
+		CursorPaginationResponse<SocialResponse> response = buildSocialPaginationResponse(
+			searchDetails, actualLimit
+		);
 
-	private void validateCategories(Long userId, List<Long> categoryIds) {
-		if (CollectionUtils.isEmpty(categoryIds)) {
-			return;
-		}
-
-		List<SocialCategory> socialCategories = socialBoardService.findSocialCategoriesByIds(categoryIds);
-		if (isInvalidCategoryIncluded(categoryIds, socialCategories)) {
-			log.warn("유효하지 않은 카테고리 포함 - UserId: {}, 요청된 카테고리 IDs: {}", userId, categoryIds);
-			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
-		}
-	}
-
-	private boolean isInvalidCategoryIncluded(
-		final List<Long> socialCategoryIds,
-		final List<SocialCategory> socialCategories
-	) {
-		return socialCategories.size() != socialCategoryIds.size();
-	}
-
-	private List<CommentDto> convertCommentsToDto(final User user, final List<Comment> comments) {
-		return comments.stream()
-			.map(comment -> createCommentDto(user, comment))
-			.toList();
-	}
-
-	private CommentDto createCommentDto(final User user, final Comment comment) {
-		Optional<CommentImageFile> commentImageFile = socialInteractionService.getCommentImageByComment(comment);
-		boolean hasImage = commentImageFile.isPresent();
-		String imageUrl = hasImage ? commentImageFile.get().getUrl() : null;
-
-		boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
-		boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
-
-		return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
-	}
-
-	private List<SocialResponse> createSocialResponses(
-		final List<Social> socialBoards,
-		final User requestingUser,
-		final int actualLimit
-	) {
-		return socialBoards.stream()
-			.limit(actualLimit)
-			.map(social -> {
-				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(social);
-				int commentCount = socialInteractionService.countCommentsBySocial(social);
-				boolean isLikedByRequestingUser = socialInteractionService.getSocialBoardIsLiked(requestingUser,
-					social);
-				List<SocialCategoryDto> socialCategoryDtos = socialCategoryService.getSocialCategoryDtosBySocial(
-					social);
-				return SocialMapper.toSocialResponse(
-					social,
-					imageFiles,
-					socialCategoryDtos,
-					commentCount,
-					isLikedByRequestingUser
-				);
-			})
-			.toList();
+		log.info("소셜 게시글 검색 성공 - UserId: {}, 키워드: '{}', 결과: {}개", userId, keyword, response.results().size());
+		return response;
 	}
 
 	@Transactional(readOnly = true)
@@ -256,35 +173,85 @@ public class SocialBoardUseCase {
 		return SocialCategoryMapper.toSocialCategoryResponse(socialCategoryDtos);
 	}
 
-	@Transactional(readOnly = true)
-	public CursorPaginationResponse<SocialResponse> searchSocials(
-		final Long userId,
-		final String keyword,
-		final Long cursor,
-		final Integer limit,
-		final List<Long> categoryIds
-	) {
-		User user = userService.getUserById(userId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-
-		int actualLimit = PaginationUtil.resolveLimit(limit, DEFAULT_SOCIAL_PAGE_SIZE);
-		int fetchLimit = PaginationUtil.calculateTotalFetchSize(actualLimit);
-
-		validateCategories(userId, categoryIds);
-
-		List<Social> searchResults = socialBoardService.searchSocialsWithFilters(
-			userId,
-			keyword,
-			cursor,
-			fetchLimit,
-			categoryIds
-		);
-
-		boolean hasMore = PaginationUtil.hasMore(searchResults, actualLimit);
-		Long nextCursor = PaginationUtil.getNextCursor(hasMore, searchResults, actualLimit, Social::getId);
-
-		List<SocialResponse> searchResponses = createSocialResponses(searchResults, user, actualLimit);
-		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, searchResponses);
+	private void validateBoardOwnership(final Social socialBoard, final User user) {
+		if (!socialBoard.isOwner(user)) {
+			log.warn("권한이 없는 유저가 소셜 게시판 접근 시도 - UserId: {}, SocialBoardId: {}",
+				user.getId(), socialBoard.getId());
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
 	}
 
+	private void validateNotBlockedUser(final User user, final Social socialBoard, final Long socialId) {
+		if (userService.isBlockedUser(user, socialBoard.getUser())) {
+			log.warn("차단된 사용자에 대한 게시글 접근 시도 - UserId: {}, BlockedUserId: {}, SocialBoardId: {}",
+				user.getId(), socialBoard.getUser().getId(), socialId);
+			throw CommonException.from(ExceptionCode.BLOCKED_USER_SOCIAL_ACCESS);
+		}
+	}
+
+	private void validateCategories(final Long userId, final List<Long> categoryIds) {
+		if (CollectionUtils.isEmpty(categoryIds)) {
+			return;
+		}
+
+		List<SocialCategory> socialCategories = socialBoardService.findSocialCategoriesByIds(categoryIds);
+		if (socialCategories.size() != categoryIds.size()) {
+			log.warn("유효하지 않은 카테고리 포함 - UserId: {}, 요청된 카테고리 IDs: {}", userId, categoryIds);
+			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_CATEGORY);
+		}
+	}
+
+	private Routine findPublicRoutineIfPresent(final User user, final Long routineId) {
+		if (routineId == null) {
+			return null;
+		}
+
+		Routine routine = routineService.getUserRoutine(user, routineId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ROUTINE));
+
+		if (!routine.getIsPublic()) {
+			throw CommonException.from(ExceptionCode.PRIVATE_ROUTINE);
+		}
+
+		return routine;
+	}
+
+	private List<CommentDto> convertCommentsToDto(final User user, final List<Comment> comments) {
+		return comments.stream()
+			.map(comment -> createCommentDto(user, comment))
+			.toList();
+	}
+
+	private CommentDto createCommentDto(final User user, final Comment comment) {
+		Optional<CommentImageFile> commentImageFile = socialInteractionService.getCommentImageByComment(comment);
+		boolean hasImage = commentImageFile.isPresent();
+		String imageUrl = hasImage ? commentImageFile.get().getUrl() : null;
+		boolean isCommentLike = socialInteractionService.getCommentIsLiked(user, comment);
+		boolean isBlocked = userService.isBlockedUser(user, comment.getUser());
+
+		return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
+	}
+
+	private CursorPaginationResponse<SocialResponse> buildSocialPaginationResponse(
+		final List<SocialWithDetailsDto> socialDetails,
+		final int actualLimit
+	) {
+		boolean hasMore = PaginationUtil.hasMore(socialDetails, actualLimit);
+		Long nextCursor = PaginationUtil.getNextCursor(
+			hasMore, socialDetails, actualLimit, dto -> dto.social().getId()
+		);
+
+		List<SocialResponse> socialResponses = socialDetails.stream()
+			.limit(actualLimit)
+			.map(details -> SocialMapper.toSocialResponse(
+				details.social(),
+				details.imageFiles(),
+				details.categories(),
+				details.commentCount(),
+				details.isLikedByCurrentUser()
+			))
+			.toList();
+
+		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
+	}
 }

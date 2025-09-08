@@ -1,6 +1,7 @@
 package im.toduck.domain.social.common.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -15,6 +16,7 @@ import im.toduck.domain.social.presentation.dto.response.SocialDetailResponse;
 import im.toduck.domain.social.presentation.dto.response.SocialImageDto;
 import im.toduck.domain.social.presentation.dto.response.SocialLikeDto;
 import im.toduck.domain.social.presentation.dto.response.SocialResponse;
+import im.toduck.domain.social.presentation.dto.response.SocialWithDetailsDto;
 import im.toduck.domain.user.persistence.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -109,5 +111,39 @@ public class SocialMapper {
 			.nickname(user.getNickname())
 			.profileImageUrl(user.getImageUrl())
 			.build();
+	}
+
+	public static SocialWithDetailsDto toSocialWithDetailsDto(
+		Social social,
+		List<SocialImageFile> imageFiles,
+		Integer commentCount,
+		Boolean isLikedByCurrentUser,
+		List<SocialCategoryDto> categories
+	) {
+		return SocialWithDetailsDto.builder()
+			.social(social)
+			.imageFiles(imageFiles != null ? imageFiles : List.of())
+			.commentCount(commentCount != null ? commentCount : 0)
+			.isLikedByCurrentUser(isLikedByCurrentUser != null ? isLikedByCurrentUser : false)
+			.categories(categories != null ? categories : List.of())
+			.build();
+	}
+
+	public static List<SocialWithDetailsDto> toSocialWithDetailsDtoList(
+		List<Social> socials,
+		Map<Long, List<SocialImageFile>> imageFilesMap,
+		Map<Long, Integer> commentCountsMap,
+		Map<Long, Boolean> likesMap,
+		Map<Long, List<SocialCategoryDto>> categoriesMap
+	) {
+		return socials.stream()
+			.map(social -> toSocialWithDetailsDto(
+				social,
+				imageFilesMap.getOrDefault(social.getId(), List.of()),
+				commentCountsMap.getOrDefault(social.getId(), 0),
+				likesMap.getOrDefault(social.getId(), false),
+				categoriesMap.getOrDefault(social.getId(), List.of())
+			))
+			.toList();
 	}
 }

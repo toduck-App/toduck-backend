@@ -1,6 +1,7 @@
 package im.toduck.domain.social.domain.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
+import im.toduck.domain.social.common.mapper.SocialCategoryMapper;
 import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
 import im.toduck.domain.social.persistence.entity.Comment;
@@ -29,6 +31,8 @@ import im.toduck.domain.social.persistence.repository.SocialImageFileRepository;
 import im.toduck.domain.social.persistence.repository.SocialRepository;
 import im.toduck.domain.social.presentation.dto.request.SocialCreateRequest;
 import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
+import im.toduck.domain.social.presentation.dto.response.SocialCategoryResponse.SocialCategoryDto;
+import im.toduck.domain.social.presentation.dto.response.SocialWithDetailsDto;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -234,6 +238,60 @@ public class SocialBoardService {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 
 		return socialRepository.findUserSocials(profileUserId, cursor, pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public List<SocialWithDetailsDto> getSocialsWithDetails(
+		final Long cursor,
+		final Integer limit,
+		final Long currentUserId,
+		final List<Long> categoryIds
+	) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+		List<Social> socials = socialRepository.findSocialsExcludingBlocked(
+			cursor, currentUserId, categoryIds, pageRequest
+		);
+
+		if (socials.isEmpty()) {
+			return List.of();
+		}
+
+		return buildSocialsWithDetails(socials, currentUserId);
+	}
+
+	@Transactional(readOnly = true)
+	public List<SocialWithDetailsDto> searchSocialsWithDetails(
+		final Long userId,
+		final String keyword,
+		final Long cursor,
+		final int limit,
+		final List<Long> categoryIds
+	) {
+		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
+		List<Social> socials = socialRepository.searchSocialsExcludingBlocked(
+			cursor, userId, keyword, categoryIds, pageRequest
+		);
+
+		if (socials.isEmpty()) {
+			return List.of();
+		}
+
+		return buildSocialsWithDetails(socials, userId);
+	}
+
+	private List<SocialWithDetailsDto> buildSocialsWithDetails(final List<Social> socials, final Long currentUserId) {
+		List<Long> socialIds = socials.stream().map(Social::getId).toList();
+
+		Map<Long, List<SocialImageFile>> imageFilesMap = socialRepository.findImageFilesBySocialIds(socialIds);
+		Map<Long, Integer> commentCountsMap = socialRepository.countCommentsBySocialIds(socialIds);
+		Map<Long, Boolean> likesMap = socialRepository.findLikesBySocialIdsAndUserId(socialIds, currentUserId);
+
+		Map<Long, List<SocialCategory>> categoriesEntityMap = socialRepository.findCategoriesBySocialIds(socialIds);
+		Map<Long, List<SocialCategoryDto>> categoriesMap = SocialCategoryMapper.toCategoryDtoMap(categoriesEntityMap);
+
+		return SocialMapper.toSocialWithDetailsDtoList(
+			socials, imageFilesMap, commentCountsMap, likesMap, categoriesMap
+		);
 	}
 }
 
