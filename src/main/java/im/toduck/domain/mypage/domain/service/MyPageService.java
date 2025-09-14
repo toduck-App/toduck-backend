@@ -1,6 +1,8 @@
 package im.toduck.domain.mypage.domain.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.mypage.common.mapper.AccountDeletionLogMapper;
 import im.toduck.domain.mypage.persistence.entity.AccountDeletionLog;
+import im.toduck.domain.mypage.persistence.entity.AccountDeletionReason;
 import im.toduck.domain.mypage.persistence.repository.AccountDeletionLogRepository;
 import im.toduck.domain.mypage.presentation.dto.request.UserDeleteRequest;
 import im.toduck.domain.mypage.presentation.dto.response.MyCommentsResponse;
@@ -56,5 +59,20 @@ public class MyPageService {
 	public List<MyCommentsResponse> getMyCommentsResponse(final Long userId, final Long cursor, final int limit) {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 		return commentRepository.findMyCommentsWithProjection(userId, cursor, pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public List<AccountDeletionLog> getAllAccountDeletionLogs() {
+		return accountDeletionLogRepository.findAll();
+	}
+
+	@Transactional(readOnly = true)
+	public Map<AccountDeletionReason, Long> getDeletionReasonStatistics() {
+		List<AccountDeletionLog> logs = accountDeletionLogRepository.findAll();
+		return logs.stream()
+			.collect(Collectors.groupingBy(
+				AccountDeletionLog::getReasonCode,
+				Collectors.counting()
+			));
 	}
 }

@@ -1,5 +1,6 @@
 package im.toduck.domain.notification.persistence.entity;
 
+import im.toduck.domain.notification.domain.data.BroadcastNotificationData;
 import im.toduck.domain.notification.domain.data.CommentNotificationData;
 import im.toduck.domain.notification.domain.data.DiaryReminderData;
 import im.toduck.domain.notification.domain.data.FollowNotificationData;
@@ -32,7 +33,9 @@ public enum NotificationType {
 	ROUTINE_REMINDER(NotificationCategory.HOME, RoutineReminderData.class, "루틴 임박", Priority.HIGH, false),
 
 	DIARY_REMINDER(NotificationCategory.DIARY, DiaryReminderData.class, "일기 작성 유도", Priority.NORMAL, false),
-	INACTIVITY_REMINDER(NotificationCategory.NOTICE, InactivityReminderData.class, "미접속 알림", Priority.LOW, false);
+	INACTIVITY_REMINDER(NotificationCategory.NOTICE, InactivityReminderData.class, "미접속 알림", Priority.LOW, false),
+
+	BROADCAST(NotificationCategory.NOTICE, BroadcastNotificationData.class, "공지사항", Priority.HIGH, false);
 
 	private final NotificationCategory category;
 	private final Class<? extends NotificationData> dataClass;

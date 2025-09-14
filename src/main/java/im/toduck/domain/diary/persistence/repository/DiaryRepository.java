@@ -1,10 +1,13 @@
 package im.toduck.domain.diary.persistence.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import im.toduck.domain.diary.persistence.entity.Diary;
@@ -20,6 +23,11 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 	int countByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 
 	List<Diary> findAllByUser(User user);
+
+	long countByCreatedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime);
+
+	@Query("SELECT COUNT(DISTINCT d.user) FROM Diary d")
+	long countDistinctUsers();
 
 	Optional<Diary> getDiaryByUserIdAndId(Long userId, Long diaryId);
 }

@@ -1,5 +1,8 @@
 package im.toduck.domain.user.domain.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +41,11 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public List<Long> getAllActiveUserIds() {
 		return userRepository.findAllActiveUserIds();
+	}
+
+	@Transactional(readOnly = true)
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
 	}
 
 	@Transactional(readOnly = true)
@@ -108,5 +116,24 @@ public class UserService {
 	@Transactional
 	public void softDelete(User user) {
 		userRepository.softDelete(user);
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalUserCount() {
+		return userRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getNewUsersCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return userRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getDeletedUsersCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return userRepository.countByDeletedAtBetween(startDateTime, endDateTime);
 	}
 }

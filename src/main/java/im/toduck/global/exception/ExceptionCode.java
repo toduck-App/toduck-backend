@@ -69,6 +69,9 @@ public enum ExceptionCode {
 	NOT_FOUND_FOLLOW(HttpStatus.NOT_FOUND, 40208, "팔로우 정보를 찾을 수 없습니다.",
 		"언팔로우 시 팔로우 관계가 존재하지 않을 때 발생하는 오류입니다."),
 	EXISTS_USER_NICKNAME(HttpStatus.CONFLICT, 40209, "이미 사용 중인 닉네임입니다."),
+	USER_SUSPENDED(HttpStatus.FORBIDDEN, 40210, "계정이 정지되었습니다.", "정지 해제일까지 서비스 이용이 제한됩니다."),
+	CANNOT_SUSPEND_SELF(HttpStatus.BAD_REQUEST, 40211, "자기 자신을 정지할 수 없습니다.",
+		"관리자는 자신의 계정을 정지할 수 없습니다."),
 
 	/* 404xx */
 	NOT_FOUND_SOCIAL_BOARD(HttpStatus.NOT_FOUND, 40401, "게시글을 찾을 수 없습니다."),
@@ -131,6 +134,7 @@ public enum ExceptionCode {
 
 	/* 407xx */
 	NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND, 40701, "해당 알림을 찾을 수 없습니다."),
+	CANNOT_CANCEL_NOTIFICATION(HttpStatus.CONFLICT, 40702, "취소할 수 없습니다."),
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),

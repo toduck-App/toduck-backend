@@ -16,7 +16,8 @@ import com.tngtech.archunit.lang.ArchRule;
 	importOptions = {
 		ImportOption.DoNotIncludeTests.class,
 		LayeredArchitectureTest.NotificationPackageIgnore.class,
-		LayeredArchitectureTest.RoutineEventPackageIgnore.class
+		LayeredArchitectureTest.RoutineEventPackageIgnore.class,
+		LayeredArchitectureTest.BackofficeEventPackageIgnore.class
 	}
 )
 public class LayeredArchitectureTest {
@@ -33,6 +34,14 @@ public class LayeredArchitectureTest {
 		@Override
 		public boolean includes(Location location) {
 			return !location.contains("routine/domain/event");
+		}
+	}
+
+	// backoffice.domain.event 패키지 제외를 위한 커스텀 ImportOption
+	public static class BackofficeEventPackageIgnore implements ImportOption {
+		@Override
+		public boolean includes(Location location) {
+			return !location.contains("backoffice/domain/event");
 		}
 	}
 

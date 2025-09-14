@@ -67,4 +67,22 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 			)
 			.fetch();
 	}
+
+	@Override
+	public long countByCreatedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime) {
+		return queryFactory.selectFrom(qUser)
+			.where(
+				qUser.createdAt.between(startDateTime, endDateTime)
+			)
+			.fetchCount();
+	}
+
+	@Override
+	public long countByDeletedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime) {
+		return queryFactory.selectFrom(qUser)
+			.where(
+				qUser.deletedAt.between(startDateTime, endDateTime)
+			)
+			.fetchCount();
+	}
 }

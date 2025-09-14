@@ -35,6 +35,11 @@ public class GeneralAuthService {
 			throw CommonException.from(INVALID_LOGIN_ID_OR_PASSWORD);
 		}
 
+		if (user.get().isSuspended()) {
+			log.warn("정지된 사용자 로그인 시도 - 로그인 ID: {}", loginId);
+			throw CommonException.from(USER_SUSPENDED);
+		}
+
 		return user.get();
 	}
 

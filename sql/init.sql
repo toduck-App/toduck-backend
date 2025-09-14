@@ -692,3 +692,35 @@ CREATE TABLE routine_reminder_job (
                                       INDEX idx_routine_reminder_date (reminder_date),
                                       INDEX idx_routine_reminder_job_key (job_key)
 );
+
+-- 브로드캐스트 알림 테이블 (백오피스)
+CREATE TABLE broadcast_notification (
+                                        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                        title VARCHAR(100) NOT NULL,
+                                        message VARCHAR(500) NOT NULL,
+                                        scheduled_at DATETIME NULL,
+                                        sent_at DATETIME NULL,
+                                        status ENUM('SCHEDULED', 'SENDING', 'COMPLETED', 'CANCELLED', 'FAILED') NOT NULL,
+                                        target_user_count INT NULL,
+                                        sent_user_count INT NULL,
+                                        job_key VARCHAR(255) NULL,
+                                        failure_reason VARCHAR(500) NULL,
+                                        created_at DATETIME NOT NULL,
+                                        updated_at DATETIME NOT NULL,
+                                        deleted_at DATETIME NULL,
+                                        INDEX idx_broadcast_notification_status (status),
+                                        INDEX idx_broadcast_notification_scheduled_at (scheduled_at),
+                                        INDEX idx_broadcast_notification_job_key (job_key)
+);
+
+-- 백오피스 기능 추가를 위한 테이블 수정
+-- users 테이블에 정지 관련 필드 추가
+ALTER TABLE users 
+ADD COLUMN suspended_until DATETIME NULL,
+ADD COLUMN suspension_reason VARCHAR(500) NULL;
+
+-- notification 테이블에 BROADCAST 타입 추가
+ALTER TABLE notification 
+MODIFY COLUMN type ENUM('COMMENT', 'REPLY', 'REPLY_ON_MY_POST', 'LIKE_POST', 'LIKE_COMMENT', 'FOLLOW',
+                        'SCHEDULE_REMINDER', 'ROUTINE_REMINDER', 'DIARY_REMINDER', 'INACTIVITY_REMINDER',
+                        'ROUTINE_SHARE_MILESTONE', 'BROADCAST') NOT NULL;

@@ -1,6 +1,8 @@
 package im.toduck.domain.diary.domain.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
@@ -117,6 +119,23 @@ public class DiaryService {
 		LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth()).plusDays(1);
 
 		return diaryRepository.countByUserIdAndDateBetween(userId, startDate, endDate);
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalDiaryCount() {
+		return diaryRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getDiaryCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return diaryRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getActiveDiaryWritersCount() {
+		return diaryRepository.countDistinctUsers();
 	}
 
 	@Transactional(readOnly = true)
