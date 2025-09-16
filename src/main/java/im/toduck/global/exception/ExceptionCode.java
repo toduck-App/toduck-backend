@@ -132,9 +132,11 @@ public enum ExceptionCode {
 	EXCEED_ROUTINE_DATE_RANGE(HttpStatus.BAD_REQUEST, 43204, "기간 범위가 유효하지 않거나, 최대 조회 범위를 초과했습니다.",
 		"루틴 범위 조회는 14일로 제한됩니다."),
 
-	/* 407xx */
+	/* 407xx 백오피스 */
 	NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND, 40701, "해당 알림을 찾을 수 없습니다."),
 	CANNOT_CANCEL_NOTIFICATION(HttpStatus.CONFLICT, 40702, "취소할 수 없습니다."),
+	INVALID_STATISTICS_DATE_RANGE(HttpStatus.BAD_REQUEST, 40703, "통계 조회 날짜 범위가 잘못되었습니다.",
+		"시작 날짜가 종료 날짜보다 이후이거나, 최대 조회 기간을 초과했습니다."),
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),

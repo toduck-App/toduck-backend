@@ -1,6 +1,7 @@
 package im.toduck.domain.backoffice.presentation.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.backoffice.domain.usecase.StatisticsUseCase;
 import im.toduck.domain.backoffice.presentation.api.StatisticsApi;
-import im.toduck.domain.backoffice.presentation.dto.response.DailyStatisticsResponse;
+import im.toduck.domain.backoffice.presentation.dto.request.StatisticsType;
+import im.toduck.domain.backoffice.presentation.dto.response.MultiDateStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.OverallStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.PeriodStatisticsResponse;
 import im.toduck.global.presentation.ApiResponse;
@@ -44,12 +46,14 @@ public class StatisticsController implements StatisticsApi {
 	}
 
 	@Override
-	@GetMapping("/daily")
+	@GetMapping("/multi-date")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<ApiResponse<DailyStatisticsResponse>> getDailyStatistics(
-		@RequestParam final LocalDate date
+	public ResponseEntity<ApiResponse<MultiDateStatisticsResponse>> getMultiDateStatistics(
+		@RequestParam final LocalDate startDate,
+		@RequestParam final LocalDate endDate,
+		@RequestParam final List<StatisticsType> types
 	) {
-		DailyStatisticsResponse response = statisticsUseCase.getDailyStatistics(date);
+		MultiDateStatisticsResponse response = statisticsUseCase.getMultiDateStatistics(startDate, endDate, types);
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 }
