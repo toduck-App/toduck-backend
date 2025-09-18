@@ -62,4 +62,16 @@ public class ScheduleReadService {
 		LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
 		return scheduleRepository.countByCreatedAtBetween(startDateTime, endDateTime);
 	}
+
+	@Transactional(readOnly = true)
+	public long getTotalSchedulesCount() {
+		return scheduleRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getSchedulesCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return scheduleRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
 }
