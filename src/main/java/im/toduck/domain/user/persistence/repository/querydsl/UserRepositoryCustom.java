@@ -19,4 +19,6 @@ public interface UserRepositoryCustom {
 	long countByCreatedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime);
 
 	long countByDeletedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime);
+
+	long countByDeletedAtIsNotNull();
 }

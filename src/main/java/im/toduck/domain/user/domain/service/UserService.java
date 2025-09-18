@@ -136,4 +136,9 @@ public class UserService {
 		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 		return userRepository.countByDeletedAtBetween(startDateTime, endDateTime);
 	}
+
+	@Transactional(readOnly = true)
+	public long getTotalDeletedUsersCount() {
+		return userRepository.countByDeletedAtIsNotNull();
+	}
 }

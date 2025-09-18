@@ -70,19 +70,31 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
 	@Override
 	public long countByCreatedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime) {
-		return queryFactory.selectFrom(qUser)
-			.where(
-				qUser.createdAt.between(startDateTime, endDateTime)
-			)
-			.fetchCount();
+		Long count = queryFactory.select(qUser.count())
+			.from(qUser)
+			.where(qUser.createdAt.between(startDateTime, endDateTime))
+			.fetchOne();
+
+		return count != null ? count : 0L;
 	}
 
 	@Override
 	public long countByDeletedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime) {
-		return queryFactory.selectFrom(qUser)
-			.where(
-				qUser.deletedAt.between(startDateTime, endDateTime)
-			)
-			.fetchCount();
+		Long count = queryFactory.select(qUser.count())
+			.from(qUser)
+			.where(qUser.deletedAt.between(startDateTime, endDateTime))
+			.fetchOne();
+
+		return count != null ? count : 0L;
+	}
+
+	@Override
+	public long countByDeletedAtIsNotNull() {
+		Long count = queryFactory.select(qUser.count())
+			.from(qUser)
+			.where(qUser.deletedAt.isNotNull())
+			.fetchOne();
+
+		return count != null ? count : 0L;
 	}
 }
