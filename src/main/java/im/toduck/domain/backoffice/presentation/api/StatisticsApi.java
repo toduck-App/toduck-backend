@@ -24,7 +24,7 @@ public interface StatisticsApi {
 
 	@Operation(
 		summary = "전체 통계 조회",
-		description = "전체 회원수, 일기수, 루틴수 등 전체 통계를 조회합니다."
+		description = "선택된 통계 타입들의 전체 누적 수치를 조회합니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
@@ -32,23 +32,29 @@ public interface StatisticsApi {
 			description = "전체 통계 조회 성공"
 		)
 	)
-	ResponseEntity<ApiResponse<OverallStatisticsResponse>> getOverallStatistics();
+	ResponseEntity<ApiResponse<OverallStatisticsResponse>> getOverallStatistics(
+		@Parameter(description = "통계 타입 목록", example = "NEW_USERS,NEW_ROUTINES,NEW_DIARIES")
+		@RequestParam final List<StatisticsType> types
+	);
 
 	@Operation(
 		summary = "기간별 통계 조회",
-		description = "지정된 기간 동안의 가입자, 탈퇴자, 신규 일기, 신규 루틴 통계를 조회합니다."
+		description = "지정된 기간 동안의 선택된 통계 타입별 수치를 조회합니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
 			responseClass = PeriodStatisticsResponse.class,
 			description = "기간별 통계 조회 성공"
-		)
+		),
+		errors = {@ApiErrorResponseExplanation(exceptionCode = ExceptionCode.INVALID_STATISTICS_DATE_RANGE)}
 	)
 	ResponseEntity<ApiResponse<PeriodStatisticsResponse>> getPeriodStatistics(
 		@Parameter(description = "시작 날짜", example = "2024-01-01")
 		@RequestParam final LocalDate startDate,
 		@Parameter(description = "종료 날짜", example = "2024-01-31")
-		@RequestParam final LocalDate endDate
+		@RequestParam final LocalDate endDate,
+		@Parameter(description = "통계 타입 목록", example = "NEW_USERS,DELETED_USERS,NEW_DIARIES")
+		@RequestParam final List<StatisticsType> types
 	);
 
 	@Operation(

@@ -39,35 +39,37 @@ public class StatisticsUseCase {
 	private final ScheduleReadService scheduleReadService;
 
 	@Transactional(readOnly = true)
-	public OverallStatisticsResponse getOverallStatistics() {
-		long totalUserCount = userService.getTotalUserCount();
-		long totalDiaryCount = diaryService.getTotalDiaryCount();
-		long totalRoutineCount = routineService.getTotalRoutineCount();
-		long activeDiaryWritersCount = diaryService.getActiveDiaryWritersCount();
-		long activeRoutineUsersCount = routineService.getActiveRoutineUsersCount();
+	public OverallStatisticsResponse getOverallStatistics(final List<StatisticsType> types) {
+		Map<StatisticsType, Long> statisticsMap = new EnumMap<>(StatisticsType.class);
 
-		log.info("백오피스 전체 통계 조회 - 총 회원수: {}, 총 일기수: {}, 총 루틴수: {}",
-			totalUserCount, totalDiaryCount, totalRoutineCount);
+		for (StatisticsType type : types) {
+			long count = getOverallStatisticsCountByType(type);
+			statisticsMap.put(type, count);
+		}
 
-		return StatisticsMapper.toOverallStatisticsResponse(
-			totalUserCount, totalDiaryCount, totalRoutineCount,
-			activeDiaryWritersCount, activeRoutineUsersCount
-		);
+		log.info("백오피스 전체 통계 조회 - 조회 타입: {}", types);
+
+		return StatisticsMapper.toOverallStatisticsResponse(statisticsMap);
 	}
 
 	@Transactional(readOnly = true)
-	public PeriodStatisticsResponse getPeriodStatistics(final LocalDate startDate, final LocalDate endDate) {
-		long newUsersCount = userService.getNewUsersCountByDateRange(startDate, endDate);
-		long deletedUsersCount = userService.getDeletedUsersCountByDateRange(startDate, endDate);
-		long newDiariesCount = diaryService.getDiaryCountByDateRange(startDate, endDate);
-		long newRoutinesCount = routineService.getRoutineCountByDateRange(startDate, endDate);
+	public PeriodStatisticsResponse getPeriodStatistics(
+		final LocalDate startDate,
+		final LocalDate endDate,
+		final List<StatisticsType> types
+	) {
+		Map<StatisticsType, Long> statisticsMap = new EnumMap<>(StatisticsType.class);
 
-		log.info("백오피스 기간별 통계 조회 - 기간: {} ~ {}, 신규 회원: {}, 탈퇴 회원: {}",
-			startDate, endDate, newUsersCount, deletedUsersCount);
+		for (StatisticsType type : types) {
+			long count = getStatisticsCountByTypeAndDateRange(type, startDate, endDate);
+			statisticsMap.put(type, count);
+		}
+
+		log.info("백오피스 기간별 통계 조회 - 기간: {} ~ {}, 조회 타입: {}",
+			startDate, endDate, types);
 
 		return StatisticsMapper.toPeriodStatisticsResponse(
-			newUsersCount, deletedUsersCount, newDiariesCount,
-			newRoutinesCount, startDate, endDate
+			statisticsMap, startDate, endDate
 		);
 	}
 
@@ -122,6 +124,34 @@ public class StatisticsUseCase {
 			case NEW_SOCIAL_POSTS -> socialBoardService.getSocialPostsCountByDate(date);
 			case NEW_COMMENTS -> socialBoardService.getCommentsCountByDate(date);
 			case NEW_SCHEDULES -> scheduleReadService.getSchedulesCountByDate(date);
+		};
+	}
+
+	private long getOverallStatisticsCountByType(final StatisticsType type) {
+		return switch (type) {
+			case NEW_USERS -> userService.getTotalUserCount();
+			case DELETED_USERS -> userService.getTotalDeletedUsersCount();
+			case NEW_ROUTINES -> routineService.getTotalRoutineCount();
+			case NEW_DIARIES -> diaryService.getTotalDiaryCount();
+			case NEW_SOCIAL_POSTS -> socialBoardService.getTotalSocialPostsCount();
+			case NEW_COMMENTS -> socialBoardService.getTotalCommentsCount();
+			case NEW_SCHEDULES -> scheduleReadService.getTotalSchedulesCount();
+		};
+	}
+
+	private long getStatisticsCountByTypeAndDateRange(
+		final StatisticsType type,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		return switch (type) {
+			case NEW_USERS -> userService.getNewUsersCountByDateRange(startDate, endDate);
+			case DELETED_USERS -> userService.getDeletedUsersCountByDateRange(startDate, endDate);
+			case NEW_ROUTINES -> routineService.getRoutineCountByDateRange(startDate, endDate);
+			case NEW_DIARIES -> diaryService.getDiaryCountByDateRange(startDate, endDate);
+			case NEW_SOCIAL_POSTS -> socialBoardService.getSocialPostsCountByDateRange(startDate, endDate);
+			case NEW_COMMENTS -> socialBoardService.getCommentsCountByDateRange(startDate, endDate);
+			case NEW_SCHEDULES -> scheduleReadService.getSchedulesCountByDateRange(startDate, endDate);
 		};
 	}
 

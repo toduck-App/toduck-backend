@@ -29,8 +29,10 @@ public class StatisticsController implements StatisticsApi {
 	@Override
 	@GetMapping("/overall")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<ApiResponse<OverallStatisticsResponse>> getOverallStatistics() {
-		OverallStatisticsResponse response = statisticsUseCase.getOverallStatistics();
+	public ResponseEntity<ApiResponse<OverallStatisticsResponse>> getOverallStatistics(
+		@RequestParam final List<StatisticsType> types
+	) {
+		OverallStatisticsResponse response = statisticsUseCase.getOverallStatistics(types);
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 
@@ -39,9 +41,10 @@ public class StatisticsController implements StatisticsApi {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<PeriodStatisticsResponse>> getPeriodStatistics(
 		@RequestParam final LocalDate startDate,
-		@RequestParam final LocalDate endDate
+		@RequestParam final LocalDate endDate,
+		@RequestParam final List<StatisticsType> types
 	) {
-		PeriodStatisticsResponse response = statisticsUseCase.getPeriodStatistics(startDate, endDate);
+		PeriodStatisticsResponse response = statisticsUseCase.getPeriodStatistics(startDate, endDate, types);
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 

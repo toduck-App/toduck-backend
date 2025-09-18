@@ -16,34 +16,20 @@ import lombok.NoArgsConstructor;
 public final class StatisticsMapper {
 
 	public static OverallStatisticsResponse toOverallStatisticsResponse(
-		final long totalUserCount,
-		final long totalDiaryCount,
-		final long totalRoutineCount,
-		final long activeDiaryWritersCount,
-		final long activeRoutineUsersCount
+		final Map<StatisticsType, Long> statistics
 	) {
 		return OverallStatisticsResponse.builder()
-			.totalUserCount(totalUserCount)
-			.totalDiaryCount(totalDiaryCount)
-			.totalRoutineCount(totalRoutineCount)
-			.activeDiaryWritersCount(activeDiaryWritersCount)
-			.activeRoutineUsersCount(activeRoutineUsersCount)
+			.statistics(statistics)
 			.build();
 	}
 
 	public static PeriodStatisticsResponse toPeriodStatisticsResponse(
-		final long newUsersCount,
-		final long deletedUsersCount,
-		final long newDiariesCount,
-		final long newRoutinesCount,
+		final Map<StatisticsType, Long> statistics,
 		final LocalDate startDate,
 		final LocalDate endDate
 	) {
 		return PeriodStatisticsResponse.builder()
-			.newUsersCount(newUsersCount)
-			.deletedUsersCount(deletedUsersCount)
-			.newDiariesCount(newDiariesCount)
-			.newRoutinesCount(newRoutinesCount)
+			.statistics(statistics)
 			.startDate(startDate)
 			.endDate(endDate)
 			.build();
