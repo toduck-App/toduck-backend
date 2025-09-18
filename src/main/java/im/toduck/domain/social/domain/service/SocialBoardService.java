@@ -252,5 +252,29 @@ public class SocialBoardService {
 		LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
 		return commentRepository.countByCreatedAtBetween(startDateTime, endDateTime);
 	}
+
+	@Transactional(readOnly = true)
+	public long getTotalSocialPostsCount() {
+		return socialRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalCommentsCount() {
+		return commentRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getSocialPostsCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return socialRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getCommentsCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return commentRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
 }
 
