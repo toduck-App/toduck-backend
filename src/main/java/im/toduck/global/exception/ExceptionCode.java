@@ -137,6 +137,17 @@ public enum ExceptionCode {
 	CANNOT_CANCEL_NOTIFICATION(HttpStatus.CONFLICT, 40702, "취소할 수 없습니다."),
 	INVALID_STATISTICS_DATE_RANGE(HttpStatus.BAD_REQUEST, 40703, "통계 조회 날짜 범위가 잘못되었습니다.",
 		"시작 날짜가 종료 날짜보다 이후이거나, 최대 조회 기간을 초과했습니다."),
+	NOT_FOUND_APP_VERSION(HttpStatus.NOT_FOUND, 40704, "앱 버전을 찾을 수 없습니다."),
+	DUPLICATE_APP_VERSION(HttpStatus.CONFLICT, 40705, "이미 존재하는 앱 버전입니다.",
+		"해당 플랫폼에 동일한 버전이 이미 등록되어 있습니다."),
+	CANNOT_DELETE_APP_VERSION(HttpStatus.CONFLICT, 40706, "삭제할 수 없는 앱 버전입니다.",
+		"LATEST, RECOMMENDED, FORCE 정책이 설정된 버전은 삭제할 수 없습니다. 먼저 정책을 NONE으로 변경해주세요."),
+	INVALID_UPDATE_POLICY(HttpStatus.BAD_REQUEST, 40707, "유효하지 않은 업데이트 정책입니다.",
+		"업데이트 정책 설정이 올바르지 않습니다."),
+	DUPLICATE_LATEST_VERSION(HttpStatus.CONFLICT, 40708, "플랫폼당 최신 버전은 하나만 설정할 수 있습니다.",
+		"각 플랫폼(iOS, Android)에는 LATEST 정책을 가진 버전이 하나만 존재해야 합니다."),
+	INVALID_VERSION_FORMAT(HttpStatus.BAD_REQUEST, 40709, "올바르지 않은 버전 형식입니다.",
+		"버전은 x.y.z 형식(예: 1.2.3)이어야 합니다."),
 
 	/* 499xx ETC */
 	NOT_FOUND_RESOURCE(HttpStatus.NOT_FOUND, 49901, "해당 경로를 찾을 수 없습니다."),

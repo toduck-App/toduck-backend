@@ -24,12 +24,12 @@ public record BroadcastNotificationResponse(
 
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	@Schema(description = "예약 발송 시간", example = "2024-12-25T10:00:00")
+	@Schema(description = "예약 발송 시간", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-12-25 10:00")
 	LocalDateTime scheduledAt,
 
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	@Schema(description = "실제 발송 시간", example = "2024-12-25T10:00:05")
+	@Schema(description = "실제 발송 시간", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-12-25 10:00")
 	LocalDateTime sentAt,
 
 	@Schema(description = "알림 상태", example = "COMPLETED")
@@ -49,7 +49,7 @@ public record BroadcastNotificationResponse(
 
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	@Schema(description = "생성 시간", example = "2024-12-24T15:30:00")
+	@Schema(description = "생성 시간", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-12-24 15:30")
 	LocalDateTime createdAt,
 
 	@Schema(description = "취소 가능 여부", example = "false")

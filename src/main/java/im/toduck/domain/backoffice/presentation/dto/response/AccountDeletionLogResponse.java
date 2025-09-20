@@ -30,7 +30,7 @@ public record AccountDeletionLogResponse(
 
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	@Schema(description = "탈퇴 일시", example = "2024-01-01T10:30:00")
+	@Schema(description = "탈퇴 일시", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-01-01 10:30")
 	LocalDateTime deletedAt
 ) {
 }

@@ -720,7 +720,22 @@ ADD COLUMN suspended_until DATETIME NULL,
 ADD COLUMN suspension_reason VARCHAR(500) NULL;
 
 -- notification 테이블에 BROADCAST 타입 추가
-ALTER TABLE notification 
+ALTER TABLE notification
 MODIFY COLUMN type ENUM('COMMENT', 'REPLY', 'REPLY_ON_MY_POST', 'LIKE_POST', 'LIKE_COMMENT', 'FOLLOW',
                         'SCHEDULE_REMINDER', 'ROUTINE_REMINDER', 'DIARY_REMINDER', 'INACTIVITY_REMINDER',
                         'ROUTINE_SHARE_MILESTONE', 'BROADCAST') NOT NULL;
+
+-- 앱 버전 관리 테이블 (백오피스)
+CREATE TABLE app_version (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    platform ENUM('IOS', 'ANDROID') NOT NULL,
+    version VARCHAR(20) NOT NULL,
+    release_date DATE NOT NULL,
+    update_type ENUM('LATEST', 'RECOMMENDED', 'FORCE', 'NONE') NOT NULL DEFAULT 'NONE',
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME NULL,
+    UNIQUE KEY uk_app_version_platform_version (platform, version),
+    INDEX idx_app_version_platform_update_type (platform, update_type),
+    INDEX idx_app_version_platform_release_date (platform, release_date DESC)
+);
