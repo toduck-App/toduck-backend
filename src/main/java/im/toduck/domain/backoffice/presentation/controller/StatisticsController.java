@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.backoffice.domain.usecase.StatisticsUseCase;
+import im.toduck.domain.backoffice.persistence.entity.StatisticsType;
 import im.toduck.domain.backoffice.presentation.api.StatisticsApi;
-import im.toduck.domain.backoffice.presentation.dto.request.StatisticsType;
 import im.toduck.domain.backoffice.presentation.dto.response.MultiDateStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.OverallStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.PeriodStatisticsResponse;

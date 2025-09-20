@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import im.toduck.domain.backoffice.presentation.dto.request.StatisticsType;
-import im.toduck.domain.backoffice.presentation.dto.response.DailyStatisticsData;
+import im.toduck.domain.backoffice.persistence.entity.StatisticsType;
+import im.toduck.domain.backoffice.presentation.dto.response.DailyStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.MultiDateStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.OverallStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.PeriodStatisticsResponse;
@@ -35,18 +35,18 @@ public final class StatisticsMapper {
 			.build();
 	}
 
-	public static DailyStatisticsData toDailyStatisticsData(
+	public static DailyStatisticsResponse toDailyStatisticsResponse(
 		final LocalDate date,
 		final Map<StatisticsType, Long> counts
 	) {
-		return DailyStatisticsData.builder()
+		return DailyStatisticsResponse.builder()
 			.date(date)
 			.counts(counts)
 			.build();
 	}
 
 	public static MultiDateStatisticsResponse toMultiDateStatisticsResponse(
-		final List<DailyStatisticsData> statisticsDataList,
+		final List<DailyStatisticsResponse> statisticsDataList,
 		final LocalDate startDate,
 		final LocalDate endDate
 	) {

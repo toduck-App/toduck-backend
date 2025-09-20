@@ -14,7 +14,7 @@ import lombok.Builder;
 @Builder
 public record MultiDateStatisticsResponse(
 	@Schema(description = "일별 통계 데이터 목록")
-	List<DailyStatisticsData> statistics,
+	List<DailyStatisticsResponse> statistics,
 
 	@JsonSerialize(using = LocalDateSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

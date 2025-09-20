@@ -2,7 +2,7 @@ package im.toduck.domain.backoffice.presentation.dto.response;
 
 import java.util.Map;
 
-import im.toduck.domain.backoffice.presentation.dto.request.StatisticsType;
+import im.toduck.domain.backoffice.persistence.entity.StatisticsType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 

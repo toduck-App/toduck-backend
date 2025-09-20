@@ -1,4 +1,4 @@
-package im.toduck.domain.backoffice.presentation.dto.request;
+package im.toduck.domain.backoffice.persistence.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

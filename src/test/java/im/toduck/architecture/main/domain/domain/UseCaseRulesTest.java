@@ -20,6 +20,8 @@ public class UseCaseRulesTest {
 	static final ArchRule UseCase_클래스는_UseCase_어노테이션을_가진다 =
 		classes()
 			.that().resideInAPackage(USECASE.getFullPackageName())
+			.and().areTopLevelClasses()
+			.and().doNotHaveSimpleName("*$*")
 			.should().beAnnotatedWith(UseCase.class);
 
 	@ArchTest

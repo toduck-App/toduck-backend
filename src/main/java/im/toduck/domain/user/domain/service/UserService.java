@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import im.toduck.domain.user.common.mapper.BlockMapper;
 import im.toduck.domain.user.persistence.entity.Block;
 import im.toduck.domain.user.persistence.entity.OAuthProvider;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.domain.user.persistence.entity.UserRole;
 import im.toduck.domain.user.persistence.repository.BlockRepository;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.global.exception.CommonException;
@@ -46,6 +49,22 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
+	}
+
+	@Transactional(readOnly = true)
+	public Page<User> getUsersWithFilters(
+		final String keyword,
+		final String searchType,
+		final String status,
+		final UserRole role,
+		final String provider,
+		final String sortBy,
+		final String sortDirection,
+		final Pageable pageable
+	) {
+		return userRepository.findUsersWithFilters(
+			keyword, searchType, status, role, provider, sortBy, sortDirection, pageable
+		);
 	}
 
 	@Transactional(readOnly = true)
@@ -140,5 +159,10 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public long getTotalDeletedUsersCount() {
 		return userRepository.countByDeletedAtIsNotNull();
+	}
+
+	@Transactional(readOnly = true)
+	public long getCountByProvider(final String provider) {
+		return userRepository.countByProvider(provider);
 	}
 }

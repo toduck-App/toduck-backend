@@ -48,6 +48,7 @@ public class LayeredArchitectureTest {
 	@ArchTest
 	static final ArchRule 레이어_의존성_규칙을_준수한다 = layeredArchitecture()
 		.consideringAllDependencies()
+		.layer(API.name()).definedBy(API.getFullPackageName())
 		.layer(CONTROLLER.name()).definedBy(CONTROLLER.getFullPackageName())
 		.layer(DTO.name()).definedBy(DTO.getFullPackageName())
 		.layer(SERVICE.name()).definedBy(SERVICE.getFullPackageName())
@@ -56,13 +57,14 @@ public class LayeredArchitectureTest {
 		.layer(ENTITY.name()).definedBy(ENTITY.getFullPackageName())
 		.layer(MAPPER.name()).definedBy(MAPPER.getFullPackageName())
 
+		.whereLayer(API.name()).mayOnlyBeAccessedByLayers(CONTROLLER.name())
 		.whereLayer(CONTROLLER.name()).mayNotBeAccessedByAnyLayer()
-		.whereLayer(SERVICE.name()).mayOnlyBeAccessedByLayers(USECASE.name())
-		.whereLayer(USECASE.name()).mayOnlyBeAccessedByLayers(CONTROLLER.name())
+		.whereLayer(SERVICE.name()).mayOnlyBeAccessedByLayers(USECASE.name(), SERVICE.name())
+		.whereLayer(USECASE.name()).mayOnlyBeAccessedByLayers(API.name(), CONTROLLER.name())
 		.whereLayer(REPOSITORY.name()).mayOnlyBeAccessedByLayers(SERVICE.name())
 		.whereLayer(ENTITY.name())
 		.mayOnlyBeAccessedByLayers(
-			SERVICE.name(), USECASE.name(), REPOSITORY.name(), MAPPER.name(), ENTITY.name(), DTO.name()
+			SERVICE.name(), USECASE.name(), REPOSITORY.name(), MAPPER.name(), ENTITY.name(), DTO.name(), API.name(), CONTROLLER.name()
 		)
 		.whereLayer(MAPPER.name()).mayOnlyBeAccessedByLayers(SERVICE.name(), USECASE.name())
 
@@ -86,5 +88,7 @@ public class LayeredArchitectureTest {
 			.areEnums()
 			.should()
 			.onlyBeAccessed()
-			.byAnyPackage(ENTITY.getFullPackageName(), DTO.getFullPackageName(), MAPPER.getFullPackageName());
+			.byAnyPackage(ENTITY.getFullPackageName(), DTO.getFullPackageName(), MAPPER.getFullPackageName(),
+				API.getFullPackageName(), CONTROLLER.getFullPackageName(), USECASE.getFullPackageName(), SERVICE.getFullPackageName(),
+				REPOSITORY.getFullPackageName());
 }

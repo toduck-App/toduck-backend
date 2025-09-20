@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import im.toduck.domain.backoffice.presentation.dto.request.StatisticsType;
+import im.toduck.domain.backoffice.persistence.entity.StatisticsType;
 import im.toduck.domain.backoffice.presentation.dto.response.MultiDateStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.OverallStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.PeriodStatisticsResponse;

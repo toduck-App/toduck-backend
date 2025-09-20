@@ -10,8 +10,8 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.backoffice.common.mapper.StatisticsMapper;
-import im.toduck.domain.backoffice.presentation.dto.request.StatisticsType;
-import im.toduck.domain.backoffice.presentation.dto.response.DailyStatisticsData;
+import im.toduck.domain.backoffice.persistence.entity.StatisticsType;
+import im.toduck.domain.backoffice.presentation.dto.response.DailyStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.MultiDateStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.OverallStatisticsResponse;
 import im.toduck.domain.backoffice.presentation.dto.response.PeriodStatisticsResponse;
@@ -81,7 +81,7 @@ public class StatisticsUseCase {
 	) {
 		validateDateRange(startDate, endDate);
 
-		List<DailyStatisticsData> statisticsDataList = new ArrayList<>();
+		List<DailyStatisticsResponse> statisticsDataList = new ArrayList<>();
 		LocalDate currentDate = startDate;
 
 		while (!currentDate.isAfter(endDate)) {
@@ -92,7 +92,7 @@ public class StatisticsUseCase {
 				counts.put(type, count);
 			}
 
-			statisticsDataList.add(StatisticsMapper.toDailyStatisticsData(currentDate, counts));
+			statisticsDataList.add(StatisticsMapper.toDailyStatisticsResponse(currentDate, counts));
 			currentDate = currentDate.plusDays(1);
 		}
 

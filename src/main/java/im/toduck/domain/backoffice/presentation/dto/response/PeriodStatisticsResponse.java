@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
-import im.toduck.domain.backoffice.presentation.dto.request.StatisticsType;
+import im.toduck.domain.backoffice.persistence.entity.StatisticsType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
