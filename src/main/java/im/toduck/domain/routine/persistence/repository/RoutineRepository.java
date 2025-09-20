@@ -1,5 +1,6 @@
 package im.toduck.domain.routine.persistence.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,4 +41,9 @@ public interface RoutineRepository extends JpaRepository<Routine, Long>, Routine
 
 	@Query("SELECT r FROM Routine r WHERE r.user = :user AND r.sharedCount = 0 AND r.deletedAt IS null")
 	List<Routine> findAllUnsharedRoutinesByUser(@Param("user") User user);
+
+	long countByCreatedAtBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime);
+
+	@Query("SELECT COUNT(DISTINCT r.user) FROM Routine r WHERE r.deletedAt IS NULL")
+	long countDistinctUsers();
 }

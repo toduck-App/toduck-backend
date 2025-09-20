@@ -2,6 +2,7 @@ package im.toduck.domain.schedule.presentation.dto.request;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
@@ -16,6 +17,7 @@ public record ScheduleCompleteRequest(
 	Boolean isComplete,
 	@Schema(description = "일정 조회 날짜", example = "2024-08-31")
 	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	LocalDate queryDate
 ) {
 }

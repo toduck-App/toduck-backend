@@ -1,5 +1,6 @@
 package im.toduck.domain.social.persistence.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
 
 	@Query("SELECT COUNT(c) FROM Comment c WHERE c.user = :user AND c.deletedAt IS NULL")
 	int countActiveCommentsByUser(@Param("user") User user);
+
+	@Query("SELECT COUNT(c) FROM Comment c WHERE c.createdAt BETWEEN :startDateTime AND :endDateTime")
+	long countByCreatedAtBetween(
+		@Param("startDateTime") LocalDateTime startDateTime,
+		@Param("endDateTime") LocalDateTime endDateTime
+	);
 }

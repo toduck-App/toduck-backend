@@ -18,6 +18,8 @@ import im.toduck.domain.user.common.mapper.UserMapper;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
 import im.toduck.infra.oauth.OidcProvider;
 import im.toduck.infra.oauth.oidc.dto.OidcPayload;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +42,14 @@ public class OAuth2UseCase {
 			request.nonce());
 
 		return userService.findByProviderAndEmail(OAuthMapper.fromOidcProvider(provider), payload.email())
-			.map(user -> Pair.of(user.getId(), jwtService.createToken(user))) // 이메일이 존재할 경우
+			.map(user -> {
+				if (user.isSuspended()) {
+					log.warn("정지된 사용자 OAuth 로그인 시도 - 사용자 ID: {}", user.getId());
+					throw CommonException.from(ExceptionCode.USER_SUSPENDED);
+				}
+
+				return Pair.of(user.getId(), jwtService.createToken(user));
+			}) // 이메일이 존재할 경우
 			.orElseGet(() -> { // 이메일이 존재하지 않을 경우
 				User oAuthUser = UserMapper.toOAuthUser(nickNameGenerateService.generateRandomNickname(),
 					OAuthMapper.fromOidcProvider(provider), payload.email());

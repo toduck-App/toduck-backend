@@ -1,5 +1,7 @@
 package im.toduck.global.security.filter;
 
+import static im.toduck.global.exception.ExceptionCode.*;
+
 import java.io.IOException;
 
 import org.springframework.http.HttpHeaders;
@@ -76,6 +78,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private void authenticateUser(UserDetails userDetails, HttpServletRequest request) {
+		if (!userDetails.isEnabled()) {
+			throw CommonException.from(USER_SUSPENDED);
+		}
+
 		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 			userDetails, null, userDetails.getAuthorities()
 		);

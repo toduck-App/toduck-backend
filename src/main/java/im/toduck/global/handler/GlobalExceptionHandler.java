@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -86,6 +87,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(VoException.class)
 	public ResponseEntity<ApiResponse<String>> handleVoErrorExceptions(VoException ex) {
 		return ApiResponseEntityBuilder.createVoErrorEntity(ex);
+	}
+
+	/**
+	 * 권한 부족으로 접근이 거부될 때 발생하는 AuthorizationDeniedException을 처리합니다.
+	 */
+	@ExceptionHandler(AuthorizationDeniedException.class)
+	public ResponseEntity<Object> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+		return ApiResponseEntityBuilder.createErrorResponseEntity(ExceptionCode.FORBIDDEN_ACCESS_TOKEN);
 	}
 
 	/**
