@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +46,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 			Class<? extends Exception> exceptionClass = ex.getClass();
 			ExceptionCode exceptionCode = JWT_EXCEPTION_CODE_MAP.get(exceptionClass);
 			sendAuthError(response, exceptionCode);
+		} catch (DisabledException ex) {
+			sendAuthError(response, ExceptionCode.USER_SUSPENDED);
 		} catch (CommonException ex) {
 			if (ex.getErrorCode() == ExceptionCode.EMPTY_ACCESS_TOKEN.getErrorCode()
 				|| ex.getErrorCode() == ExceptionCode.FORBIDDEN_ACCESS_TOKEN.getErrorCode()) {

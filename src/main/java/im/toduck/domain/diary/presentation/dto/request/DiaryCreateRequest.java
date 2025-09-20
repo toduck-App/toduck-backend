@@ -3,6 +3,7 @@ package im.toduck.domain.diary.presentation.dto.request;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
@@ -17,6 +18,7 @@ import lombok.Builder;
 public record DiaryCreateRequest(
 	@NotNull(message = "날짜는 비어있을 수 없습니다.")
 	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	@Schema(description = "일기 날짜", example = "2025-03-12")
 	LocalDate date,
 

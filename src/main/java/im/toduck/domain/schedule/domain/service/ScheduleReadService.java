@@ -1,6 +1,8 @@
 package im.toduck.domain.schedule.domain.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,5 +54,24 @@ public class ScheduleReadService {
 	public Schedule validateScheduleById(Long scheduleId) {
 		return scheduleRepository.findById(scheduleId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
+	}
+
+	@Transactional(readOnly = true)
+	public long getSchedulesCountByDate(final LocalDate date) {
+		LocalDateTime startDateTime = date.atStartOfDay();
+		LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
+		return scheduleRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalSchedulesCount() {
+		return scheduleRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getSchedulesCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return scheduleRepository.countByCreatedAtBetween(startDateTime, endDateTime);
 	}
 }

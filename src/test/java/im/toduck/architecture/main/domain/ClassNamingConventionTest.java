@@ -19,6 +19,7 @@ public class ClassNamingConventionTest {
 	@ArchTest
 	static final ArchRule 유스케이스_클래스_네이밍_규칙을_준수한다 = classes()
 		.that().resideInAPackage(USECASE.getFullPackageName())
+		.and().areTopLevelClasses()
 		.should().haveSimpleNameEndingWith("UseCase");
 
 	@ArchTest

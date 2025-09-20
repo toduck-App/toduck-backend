@@ -1,5 +1,8 @@
 package im.toduck.domain.social.domain.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -234,6 +237,44 @@ public class SocialBoardService {
 		PageRequest pageRequest = PageRequest.of(PaginationUtil.FIRST_PAGE_INDEX, limit);
 
 		return socialRepository.findUserSocials(profileUserId, cursor, pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public long getSocialPostsCountByDate(final LocalDate date) {
+		LocalDateTime startDateTime = date.atStartOfDay();
+		LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
+		return socialRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getCommentsCountByDate(final LocalDate date) {
+		LocalDateTime startDateTime = date.atStartOfDay();
+		LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
+		return commentRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalSocialPostsCount() {
+		return socialRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalCommentsCount() {
+		return commentRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getSocialPostsCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return socialRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getCommentsCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return commentRepository.countByCreatedAtBetween(startDateTime, endDateTime);
 	}
 }
 

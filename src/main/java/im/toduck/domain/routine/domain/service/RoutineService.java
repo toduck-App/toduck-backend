@@ -1,6 +1,7 @@
 package im.toduck.domain.routine.domain.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -157,5 +158,22 @@ public class RoutineService {
 	@Transactional(readOnly = true)
 	public List<Routine> findActiveRoutinesWithReminderForDates(LocalDate startDate, LocalDate endDate) {
 		return routineRepository.findActiveRoutinesWithReminderForDates(startDate, endDate);
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalRoutineCount() {
+		return routineRepository.count();
+	}
+
+	@Transactional(readOnly = true)
+	public long getRoutineCountByDateRange(final LocalDate startDate, final LocalDate endDate) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		return routineRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public long getActiveRoutineUsersCount() {
+		return routineRepository.countDistinctUsers();
 	}
 }
