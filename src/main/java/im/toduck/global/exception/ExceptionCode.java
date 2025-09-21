@@ -108,6 +108,10 @@ public enum ExceptionCode {
 	/* 409xx diaryKeyword */
 	INVALID_KEYWORD_ID(HttpStatus.BAD_REQUEST, 40901, "유효하지 않은 키워드 ID입니다."),
 
+	/* 411xx EventsSocial */
+	ALREADY_EXISTS_EVENTSSOCIAL(HttpStatus.CONFLICT, 41101, "이미 참여한 유저입니다."),
+	UNAUTHORIZED_ACCESS_EVENTSSOCIAL(HttpStatus.FORBIDDEN, 41102, "소셜 이벤트에 접근 권한이 없습니다."),
+
 	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",
 		"일정 기록을 찾을 수 없을 때 발생하는 오류입니다."),

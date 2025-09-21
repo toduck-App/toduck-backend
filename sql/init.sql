@@ -358,6 +358,17 @@ CREATE TABLE concentration
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE events_social
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    social_id               BIGINT                              NOT NULL,
+    user_id                 BIGINT                              NOT NULL,
+    phone                   VARCHAR(31)                         NOT NULL,
+    participation_date      DATE                                NOT NULL,
+    FOREIGN KEY (social_id) REFERENCES socials (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
 CREATE TABLE account_deletion_log
 (
     id          BIGINT PRIMARY KEY auto_increment,
