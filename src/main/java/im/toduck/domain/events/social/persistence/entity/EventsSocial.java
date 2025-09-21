@@ -35,7 +35,7 @@ public class EventsSocial {
 	@Column(length = 31, nullable = false)
 	private String phone;
 
-	@JoinColumn(name = "participation_date", nullable = false)
+	@Column(name = "participation_date", nullable = false)
 	private LocalDate date;
 
 	@Builder
