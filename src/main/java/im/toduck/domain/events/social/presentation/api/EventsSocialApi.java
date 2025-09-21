@@ -23,8 +23,11 @@ public interface EventsSocialApi {
 	@Operation(
 		summary = "참여 확인",
 		description = """
-			사용자가 해당 날짜에 참여했는지 확인합니다.
-			예시 : /v1/events-social/check?date=2025-09-21
+			<p>사용자가 해당 날짜에 참여했는지 확인합니다.</p>
+			<p>예시 : /v1/events-social/check?date=2025-09-21</p>
+			<p>응답 - <br/>
+			participated : true -> 이미 참여함 <br/>
+			participated : false -> 참여하지 않음</p>
 			"""
 	)
 	@ApiResponseExplanations(
