@@ -31,7 +31,7 @@ public class EventsSocialUseCase {
 	}
 
 	@Transactional
-	public void createEventsSocial(final EventsSocialRequest request, final Long userId) {
+	public void saveEventsSocial(final EventsSocialRequest request, final Long userId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 

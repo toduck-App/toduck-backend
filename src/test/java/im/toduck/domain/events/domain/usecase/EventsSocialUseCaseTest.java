@@ -75,7 +75,7 @@ class EventsSocialUseCaseTest extends ServiceTest {
 				.date(LocalDate.now())
 				.build();
 
-			eventsSocialUseCase.createEventsSocial(eventsSocialRequest, savedUser.getId());
+			eventsSocialUseCase.saveEventsSocial(eventsSocialRequest, savedUser.getId());
 
 			// when
 			EventsSocialCheckResponse eventsSocialCheckResponse =

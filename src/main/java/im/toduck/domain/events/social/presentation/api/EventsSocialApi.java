@@ -50,7 +50,7 @@ public interface EventsSocialApi {
 			description = "저장 완료. 빈 content 객체를 반환합니다."
 		)
 	)
-	ResponseEntity<ApiResponse<Map<String, Object>>> createEventsSocial(
+	ResponseEntity<ApiResponse<Map<String, Object>>> saveEventsSocial(
 		@RequestBody @Valid final EventsSocialRequest request,
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	);

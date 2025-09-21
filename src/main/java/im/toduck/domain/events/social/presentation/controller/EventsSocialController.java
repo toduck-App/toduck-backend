@@ -45,12 +45,15 @@ public class EventsSocialController implements EventsSocialApi {
 	@Override
 	@PostMapping("/save")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> createEventsSocial(
+	public ResponseEntity<ApiResponse<Map<String, Object>>> saveEventsSocial(
 		@RequestBody @Valid final EventsSocialRequest request,
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	) {
-		eventsSocialUseCase.createEventsSocial(request, userDetails.getUserId());
+		eventsSocialUseCase.saveEventsSocial(request, userDetails.getUserId());
 
 		return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoContent());
 	}
+
+	// 삭제도 추가해야 할듯. 업데이트도 해야하나? 업데이트는 굳이..?
+	// 지울땐 어떤 정보를 기준으로 지워야 할까
 }
