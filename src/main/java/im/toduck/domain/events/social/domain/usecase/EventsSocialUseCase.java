@@ -36,12 +36,11 @@ public class EventsSocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		boolean checkEventsSocial = eventsSocialService.getEventsSocialByDate(request.date(), userId);
-		// 있는지 확인 -> 없으면 저장, 있으면 오류 반환
+
 		if (checkEventsSocial) {
 			throw CommonException.from(ExceptionCode.ALREADY_EXISTS_EVENTSSOCIAL);
 		} else {
 			eventsSocialService.saveEventsSocial(request, userId);
 		}
-		// 만약 참여된 게시글이 삭제 될 경우 값 지우고 소셜 게시글 중에 같은 날에 작성된 글이 있는지 확인하고 다시 저장??
 	}
 }
