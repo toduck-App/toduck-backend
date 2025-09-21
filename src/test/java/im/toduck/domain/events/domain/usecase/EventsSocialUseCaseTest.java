@@ -61,7 +61,7 @@ class EventsSocialUseCaseTest extends ServiceTest {
 
 		@Test
 		void 성공적으로_반환한다2() { //
-			// given
+			// given 해당 날짜에 참여 한 경우
 			Social social = Social.builder()
 				.user(savedUser)
 				.content(DEFAULT_CONTENT + " " + 1)
