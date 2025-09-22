@@ -5,11 +5,13 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import im.toduck.domain.events.social.presentation.dto.request.EventsSocialRequest;
 import im.toduck.domain.events.social.presentation.dto.response.EventsSocialCheckResponse;
+import im.toduck.domain.events.social.presentation.dto.response.EventsSocialListResponse;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
 import im.toduck.global.presentation.ApiResponse;
@@ -52,6 +54,34 @@ public interface EventsSocialApi {
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> saveEventsSocial(
 		@RequestBody @Valid final EventsSocialRequest request,
+		@AuthenticationPrincipal final CustomUserDetails userDetails
+	);
+
+	@Operation(
+		summary = "소셜 이벤트 참여 목록 반환",
+		description = "소셜 이벤트 참여 목록을 반환합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = EventsSocialListResponse.class,
+			description = "소셜 이벤트 참여 목록 반환 완료. 목록을 반환합니다. </br> 관리자(ADMIN)만 조회할 수 있습니다."
+		)
+	)
+	ResponseEntity<ApiResponse<EventsSocialListResponse>> getEventsSocial(
+		@AuthenticationPrincipal final CustomUserDetails userDetails
+	);
+
+	@Operation(
+		summary = "소셜 이벤트 정보 삭제",
+		description = "소셜 이벤트 정보를 삭제합니다."
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "소셜 이벤트 정보 삭제 완료. 빈 content를 반환합니다. </br> 관리자(ADMIN)만 삭제할 수 있습니다."
+		)
+	)
+	ResponseEntity<ApiResponse<Map<String, Object>>> deleteEventsSocial(
+		@PathVariable final Long eventsSocialId,
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	);
 }
