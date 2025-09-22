@@ -50,7 +50,7 @@ class EventsUseCaseTest extends ServiceTest {
 			.eventName("테스트1")
 			.startAt(st)
 			.endAt(ed)
-			.thumbUrl("https://userpic.codeforces.org/1306481/title/63d99453ed22e728.jpg")
+			.thumbUrl("https://asdf.jpg")
 			.appVersion("1.0.1")
 			.build();
 
