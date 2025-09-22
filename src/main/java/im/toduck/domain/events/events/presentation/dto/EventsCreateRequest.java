@@ -1,0 +1,38 @@
+package im.toduck.domain.events.events.presentation.dto;
+
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+
+@Builder
+@Schema(description = "이벤트 생성 요청 DTO")
+public record EventsCreateRequest(
+	@NotNull(message = "이벤트 이름은 비어있을 수 없습니다.")
+	@Schema(description = "이벤트 이름", example = "경험 공유 EVENT")
+	String eventName,
+
+	@NotNull(message = "시작 시간은 비어있을 수 없습니다.")
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@Schema(description = "시작 시간", example = "2025-09-22T00:00:00")
+	LocalDateTime startAt,
+
+	@NotNull(message = "종료 시간은 비어있을 수 없습니다.")
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@Schema(description = "종료 시간", example = "2025-09-23T23:59:59")
+	LocalDateTime endAt,
+
+	@NotNull(message = "썸네일 url은 비어있을 수 없습니다.")
+	@Schema(description = "썸네일 url", example = "https://asdf.jpg")
+	String thumbUrl,
+
+	@NotNull(message = "최소 앱버전은 비어있을 수 없습니다.")
+	@Schema(description = "최소 앱버전", example = "1.0.1")
+	String appVersion
+) {
+
+}

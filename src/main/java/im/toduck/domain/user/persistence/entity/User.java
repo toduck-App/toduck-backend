@@ -99,4 +99,8 @@ public class User extends BaseEntity {
 	public void changePassword(String encodedPassword) {
 		this.password = encodedPassword;
 	}
+
+	public boolean isAdmin() {
+		return this.role == UserRole.ADMIN;
+	}
 }

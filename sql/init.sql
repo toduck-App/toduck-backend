@@ -358,6 +358,18 @@ CREATE TABLE concentration
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE events
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    event_name              VARCHAR(63)                         NOT NULL,
+    start_at                DATETIME                            NOT NULL,
+    end_at                  DATETIME                            NOT NULL,
+    thumb_url               VARCHAR(1023)                       NOT NULL,
+    app_version             VARCHAR(63)                         NOT NULL,
+    created_at              DATETIME                            NOT NULL,
+    deleted_at              DATETIME                            NULL
+)
+
 CREATE TABLE events_social
 (
     id                      BIGINT PRIMARY KEY auto_increment,
