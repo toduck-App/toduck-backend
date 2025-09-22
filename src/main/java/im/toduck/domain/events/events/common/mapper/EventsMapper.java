@@ -3,9 +3,9 @@ package im.toduck.domain.events.events.common.mapper;
 import java.util.List;
 
 import im.toduck.domain.events.events.persistence.entity.Events;
-import im.toduck.domain.events.events.presentation.dto.EventsCreateRequest;
-import im.toduck.domain.events.events.presentation.dto.EventsListResponse;
-import im.toduck.domain.events.events.presentation.dto.EventsResponse;
+import im.toduck.domain.events.events.presentation.dto.request.EventsCreateRequest;
+import im.toduck.domain.events.events.presentation.dto.response.EventsListResponse;
+import im.toduck.domain.events.events.presentation.dto.response.EventsResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

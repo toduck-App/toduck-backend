@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.events.events.common.mapper.EventsMapper;
 import im.toduck.domain.events.events.persistence.entity.Events;
 import im.toduck.domain.events.events.persistence.repository.EventsRepository;
-import im.toduck.domain.events.events.presentation.dto.EventsCreateRequest;
-import im.toduck.domain.events.events.presentation.dto.EventsResponse;
-import im.toduck.domain.events.events.presentation.dto.EventsUpdateRequest;
+import im.toduck.domain.events.events.presentation.dto.request.EventsCreateRequest;
+import im.toduck.domain.events.events.presentation.dto.request.EventsUpdateRequest;
+import im.toduck.domain.events.events.presentation.dto.response.EventsResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -1,4 +1,4 @@
-package im.toduck.domain.events.events.presentation.dto;
+package im.toduck.domain.events.events.presentation.dto.response;
 
 import java.util.List;
 

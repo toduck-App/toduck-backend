@@ -7,9 +7,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import im.toduck.domain.events.events.presentation.dto.EventsCreateRequest;
-import im.toduck.domain.events.events.presentation.dto.EventsListResponse;
-import im.toduck.domain.events.events.presentation.dto.EventsUpdateRequest;
+import im.toduck.domain.events.events.presentation.dto.request.EventsCreateRequest;
+import im.toduck.domain.events.events.presentation.dto.request.EventsUpdateRequest;
+import im.toduck.domain.events.events.presentation.dto.response.EventsListResponse;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
 import im.toduck.global.presentation.ApiResponse;

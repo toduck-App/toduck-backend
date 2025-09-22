@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.events.events.domain.usecase.EventsUseCase;
 import im.toduck.domain.events.events.presentation.api.EventsApi;
-import im.toduck.domain.events.events.presentation.dto.EventsCreateRequest;
-import im.toduck.domain.events.events.presentation.dto.EventsListResponse;
-import im.toduck.domain.events.events.presentation.dto.EventsUpdateRequest;
+import im.toduck.domain.events.events.presentation.dto.request.EventsCreateRequest;
+import im.toduck.domain.events.events.presentation.dto.request.EventsUpdateRequest;
+import im.toduck.domain.events.events.presentation.dto.response.EventsListResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
