@@ -2,6 +2,9 @@ package im.toduck.domain.events.events.persistence.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +22,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE diary SET deleted_at = NOW() where id=?")
+@SQLRestriction(value = "deleted_at is NULL")
 public class Events extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

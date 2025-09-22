@@ -14,10 +14,10 @@ import lombok.Builder;
 @Builder
 @Schema(description = "이벤트 목록 확인 응답")
 public record EventsResponse(
-	@Schema(description = "이벤트 ID")
+	@Schema(description = "이벤트 ID", example = "1")
 	Long id,
 
-	@Schema(description = "이벤트 이름")
+	@Schema(description = "이벤트 이름", example = "댓글 이벤트")
 	String eventName,
 
 	@Schema(description = "시작일시")
@@ -30,10 +30,10 @@ public record EventsResponse(
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	LocalDateTime endAt,
 
-	@Schema(description = "썸네일 URL")
+	@Schema(description = "썸네일 URL", example = "https://asdf.jpg")
 	String thumbUrl,
 
-	@Schema(description = "앱 버전")
+	@Schema(description = "앱 버전", example = "1.0.1")
 	String appVersion
 ) {
 	public static List<EventsResponse> toEventsCheckResponse(List<Events> eventsList) {

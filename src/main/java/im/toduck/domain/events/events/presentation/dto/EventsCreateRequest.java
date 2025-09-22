@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
@@ -27,6 +28,7 @@ public record EventsCreateRequest(
 	LocalDateTime endAt,
 
 	@NotNull(message = "썸네일 url은 비어있을 수 없습니다.")
+	@Size(max = 1023, message = "썸네일 url은 1023자를 초과할 수 없습니다.")
 	@Schema(description = "썸네일 url", example = "https://asdf.jpg")
 	String thumbUrl,
 
