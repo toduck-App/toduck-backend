@@ -59,12 +59,12 @@ public interface EventsSocialApi {
 
 	@Operation(
 		summary = "소셜 이벤트 참여 목록 반환",
-		description = "소셜 이벤트 참여 목록을 반환합니다."
+		description = "소셜 이벤트 참여 목록을 반환합니다. 관리자(ADMIN)만 조회할 수 있습니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
 			responseClass = EventsSocialListResponse.class,
-			description = "소셜 이벤트 참여 목록 반환 완료. 목록을 반환합니다. </br> 관리자(ADMIN)만 조회할 수 있습니다."
+			description = "소셜 이벤트 참여 목록 반환 완료. 목록을 반환합니다."
 		)
 	)
 	ResponseEntity<ApiResponse<EventsSocialListResponse>> getEventsSocial(
@@ -73,11 +73,11 @@ public interface EventsSocialApi {
 
 	@Operation(
 		summary = "소셜 이벤트 정보 삭제",
-		description = "소셜 이벤트 정보를 삭제합니다."
+		description = "소셜 이벤트 정보를 삭제합니다. 관리자(ADMIN)만 조회할 수 있습니다."
 	)
 	@ApiResponseExplanations(
 		success = @ApiSuccessResponseExplanation(
-			description = "소셜 이벤트 정보 삭제 완료. 빈 content를 반환합니다. </br> 관리자(ADMIN)만 삭제할 수 있습니다."
+			description = "소셜 이벤트 정보 삭제 완료. 빈 content를 반환합니다."
 		)
 	)
 	ResponseEntity<ApiResponse<Map<String, Object>>> deleteEventsSocial(
