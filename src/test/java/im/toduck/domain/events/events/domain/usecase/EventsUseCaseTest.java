@@ -170,10 +170,10 @@ class EventsUseCaseTest extends ServiceTest {
 
 				assertSoftly(softly -> {
 					softly.assertThat(updatedEvent.getEventName()).isEqualTo(eventsUpdateRequest.eventName());
-					softly.assertThat(updatedEvent.getStartAt()).isEqualTo(updatedEvent.getStartAt());
-					softly.assertThat(updatedEvent.getEndAt()).isEqualTo(updatedEvent.getEndAt());
-					softly.assertThat(updatedEvent.getThumbUrl()).isEqualTo(updatedEvent.getThumbUrl());
-					softly.assertThat(updatedEvent.getAppVersion()).isEqualTo(updatedEvent.getAppVersion());
+					softly.assertThat(updatedEvent.getStartAt()).isEqualTo(events.getStartAt());
+					softly.assertThat(updatedEvent.getEndAt()).isEqualTo(events.getEndAt());
+					softly.assertThat(updatedEvent.getThumbUrl()).isEqualTo(events.getThumbUrl());
+					softly.assertThat(updatedEvent.getAppVersion()).isEqualTo(events.getAppVersion());
 				});
 			}
 		}

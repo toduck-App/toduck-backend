@@ -11,4 +11,6 @@ public interface EventsDetailImgRepository extends JpaRepository<EventsDetailImg
 	List<EventsDetailImg> findAllByOrderByIdAsc();
 
 	void deleteAllByEventsDetail(EventsDetail eventsDetail);
+
+	List<EventsDetailImg> findAllByDeletedAtIsNull();
 }

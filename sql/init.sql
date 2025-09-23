@@ -374,7 +374,7 @@ CREATE TABLE events
 CREATE TABLE events_detail
 (
     id                      BIGINT PRIMARY KEY auto_increment,
-    events_id               BIGINT                              NOT NULL,
+    events_id               BIGINT                              NOT NULL    UNIQUE,
     routing_url             VARCHAR(1023)                       NULL,
     created_at              DATETIME                            NOT NULL,
     updated_at              DATETIME                            NOT NULL,
@@ -400,7 +400,7 @@ CREATE TABLE events_social
     user_id                 BIGINT                              NOT NULL,
     phone                   VARCHAR(31)                         NOT NULL,
     participation_date      DATE                                NOT NULL,
-    FOREIGN KEY (social_id) REFERENCES socials (id),
+    FOREIGN KEY (social_id) REFERENCES social (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 

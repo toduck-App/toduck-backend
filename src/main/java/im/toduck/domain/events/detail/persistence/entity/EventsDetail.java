@@ -35,7 +35,7 @@ public class EventsDetail extends BaseEntity {
 	private Long id;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "events_id", nullable = false)
+	@JoinColumn(name = "events_id", nullable = false, unique = true)
 	private Events events;
 
 	@Column(name = "routing_url", length = 1023, nullable = true)

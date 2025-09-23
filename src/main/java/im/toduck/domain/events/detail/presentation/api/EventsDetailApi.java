@@ -56,7 +56,7 @@ public interface EventsDetailApi {
 				"eventsId" : 이벤트의 일련번호 <br/>
 				"routingUrl" : 연결 url <br/>
 				"eventsDetailImgs" : 이벤트 상세 이미지 url <br/><br/>
-				수정하지 않을 경우 null을 입력하거나 이미지의 경우 빈 리스트를 넣어주면 됩니다.
+				수정하지 않을 경우 null을 입력하면 됩니다. 이미지의 경우 빈 리스트를 넣으면 이미지가 전부 삭제됩니다.
 				"""
 	)
 	@ApiResponseExplanations(

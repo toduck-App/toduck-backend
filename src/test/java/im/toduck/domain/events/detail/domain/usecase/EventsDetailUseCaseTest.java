@@ -138,10 +138,32 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				softly.assertThat(eventsDetailListResponse.eventsDetailDtos().get(0).routingUrl())
 					.isEqualTo(eventsDetail1.getRoutingUrl());
 			});
+		}
 
-			// 이벤트에 대한 이벤트 디테일을 중복으로 생성하는 경우
+		@Test
+		void 중복_생성_시_예외가_발생한다() {
+			// given
+			EventsDetailCreateRequest eventsDetailCreateRequest =
+				EventsDetailCreateRequest.builder()
+					.eventsId(savedEvent.getId())
+					.routingUrl("toduck://createPost")
+					.eventsDetailImgs(
+						Arrays.asList("https://cdn.toduck.app/test1.jpg", "https://cdn.toduck.app/test2.jpg"))
+					.build();
+
+			eventsDetailUseCase.createEventsDetail(eventsDetailCreateRequest, savedAdminUser.getId());
+
+			EventsDetailCreateRequest duplicateRequest =
+				EventsDetailCreateRequest.builder()
+					.eventsId(savedEvent.getId())
+					.routingUrl("toduck://anotherPost")
+					.eventsDetailImgs(
+						Arrays.asList("https://cdn.toduck.app/test3.jpg", "https://cdn.toduck.app/test4.jpg"))
+					.build();
+
+			// when - then
 			CommonException exception = assertThrows(CommonException.class, () ->
-				eventsDetailUseCase.createEventsDetail(eventsDetailCreateRequest2, savedAdminUser.getId())
+				eventsDetailUseCase.createEventsDetail(duplicateRequest, savedAdminUser.getId())
 			);
 
 			assertThat(exception.getErrorCode()).isEqualTo(ExceptionCode.DUPLICATE_EVENTS_DETAIL.getErrorCode());
@@ -190,7 +212,7 @@ class EventsDetailUseCaseTest extends ServiceTest {
 
 			assertSoftly(softly -> {
 				softly.assertThat(eventsDetail2.getEvents().getId()).isEqualTo(savedEvent.getId());
-				softly.assertThat(eventsDetail2.getRoutingUrl()).isEqualTo(eventsDetail1.getRoutingUrl());
+				softly.assertThat(eventsDetail2.getRoutingUrl()).isEqualTo(eventsDetail2.getRoutingUrl());
 			});
 		}
 
