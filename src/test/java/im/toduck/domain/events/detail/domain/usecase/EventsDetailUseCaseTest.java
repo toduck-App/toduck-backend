@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
 import im.toduck.domain.events.detail.persistence.entity.EventsDetail;
-import im.toduck.domain.events.detail.persistence.repository.EventsDetailImgRepository;
 import im.toduck.domain.events.detail.persistence.repository.EventsDetailRepository;
 import im.toduck.domain.events.detail.presentation.dto.request.EventsDetailCreateRequest;
 import im.toduck.domain.events.detail.presentation.dto.request.EventsDetailUpdateRequest;
@@ -42,9 +41,6 @@ class EventsDetailUseCaseTest extends ServiceTest {
 
 	@Autowired
 	EventsDetailRepository eventsDetailRepository;
-
-	@Autowired
-	EventsDetailImgRepository eventsDetailImgRepository;
 
 	@Autowired
 	UserRepository userRepository;
