@@ -15,14 +15,12 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "events")
 @Getter
-@Setter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE diary SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE events SET deleted_at = NOW() where id=?")
 @SQLRestriction(value = "deleted_at is NULL")
 public class Events extends BaseEntity {
 	@Id
@@ -54,6 +52,26 @@ public class Events extends BaseEntity {
 		this.startAt = startAt;
 		this.endAt = endAt;
 		this.thumbUrl = thumbUrl;
+		this.appVersion = appVersion;
+	}
+
+	public void updateEventName(final String eventName) {
+		this.eventName = eventName;
+	}
+
+	public void updateStartAt(final LocalDateTime startAt) {
+		this.startAt = startAt;
+	}
+
+	public void updateEndAt(final LocalDateTime endAt) {
+		this.endAt = endAt;
+	}
+
+	public void updateThumbUrl(final String thumbUrl) {
+		this.thumbUrl = thumbUrl;
+	}
+
+	public void updateAppVersion(final String appVersion) {
 		this.appVersion = appVersion;
 	}
 }

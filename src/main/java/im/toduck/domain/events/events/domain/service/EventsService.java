@@ -42,19 +42,19 @@ public class EventsService {
 	@Transactional
 	public void updateEvents(final Events events, final EventsUpdateRequest request) {
 		if (request.eventName() != null) {
-			events.setEventName(request.eventName());
+			events.updateEventName(request.eventName());
 		}
 		if (request.startAt() != null) {
-			events.setStartAt(request.startAt());
+			events.updateStartAt(request.startAt());
 		}
 		if (request.endAt() != null) {
-			events.setEndAt(request.endAt());
+			events.updateEndAt(request.endAt());
 		}
 		if (request.thumbUrl() != null) {
-			events.setThumbUrl(request.thumbUrl());
+			events.updateThumbUrl(request.thumbUrl());
 		}
 		if (request.appVersion() != null) {
-			events.setAppVersion(request.appVersion());
+			events.updateAppVersion(request.appVersion());
 		}
 	}
 

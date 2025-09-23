@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventsMapper {
-	public static EventsListResponse toListEventsResponse(List<EventsResponse> events) {
+	public static EventsListResponse toListEventsResponse(final List<EventsResponse> events) {
 		return EventsListResponse.toListEventsResponse(events);
 	}
 
-	public static EventsResponse fromEvents(Events events) {
+	public static EventsResponse fromEvents(final Events events) {
 		return new EventsResponse(
 			events.getId(),
 			events.getEventName(),
@@ -26,7 +26,7 @@ public class EventsMapper {
 		);
 	}
 
-	public static Events toEvents(EventsCreateRequest request) {
+	public static Events toEvents(final EventsCreateRequest request) {
 		return Events.builder()
 			.eventName(request.eventName())
 			.startAt(request.startAt())

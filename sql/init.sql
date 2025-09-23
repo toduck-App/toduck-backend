@@ -367,8 +367,31 @@ CREATE TABLE events
     thumb_url               VARCHAR(1023)                       NOT NULL,
     app_version             VARCHAR(63)                         NOT NULL,
     created_at              DATETIME                            NOT NULL,
+    updated_at              DATETIME                            NOT NULL,
     deleted_at              DATETIME                            NULL
-)
+);
+
+CREATE TABLE events_detail
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    events_id               BIGINT                              NOT NULL,
+    routing_url             VARCHAR(1023)                       NULL,
+    created_at              DATETIME                            NOT NULL,
+    updated_at              DATETIME                            NOT NULL,
+    deleted_at              DATETIME                            NULL,
+    FOREIGN KEY (events_id) REFERENCES events(id)
+);
+
+CREATE TABLE events_detail_img
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    events_detail_id        BIGINT                              NOT NULL,
+    detail_img_url          VARCHAR(1023)                       NOT NULL,
+    created_at              DATETIME                            NOT NULL,
+    updated_at              DATETIME                            NOT NULL,
+    deleted_at              DATETIME                            NULL,
+    FOREIGN KEY (events_detail_id) REFERENCES events_detail(id)
+);
 
 CREATE TABLE events_social
 (

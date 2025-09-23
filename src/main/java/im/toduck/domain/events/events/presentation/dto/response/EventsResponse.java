@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
-@Schema(description = "이벤트 목록 확인 응답")
+@Schema(description = "이벤트 응답")
 public record EventsResponse(
 	@Schema(description = "이벤트 ID", example = "1")
 	Long id,

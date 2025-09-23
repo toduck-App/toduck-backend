@@ -113,6 +113,8 @@ public enum ExceptionCode {
 	NOT_FOUND_EVENTS(HttpStatus.NOT_FOUND, 41001, "이벤트를 찾을 수 없습니다."),
 
 	/* 411xx EventsDetail */
+	NOT_FOUND_EVENTS_DETAIL(HttpStatus.NOT_FOUND, 41101, "이벤트 디테일을 찾을 수 없습니다."),
+	DUPLICATE_EVENTS_DETAIL(HttpStatus.CONFLICT, 41102, "해당 이벤트에 대한 이벤트 디테일이 존재합니다."),
 
 	/* 412xx EventsSocial */
 	ALREADY_EXISTS_EVENTSSOCIAL(HttpStatus.CONFLICT, 41201, "이미 참여한 유저입니다."),
