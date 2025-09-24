@@ -32,6 +32,9 @@ public class EventsSocialService {
 
 	@Transactional
 	public void saveEventsSocial(final EventsSocialRequest request, final Long userId) {
+		if (eventsSocialRepository.findByDateAndUserId(request.date(), userId).isPresent()) {
+			throw CommonException.from(ExceptionCode.ALREADY_EXISTS_EVENTSSOCIAL);
+		}
 		Optional<Social> socialOptional = socialRepository.findById(request.socialId());
 		if (!socialOptional.isPresent()) {
 			throw CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD);
