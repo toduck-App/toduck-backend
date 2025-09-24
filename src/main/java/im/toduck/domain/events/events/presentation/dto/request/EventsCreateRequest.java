@@ -14,6 +14,7 @@ import lombok.Builder;
 @Schema(description = "이벤트 생성 요청 DTO")
 public record EventsCreateRequest(
 	@NotNull(message = "이벤트 이름은 비어있을 수 없습니다.")
+	@Size(max = 63, message = "이벤트 이름은 63자를 초과할 수 없습니다.")
 	@Schema(description = "이벤트 이름", example = "경험 공유 EVENT")
 	String eventName,
 
@@ -33,6 +34,7 @@ public record EventsCreateRequest(
 	String thumbUrl,
 
 	@NotNull(message = "최소 앱버전은 비어있을 수 없습니다.")
+	@Size(max = 63, message = "앱버전은 63자를 초과할 수 없습니다.")
 	@Schema(description = "최소 앱버전", example = "1.0.1")
 	String appVersion
 ) {
