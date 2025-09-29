@@ -1,6 +1,8 @@
 package im.toduck.domain.notification.domain.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import im.toduck.domain.notification.common.mapper.NotificationMapper;
 import im.toduck.domain.notification.domain.data.NotificationData;
 import im.toduck.domain.notification.domain.event.NotificationEvent;
 import im.toduck.domain.notification.persistence.entity.Notification;
+import im.toduck.domain.notification.persistence.entity.NotificationType;
 import im.toduck.domain.notification.persistence.repository.NotificationRepository;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
@@ -64,5 +67,20 @@ public class NotificationService {
 	@Transactional
 	public void markAsSent(Notification notification) {
 		notification.markAsSent();
+	}
+
+	@Transactional(readOnly = true)
+	public long getTotalSentNotificationsCount() {
+		return notificationRepository.countSentNotifications();
+	}
+
+	@Transactional(readOnly = true)
+	public long getSentNotificationsCountBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime) {
+		return notificationRepository.countSentNotificationsBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public Map<NotificationType, Long> getSentNotificationCountsByType() {
+		return notificationRepository.countSentNotificationsByType();
 	}
 }

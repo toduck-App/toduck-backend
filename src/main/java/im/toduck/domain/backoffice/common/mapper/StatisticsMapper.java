@@ -1,0 +1,59 @@
+package im.toduck.domain.backoffice.common.mapper;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import im.toduck.domain.backoffice.persistence.entity.StatisticsType;
+import im.toduck.domain.backoffice.presentation.dto.response.DailyStatisticsResponse;
+import im.toduck.domain.backoffice.presentation.dto.response.MultiDateStatisticsResponse;
+import im.toduck.domain.backoffice.presentation.dto.response.OverallStatisticsResponse;
+import im.toduck.domain.backoffice.presentation.dto.response.PeriodStatisticsResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class StatisticsMapper {
+
+	public static OverallStatisticsResponse toOverallStatisticsResponse(
+		final Map<StatisticsType, Long> statistics
+	) {
+		return OverallStatisticsResponse.builder()
+			.statistics(statistics)
+			.build();
+	}
+
+	public static PeriodStatisticsResponse toPeriodStatisticsResponse(
+		final Map<StatisticsType, Long> statistics,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		return PeriodStatisticsResponse.builder()
+			.statistics(statistics)
+			.startDate(startDate)
+			.endDate(endDate)
+			.build();
+	}
+
+	public static DailyStatisticsResponse toDailyStatisticsResponse(
+		final LocalDate date,
+		final Map<StatisticsType, Long> counts
+	) {
+		return DailyStatisticsResponse.builder()
+			.date(date)
+			.counts(counts)
+			.build();
+	}
+
+	public static MultiDateStatisticsResponse toMultiDateStatisticsResponse(
+		final List<DailyStatisticsResponse> statisticsDataList,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		return MultiDateStatisticsResponse.builder()
+			.statistics(statisticsDataList)
+			.startDate(startDate)
+			.endDate(endDate)
+			.build();
+	}
+}

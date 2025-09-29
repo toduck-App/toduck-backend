@@ -20,13 +20,15 @@ public class CustomUserDetails implements UserDetails {
 	private final Long userId;
 	private final String username;
 	private Collection<? extends GrantedAuthority> authorities;
+	private final boolean enabled;
 
 	@Builder
 	private CustomUserDetails(Long userId, String username,
-		Collection<? extends GrantedAuthority> authorities) {
+		Collection<? extends GrantedAuthority> authorities, boolean enabled) {
 		this.userId = userId;
 		this.username = username;
 		this.authorities = authorities;
+		this.enabled = enabled;
 	}
 
 	public static CustomUserDetails from(User user) {
@@ -34,6 +36,7 @@ public class CustomUserDetails implements UserDetails {
 			.userId(user.getId())
 			.username(user.getNickname())
 			.authorities(List.of(new SimpleGrantedAuthority(ROLE_PREFIX + user.getRole().name())))
+			.enabled(!user.isSuspended())
 			.build();
 	}
 
@@ -69,6 +72,6 @@ public class CustomUserDetails implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return enabled;
 	}
 }

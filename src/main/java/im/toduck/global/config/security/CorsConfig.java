@@ -19,7 +19,8 @@ public class CorsConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(
-			List.of("https://api.toduck.app", "https://dev-api-toduck.seol.pro", "https://api-toduck.seol.pro"));
+			List.of("https://api.toduck.app", "https://dev-api-toduck.seol.pro", "https://api-toduck.seol.pro",
+				"https://backoffice-toduck.seol.pro", "http://localhost:5173"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setExposedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.SET_COOKIE));

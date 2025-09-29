@@ -1,5 +1,7 @@
 package im.toduck.domain.user.persistence.entity;
 
+import java.time.LocalDateTime;
+
 import im.toduck.global.base.entity.BaseEntity;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -52,6 +54,12 @@ public class User extends BaseEntity {
 	@Column(nullable = true, length = 1024)
 	private String imageUrl;
 
+	@Column(nullable = true, name = "suspended_until")
+	private LocalDateTime suspendedUntil;
+
+	@Column(nullable = true, name = "suspension_reason", length = 500)
+	private String suspensionReason;
+
 	@Builder
 	private User(UserRole role, String nickname, String phoneNumber, String loginId, String password,
 		OAuthProvider provider, String email) {
@@ -100,7 +108,17 @@ public class User extends BaseEntity {
 		this.password = encodedPassword;
 	}
 
-	public boolean isAdmin() {
-		return this.role == UserRole.ADMIN;
+	public boolean isSuspended() {
+		return suspendedUntil != null && suspendedUntil.isAfter(LocalDateTime.now());
+	}
+
+	public void suspend(LocalDateTime until, String reason) {
+		this.suspendedUntil = until;
+		this.suspensionReason = reason;
+	}
+
+	public void unsuspend() {
+		this.suspendedUntil = null;
+		this.suspensionReason = null;
 	}
 }

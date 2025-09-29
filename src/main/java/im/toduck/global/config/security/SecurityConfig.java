@@ -27,7 +27,7 @@ public class SecurityConfig {
 	private static final String[] SWAGGER_ENDPOINTS = {
 		"/api-docs/**", "/v3/api-docs/**", "/docs/open-api-3.0.1.yaml", "/swagger-ui/**", "/swagger", "/docs",
 		"/exception-codes"};
-	private static final String[] PUBLIC_ENDPOINTS = {"/", "/error"};
+	private static final String[] PUBLIC_ENDPOINTS = {"/", "/error", "v1/backoffice/app/version-check"};
 	private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/users/find/**"};
 	private static final String[] ATUATOR_ENDPOINTS = {"/actuator/**"};
 
