@@ -358,6 +358,52 @@ CREATE TABLE concentration
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE events
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    event_name              VARCHAR(63)                         NOT NULL,
+    start_at                DATETIME                            NOT NULL,
+    end_at                  DATETIME                            NOT NULL,
+    thumb_url               VARCHAR(1023)                       NOT NULL,
+    app_version             VARCHAR(63)                         NOT NULL,
+    created_at              DATETIME                            NOT NULL,
+    updated_at              DATETIME                            NOT NULL,
+    deleted_at              DATETIME                            NULL
+);
+
+CREATE TABLE events_detail
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    events_id               BIGINT                              NOT NULL    UNIQUE,
+    routing_url             VARCHAR(1023)                       NULL,
+    created_at              DATETIME                            NOT NULL,
+    updated_at              DATETIME                            NOT NULL,
+    deleted_at              DATETIME                            NULL,
+    FOREIGN KEY (events_id) REFERENCES events(id)
+);
+
+CREATE TABLE events_detail_img
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    events_detail_id        BIGINT                              NOT NULL,
+    detail_img_url          VARCHAR(1023)                       NOT NULL,
+    created_at              DATETIME                            NOT NULL,
+    updated_at              DATETIME                            NOT NULL,
+    deleted_at              DATETIME                            NULL,
+    FOREIGN KEY (events_detail_id) REFERENCES events_detail(id)
+);
+
+CREATE TABLE events_social
+(
+    id                      BIGINT PRIMARY KEY auto_increment,
+    social_id               BIGINT                              NOT NULL,
+    user_id                 BIGINT                              NOT NULL,
+    phone                   VARCHAR(31)                         NOT NULL,
+    participation_date      DATE                                NOT NULL,
+    FOREIGN KEY (social_id) REFERENCES social (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
 CREATE TABLE account_deletion_log
 (
     id          BIGINT PRIMARY KEY auto_increment,

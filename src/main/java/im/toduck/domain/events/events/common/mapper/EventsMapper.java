@@ -1,0 +1,38 @@
+package im.toduck.domain.events.events.common.mapper;
+
+import java.util.List;
+
+import im.toduck.domain.events.events.persistence.entity.Events;
+import im.toduck.domain.events.events.presentation.dto.request.EventsCreateRequest;
+import im.toduck.domain.events.events.presentation.dto.response.EventsListResponse;
+import im.toduck.domain.events.events.presentation.dto.response.EventsResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class EventsMapper {
+	public static EventsListResponse toListEventsResponse(final List<EventsResponse> events) {
+		return EventsListResponse.toListEventsResponse(events);
+	}
+
+	public static EventsResponse fromEvents(final Events events) {
+		return new EventsResponse(
+			events.getId(),
+			events.getEventName(),
+			events.getStartAt(),
+			events.getEndAt(),
+			events.getThumbUrl(),
+			events.getAppVersion()
+		);
+	}
+
+	public static Events toEvents(final EventsCreateRequest request) {
+		return Events.builder()
+			.eventName(request.eventName())
+			.startAt(request.startAt())
+			.endAt(request.endAt())
+			.thumbUrl(request.thumbUrl())
+			.appVersion(request.appVersion())
+			.build();
+	}
+}
