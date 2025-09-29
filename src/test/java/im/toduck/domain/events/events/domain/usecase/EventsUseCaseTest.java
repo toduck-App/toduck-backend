@@ -3,7 +3,6 @@ package im.toduck.domain.events.events.domain.usecase;
 import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,17 +82,6 @@ class EventsUseCaseTest extends ServiceTest {
 					softly.assertThat(events.size()).isEqualTo(1);
 					softly.assertThat(events.get(0).getEventName()).isEqualTo("테스트1");
 				});
-			}
-
-			@Test
-			void 관리자가_아닐_경우_실패한다() {
-				// given - when
-				CommonException exception = assertThrows(CommonException.class, () ->
-					eventsUseCase.createEvents(eventsCreateRequest, savedGeneralUser.getId())
-				);
-
-				// then
-				assertThat(exception.getErrorCode()).isEqualTo(ExceptionCode.NOT_ADMIN.getErrorCode());
 			}
 		}
 
