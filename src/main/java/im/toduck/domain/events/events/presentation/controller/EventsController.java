@@ -44,7 +44,7 @@ public class EventsController implements EventsApi {
 
 	@Override
 	@PostMapping("/create")
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> createEvents(
 		@RequestBody @Valid final EventsCreateRequest request,
 		@AuthenticationPrincipal final CustomUserDetails userDetails
@@ -56,7 +56,7 @@ public class EventsController implements EventsApi {
 
 	@Override
 	@PatchMapping("/{eventsId}")
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> updateEvents(
 		@PathVariable final Long eventsId,
 		@RequestBody @Valid final EventsUpdateRequest request,
@@ -69,7 +69,7 @@ public class EventsController implements EventsApi {
 
 	@Override
 	@DeleteMapping("/{eventsId}")
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteEvents(
 		@PathVariable final Long eventsId,
 		@AuthenticationPrincipal final CustomUserDetails userDetails

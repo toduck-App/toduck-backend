@@ -51,7 +51,6 @@ public enum ExceptionCode {
 		"자체 회원가입에서 ID 찾기 혹은 비밀번호 찾기를 위한 인증번호 요청에서 회원으로 등록되지 않은 전화번호이어서 발생하는 오류입니다."),
 	INVALID_LOGIN_ID(HttpStatus.BAD_REQUEST, 40122, "유효하지 않은 아이디입니다.",
 		"비밀번호 찾기를 위한 인증번호 요청에서 회원ID와 일치하지 않는 로그인 아이디이어서 발생하는 오류입니다."),
-	NOT_ADMIN(HttpStatus.FORBIDDEN, 40123, "관리자 권한이 필요합니다."),
 
 	/* 402xx */
 	NOT_FOUND_USER(HttpStatus.NOT_FOUND, 40201, "사용자를 찾을 수 없습니다."),

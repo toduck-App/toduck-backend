@@ -41,11 +41,6 @@ public class EventsUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 이벤트 생성 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
-
 		return eventsService.createEvents(request);
 	}
 
@@ -60,11 +55,6 @@ public class EventsUseCase {
 		Events events = eventsService.getEventsById(eventsId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_EVENTS));
 
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 이벤트 수정 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
-
 		eventsService.updateEvents(events, request);
 	}
 
@@ -74,11 +64,6 @@ public class EventsUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		Events events = eventsService.getEventsById(eventsId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_EVENTS));
-
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 이벤트 삭제 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
 
 		eventsService.deleteEvents(events);
 	}

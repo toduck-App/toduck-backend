@@ -59,7 +59,7 @@ public class EventsSocialController implements EventsSocialApi {
 
 	@Override
 	@GetMapping("/get")
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<EventsSocialListResponse>> getEventsSocial(
 		@AuthenticationPrincipal final CustomUserDetails userDetails
 	) {
@@ -70,7 +70,7 @@ public class EventsSocialController implements EventsSocialApi {
 
 	@Override
 	@DeleteMapping("/{eventsSocialId}")
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> deleteEventsSocial(
 		@PathVariable final Long eventsSocialId,
 		@AuthenticationPrincipal final CustomUserDetails userDetails

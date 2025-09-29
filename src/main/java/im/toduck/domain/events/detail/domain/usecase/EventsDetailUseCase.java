@@ -41,11 +41,6 @@ public class EventsDetailUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 이벤트 디테일 생성 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
-
 		boolean exists = eventsDetailService.existsByEventsId(request.eventsId());
 		if (exists) {
 			throw CommonException.from(ExceptionCode.DUPLICATE_EVENTS_DETAIL);
@@ -66,11 +61,6 @@ public class EventsDetailUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 이벤트 디테일 수정 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
-
 		EventsDetail eventsDetail = eventsDetailService.getEventsDetailById(eventsDetailId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_EVENTS_DETAIL));
 
@@ -82,11 +72,6 @@ public class EventsDetailUseCase {
 	public void deleteEventsDetail(final Long eventsDetailId, final Long userId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
-
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 이벤트 디테일 삭제 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
 
 		EventsDetail eventsDetail = eventsDetailService.findById(eventsDetailId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_EVENTS_DETAIL));

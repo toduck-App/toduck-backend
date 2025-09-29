@@ -55,11 +55,6 @@ public class EventsSocialUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 소셜 이벤트 참가 정보 조회 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
-
 		List<EventsSocialResponse> eventsSocials = eventsSocialService.getEventsSocials();
 
 		return EventsSocialMapper.toListEventsSocialResponse(eventsSocials);
@@ -71,11 +66,6 @@ public class EventsSocialUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 		EventsSocial eventsSocial = eventsSocialService.getEventsSocialById(eventsSocialId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_EVENTS_SOCIAL));
-
-		if (!user.isAdmin()) {
-			log.warn("권한이 없는 유저가 소셜 이벤트 정보 삭제 시도 - UserId: {}", user.getId());
-			throw CommonException.from(ExceptionCode.NOT_ADMIN);
-		}
 
 		eventsSocialService.deleteEventsSocial(eventsSocial);
 	}
