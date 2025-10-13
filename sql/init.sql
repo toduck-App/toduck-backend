@@ -279,7 +279,7 @@ CREATE TABLE diary
     diary_date  DATE                                                                                NOT NULL,
     emotion     ENUM ('HAPPY', 'GOOD', 'SAD', 'ANGRY', 'ANXIOUS', 'TIRED', 'SICK', 'SOSO', 'LOVE')  NOT NULL,
     title       VARCHAR(50)                                                                         NULL,
-    memo        VARCHAR(2048)                                                                       NULL,
+    memo        TEXT                                                                                NULL,
     created_at  DATETIME                                                                            NOT NULL,
     updated_at  DATETIME                                                                            NOT NULL,
     deleted_at  DATETIME                                                                            NULL,
@@ -785,3 +785,6 @@ CREATE TABLE app_version (
     INDEX idx_app_version_platform_update_type (platform, update_type),
     INDEX idx_app_version_platform_release_date (platform, release_date DESC)
 );
+
+-- 일기 글자수 변경(varchar(2048) -> text) text는 2^16-1 byte까지 저장되고 한글 기준 21,000자 저장 가능
+ALTER TABLE diary MODIFY memo TEXT;
