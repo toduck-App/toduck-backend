@@ -30,8 +30,8 @@ public record DiaryCreateRequest(
 	@Schema(description = "일기 제목", example = "슬퍼")
 	String title,
 
-	@Size(max = 200, message = "일기는 200자를 초과할 수 없습니다.")
-	@Schema(description = "문장 기록", example = "출근 전에 지갑을 두고 나오는 바람에 다시 돌아갔다")
+	@Size(max = 5000, message = "일기는 5000자를 초과할 수 없습니다.")
+	@Schema(description = "일기", example = "출근 전에 지갑을 두고 나오는 바람에 다시 돌아갔다")
 	String memo,
 
 	@Size(max = 5, message = "이미지는 최대 5개까지만 등록할 수 있습니다.")

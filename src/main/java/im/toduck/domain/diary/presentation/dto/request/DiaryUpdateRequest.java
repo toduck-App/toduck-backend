@@ -19,13 +19,13 @@ public record DiaryUpdateRequest(
 	Emotion emotion,
 
 	@Nullable
-	@Size(max = 50, message = "제목은 공백일 수 없으며 50자 이하여야 합니다.")
-	@Schema(description = "변경된 제목", example = "버그를 만났어")
+	@Size(max = 50, message = "제목은 50자 이하여야 합니다.")
+	@Schema(description = "변경된 제목", example = "슬퍼")
 	String title,
 
 	@Nullable
-	@Size(max = 2048, message = "메모는 공백일 수 없으며 2048자 이하여야 합니다.")
-	@Schema(description = "변경된 메모", example = "버그 수정할 생각에 기분이 좋음")
+	@Size(max = 5000, message = "일기는 5000자 이하여야 합니다.")
+	@Schema(description = "변경된 일기", example = "출근 전에 지갑을 두고 나오는 바람에 다시 돌아갔다")
 	String memo,
 
 	@Nullable
