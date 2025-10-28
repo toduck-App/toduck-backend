@@ -12,6 +12,8 @@ import im.toduck.domain.events.social.presentation.dto.request.EventsSocialReque
 import im.toduck.domain.events.social.presentation.dto.response.EventsSocialCheckResponse;
 import im.toduck.domain.events.social.presentation.dto.response.EventsSocialListResponse;
 import im.toduck.domain.events.social.presentation.dto.response.EventsSocialResponse;
+import im.toduck.domain.social.domain.service.SocialBoardService;
+import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -26,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EventsSocialUseCase {
 	private final UserService userService;
 	private final EventsSocialService eventsSocialService;
+	private final SocialBoardService socialBoardService;
 
 	@Transactional(readOnly = true)
 	public EventsSocialCheckResponse checkEventsSocial(final LocalDate date, final Long userId) {
@@ -40,6 +43,13 @@ public class EventsSocialUseCase {
 	public void saveEventsSocial(final EventsSocialRequest request, final Long userId) {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		Social socialBoard = socialBoardService.getSocialById(request.socialId())
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
+
+		if (socialBoard.getContent().length() < 100) {
+			throw CommonException.from(ExceptionCode.INVALID_CONTENT_LENGTH);
+		}
 
 		boolean checkEventsSocial = eventsSocialService.getEventsSocialByDate(request.date(), userId);
 
