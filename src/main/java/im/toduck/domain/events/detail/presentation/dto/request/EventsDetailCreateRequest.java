@@ -15,7 +15,7 @@ public record EventsDetailCreateRequest(
 	Long eventsId,
 
 	@Size(max = 1023, message = "라우팅 url은 1023자를 초과할 수 없습니다.")
-	@Schema(description = "라우팅 url")
+	@Schema(description = "라우팅 url", example = "toduck://createPost")
 	String routingUrl,
 
 	@Schema(description = "이벤트 디테일 URL 목록", example = "[\"https://cdn.toduck.app/image1.jpg\"]")
