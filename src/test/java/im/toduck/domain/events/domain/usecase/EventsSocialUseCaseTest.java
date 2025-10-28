@@ -1,12 +1,8 @@
 package im.toduck.domain.events.domain.usecase;
 
-import static im.toduck.fixtures.social.SocialFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.SoftAssertions.*;
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 
@@ -68,7 +64,7 @@ class EventsSocialUseCaseTest extends ServiceTest {
 			// given 해당 날짜에 참여 한 경우
 			Social social = Social.builder()
 				.user(savedUser)
-				.content(DEFAULT_CONTENT + " " + 1)
+				.content("가".repeat(100))
 				.isAnonymous(true)
 				.build();
 			socialRepository.save(social);
@@ -122,9 +118,8 @@ class EventsSocialUseCaseTest extends ServiceTest {
 				.build();
 
 			// when & then
-			assertDoesNotThrow(() -> {
-				eventsSocialUseCase.saveEventsSocial(eventsSocialRequest, savedUser.getId());
-			});
+			assertThatCode(() -> eventsSocialUseCase.saveEventsSocial(eventsSocialRequest, savedUser.getId()))
+				.doesNotThrowAnyException();
 		}
 
 		@Test
@@ -144,11 +139,10 @@ class EventsSocialUseCaseTest extends ServiceTest {
 				.build();
 
 			// when & then
-			CommonException exception = assertThrows(CommonException.class, () -> {
-				eventsSocialUseCase.saveEventsSocial(eventsSocialRequest, savedUser.getId());
-			});
-
-			assertEquals(41204, exception.getErrorCode());
+			assertThatThrownBy(() -> eventsSocialUseCase.saveEventsSocial(eventsSocialRequest, savedUser.getId()))
+				.isInstanceOf(CommonException.class)
+				.extracting("errorCode")
+				.isEqualTo(41204);
 		}
 	}
 }
