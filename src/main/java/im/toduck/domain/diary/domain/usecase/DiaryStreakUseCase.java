@@ -42,8 +42,7 @@ public class DiaryStreakUseCase {
 			if (optionalDiaryStreak.isEmpty()) {
 				return DiaryStreakMapper.toDiaryStreakResponseEmpty();
 			}
-			DiaryStreak diaryStreak = optionalDiaryStreak.get();
-			diaryStreakService.updateDiaryStreak(diaryStreak, 0L, diaryStreak.getLastDiaryDate());
+			diaryStreakService.resetStreak(userId);
 			response = diaryStreakService.getDiaryStreakAndLastDiaryDate(user.getId());
 		}
 		return response;
