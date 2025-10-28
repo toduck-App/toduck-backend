@@ -47,7 +47,12 @@ public class EventsSocialUseCase {
 		Social socialBoard = socialBoardService.getSocialById(request.socialId())
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SOCIAL_BOARD));
 
-		if (socialBoard.getContent().length() < 100) {
+		if (!socialBoard.getUser().getId().equals(userId)) {
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_SOCIAL_BOARD);
+		}
+
+		String content = socialBoard.getContent();
+		if (content == null || content.length() < 100) {
 			throw CommonException.from(ExceptionCode.INVALID_CONTENT_LENGTH);
 		}
 
