@@ -188,6 +188,14 @@ public class SocialBoardService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<SocialImageFile> getSocialImagesBySocialIds(final List<Long> socialIds) {
+		if (socialIds == null || socialIds.isEmpty()) {
+			return List.of();
+		}
+		return socialImageFileRepository.findAllBySocialIdIn(socialIds);
+	}
+
+	@Transactional(readOnly = true)
 	public List<Social> getSocials(
 		final Long cursor,
 		final Integer limit,

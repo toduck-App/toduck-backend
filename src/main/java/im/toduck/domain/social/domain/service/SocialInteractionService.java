@@ -1,7 +1,11 @@
 package im.toduck.domain.social.domain.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +23,7 @@ import im.toduck.domain.social.persistence.entity.Like;
 import im.toduck.domain.social.persistence.entity.ReportType;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.social.persistence.entity.SocialReport;
+import im.toduck.domain.social.persistence.projection.SocialCommentCount;
 import im.toduck.domain.social.persistence.repository.CommentImageFileRepository;
 import im.toduck.domain.social.persistence.repository.CommentLikeRepository;
 import im.toduck.domain.social.persistence.repository.CommentReportRepository;
@@ -239,6 +244,30 @@ public class SocialInteractionService {
 	@Transactional(readOnly = true)
 	public int countActiveCommentsByUser(final User user) {
 		return commentRepository.countActiveCommentsByUser(user);
+	}
+
+	@Transactional(readOnly = true)
+	public Map<Long, Integer> countCommentsBySocialIds(final List<Long> socialIds) {
+		if (socialIds == null || socialIds.isEmpty()) {
+			return Map.of();
+		}
+
+		return commentRepository.countBySocialIdIn(socialIds)
+			.stream()
+			.collect(Collectors.toMap(
+				SocialCommentCount::getSocialId,
+				result -> result.getCount().intValue()
+			));
+	}
+
+	@Transactional(readOnly = true)
+	public Set<Long> getLikedSocialIdsByUserAndSocialIds(final User user, final List<Long> socialIds) {
+		if (socialIds == null || socialIds.isEmpty()) {
+			return Set.of();
+		}
+
+		List<Long> likedSocialIds = likeRepository.findSocialIdsByUserAndSocialIdIn(user, socialIds);
+		return new HashSet<>(likedSocialIds);
 	}
 }
 

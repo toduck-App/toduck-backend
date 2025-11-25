@@ -1,7 +1,10 @@
 package im.toduck.domain.social.domain.usecase;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,9 +48,9 @@ public class SocialBoardUseCase {
 
 	private final SocialBoardService socialBoardService;
 	private final SocialInteractionService socialInteractionService;
+	private final SocialCategoryService socialCategoryService;
 	private final UserService userService;
 	private final RoutineService routineService;
-	private final SocialCategoryService socialCategoryService;
 
 	@Transactional
 	public SocialCreateResponse createSocialBoard(final Long userId, final SocialCreateRequest request) {
@@ -178,7 +181,8 @@ public class SocialBoardUseCase {
 		boolean hasMore = PaginationUtil.hasMore(socialBoards, actualLimit);
 		Long nextCursor = PaginationUtil.getNextCursor(hasMore, socialBoards, actualLimit, Social::getId);
 
-		List<SocialResponse> socialResponses = createSocialResponses(socialBoards, user, actualLimit);
+		List<Social> limitedSocials = socialBoards.stream().limit(actualLimit).toList();
+		List<SocialResponse> socialResponses = buildSocialResponses(limitedSocials, user);
 
 		log.info("소셜 게시글 목록 조회 성공 - UserId: {}, HasMore: {}, NextCursor: {}", userId, hasMore, nextCursor);
 		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, socialResponses);
@@ -220,31 +224,6 @@ public class SocialBoardUseCase {
 		return CommentMapper.toCommentDto(comment, hasImage, imageUrl, isCommentLike, isBlocked);
 	}
 
-	private List<SocialResponse> createSocialResponses(
-		final List<Social> socialBoards,
-		final User requestingUser,
-		final int actualLimit
-	) {
-		return socialBoards.stream()
-			.limit(actualLimit)
-			.map(social -> {
-				List<SocialImageFile> imageFiles = socialBoardService.getSocialImagesBySocial(social);
-				int commentCount = socialInteractionService.countCommentsBySocial(social);
-				boolean isLikedByRequestingUser = socialInteractionService.getSocialBoardIsLiked(requestingUser,
-					social);
-				List<SocialCategoryDto> socialCategoryDtos = socialCategoryService.getSocialCategoryDtosBySocial(
-					social);
-				return SocialMapper.toSocialResponse(
-					social,
-					imageFiles,
-					socialCategoryDtos,
-					commentCount,
-					isLikedByRequestingUser
-				);
-			})
-			.toList();
-	}
-
 	@Transactional(readOnly = true)
 	public SocialCategoryResponse getAllCategories() {
 		List<SocialCategory> socialCategories = socialBoardService.findAllSocialCategories();
@@ -283,8 +262,38 @@ public class SocialBoardUseCase {
 		boolean hasMore = PaginationUtil.hasMore(searchResults, actualLimit);
 		Long nextCursor = PaginationUtil.getNextCursor(hasMore, searchResults, actualLimit, Social::getId);
 
-		List<SocialResponse> searchResponses = createSocialResponses(searchResults, user, actualLimit);
+		List<Social> limitedSocials = searchResults.stream().limit(actualLimit).toList();
+		List<SocialResponse> searchResponses = buildSocialResponses(limitedSocials, user);
 		return PaginationUtil.toCursorPaginationResponse(hasMore, nextCursor, searchResponses);
 	}
 
+	private List<SocialResponse> buildSocialResponses(final List<Social> socialBoards, final User requestingUser) {
+		if (socialBoards.isEmpty()) {
+			return List.of();
+		}
+
+		List<Long> socialIds = socialBoards.stream()
+			.map(Social::getId)
+			.toList();
+
+		Map<Long, List<SocialImageFile>> imageFilesBySocialId = socialBoardService.getSocialImagesBySocialIds(socialIds)
+			.stream()
+			.collect(Collectors.groupingBy(sif -> sif.getSocial().getId()));
+
+		Map<Long, Integer> commentCountsBySocialId = socialInteractionService.countCommentsBySocialIds(socialIds);
+		Set<Long> likedSocialIds = socialInteractionService.getLikedSocialIdsByUserAndSocialIds(
+			requestingUser,
+			socialIds
+		);
+		Map<Long, List<SocialCategoryDto>> categoryDtosBySocialId =
+			socialCategoryService.getSocialCategoryDtosBySocialIds(socialIds);
+
+		return SocialMapper.toSocialResponses(
+			socialBoards,
+			imageFilesBySocialId,
+			commentCountsBySocialId,
+			likedSocialIds,
+			categoryDtosBySocialId
+		);
+	}
 }
