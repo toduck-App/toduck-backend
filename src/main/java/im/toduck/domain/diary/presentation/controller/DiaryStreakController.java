@@ -29,4 +29,14 @@ public class DiaryStreakController implements DiaryStreakApi {
 		DiaryStreakResponse response = diaryStreakUseCase.getDiaryStreak(user.getUserId());
 		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
+
+	@Override
+	@GetMapping("/cached")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<DiaryStreakResponse>> getCachedDiaryStreak(
+		@AuthenticationPrincipal CustomUserDetails user
+	) {
+		DiaryStreakResponse response = diaryStreakUseCase.getCachedDiaryStreak(user.getUserId());
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
+	}
 }

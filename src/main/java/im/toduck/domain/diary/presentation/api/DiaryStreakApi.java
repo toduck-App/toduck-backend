@@ -38,4 +38,21 @@ public interface DiaryStreakApi {
 	ResponseEntity<ApiResponse<DiaryStreakResponse>> getDiaryStreak(
 		@AuthenticationPrincipal CustomUserDetails user
 	);
+
+	@Operation(
+		summary = "캐시에 저장된 일기 스트릭과 최근에 작성한 일기 날짜를 불러옵니다",
+		description =
+			"""
+				바탕화면의 위젯과 같이 자주 사용되는 곳에서 사용해 주세요.
+				"""
+	)
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			responseClass = DiaryStreakResponse.class,
+			description = "일기 스트릭 조회 성공, 해당 유저의 일기 스트릭과 최근에 작성한 일기 날짜를 반환합니다."
+		)
+	)
+	ResponseEntity<ApiResponse<DiaryStreakResponse>> getCachedDiaryStreak(
+		@AuthenticationPrincipal CustomUserDetails user
+	);
 }
