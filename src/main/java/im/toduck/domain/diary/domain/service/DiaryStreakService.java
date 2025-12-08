@@ -112,17 +112,9 @@ public class DiaryStreakService {
 
 		DiaryStreakResponse dto = DiaryStreakMapper.toDiaryStreakResponse(diaryStreak);
 		redisTemplate.opsForValue().set(CACHE_PREFIX + diaryStreak.getUser().getId(), serialize(dto),
-			6, TimeUnit.HOURS);
+			CACHE_TTL_HOURS, TimeUnit.HOURS);
 
 		return dto;
-	}
-
-	@Transactional
-	public void resetStreak(final Long userId) {
-		diaryStreakRepository.findByUser_Id(userId)
-			.ifPresent(diaryStreak -> diaryStreak.updateStreak(0L));
-
-		redisTemplate.delete(CACHE_PREFIX + userId);
 	}
 
 	@Transactional(readOnly = true)
