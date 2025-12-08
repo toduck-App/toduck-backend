@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
@@ -189,7 +190,7 @@ public class SocialBoardService {
 
 	@Transactional(readOnly = true)
 	public List<SocialImageFile> getSocialImagesBySocialIds(final List<Long> socialIds) {
-		if (socialIds == null || socialIds.isEmpty()) {
+		if (CollectionUtils.isEmpty(socialIds)) {
 			return List.of();
 		}
 		return socialImageFileRepository.findAllBySocialIdIn(socialIds);
