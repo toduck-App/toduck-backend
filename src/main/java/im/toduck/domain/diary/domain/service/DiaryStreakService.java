@@ -28,6 +28,7 @@ public class DiaryStreakService {
 	private final RedisTemplate<String, String> redisTemplate;
 
 	private static final String CACHE_PREFIX = "diaryStreak::";
+	private static final long CACHE_TTL_HOURS = 6L;
 
 	private String serialize(final DiaryStreakResponse dto) {
 		String dateStr = dto.lastDiaryDate() != null ? dto.lastDiaryDate().toString() : "";
@@ -47,7 +48,8 @@ public class DiaryStreakService {
 
 		if (diaryStreak == null) {
 			DiaryStreakResponse emptyDto = DiaryStreakMapper.toDiaryStreakResponseEmpty();
-			redisTemplate.opsForValue().set(CACHE_PREFIX + userId, serialize(emptyDto), 6, TimeUnit.HOURS);
+			redisTemplate.opsForValue()
+				.set(CACHE_PREFIX + userId, serialize(emptyDto), CACHE_TTL_HOURS, TimeUnit.HOURS);
 			return emptyDto;
 		}
 
@@ -62,7 +64,7 @@ public class DiaryStreakService {
 		}
 
 		DiaryStreakResponse dto = DiaryStreakMapper.toDiaryStreakResponse(diaryStreak);
-		redisTemplate.opsForValue().set(CACHE_PREFIX + userId, serialize(dto), 6, TimeUnit.HOURS);
+		redisTemplate.opsForValue().set(CACHE_PREFIX + userId, serialize(dto), CACHE_TTL_HOURS, TimeUnit.HOURS);
 		return dto;
 	}
 
@@ -89,7 +91,7 @@ public class DiaryStreakService {
 		diaryStreakRepository.save(diaryStreak);
 
 		DiaryStreakResponse dto = DiaryStreakMapper.toDiaryStreakResponse(diaryStreak);
-		redisTemplate.opsForValue().set(CACHE_PREFIX + user.getId(), serialize(dto), 6, TimeUnit.HOURS);
+		redisTemplate.opsForValue().set(CACHE_PREFIX + user.getId(), serialize(dto), CACHE_TTL_HOURS, TimeUnit.HOURS);
 
 		return dto;
 	}

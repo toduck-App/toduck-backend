@@ -60,6 +60,11 @@ public class DiaryStreakUseCase {
 			return;
 		}
 
+		if (lastDiaryDate == null) {
+			diaryStreakService.updateDiaryStreak(diaryStreak, 1L, today);
+			return;
+		}
+
 		if (requestDate.isEqual(lastDiaryDate)) { // 이미 오늘 일기를 작성한 경우 예외처리
 			return;
 		}
