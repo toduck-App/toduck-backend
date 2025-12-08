@@ -34,6 +34,8 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 	) {
 		JPAQuery<Social> query = queryFactory
 			.selectFrom(qSocial)
+			.leftJoin(qSocial.user).fetchJoin()
+			.leftJoin(qSocial.routine).fetchJoin()
 			.where(
 				qSocial.deletedAt.isNull(),
 				excludeBlockedUsers(currentUserId),
@@ -55,6 +57,8 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 	) {
 		JPAQuery<Social> query = queryFactory
 			.selectFrom(qSocial)
+			.leftJoin(qSocial.user).fetchJoin()
+			.leftJoin(qSocial.routine).fetchJoin()
 			.where(
 				qSocial.deletedAt.isNull(),
 				excludeBlockedUsers(currentUserId),
