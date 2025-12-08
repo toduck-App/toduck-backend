@@ -25,7 +25,6 @@ public class EventsDetailRepositoryCustomImpl implements EventsDetailRepositoryC
 		return queryFactory
 			.selectFrom(ed)
 			.leftJoin(ed.eventsDetailImgs, edi).fetchJoin()
-			.orderBy(ed.id.asc())
 			.fetch();
 	}
 }
