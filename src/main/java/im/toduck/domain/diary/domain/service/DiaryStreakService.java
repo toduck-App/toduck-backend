@@ -1,7 +1,9 @@
 package im.toduck.domain.diary.domain.service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -39,11 +41,36 @@ public class DiaryStreakService {
 		return new DiaryStreakResponse(streak, lastDiaryDate);
 	}
 
-	@Transactional(readOnly = true)
-	public DiaryStreakResponse getDiaryStreakAndLastDiaryDate(final Long userId) {
-		String cached = redisTemplate.opsForValue().get(CACHE_PREFIX + userId);
+	@Transactional
+	public DiaryStreakResponse synchronizeAndGetFromDb(final Long userId) {
+		DiaryStreak diaryStreak = diaryStreakRepository.findByUser_Id(userId).orElse(null);
 
-		if (cached != null) {
+		if (diaryStreak == null) {
+			DiaryStreakResponse emptyDto = DiaryStreakMapper.toDiaryStreakResponseEmpty();
+			redisTemplate.opsForValue().set(CACHE_PREFIX + userId, serialize(emptyDto), 6, TimeUnit.HOURS);
+			return emptyDto;
+		}
+
+		LocalDate today = LocalDate.now();
+		LocalDate lastDiaryDate = diaryStreak.getLastDiaryDate();
+		Long streak = diaryStreak.getStreak();
+
+		if (lastDiaryDate != null
+			&& ChronoUnit.DAYS.between(lastDiaryDate, today) > 1
+			&& streak > 0) { // 스트릭이 채워져 있었는데 마지막 작성일과 오늘 날짜가 이틀 이상 차이나서 초기화
+			diaryStreak.reset();
+		}
+
+		DiaryStreakResponse dto = DiaryStreakMapper.toDiaryStreakResponse(diaryStreak);
+		redisTemplate.opsForValue().set(CACHE_PREFIX + userId, serialize(dto), 6, TimeUnit.HOURS);
+		return dto;
+	}
+
+	public DiaryStreakResponse getCachedDiaryStreakAndLastDiaryDate(final Long userId) {
+		String cacheKey = CACHE_PREFIX + userId;
+		String cached = redisTemplate.opsForValue().get(cacheKey);
+
+		if (cached != null) { // 캐싱 된 경우
 			try {
 				return deserialize(cached);
 			} catch (Exception e) {
@@ -52,13 +79,8 @@ public class DiaryStreakService {
 			}
 		}
 
-		DiaryStreakResponse dto = diaryStreakRepository.findByUser_Id(userId)
-			.map(DiaryStreakMapper::toDiaryStreakResponse)
-			.orElse(DiaryStreakMapper.toDiaryStreakResponseEmpty());
-
-		redisTemplate.opsForValue().set(CACHE_PREFIX + userId, serialize(dto));
-
-		return dto;
+		// 캐싱 안된 경우
+		return synchronizeAndGetFromDb(userId);
 	}
 
 	@Transactional
@@ -67,7 +89,7 @@ public class DiaryStreakService {
 		diaryStreakRepository.save(diaryStreak);
 
 		DiaryStreakResponse dto = DiaryStreakMapper.toDiaryStreakResponse(diaryStreak);
-		redisTemplate.opsForValue().set(CACHE_PREFIX + user.getId(), serialize(dto));
+		redisTemplate.opsForValue().set(CACHE_PREFIX + user.getId(), serialize(dto), 6, TimeUnit.HOURS);
 
 		return dto;
 	}
@@ -87,7 +109,8 @@ public class DiaryStreakService {
 		}
 
 		DiaryStreakResponse dto = DiaryStreakMapper.toDiaryStreakResponse(diaryStreak);
-		redisTemplate.opsForValue().set(CACHE_PREFIX + diaryStreak.getUser().getId(), serialize(dto));
+		redisTemplate.opsForValue().set(CACHE_PREFIX + diaryStreak.getUser().getId(), serialize(dto),
+			6, TimeUnit.HOURS);
 
 		return dto;
 	}

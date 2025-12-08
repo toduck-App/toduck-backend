@@ -1,12 +1,10 @@
 package im.toduck.domain.diary.domain.usecase;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import im.toduck.domain.diary.common.mapper.DiaryStreakMapper;
 import im.toduck.domain.diary.domain.service.DiaryStreakService;
 import im.toduck.domain.diary.persistence.entity.DiaryStreak;
 import im.toduck.domain.diary.presentation.dto.response.DiaryStreakResponse;
@@ -30,21 +28,11 @@ public class DiaryStreakUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		DiaryStreakResponse response = diaryStreakService.getDiaryStreakAndLastDiaryDate(user.getId());
-		LocalDate today = LocalDate.now();
-		LocalDate lastDiaryDate = response.lastDiaryDate();
-		Long streak = response.streak();
+		return diaryStreakService.synchronizeAndGetFromDb(user.getId());
+	}
 
-		if (lastDiaryDate != null
-			&& ChronoUnit.DAYS.between(lastDiaryDate, today) > 1
-			&& streak > 0) {
-			Optional<DiaryStreak> optionalDiaryStreak = diaryStreakService.getDiaryStreak(userId);
-			if (optionalDiaryStreak.isEmpty()) {
-				return DiaryStreakMapper.toDiaryStreakResponseEmpty();
-			}
-			diaryStreakService.resetStreak(userId);
-			response = diaryStreakService.getDiaryStreakAndLastDiaryDate(user.getId());
-		}
+	public DiaryStreakResponse getCachedDiaryStreak(final Long userId) {
+		DiaryStreakResponse response = diaryStreakService.getCachedDiaryStreakAndLastDiaryDate(userId);
 		return response;
 	}
 
@@ -53,10 +41,11 @@ public class DiaryStreakUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
+		// 일기 작성 시 해당 함수 실행
 		Optional<DiaryStreak> optionalDiaryStreak = diaryStreakService.getDiaryStreak(user.getId());
 
-		if (optionalDiaryStreak.isEmpty()) {
-			if (today.isEqual(requestDate)) {
+		if (optionalDiaryStreak.isEmpty()) { // 스트릭 최초 생성시
+			if (today.isEqual(requestDate)) { // 오늘 날짜에 일기를 작성하는 경우
 				diaryStreakService.createDiaryStreak(user, 1L, today);
 			}
 			return;
@@ -67,18 +56,18 @@ public class DiaryStreakUseCase {
 		Long streak = diaryStreak.getStreak();
 		LocalDate lastDiaryDate = diaryStreak.getLastDiaryDate();
 
-		if (!today.isEqual(requestDate)) {
+		if (!today.isEqual(requestDate)) { // 오늘 날짜랑 일기 작성 날짜가 다른 경우 예외처리
 			return;
 		}
 
-		if (requestDate.isEqual(lastDiaryDate)) {
+		if (requestDate.isEqual(lastDiaryDate)) { // 이미 오늘 일기를 작성한 경우 예외처리
 			return;
 		}
 
-		if (requestDate.isEqual(lastDiaryDate.plusDays(1))) {
-			diaryStreakService.updateDiaryStreak(diaryStreak, streak + 1, today);
+		if (requestDate.isEqual(lastDiaryDate.plusDays(1))) { // 최근 스트릭이 저장된 날이랑 비교해서 하루 차이나면
+			diaryStreakService.updateDiaryStreak(diaryStreak, streak + 1, today); // 기존 스트릭 + 1
 		} else {
-			diaryStreakService.updateDiaryStreak(diaryStreak, 1L, today);
+			diaryStreakService.updateDiaryStreak(diaryStreak, 1L, today); // 이틀 이상 차이나면 1로 초기화
 		}
 	}
 }
