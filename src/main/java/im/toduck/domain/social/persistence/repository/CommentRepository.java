@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.Social;
+import im.toduck.domain.social.persistence.projection.SocialCommentCount;
 import im.toduck.domain.social.persistence.repository.querydsl.CommentRepositoryCustom;
 import im.toduck.domain.user.persistence.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -32,4 +33,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
 		@Param("startDateTime") LocalDateTime startDateTime,
 		@Param("endDateTime") LocalDateTime endDateTime
 	);
+
+	@Query("SELECT c.social.id as socialId, COUNT(c) as count FROM Comment c "
+		+ "WHERE c.social.id IN :socialIds AND c.deletedAt IS NULL "
+		+ "GROUP BY c.social.id")
+	List<SocialCommentCount> countBySocialIdIn(@Param("socialIds") List<Long> socialIds);
 }

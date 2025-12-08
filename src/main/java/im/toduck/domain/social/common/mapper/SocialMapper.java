@@ -1,6 +1,8 @@
 package im.toduck.domain.social.common.mapper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import im.toduck.domain.routine.common.mapper.RoutineMapper;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -84,6 +86,27 @@ public class SocialMapper {
 			.categories(socialCategoryDtos)
 			.createdAt(socialBoard.getCreatedAt())
 			.build();
+	}
+
+	public static List<SocialResponse> toSocialResponses(
+		final List<Social> socialBoards,
+		final Map<Long, List<SocialImageFile>> imageFilesBySocialId,
+		final Map<Long, Integer> commentCountsBySocialId,
+		final Set<Long> likedSocialIds,
+		final Map<Long, List<SocialCategoryDto>> categoryDtosBySocialId
+	) {
+		return socialBoards.stream()
+			.map(social -> {
+				Long socialId = social.getId();
+				return toSocialResponse(
+					social,
+					imageFilesBySocialId.getOrDefault(socialId, List.of()),
+					categoryDtosBySocialId.getOrDefault(socialId, List.of()),
+					commentCountsBySocialId.getOrDefault(socialId, 0),
+					likedSocialIds.contains(socialId)
+				);
+			})
+			.toList();
 	}
 
 	private static SocialLikeDto getSocialLikeDto(Social socialBoard, boolean isLiked) {

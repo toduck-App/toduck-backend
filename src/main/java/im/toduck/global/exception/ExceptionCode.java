@@ -122,6 +122,7 @@ public enum ExceptionCode {
 	ALREADY_EXISTS_EVENTSSOCIAL(HttpStatus.CONFLICT, 41201, "이미 참여한 유저입니다."),
 	UNAUTHORIZED_ACCESS_EVENTSSOCIAL(HttpStatus.FORBIDDEN, 41202, "소셜 이벤트에 접근 권한이 없습니다."),
 	NOT_FOUND_EVENTS_SOCIAL(HttpStatus.NOT_FOUND, 41203, "소셜 이벤트 참여 정보를 찾을 수 없습니다."),
+	INVALID_CONTENT_LENGTH(HttpStatus.BAD_REQUEST, 41204, "소셜 게시글 글자 수가 이벤트 참여 조건에 부합하지 않습니다."),
 
 	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",
