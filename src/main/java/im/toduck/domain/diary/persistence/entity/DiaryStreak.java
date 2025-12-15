@@ -50,4 +50,8 @@ public class DiaryStreak {
 	public void updateLastDiaryDate(LocalDate lastDiaryDate) {
 		this.lastDiaryDate = lastDiaryDate;
 	}
+
+	public void reset() {
+		this.streak = 0L;
+	}
 }
