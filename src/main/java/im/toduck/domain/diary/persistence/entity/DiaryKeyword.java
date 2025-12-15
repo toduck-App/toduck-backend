@@ -1,8 +1,5 @@
 package im.toduck.domain.diary.persistence.entity;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,8 +17,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "diary_keywords")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE diary_keywords SET deleted_at = NOW() where id=?")
-@SQLRestriction(value = "deleted_at is NULL")
 public class DiaryKeyword extends BaseEntity {
 
 	@Id
