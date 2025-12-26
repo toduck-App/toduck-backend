@@ -10,8 +10,13 @@ import lombok.NoArgsConstructor;
 public class BroadcastNotificationData extends AbstractNotificationData {
 	private String title;
 	private String message;
+	private String actionUrl;
 
-	public static BroadcastNotificationData of(final String title, final String message) {
-		return new BroadcastNotificationData(title, message);
+	public static BroadcastNotificationData of(
+		final String title,
+		final String message,
+		final String actionUrl
+	) {
+		return new BroadcastNotificationData(title, message, actionUrl);
 	}
 }

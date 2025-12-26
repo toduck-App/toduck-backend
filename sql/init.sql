@@ -788,3 +788,11 @@ CREATE TABLE app_version (
 
 -- 일기 글자수 변경(varchar(2048) -> text) text는 2^16-1 byte까지 저장되고 한글 기준 21,000자 저장 가능
 ALTER TABLE diary MODIFY memo TEXT;
+
+-- broadcast_notification 테이블에 action_url 컬럼 추가
+ALTER TABLE broadcast_notification
+ADD COLUMN action_url VARCHAR(500) NOT NULL DEFAULT 'toduck://home' AFTER failure_reason;
+
+-- 기존 데이터에 대해 기본값 적용 후 DEFAULT 제거
+ALTER TABLE broadcast_notification
+ALTER COLUMN action_url DROP DEFAULT;
