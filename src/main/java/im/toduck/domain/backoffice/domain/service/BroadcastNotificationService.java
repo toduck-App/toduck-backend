@@ -45,7 +45,8 @@ public class BroadcastNotificationService {
 	public BroadcastNotification createBroadcastNotification(
 		final String title,
 		final String message,
-		final LocalDateTime scheduledAt
+		final LocalDateTime scheduledAt,
+		final String actionUrl
 	) {
 		List<Long> activeUserIds = userService.getAllActiveUserIds();
 		String jobKey = generateJobKey();
@@ -55,7 +56,8 @@ public class BroadcastNotificationService {
 			message,
 			scheduledAt,
 			activeUserIds.size(),
-			jobKey
+			jobKey,
+			actionUrl
 		);
 
 		BroadcastNotification savedNotification = broadcastNotificationRepository.save(notification);

@@ -9,11 +9,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.backoffice.common.helper.NotificationPlaceholderResolver;
 import im.toduck.domain.backoffice.domain.service.BroadcastNotificationService;
 import im.toduck.domain.backoffice.persistence.entity.BroadcastNotification;
 import im.toduck.domain.notification.domain.event.BroadcastNotificationEvent;
 import im.toduck.domain.notification.messaging.NotificationMessagePublisher;
 import im.toduck.domain.user.domain.service.UserService;
+import im.toduck.domain.user.persistence.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,24 +45,32 @@ public class BroadcastNotificationEventListener {
 			notification.markAsSending();
 			broadcastNotificationService.save(notification);
 
-			List<Long> activeUserIds = userService.getAllActiveUserIds();
+			List<User> activeUsers = userService.getAllActiveUsers();
 
-			log.info("브로드캐스트 알림 발송 시작 - BroadcastId: {}, 대상 사용자 수: {}",
-				event.getBroadcastId(), activeUserIds.size());
+			log.info("브로드캐스트 알림 발송 시작 - BroadcastId: {}, 대상 사용자 수: {}, actionUrl: {}",
+				event.getBroadcastId(), activeUsers.size(), notification.getActionUrl());
 
-			// 각 사용자에게 브로드캐스트 알림 이벤트 발행
-			for (Long userId : activeUserIds) {
+			for (User user : activeUsers) {
+				String nickname = user.getNickname();
+				String resolvedTitle = NotificationPlaceholderResolver.resolve(notification.getTitle(), nickname);
+				String resolvedMessage = NotificationPlaceholderResolver.resolve(notification.getMessage(), nickname);
+
 				BroadcastNotificationEvent notificationEvent = BroadcastNotificationEvent.of(
-					userId, notification.getTitle(), notification.getMessage()
+					user.getId(),
+					resolvedTitle,
+					resolvedMessage,
+					notification.getActionUrl()
 				);
 				notificationMessagePublisher.publishNotificationEvent(notificationEvent);
 			}
 
-			notification.markAsCompleted(activeUserIds.size());
+			notification.markAsCompleted(activeUsers.size());
 			broadcastNotificationService.save(notification);
 
-			log.info("브로드캐스트 알림 이벤트 발행 완료 - BroadcastId: {}, 발행된 이벤트 수: {}",
-				event.getBroadcastId(), activeUserIds.size());
+			log.info(
+				"브로드캐스트 알림 이벤트 발행 완료 - BroadcastId: {}, 발행된 이벤트 수: {}",
+				event.getBroadcastId(), activeUsers.size()
+			);
 
 		} catch (Exception e) {
 			Optional<BroadcastNotification> optionalNotification =

@@ -47,6 +47,11 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<User> getAllActiveUsers() {
+		return userRepository.findAllActiveUsers();
+	}
+
+	@Transactional(readOnly = true)
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
 	}

@@ -14,10 +14,15 @@ public class BroadcastNotificationEvent extends NotificationEvent<BroadcastNotif
 		super(userId, NotificationType.BROADCAST, data);
 	}
 
-	public static BroadcastNotificationEvent of(final Long userId, final String title, final String message) {
+	public static BroadcastNotificationEvent of(
+		final Long userId,
+		final String title,
+		final String message,
+		final String actionUrl
+	) {
 		return new BroadcastNotificationEvent(
 			userId,
-			BroadcastNotificationData.of(title, message)
+			BroadcastNotificationData.of(title, message, actionUrl)
 		);
 	}
 
@@ -43,6 +48,6 @@ public class BroadcastNotificationEvent extends NotificationEvent<BroadcastNotif
 
 	@Override
 	public String getActionUrl() {
-		return "toduck://notification";
+		return getData().getActionUrl();
 	}
 }
