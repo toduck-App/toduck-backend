@@ -33,7 +33,8 @@ public class BroadcastNotificationUseCase {
 		BroadcastNotification notification = broadcastNotificationService.createBroadcastNotification(
 			request.title(),
 			request.message(),
-			request.scheduledAt()
+			request.scheduledAt(),
+			request.actionUrl()
 		);
 
 		if (request.scheduledAt() == null) {

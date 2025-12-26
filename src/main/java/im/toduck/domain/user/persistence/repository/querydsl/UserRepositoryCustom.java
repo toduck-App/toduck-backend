@@ -12,6 +12,8 @@ import im.toduck.domain.user.persistence.entity.UserRole;
 public interface UserRepositoryCustom {
 	List<Long> findAllActiveUserIds();
 
+	List<User> findAllActiveUsers();
+
 	void updateNickname(User user, String nickname);
 
 	void updateProfileImageUrl(User user, String imageUrl);

@@ -22,6 +22,9 @@ public record BroadcastNotificationResponse(
 	@Schema(description = "알림 메시지", example = "새로운 기능이 추가되었습니다.")
 	String message,
 
+	@Schema(description = "알림 클릭 시 이동할 딥링크", example = "toduck://notification")
+	String actionUrl,
+
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	@Schema(description = "예약 발송 시간", type = "string", pattern = "yyyy-MM-dd HH:mm", example = "2024-12-25 10:00")

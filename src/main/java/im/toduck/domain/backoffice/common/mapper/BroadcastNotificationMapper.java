@@ -18,7 +18,8 @@ public final class BroadcastNotificationMapper {
 		final String message,
 		final LocalDateTime scheduledAt,
 		final int targetUserCount,
-		final String jobKey
+		final String jobKey,
+		final String actionUrl
 	) {
 		return BroadcastNotification.builder()
 			.title(title)
@@ -27,6 +28,7 @@ public final class BroadcastNotificationMapper {
 			.status(scheduledAt == null ? BroadcastNotificationStatus.SENDING : BroadcastNotificationStatus.SCHEDULED)
 			.targetUserCount(targetUserCount)
 			.jobKey(jobKey)
+			.actionUrl(actionUrl)
 			.build();
 	}
 
@@ -37,6 +39,7 @@ public final class BroadcastNotificationMapper {
 			.id(notification.getId())
 			.title(notification.getTitle())
 			.message(notification.getMessage())
+			.actionUrl(notification.getActionUrl())
 			.scheduledAt(notification.getScheduledAt())
 			.sentAt(notification.getSentAt())
 			.status(notification.getStatus())

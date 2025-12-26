@@ -54,6 +54,9 @@ public class BroadcastNotification extends BaseEntity {
 	@Column(name = "failure_reason", length = 500)
 	private String failureReason;
 
+	@Column(name = "action_url", nullable = false, length = 500)
+	private String actionUrl;
+
 	@Builder
 	private BroadcastNotification(
 		final String title,
@@ -61,7 +64,8 @@ public class BroadcastNotification extends BaseEntity {
 		final LocalDateTime scheduledAt,
 		final BroadcastNotificationStatus status,
 		final Integer targetUserCount,
-		final String jobKey
+		final String jobKey,
+		final String actionUrl
 	) {
 		this.title = title;
 		this.message = message;
@@ -69,6 +73,7 @@ public class BroadcastNotification extends BaseEntity {
 		this.status = status;
 		this.targetUserCount = targetUserCount;
 		this.jobKey = jobKey;
+		this.actionUrl = actionUrl;
 	}
 
 	public void markAsSending() {

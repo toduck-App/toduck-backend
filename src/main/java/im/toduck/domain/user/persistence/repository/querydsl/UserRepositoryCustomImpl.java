@@ -37,6 +37,13 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 	}
 
 	@Override
+	public List<User> findAllActiveUsers() {
+		return queryFactory.selectFrom(qUser)
+			.where(qUser.deletedAt.isNull())
+			.fetch();
+	}
+
+	@Override
 	public void updateNickname(User user, String nickname) {
 		queryFactory.update(qUser)
 			.set(qUser.nickname, nickname)
