@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.domain.user.persistence.entity.UserRole;
+import im.toduck.global.persistence.projection.DailyCount;
 
 public interface UserRepositoryCustom {
 	List<Long> findAllActiveUserIds();
@@ -40,4 +41,14 @@ public interface UserRepositoryCustom {
 	);
 
 	long countByProvider(final String provider);
+
+	List<DailyCount> countNewUsersByDateBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	);
+
+	List<DailyCount> countDeletedUsersByDateBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	);
 }

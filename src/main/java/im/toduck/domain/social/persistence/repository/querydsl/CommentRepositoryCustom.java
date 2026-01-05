@@ -1,15 +1,22 @@
 package im.toduck.domain.social.persistence.repository.querydsl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
 import im.toduck.domain.mypage.presentation.dto.response.MyCommentsResponse;
+import im.toduck.global.persistence.projection.DailyCount;
 
 public interface CommentRepositoryCustom {
 	List<MyCommentsResponse> findMyCommentsWithProjection(
 		Long userId,
 		Long cursor,
 		Pageable pageable
+	);
+
+	List<DailyCount> countByCreatedAtBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
 	);
 }

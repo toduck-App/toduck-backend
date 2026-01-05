@@ -1,5 +1,6 @@
 package im.toduck.domain.user.persistence.repository.querydsl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,8 @@ import im.toduck.domain.user.persistence.entity.QBlock;
 import im.toduck.domain.user.persistence.entity.QUser;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.domain.user.persistence.entity.UserRole;
+import im.toduck.global.persistence.helper.DailyCountQueryHelper;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -264,5 +267,25 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 			.fetchOne();
 
 		return count != null ? count : 0L;
+	}
+
+	@Override
+	public List<DailyCount> countNewUsersByDateBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	) {
+		return DailyCountQueryHelper.countGroupByDate(
+			queryFactory, qUser, qUser.createdAt, qUser.count(), startDateTime, endDateTime
+		);
+	}
+
+	@Override
+	public List<DailyCount> countDeletedUsersByDateBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	) {
+		return DailyCountQueryHelper.countGroupByDate(
+			queryFactory, qUser, qUser.deletedAt, qUser.count(), startDateTime, endDateTime
+		);
 	}
 }

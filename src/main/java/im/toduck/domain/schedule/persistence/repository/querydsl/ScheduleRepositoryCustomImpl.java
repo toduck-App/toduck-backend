@@ -1,6 +1,7 @@
 package im.toduck.domain.schedule.persistence.repository.querydsl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import im.toduck.domain.schedule.persistence.entity.QSchedule;
 import im.toduck.domain.schedule.persistence.entity.Schedule;
+import im.toduck.global.persistence.helper.DailyCountQueryHelper;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -54,5 +57,15 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom {
 		return schedule.scheduleDate.startDate.ne(schedule.scheduleDate.endDate) // 시작일 ≠ 종료일 → 기간 일정
 			.and(schedule.scheduleDate.endDate.goe(startDate)) // 조회 시작일이 일정 종료일보다 같거나 작아야 함
 			.and(schedule.scheduleDate.startDate.loe(endDate)); // 일정 시작일이 조회 종료일보다 같거나 작아야 함
+	}
+
+	@Override
+	public List<DailyCount> countByCreatedAtBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	) {
+		return DailyCountQueryHelper.countGroupByDate(
+			queryFactory, schedule, schedule.createdAt, schedule.count(), startDateTime, endDateTime
+		);
 	}
 }
