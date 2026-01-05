@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ import im.toduck.domain.social.presentation.dto.request.SocialUpdateRequest;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.persistence.projection.DailyCount;
 import im.toduck.global.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -284,6 +287,38 @@ public class SocialBoardService {
 		LocalDateTime startDateTime = startDate.atStartOfDay();
 		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 		return commentRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public Map<LocalDate, Long> getSocialPostsCountByDateRangeGroupByDate(
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+		List<DailyCount> dailyCounts = socialRepository.countByCreatedAtBetweenGroupByDate(
+			startDateTime, endDateTime
+		);
+
+		return dailyCounts.stream()
+			.collect(Collectors.toMap(DailyCount::date, DailyCount::count));
+	}
+
+	@Transactional(readOnly = true)
+	public Map<LocalDate, Long> getCommentsCountByDateRangeGroupByDate(
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+		List<DailyCount> dailyCounts = commentRepository.countByCreatedAtBetweenGroupByDate(
+			startDateTime, endDateTime
+		);
+
+		return dailyCounts.stream()
+			.collect(Collectors.toMap(DailyCount::date, DailyCount::count));
 	}
 }
 

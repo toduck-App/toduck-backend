@@ -16,6 +16,8 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.routine.persistence.entity.RoutineRecord;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.helper.DaysOfWeekBitmask;
+import im.toduck.global.persistence.helper.DailyCountQueryHelper;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -140,5 +142,15 @@ public class RoutineRepositoryCustomImpl implements RoutineRepositoryCustom {
 		return Expressions.numberTemplate(
 			Byte.class, "function('bitand', {0}, CAST({1} as byte))", qRoutine.daysOfWeekBitmask, periodDaysBitmask
 		).gt((byte)0);
+	}
+
+	@Override
+	public List<DailyCount> countByCreatedAtBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	) {
+		return DailyCountQueryHelper.countGroupByDate(
+			queryFactory, qRoutine, qRoutine.createdAt, qRoutine.count(), startDateTime, endDateTime
+		);
 	}
 }

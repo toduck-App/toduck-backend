@@ -6,7 +6,9 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import im.toduck.domain.diary.presentation.dto.response.DiaryResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -142,5 +145,21 @@ public class DiaryService {
 	public Diary getDiaryByIdAndUserId(Long userId, Long diaryId) {
 		return diaryRepository.getDiaryByUserIdAndId(userId, diaryId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_DIARY));
+	}
+
+	@Transactional(readOnly = true)
+	public Map<LocalDate, Long> getDiaryCountByDateRangeGroupByDate(
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+		List<DailyCount> dailyCounts = diaryRepository.countByCreatedAtBetweenGroupByDate(
+			startDateTime, endDateTime
+		);
+
+		return dailyCounts.stream()
+			.collect(Collectors.toMap(DailyCount::date, DailyCount::count));
 	}
 }

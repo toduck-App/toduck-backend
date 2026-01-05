@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import im.toduck.domain.user.persistence.repository.BlockRepository;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -169,5 +172,37 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public long getCountByProvider(final String provider) {
 		return userRepository.countByProvider(provider);
+	}
+
+	@Transactional(readOnly = true)
+	public Map<LocalDate, Long> getNewUsersCountByDateRangeGroupByDate(
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+		List<DailyCount> dailyCounts = userRepository.countNewUsersByDateBetweenGroupByDate(
+			startDateTime, endDateTime
+		);
+
+		return dailyCounts.stream()
+			.collect(Collectors.toMap(DailyCount::date, DailyCount::count));
+	}
+
+	@Transactional(readOnly = true)
+	public Map<LocalDate, Long> getDeletedUsersCountByDateRangeGroupByDate(
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+		List<DailyCount> dailyCounts = userRepository.countDeletedUsersByDateBetweenGroupByDate(
+			startDateTime, endDateTime
+		);
+
+		return dailyCounts.stream()
+			.collect(Collectors.toMap(DailyCount::date, DailyCount::count));
 	}
 }

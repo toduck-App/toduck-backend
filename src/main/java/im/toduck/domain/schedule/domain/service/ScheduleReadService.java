@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import im.toduck.domain.schedule.presentation.dto.response.ScheduleInfoResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -73,5 +76,20 @@ public class ScheduleReadService {
 		LocalDateTime startDateTime = startDate.atStartOfDay();
 		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 		return scheduleRepository.countByCreatedAtBetween(startDateTime, endDateTime);
+	}
+
+	@Transactional(readOnly = true)
+	public Map<LocalDate, Long> getSchedulesCountByDateRangeGroupByDate(
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+		List<DailyCount> dailyCounts = scheduleRepository.countByCreatedAtBetweenGroupByDate(
+			startDateTime, endDateTime
+		);
+
+		return dailyCounts.stream().collect(Collectors.toMap(DailyCount::date, DailyCount::count));
 	}
 }

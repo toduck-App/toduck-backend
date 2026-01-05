@@ -1,7 +1,6 @@
 package im.toduck.domain.backoffice.domain.usecase;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -30,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class StatisticsUseCase {
-	private static final int MAX_STATISTICS_DATE_RANGE_DAYS = 31;
-
 	private final UserService userService;
 	private final DiaryService diaryService;
 	private final RoutineService routineService;
@@ -81,6 +78,11 @@ public class StatisticsUseCase {
 	) {
 		validateDateRange(startDate, endDate);
 
+		Map<StatisticsType, Map<LocalDate, Long>> statisticsByType = new EnumMap<>(StatisticsType.class);
+		for (StatisticsType type : types) {
+			statisticsByType.put(type, getDailyCountsByTypeAndDateRange(type, startDate, endDate));
+		}
+
 		List<DailyStatisticsResponse> statisticsDataList = new ArrayList<>();
 		LocalDate currentDate = startDate;
 
@@ -88,8 +90,7 @@ public class StatisticsUseCase {
 			Map<StatisticsType, Long> counts = new EnumMap<>(StatisticsType.class);
 
 			for (StatisticsType type : types) {
-				long count = getStatisticsCountByTypeAndDate(type, currentDate);
-				counts.put(type, count);
+				counts.put(type, statisticsByType.get(type).getOrDefault(currentDate, 0L));
 			}
 
 			statisticsDataList.add(StatisticsMapper.toDailyStatisticsResponse(currentDate, counts));
@@ -106,11 +107,6 @@ public class StatisticsUseCase {
 
 	private void validateDateRange(final LocalDate startDate, final LocalDate endDate) {
 		if (startDate.isAfter(endDate)) {
-			throw CommonException.from(ExceptionCode.INVALID_STATISTICS_DATE_RANGE);
-		}
-
-		long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
-		if (daysBetween > MAX_STATISTICS_DATE_RANGE_DAYS) {
 			throw CommonException.from(ExceptionCode.INVALID_STATISTICS_DATE_RANGE);
 		}
 	}
@@ -155,4 +151,19 @@ public class StatisticsUseCase {
 		};
 	}
 
+	private Map<LocalDate, Long> getDailyCountsByTypeAndDateRange(
+		final StatisticsType type,
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		return switch (type) {
+			case NEW_USERS -> userService.getNewUsersCountByDateRangeGroupByDate(startDate, endDate);
+			case DELETED_USERS -> userService.getDeletedUsersCountByDateRangeGroupByDate(startDate, endDate);
+			case NEW_ROUTINES -> routineService.getRoutineCountByDateRangeGroupByDate(startDate, endDate);
+			case NEW_DIARIES -> diaryService.getDiaryCountByDateRangeGroupByDate(startDate, endDate);
+			case NEW_SOCIAL_POSTS -> socialBoardService.getSocialPostsCountByDateRangeGroupByDate(startDate, endDate);
+			case NEW_COMMENTS -> socialBoardService.getCommentsCountByDateRangeGroupByDate(startDate, endDate);
+			case NEW_SCHEDULES -> scheduleReadService.getSchedulesCountByDateRangeGroupByDate(startDate, endDate);
+		};
+	}
 }

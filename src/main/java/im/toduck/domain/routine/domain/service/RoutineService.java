@@ -25,6 +25,7 @@ import im.toduck.domain.routine.presentation.dto.response.RoutineCreateResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -175,5 +176,21 @@ public class RoutineService {
 	@Transactional(readOnly = true)
 	public long getActiveRoutineUsersCount() {
 		return routineRepository.countDistinctUsers();
+	}
+
+	@Transactional(readOnly = true)
+	public Map<LocalDate, Long> getRoutineCountByDateRangeGroupByDate(
+		final LocalDate startDate,
+		final LocalDate endDate
+	) {
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+		List<DailyCount> dailyCounts = routineRepository.countByCreatedAtBetweenGroupByDate(
+			startDateTime, endDateTime
+		);
+
+		return dailyCounts.stream()
+			.collect(Collectors.toMap(DailyCount::date, DailyCount::count));
 	}
 }
