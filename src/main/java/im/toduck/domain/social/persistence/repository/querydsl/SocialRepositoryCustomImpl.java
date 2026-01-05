@@ -1,5 +1,6 @@
 package im.toduck.domain.social.persistence.repository.querydsl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,8 @@ import im.toduck.domain.social.persistence.entity.QSocialCategory;
 import im.toduck.domain.social.persistence.entity.QSocialCategoryLink;
 import im.toduck.domain.social.persistence.entity.Social;
 import im.toduck.domain.user.persistence.entity.QBlock;
+import im.toduck.global.persistence.helper.DailyCountQueryHelper;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -132,5 +135,15 @@ public class SocialRepositoryCustomImpl implements SocialRepositoryCustom {
 				.groupBy(qSocial.id)
 				.having(qSocialCategoryLink.socialCategory.id.countDistinct().eq((long)categoryIds.size()));
 		}
+	}
+
+	@Override
+	public List<DailyCount> countByCreatedAtBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	) {
+		return DailyCountQueryHelper.countGroupByDate(
+			queryFactory, qSocial, qSocial.createdAt, qSocial.count(), startDateTime, endDateTime
+		);
 	}
 }

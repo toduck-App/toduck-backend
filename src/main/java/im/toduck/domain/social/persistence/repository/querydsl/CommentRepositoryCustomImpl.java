@@ -1,5 +1,6 @@
 package im.toduck.domain.social.persistence.repository.querydsl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,8 @@ import im.toduck.domain.social.presentation.dto.response.CommentDto;
 import im.toduck.domain.social.presentation.dto.response.CommentLikeDto;
 import im.toduck.domain.social.presentation.dto.response.OwnerDto;
 import im.toduck.domain.user.persistence.entity.QUser;
+import im.toduck.global.persistence.helper.DailyCountQueryHelper;
+import im.toduck.global.persistence.projection.DailyCount;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -84,6 +87,16 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
 				)
 				.exists(),
 			qComment.likeCount
+		);
+	}
+
+	@Override
+	public List<DailyCount> countByCreatedAtBetweenGroupByDate(
+		final LocalDateTime startDateTime,
+		final LocalDateTime endDateTime
+	) {
+		return DailyCountQueryHelper.countGroupByDate(
+			queryFactory, qComment, qComment.createdAt, qComment.count(), startDateTime, endDateTime
 		);
 	}
 }
