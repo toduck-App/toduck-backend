@@ -2,6 +2,7 @@ package im.toduck.domain.auth.domain.usecase;
 
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.util.Pair;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import im.toduck.domain.diary.domain.service.MasterKeywordService;
 import im.toduck.domain.diary.domain.service.UserKeywordService;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.user.common.mapper.UserMapper;
+import im.toduck.domain.user.domain.event.UserSignedUpEvent;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -35,6 +37,7 @@ public class OAuth2UseCase {
 	private final NickNameGenerateService nickNameGenerateService;
 	private final UserKeywordService userKeywordService;
 	private final MasterKeywordService masterKeywordService;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public Pair<Long, JwtPair> signUp(OidcProvider provider, SignUpRequest.Oidc request) {
@@ -57,6 +60,8 @@ public class OAuth2UseCase {
 
 				List<MasterKeyword> masterKeywords = masterKeywordService.findAll();
 				userKeywordService.setupKeywordsFromMaster(newUser, masterKeywords);
+
+				eventPublisher.publishEvent(new UserSignedUpEvent(newUser.getId()));
 
 				return Pair.of(newUser.getId(), jwtService.createToken(newUser));
 			});
