@@ -43,7 +43,7 @@ public record EventsCreateRequest(
 	Boolean buttonVisible,
 
 	@Size(max = 63, message = "버튼 내용은 63자를 초과할 수 없습니다.")
-	@Schema(description = "버튼 내용", example = "당청 확인하기")
+	@Schema(description = "버튼 내용", example = "당첨 확인하기")
 	String buttonText
 ) {
 

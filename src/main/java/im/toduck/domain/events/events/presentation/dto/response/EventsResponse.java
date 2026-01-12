@@ -37,7 +37,7 @@ public record EventsResponse(
 	String appVersion,
 
 	@Schema(description = "버튼 표시 여부", example = "true")
-	boolean isButtonVisible,
+	Boolean isButtonVisible,
 
 	@Schema(description = "버튼 내용", example = "당첨 확인하기")
 	String buttonText
