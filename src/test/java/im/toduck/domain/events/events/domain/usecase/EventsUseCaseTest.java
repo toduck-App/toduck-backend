@@ -51,6 +51,8 @@ class EventsUseCaseTest extends ServiceTest {
 			.endAt(ed)
 			.thumbUrl("https://asdf.jpg")
 			.appVersion("1.0.1")
+			.buttonVisible(true)
+			.buttonText("당첨 확인하기")
 			.build();
 
 		@Transactional
@@ -147,6 +149,8 @@ class EventsUseCaseTest extends ServiceTest {
 					.endAt(null)
 					.thumbUrl(null)
 					.appVersion(null)
+					.buttonVisible(null)
+					.buttonText(null)
 					.build();
 
 				// when

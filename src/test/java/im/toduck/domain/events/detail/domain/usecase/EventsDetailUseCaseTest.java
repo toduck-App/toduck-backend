@@ -72,6 +72,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 					.endAt(LocalDateTime.now().plusDays(1))
 					.thumbUrl("https://thumb.jpg")
 					.appVersion("1.0.0")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.build()
 			);
 		}
@@ -83,6 +85,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailCreateRequest.builder()
 					.eventsId(savedEvent.getId())
 					.routingUrl("toduck://createPost")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(Arrays.asList("asdf", "ㅁㄴㅇㄹ"))
 					.build();
 
@@ -107,6 +111,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailCreateRequest.builder()
 					.eventsId(savedEvent.getId())
 					.routingUrl("toduck://createPost")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(Arrays.asList("asdf", "ㅁㄴㅇㄹ"))
 					.build();
 
@@ -114,6 +120,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailCreateRequest.builder()
 					.eventsId(savedEvent.getId())
 					.routingUrl("toduck://anotherPost")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(Arrays.asList("xyz", "123"))
 					.build();
 
@@ -143,6 +151,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailCreateRequest.builder()
 					.eventsId(savedEvent.getId())
 					.routingUrl("toduck://createPost")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(
 						Arrays.asList("https://cdn.toduck.app/test1.jpg", "https://cdn.toduck.app/test2.jpg"))
 					.build();
@@ -153,6 +163,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailCreateRequest.builder()
 					.eventsId(savedEvent.getId())
 					.routingUrl("toduck://anotherPost")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(
 						Arrays.asList("https://cdn.toduck.app/test3.jpg", "https://cdn.toduck.app/test4.jpg"))
 					.build();
@@ -172,6 +184,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailCreateRequest.builder()
 					.eventsId(savedEvent.getId())
 					.routingUrl("toduck://createPost")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(Arrays.asList("asdf", "ㅁㄴㅇㄹ"))
 					.build();
 
@@ -182,6 +196,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailUpdateRequest.builder()
 					.eventsId(null)
 					.routingUrl("asas")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(Arrays.asList())
 					.build();
 
@@ -189,6 +205,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailUpdateRequest.builder()
 					.eventsId(null)
 					.routingUrl("asas")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(Arrays.asList())
 					.build();
 
@@ -219,6 +237,8 @@ class EventsDetailUseCaseTest extends ServiceTest {
 				EventsDetailCreateRequest.builder()
 					.eventsId(savedEvent.getId())
 					.routingUrl("toduck://createPost")
+					.buttonVisible(true)
+					.buttonText("당첨 확인하기")
 					.eventsDetailImgs(Arrays.asList("asdf", "ㅁㄴㅇㄹ"))
 					.build();
 

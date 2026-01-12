@@ -366,6 +366,8 @@ CREATE TABLE events
     end_at                  DATETIME                            NOT NULL,
     thumb_url               VARCHAR(1023)                       NOT NULL,
     app_version             VARCHAR(63)                         NOT NULL,
+    button_visible          BOOLEAN                             NOT NULL,
+    button_text             VARCHAR(63)                         NULL,
     created_at              DATETIME                            NOT NULL,
     updated_at              DATETIME                            NOT NULL,
     deleted_at              DATETIME                            NULL
@@ -376,6 +378,8 @@ CREATE TABLE events_detail
     id                      BIGINT PRIMARY KEY auto_increment,
     events_id               BIGINT                              NOT NULL    UNIQUE,
     routing_url             VARCHAR(1023)                       NULL,
+    button_visible          BOOLEAN                             NOT NULL,
+    button_text             VARCHAR(63)                         NULL,
     created_at              DATETIME                            NOT NULL,
     updated_at              DATETIME                            NOT NULL,
     deleted_at              DATETIME                            NULL,
