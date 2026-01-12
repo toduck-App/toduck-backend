@@ -22,7 +22,9 @@ public class EventsMapper {
 			events.getStartAt(),
 			events.getEndAt(),
 			events.getThumbUrl(),
-			events.getAppVersion()
+			events.getAppVersion(),
+			events.getButtonVisible(),
+			events.getButtonText()
 		);
 	}
 
@@ -33,6 +35,8 @@ public class EventsMapper {
 			.endAt(request.endAt())
 			.thumbUrl(request.thumbUrl())
 			.appVersion(request.appVersion())
+			.buttonVisible(request.buttonVisible())
+			.buttonText(request.buttonText())
 			.build();
 	}
 }

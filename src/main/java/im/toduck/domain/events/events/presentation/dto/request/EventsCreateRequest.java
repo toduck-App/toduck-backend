@@ -33,10 +33,18 @@ public record EventsCreateRequest(
 	@Schema(description = "썸네일 url", example = "https://asdf.jpg")
 	String thumbUrl,
 
-	@NotNull(message = "최소 앱버전은 비어있을 수 없습니다.")
-	@Size(max = 63, message = "앱버전은 63자를 초과할 수 없습니다.")
-	@Schema(description = "최소 앱버전", example = "1.0.1")
-	String appVersion
+	@NotNull(message = "최소 앱 버전은 비어있을 수 없습니다.")
+	@Size(max = 63, message = "최소 앱 버전은 63자를 초과할 수 없습니다.")
+	@Schema(description = "최소 앱 버전", example = "1.0.1")
+	String appVersion,
+
+	@NotNull(message = "버튼 표시 여부는 비어있을 수 없습니다.")
+	@Schema(description = "버튼 표시 여부", example = "true")
+	Boolean buttonVisible,
+
+	@Size(max = 63, message = "버튼 내용은 63자를 초과할 수 없습니다.")
+	@Schema(description = "버튼 내용", example = "당청 확인하기")
+	String buttonText
 ) {
 
 }

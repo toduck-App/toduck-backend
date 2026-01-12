@@ -41,13 +41,24 @@ public class EventsDetail extends BaseEntity {
 	@Column(name = "routing_url", length = 1023, nullable = true)
 	private String routingUrl;
 
+	@Column(nullable = false)
+	private Boolean buttonVisible;
+
+	@Column(length = 63)
+	private String buttonText;
+
 	@OneToMany(mappedBy = "eventsDetail", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<EventsDetailImg> eventsDetailImgs = new ArrayList<>();
 
 	@Builder
-	private EventsDetail(Events events, String routingUrl) {
+	private EventsDetail(Events events,
+		String routingUrl,
+		Boolean buttonVisible,
+		String buttonText) {
 		this.events = events;
 		this.routingUrl = routingUrl;
+		this.buttonVisible = buttonVisible;
+		this.buttonText = buttonText;
 	}
 
 	public void updateEvents(final Events events) {
@@ -56,5 +67,13 @@ public class EventsDetail extends BaseEntity {
 
 	public void updateRoutingUrl(final String routingUrl) {
 		this.routingUrl = routingUrl;
+	}
+
+	public void updateButtonVisible(final boolean buttonVisible) {
+		this.buttonVisible = buttonVisible;
+	}
+
+	public void updateButtonText(final String buttonText) {
+		this.buttonText = buttonText;
 	}
 }

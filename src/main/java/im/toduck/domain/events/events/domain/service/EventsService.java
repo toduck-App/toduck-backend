@@ -56,6 +56,12 @@ public class EventsService {
 		if (request.appVersion() != null) {
 			events.updateAppVersion(request.appVersion());
 		}
+		if (request.buttonVisible() != null) {
+			events.updateButtonVisible(request.buttonVisible());
+		}
+		if (request.buttonText() != null) {
+			events.updateButtonText(request.buttonText());
+		}
 	}
 
 	@Transactional

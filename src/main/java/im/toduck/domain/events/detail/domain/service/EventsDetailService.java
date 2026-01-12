@@ -85,6 +85,14 @@ public class EventsDetailService {
 			eventsDetail.updateRoutingUrl(request.routingUrl());
 		}
 
+		if (request.buttonVisible() != null) {
+			eventsDetail.updateButtonVisible(request.buttonVisible());
+		}
+
+		if (request.buttonText() != null) {
+			eventsDetail.updateButtonText(request.buttonText());
+		}
+
 		if (request.eventsDetailImgs() != null && !request.eventsDetailImgs().isEmpty()) {
 			eventsDetailImgRepository.deleteAllByEventsDetail(eventsDetail);
 			addEventsDetailImges(eventsDetail, request.eventsDetailImgs());

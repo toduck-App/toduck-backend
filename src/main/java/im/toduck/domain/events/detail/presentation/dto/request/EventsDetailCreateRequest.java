@@ -18,6 +18,14 @@ public record EventsDetailCreateRequest(
 	@Schema(description = "라우팅 url", example = "toduck://createPost")
 	String routingUrl,
 
+	@NotNull(message = "버튼 표시 여부는 비어있을 수 없습니다.")
+	@Schema(description = "버튼 표시 여부", example = "true")
+	Boolean buttonVisible,
+
+	@Size(max = 63, message = "버튼 내용은 63자를 초과할 수 없습니다.")
+	@Schema(description = "버튼 내용", example = "당청 확인하기")
+	String buttonText,
+
 	@Schema(description = "이벤트 디테일 URL 목록", example = "[\"https://cdn.toduck.app/image1.jpg\"]")
 	List<String> eventsDetailImgs
 ) {

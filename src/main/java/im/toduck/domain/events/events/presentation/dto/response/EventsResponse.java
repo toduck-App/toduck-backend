@@ -34,7 +34,13 @@ public record EventsResponse(
 	String thumbUrl,
 
 	@Schema(description = "앱 버전", example = "1.0.1")
-	String appVersion
+	String appVersion,
+
+	@Schema(description = "버튼 표시 여부", example = "true")
+	boolean isButtonVisible,
+
+	@Schema(description = "버튼 내용", example = "당첨 확인하기")
+	String buttonText
 ) {
 	public static List<EventsResponse> toEventsCheckResponse(List<Events> eventsList) {
 		return eventsList.stream()
@@ -45,6 +51,8 @@ public record EventsResponse(
 				.endAt(e.getEndAt())
 				.thumbUrl(e.getThumbUrl())
 				.appVersion(e.getAppVersion())
+				.isButtonVisible(e.getButtonVisible())
+				.buttonText(e.getButtonText())
 				.build())
 			.toList();
 	}
