@@ -42,17 +42,27 @@ public class Events extends BaseEntity {
 	@Column(length = 63, nullable = false)
 	private String appVersion;
 
+	@Column(nullable = false)
+	private Boolean buttonVisible;
+
+	@Column(length = 63)
+	private String buttonText;
+
 	@Builder
 	private Events(String eventName,
 		LocalDateTime startAt,
 		LocalDateTime endAt,
 		String thumbUrl,
-		String appVersion) {
+		String appVersion,
+		Boolean buttonVisible,
+		String buttonText) {
 		this.eventName = eventName;
 		this.startAt = startAt;
 		this.endAt = endAt;
 		this.thumbUrl = thumbUrl;
 		this.appVersion = appVersion;
+		this.buttonVisible = buttonVisible;
+		this.buttonText = buttonText;
 	}
 
 	public void updateEventName(final String eventName) {
@@ -73,5 +83,13 @@ public class Events extends BaseEntity {
 
 	public void updateAppVersion(final String appVersion) {
 		this.appVersion = appVersion;
+	}
+
+	public void updateButtonVisible(final boolean buttonVisible) {
+		this.buttonVisible = buttonVisible;
+	}
+
+	public void updateButtonText(final String buttonText) {
+		this.buttonText = buttonText;
 	}
 }

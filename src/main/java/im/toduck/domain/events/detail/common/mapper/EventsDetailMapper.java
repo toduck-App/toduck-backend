@@ -19,6 +19,8 @@ public class EventsDetailMapper {
 		return EventsDetail.builder()
 			.events(events)
 			.routingUrl(request.routingUrl())
+			.buttonVisible(request.buttonVisible())
+			.buttonText(request.buttonText())
 			.build();
 	}
 
@@ -27,6 +29,8 @@ public class EventsDetailMapper {
 			eventsDetail.getId(),
 			eventsDetail.getEvents().getId(),
 			eventsDetail.getRoutingUrl(),
+			eventsDetail.getButtonVisible(),
+			eventsDetail.getButtonText(),
 			eventsDetail.getEventsDetailImgs().stream()
 				.map(EventsDetailImgMapper::fromEventDetailImg)
 				.toList()
