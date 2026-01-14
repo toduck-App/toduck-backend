@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,14 +37,18 @@ public class UserBadge extends BaseEntity {
 	@Column(name = "is_representative", nullable = false)
 	private boolean isRepresentative;
 
+	@Column(name = "is_seen", nullable = false)
+	private boolean isSeen;
+
 	@Builder
 	private UserBadge(User user, Badge badge) {
 		this.user = user;
 		this.badge = badge;
 		this.isRepresentative = false;
+		this.isSeen = false;
 	}
 
-	public void setRepresentative(boolean isRepresentative) {
-		this.isRepresentative = isRepresentative;
+	public void markAsSeen() {
+		this.isSeen = true;
 	}
 }

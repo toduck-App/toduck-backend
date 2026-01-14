@@ -1,5 +1,8 @@
 package im.toduck.domain.badge.domain.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,21 +32,32 @@ public class BadgeService {
 	 *
 	 * @param user 뱃지를 받을 사용자
 	 * @param badgeCode 지급할 뱃지 코드
+	 * @return 새로 지급된 뱃지 정보 (이미 보유 중이면 Empty)
 	 */
 	@Transactional
-	public void grantBadge(final User user, final BadgeCode badgeCode) {
+	public Optional<UserBadge> grantBadge(final User user, final BadgeCode badgeCode) {
 		Badge badge = badgeRepository.findByCode(badgeCode)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_BADGE));
 
 		if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
-			return;
+			return Optional.empty();
 		}
 
 		UserBadge userBadge = UserBadgeMapper.toUserBadge(user, badge);
+		UserBadge savedBadge = userBadgeRepository.save(userBadge);
 
-		userBadgeRepository.save(userBadge);
 		log.info("뱃지 획득 - UserId: {}, Badge: {}", user.getId(), badge.getName());
+		return Optional.of(savedBadge);
+	}
 
-		// TODO: 뱃지 획득 알림 이벤트 발행
+	/**
+	 * 사용자가 아직 확인하지 않은 획득 뱃지 목록을 조회합니다.
+	 *
+	 * @param user 조회할 사용자
+	 * @return 미확인 획득 뱃지 목록
+	 */
+	@Transactional(readOnly = true)
+	public List<UserBadge> getUnseenBadges(final User user) {
+		return userBadgeRepository.findAllByUserAndIsSeenFalse(user);
 	}
 }

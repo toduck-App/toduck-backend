@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.badge.domain.checker.BadgeConditionChecker;
-import im.toduck.domain.badge.domain.service.BadgeService;
+import im.toduck.domain.badge.domain.usecase.BadgeUseCase;
 import im.toduck.domain.badge.persistence.entity.BadgeCode;
 import im.toduck.domain.user.domain.event.UserSignedUpEvent;
 import im.toduck.domain.user.domain.service.UserService;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BadgeEventListener {
 
-	private final BadgeService badgeService;
+	private final BadgeUseCase badgeUseCase;
 	private final UserService userService;
 	private final List<BadgeConditionChecker> badgeConditionCheckers;
 
@@ -43,7 +43,7 @@ public class BadgeEventListener {
 		findCheckerByBadgeCode(badgeCode)
 			.filter(checker -> checker.checkCondition(user))
 			.ifPresent(checker -> {
-				badgeService.grantBadge(user, badgeCode);
+				badgeUseCase.grantBadge(user, badgeCode);
 			});
 
 		log.info("뱃지 부여 완료 - UserId: {}, BadgeCode: {}", user.getId(), badgeCode);
