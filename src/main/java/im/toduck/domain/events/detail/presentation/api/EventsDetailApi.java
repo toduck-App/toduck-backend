@@ -55,6 +55,8 @@ public interface EventsDetailApi {
 				이벤트 디테일의 내용을 수정합니다. <br/>
 				"eventsId" : 이벤트의 일련번호 <br/>
 				"routingUrl" : 연결 url <br/>
+				"buttonVisible" : 버튼 표시 여부 <br/>
+				"buttonText" : 버튼 내용 <br/>
 				"eventsDetailImgs" : 이벤트 상세 이미지 url <br/><br/>
 				수정하지 않을 경우 null을 입력하면 됩니다. 이미지의 경우 빈 리스트를 넣으면 이미지가 전부 삭제됩니다.
 				"""

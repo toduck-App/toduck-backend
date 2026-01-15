@@ -24,7 +24,7 @@ public record EventsDetailResponse(
 	String buttonText,
 
 	@Schema(description = "이벤트 디테일 이미지 url 목록", example = "[\"https://cdn.toduck.app/image1.jpg\"]")
-	List<String> eventsDetailImgUrl
+	List<String> eventsDetailImgs
 ) {
 
 }
