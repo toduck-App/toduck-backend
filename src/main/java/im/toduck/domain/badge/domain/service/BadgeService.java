@@ -1,7 +1,6 @@
 package im.toduck.domain.badge.domain.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,22 +31,23 @@ public class BadgeService {
 	 *
 	 * @param user 뱃지를 받을 사용자
 	 * @param badgeCode 지급할 뱃지 코드
-	 * @return 새로 지급된 뱃지 정보 (이미 보유 중이면 Empty)
+	 * @return 새로 지급된 뱃지 정보
+	 * @throws CommonException 이미 배지를 보유하고 있을 경우
 	 */
 	@Transactional
-	public Optional<UserBadge> grantBadge(final User user, final BadgeCode badgeCode) {
+	public UserBadge grantBadge(final User user, final BadgeCode badgeCode) {
 		Badge badge = badgeRepository.findByCode(badgeCode)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_BADGE));
 
 		if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
-			return Optional.empty();
+			throw CommonException.from(ExceptionCode.ALREADY_ACQUIRED_BADGE);
 		}
 
 		UserBadge userBadge = UserBadgeMapper.toUserBadge(user, badge);
 		UserBadge savedBadge = userBadgeRepository.save(userBadge);
 
 		log.info("뱃지 획득 - UserId: {}, Badge: {}", user.getId(), badge.getName());
-		return Optional.of(savedBadge);
+		return savedBadge;
 	}
 
 	/**

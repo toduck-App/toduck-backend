@@ -126,6 +126,7 @@ public enum ExceptionCode {
 
 	/* 413xx Badge */
 	NOT_FOUND_BADGE(HttpStatus.NOT_FOUND, 41301, "뱃지를 찾을 수 없습니다."),
+	ALREADY_ACQUIRED_BADGE(HttpStatus.CONFLICT, 41302, "이미 획득한 뱃지입니다."),
 
 	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",

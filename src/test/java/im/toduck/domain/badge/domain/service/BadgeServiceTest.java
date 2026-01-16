@@ -2,9 +2,8 @@ package im.toduck.domain.badge.domain.service;
 
 import static im.toduck.fixtures.badge.BadgeFixtures.*;
 import static im.toduck.fixtures.user.UserFixtures.*;
+import static im.toduck.global.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
-
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,24 +35,23 @@ class BadgeServiceTest extends ServiceTest {
 	@DisplayName("배지를 처음 획득하면 UserBadge를 반환한다")
 	void grantBadge_new() {
 		// when
-		Optional<UserBadge> result = badgeService.grantBadge(user, badge.getCode());
+		UserBadge result = badgeService.grantBadge(user, badge.getCode());
 
 		// then
-		assertThat(result).isPresent();
-		assertThat(result.get().getBadge()).isEqualTo(badge);
-		assertThat(result.get().getUser()).isEqualTo(user);
+		assertThat(result).isNotNull();
+		assertThat(result.getBadge()).isEqualTo(badge);
+		assertThat(result.getUser()).isEqualTo(user);
 	}
 
 	@Test
-	@DisplayName("이미 보유한 배지를 획득하려 하면 Empty를 반환한다")
+	@DisplayName("이미 보유한 배지를 획득하려 하면 ALREADY_ACQUIRED_BADGE 예외가 발생한다")
 	void grantBadge_duplicate() {
 		// given
 		badgeService.grantBadge(user, badge.getCode());
 
-		// when
-		Optional<UserBadge> result = badgeService.grantBadge(user, badge.getCode());
-
-		// then
-		assertThat(result).isEmpty();
+		// when & then
+		assertThatThrownBy(() -> badgeService.grantBadge(user, badge.getCode()))
+			.isInstanceOf(im.toduck.global.exception.CommonException.class)
+			.hasMessageContaining(ALREADY_ACQUIRED_BADGE.getMessage());
 	}
 }

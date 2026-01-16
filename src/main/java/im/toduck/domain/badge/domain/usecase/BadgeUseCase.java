@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.badge.common.dto.response.BadgeResponse;
@@ -15,13 +14,14 @@ import im.toduck.domain.notification.domain.data.BadgeAcquiredNotificationData;
 import im.toduck.domain.notification.domain.event.BadgeAcquiredNotificationEvent;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@UseCase
 @RequiredArgsConstructor
 public class BadgeUseCase {
 
@@ -37,12 +37,11 @@ public class BadgeUseCase {
 	 */
 	@Transactional
 	public void grantBadge(final User user, final BadgeCode badgeCode) {
-		badgeService.grantBadge(user, badgeCode).ifPresent(userBadge -> {
-			eventPublisher.publishEvent(
-				BadgeAcquiredNotificationEvent.of(user.getId(),
-					BadgeAcquiredNotificationData.from(userBadge.getBadge()))
-			);
-		});
+		UserBadge userBadge = badgeService.grantBadge(user, badgeCode);
+		eventPublisher.publishEvent(
+			BadgeAcquiredNotificationEvent.of(user.getId(),
+				BadgeAcquiredNotificationData.from(userBadge.getBadge().getName()))
+		);
 	}
 
 	/**
