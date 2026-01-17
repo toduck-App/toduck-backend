@@ -66,4 +66,18 @@ public class BadgeUseCase {
 
 		return responses;
 	}
+
+	/**
+	 * 사용자의 대표 뱃지를 설정합니다.
+	 *
+	 * @param userId 뱃지를 설정할 사용자 ID
+	 * @param badgeId 설정할 뱃지 ID
+	 */
+	@Transactional
+	public void setRepresentativeBadge(final Long userId, final Long badgeId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		badgeService.setRepresentativeBadge(user, badgeId);
+	}
 }

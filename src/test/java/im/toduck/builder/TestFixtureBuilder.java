@@ -143,4 +143,9 @@ public class TestFixtureBuilder {
 	public UserBadge buildUserBadge(final UserBadge userBadge) {
 		return bs.userBadgeRepository().save(userBadge);
 	}
+
+	public UserBadge buildUserBadge(final UserBadge userBadge, boolean isRepresentative) {
+		ReflectionTestUtils.setField(userBadge, "isRepresentative", isRepresentative);
+		return bs.userBadgeRepository().save(userBadge);
+	}
 }

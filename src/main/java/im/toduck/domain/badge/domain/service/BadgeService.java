@@ -60,4 +60,18 @@ public class BadgeService {
 	public List<UserBadge> getUnseenBadges(final User user) {
 		return userBadgeRepository.findAllByUserAndIsSeenFalse(user);
 	}
+
+	@Transactional
+	public void setRepresentativeBadge(final User user, final Long badgeId) {
+		Badge badge = badgeRepository.findById(badgeId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_BADGE));
+
+		UserBadge newRepresentativeBadge = userBadgeRepository.findByUserAndBadge(user, badge)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_OWNED_BADGE));
+
+		userBadgeRepository.findByUserAndIsRepresentativeTrue(user)
+			.ifPresent(oldBadge -> oldBadge.updateRepresentativeStatus(false));
+
+		newRepresentativeBadge.updateRepresentativeStatus(true);
+	}
 }

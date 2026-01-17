@@ -1,19 +1,24 @@
 package im.toduck.domain.badge.presentation.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import im.toduck.domain.badge.common.dto.response.BadgeResponse;
 import im.toduck.domain.badge.domain.usecase.BadgeUseCase;
 import im.toduck.domain.badge.presentation.api.BadgeApi;
+import im.toduck.domain.badge.presentation.dto.request.RepresentativeBadgeRequest;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,5 +36,16 @@ public class BadgeController implements BadgeApi {
 	) {
 		List<BadgeResponse> responses = badgeUseCase.getNewBadges(userDetails.getUserId());
 		return ResponseEntity.ok(ApiResponse.createSuccess(responses));
+	}
+
+	@Override
+	@PatchMapping("/representative")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> updateRepresentativeBadge(
+		@AuthenticationPrincipal CustomUserDetails userDetails,
+		@Valid @RequestBody RepresentativeBadgeRequest request
+	) {
+		badgeUseCase.setRepresentativeBadge(userDetails.getUserId(), request.badgeId());
+		return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
 	}
 }
