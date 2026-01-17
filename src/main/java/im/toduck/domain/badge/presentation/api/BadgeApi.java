@@ -5,10 +5,12 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import im.toduck.domain.badge.common.dto.response.BadgeResponse;
 import im.toduck.domain.badge.presentation.dto.request.RepresentativeBadgeRequest;
+import im.toduck.domain.badge.presentation.dto.response.BadgeListResponse;
+import im.toduck.domain.badge.presentation.dto.response.BadgeResponse;
 import im.toduck.global.annotation.swagger.ApiErrorResponseExplanation;
 import im.toduck.global.annotation.swagger.ApiResponseExplanations;
 import im.toduck.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -29,6 +31,17 @@ public interface BadgeApi {
 		)
 	)
 	ResponseEntity<ApiResponse<List<BadgeResponse>>> getNewBadges(
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	);
+
+	@Operation(summary = "내 뱃지 목록 조회", description = "보유한 뱃지 목록과 대표 뱃지 설정 정보를 조회합니다.")
+	@ApiResponseExplanations(
+		success = @ApiSuccessResponseExplanation(
+			description = "내 뱃지 목록 조회 성공"
+		)
+	)
+	@GetMapping
+	ResponseEntity<ApiResponse<BadgeListResponse>> getMyBadgeList(
 		@AuthenticationPrincipal CustomUserDetails userDetails
 	);
 

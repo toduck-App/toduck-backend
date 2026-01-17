@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import im.toduck.domain.badge.common.dto.response.BadgeResponse;
 import im.toduck.domain.badge.domain.usecase.BadgeUseCase;
 import im.toduck.domain.badge.presentation.api.BadgeApi;
 import im.toduck.domain.badge.presentation.dto.request.RepresentativeBadgeRequest;
+import im.toduck.domain.badge.presentation.dto.response.BadgeListResponse;
+import im.toduck.domain.badge.presentation.dto.response.BadgeResponse;
 import im.toduck.global.presentation.ApiResponse;
 import im.toduck.global.security.authentication.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -36,6 +37,16 @@ public class BadgeController implements BadgeApi {
 	) {
 		List<BadgeResponse> responses = badgeUseCase.getNewBadges(userDetails.getUserId());
 		return ResponseEntity.ok(ApiResponse.createSuccess(responses));
+	}
+
+	@Override
+	@GetMapping
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ApiResponse<BadgeListResponse>> getMyBadgeList(
+		@AuthenticationPrincipal CustomUserDetails userDetails
+	) {
+		BadgeListResponse response = badgeUseCase.getMyBadgeList(userDetails.getUserId());
+		return ResponseEntity.ok(ApiResponse.createSuccess(response));
 	}
 
 	@Override

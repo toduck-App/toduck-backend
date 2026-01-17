@@ -6,10 +6,11 @@ import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
-import im.toduck.domain.badge.common.dto.response.BadgeResponse;
 import im.toduck.domain.badge.domain.service.BadgeService;
 import im.toduck.domain.badge.persistence.entity.BadgeCode;
 import im.toduck.domain.badge.persistence.entity.UserBadge;
+import im.toduck.domain.badge.presentation.dto.response.BadgeListResponse;
+import im.toduck.domain.badge.presentation.dto.response.BadgeResponse;
 import im.toduck.domain.notification.domain.data.BadgeAcquiredNotificationData;
 import im.toduck.domain.notification.domain.event.BadgeAcquiredNotificationEvent;
 import im.toduck.domain.user.domain.service.UserService;
@@ -65,6 +66,20 @@ public class BadgeUseCase {
 		newBadges.forEach(UserBadge::markAsSeen);
 
 		return responses;
+	}
+
+	/**
+	 * 사용자의 뱃지 목록 정보를 조회합니다.
+	 *
+	 * @param userId 조회할 사용자 ID
+	 * @return 뱃지 목록 정보
+	 */
+	@Transactional(readOnly = true)
+	public BadgeListResponse getMyBadgeList(final Long userId) {
+		User user = userService.getUserById(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		return badgeService.getMyBadgeList(user);
 	}
 
 	/**

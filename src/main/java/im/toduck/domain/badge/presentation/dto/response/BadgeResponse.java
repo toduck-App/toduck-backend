@@ -1,4 +1,4 @@
-package im.toduck.domain.badge.common.dto.response;
+package im.toduck.domain.badge.presentation.dto.response;
 
 import im.toduck.domain.badge.persistence.entity.Badge;
 import io.swagger.v3.oas.annotations.media.Schema;

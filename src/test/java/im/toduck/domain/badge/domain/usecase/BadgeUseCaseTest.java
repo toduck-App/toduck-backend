@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
-import im.toduck.domain.badge.common.dto.response.BadgeResponse;
+import im.toduck.domain.badge.presentation.dto.response.BadgeResponse;
 import im.toduck.domain.badge.domain.service.BadgeService;
 import im.toduck.domain.badge.persistence.entity.Badge;
 import im.toduck.domain.badge.persistence.entity.UserBadge;
