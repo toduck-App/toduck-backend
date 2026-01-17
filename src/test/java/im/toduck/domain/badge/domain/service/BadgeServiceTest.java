@@ -122,9 +122,9 @@ class BadgeServiceTest extends ServiceTest {
 		BadgeListResponse response = badgeService.getMyBadgeList(USER);
 
 		// then
-		assertThat(response.getTotalCount()).isEqualTo(2); // 전체 뱃지 종류 수
-		assertThat(response.getRepresentativeBadgeId()).isEqualTo(firstBadge.getId());
-		assertThat(response.getOwnedBadges()).hasSize(2)
+		assertThat(response.totalCount()).isEqualTo(2); // 전체 뱃지 종류 수
+		assertThat(response.representativeBadgeId()).isEqualTo(firstBadge.getId());
+		assertThat(response.ownedBadges()).hasSize(2)
 			.extracting("id")
 			.containsExactlyInAnyOrder(firstBadge.getId(), secondBadge.getId());
 	}

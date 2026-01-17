@@ -20,7 +20,7 @@ public class UserBadgeMapper {
 			.build();
 	}
 
-	public static BadgeListResponse toBadgeListResponse(long totalCount, List<UserBadge> userBadges) {
+	public static BadgeListResponse toBadgeListResponse(final long totalCount, final List<UserBadge> userBadges) {
 		Long representativeBadgeId = userBadges.stream()
 			.filter(UserBadge::isRepresentative)
 			.findFirst()
