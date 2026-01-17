@@ -800,3 +800,31 @@ ADD COLUMN action_url VARCHAR(500) NOT NULL DEFAULT 'toduck://home' AFTER failur
 -- 기존 데이터에 대해 기본값 적용 후 DEFAULT 제거
 ALTER TABLE broadcast_notification
 ALTER COLUMN action_url DROP DEFAULT;
+
+-- Badge 테이블
+CREATE TABLE badge
+(
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code        VARCHAR(50)   NOT NULL UNIQUE,
+    name        VARCHAR(50)   NOT NULL,
+    description VARCHAR(255)  NOT NULL,
+    image_url   VARCHAR(1024) NOT NULL,
+    created_at  DATETIME      NOT NULL,
+    updated_at  DATETIME      NOT NULL,
+    deleted_at  DATETIME      NULL
+);
+
+-- UserBadge 테이블
+CREATE TABLE user_badge
+(
+    id                BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id           BIGINT   NOT NULL,
+    badge_id          BIGINT   NOT NULL,
+    is_representative BOOLEAN  NOT NULL DEFAULT FALSE,
+    created_at        DATETIME NOT NULL,
+    updated_at        DATETIME NOT NULL,
+    deleted_at        DATETIME NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (badge_id) REFERENCES badge (id),
+    UNIQUE KEY uk_user_badge_user_id_badge_id (user_id, badge_id)
+);

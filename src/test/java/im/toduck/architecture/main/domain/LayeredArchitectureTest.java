@@ -17,7 +17,8 @@ import com.tngtech.archunit.lang.ArchRule;
 		ImportOption.DoNotIncludeTests.class,
 		LayeredArchitectureTest.NotificationPackageIgnore.class,
 		LayeredArchitectureTest.RoutineEventPackageIgnore.class,
-		LayeredArchitectureTest.BackofficeEventPackageIgnore.class
+		LayeredArchitectureTest.BackofficeEventPackageIgnore.class,
+		LayeredArchitectureTest.BadgePackageIgnore.class
 	}
 )
 public class LayeredArchitectureTest {
@@ -45,6 +46,14 @@ public class LayeredArchitectureTest {
 		}
 	}
 
+	// badge 패키지의 event, checker 제외를 위한 커스텀 ImportOption
+	public static class BadgePackageIgnore implements ImportOption {
+		@Override
+		public boolean includes(Location location) {
+			return !location.contains("badge/domain/event") && !location.contains("badge/domain/checker");
+		}
+	}
+
 	@ArchTest
 	static final ArchRule 레이어_의존성_규칙을_준수한다 = layeredArchitecture()
 		.consideringAllDependencies()
@@ -64,7 +73,8 @@ public class LayeredArchitectureTest {
 		.whereLayer(REPOSITORY.name()).mayOnlyBeAccessedByLayers(SERVICE.name())
 		.whereLayer(ENTITY.name())
 		.mayOnlyBeAccessedByLayers(
-			SERVICE.name(), USECASE.name(), REPOSITORY.name(), MAPPER.name(), ENTITY.name(), DTO.name(), API.name(), CONTROLLER.name()
+			SERVICE.name(), USECASE.name(), REPOSITORY.name(), MAPPER.name(), ENTITY.name(), DTO.name(), API.name(),
+			CONTROLLER.name()
 		)
 		.whereLayer(MAPPER.name()).mayOnlyBeAccessedByLayers(SERVICE.name(), USECASE.name())
 
@@ -89,6 +99,7 @@ public class LayeredArchitectureTest {
 			.should()
 			.onlyBeAccessed()
 			.byAnyPackage(ENTITY.getFullPackageName(), DTO.getFullPackageName(), MAPPER.getFullPackageName(),
-				API.getFullPackageName(), CONTROLLER.getFullPackageName(), USECASE.getFullPackageName(), SERVICE.getFullPackageName(),
+				API.getFullPackageName(), CONTROLLER.getFullPackageName(), USECASE.getFullPackageName(),
+				SERVICE.getFullPackageName(),
 				REPOSITORY.getFullPackageName());
 }
