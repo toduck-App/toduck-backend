@@ -11,6 +11,7 @@ import im.toduck.domain.badge.persistence.entity.BadgeCode;
 import im.toduck.domain.badge.persistence.entity.UserBadge;
 import im.toduck.domain.badge.persistence.repository.BadgeRepository;
 import im.toduck.domain.badge.persistence.repository.UserBadgeRepository;
+import im.toduck.domain.badge.presentation.dto.response.BadgeListResponse;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -59,5 +60,40 @@ public class BadgeService {
 	@Transactional(readOnly = true)
 	public List<UserBadge> getUnseenBadges(final User user) {
 		return userBadgeRepository.findAllByUserAndIsSeenFalse(user);
+	}
+
+	/**
+	 * 사용자의 뱃지 목록 정보를 조회합니다.
+	 *
+	 * @param user 조회할 사용자
+	 * @return 뱃지 목록 정보 (전체 개수, 대표 뱃지 ID, 보유 뱃지 목록)
+	 */
+	@Transactional(readOnly = true)
+	public BadgeListResponse getMyBadgeList(final User user) {
+		long totalCount = badgeRepository.count();
+		List<UserBadge> userBadges = userBadgeRepository.findAllByUser(user);
+
+		return UserBadgeMapper.toBadgeListResponse(totalCount, userBadges);
+	}
+
+	/**
+	 * 사용자의 대표 뱃지를 설정합니다.
+	 * 기존 대표 뱃지가 있다면 해제하고, 새로운 뱃지를 대표로 설정합니다.
+	 *
+	 * @param user 뱃지를 설정할 사용자
+	 * @param badgeId 대표로 설정할 뱃지 ID (UserBadge PK가 아닌 Badge PK)
+	 */
+	@Transactional
+	public void setRepresentativeBadge(final User user, final Long badgeId) {
+		Badge badge = badgeRepository.findById(badgeId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_BADGE));
+
+		UserBadge newRepresentativeBadge = userBadgeRepository.findByUserAndBadge(user, badge)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_OWNED_BADGE));
+
+		userBadgeRepository.findByUserAndIsRepresentativeTrue(user)
+			.ifPresent(oldBadge -> oldBadge.updateRepresentativeStatus(false));
+
+		newRepresentativeBadge.updateRepresentativeStatus(true);
 	}
 }

@@ -140,7 +140,12 @@ public class TestFixtureBuilder {
 		return bs.badgeRepository().save(badge);
 	}
 
-	public UserBadge buildUserBadge(final UserBadge userBadge) {
+	public UserBadge buildUserBadge(final User user, final Badge badge, boolean isRepresentative) {
+		UserBadge userBadge = UserBadge.builder()
+			.user(user)
+			.badge(badge)
+			.build();
+		ReflectionTestUtils.setField(userBadge, "isRepresentative", isRepresentative);
 		return bs.userBadgeRepository().save(userBadge);
 	}
 }

@@ -1,6 +1,7 @@
 package im.toduck.domain.badge.persistence.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,8 @@ public interface UserBadgeRepository extends JpaRepository<UserBadge, Long> {
 	List<UserBadge> findAllByUser(User user);
 
 	List<UserBadge> findAllByUserAndIsSeenFalse(User user);
+
+	Optional<UserBadge> findByUserAndIsRepresentativeTrue(User user);
+
+	Optional<UserBadge> findByUserAndBadge(User user, Badge badge);
 }
