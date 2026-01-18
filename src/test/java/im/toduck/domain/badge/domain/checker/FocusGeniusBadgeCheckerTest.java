@@ -1,28 +1,33 @@
 package im.toduck.domain.badge.domain.checker;
 
+import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.ServiceTest;
 import im.toduck.domain.badge.persistence.entity.BadgeCode;
-import im.toduck.domain.concentration.persistence.repository.ConcentrationRepository;
+import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.fixtures.user.UserFixtures;
 
-@ExtendWith(MockitoExtension.class)
-class FocusGeniusBadgeCheckerTest {
+@Transactional
+class FocusGeniusBadgeCheckerTest extends ServiceTest {
 
-	@InjectMocks
+	@Autowired
 	private FocusGeniusBadgeChecker focusGeniusBadgeChecker;
 
-	@Mock
-	private ConcentrationRepository concentrationRepository;
+	private User user;
+
+	@BeforeEach
+	void setUp() {
+		user = testFixtureBuilder.buildUser(GENERAL_USER());
+	}
 
 	@Test
 	@DisplayName("뱃지 코드는 FOCUS_GENIUS여야 한다")
@@ -34,8 +39,8 @@ class FocusGeniusBadgeCheckerTest {
 	@DisplayName("타이머 달성 횟수 합계가 15회 이상이면 true를 반환한다")
 	void checkCondition_True() {
 		// given
-		User user = UserFixtures.GENERAL_USER();
-		given(concentrationRepository.sumTargetCountByUser(user)).willReturn(15L);
+		// targetCount 15인 Concentration 생성
+		createConcentrationWithTargetCount(15);
 
 		// when
 		boolean result = focusGeniusBadgeChecker.checkCondition(user);
@@ -48,13 +53,23 @@ class FocusGeniusBadgeCheckerTest {
 	@DisplayName("타이머 달성 횟수 합계가 15회 미만이면 false를 반환한다")
 	void checkCondition_False() {
 		// given
-		User user = UserFixtures.GENERAL_USER();
-		given(concentrationRepository.sumTargetCountByUser(user)).willReturn(14L);
+		// targetCount 14인 Concentration 생성
+		createConcentrationWithTargetCount(14);
 
 		// when
 		boolean result = focusGeniusBadgeChecker.checkCondition(user);
 
 		// then
 		assertThat(result).isFalse();
+	}
+
+	private void createConcentrationWithTargetCount(int targetCount) {
+		Concentration concentration = Concentration.builder()
+			.user(user)
+			.date(LocalDate.now())
+			.build();
+
+		concentration.addTargetCount(targetCount);
+		testFixtureBuilder.buildConcentration(concentration);
 	}
 }

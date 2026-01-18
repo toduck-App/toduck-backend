@@ -1,28 +1,31 @@
 package im.toduck.domain.badge.domain.checker;
 
+import static im.toduck.fixtures.routine.RoutineFixtures.*;
+import static im.toduck.fixtures.user.UserFixtures.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.ServiceTest;
 import im.toduck.domain.badge.persistence.entity.BadgeCode;
-import im.toduck.domain.routine.persistence.repository.RoutineRepository;
 import im.toduck.domain.user.persistence.entity.User;
-import im.toduck.fixtures.user.UserFixtures;
 
-@ExtendWith(MockitoExtension.class)
-class PerfectionistBadgeCheckerTest {
+@Transactional
+class PerfectionistBadgeCheckerTest extends ServiceTest {
 
-	@InjectMocks
+	@Autowired
 	private PerfectionistBadgeChecker perfectionistBadgeChecker;
 
-	@Mock
-	private RoutineRepository routineRepository;
+	private User user;
+
+	@BeforeEach
+	void setUp() {
+		user = testFixtureBuilder.buildUser(GENERAL_USER());
+	}
 
 	@Test
 	@DisplayName("뱃지 코드는 PERFECTIONIST여야 한다")
@@ -34,8 +37,9 @@ class PerfectionistBadgeCheckerTest {
 	@DisplayName("루틴이 10개 이상이면 true를 반환한다")
 	void checkCondition_True() {
 		// given
-		User user = UserFixtures.GENERAL_USER();
-		given(routineRepository.countByUserAndDeletedAtIsNull(user)).willReturn(10L);
+		for (int i = 0; i < 10; i++) {
+			testFixtureBuilder.buildRoutineAndUpdateAuditFields(PUBLIC_MONDAY_MORNING_ROUTINE(user).build());
+		}
 
 		// when
 		boolean result = perfectionistBadgeChecker.checkCondition(user);
@@ -48,8 +52,9 @@ class PerfectionistBadgeCheckerTest {
 	@DisplayName("루틴이 10개 미만이면 false를 반환한다")
 	void checkCondition_False() {
 		// given
-		User user = UserFixtures.GENERAL_USER();
-		given(routineRepository.countByUserAndDeletedAtIsNull(user)).willReturn(9L);
+		for (int i = 0; i < 9; i++) {
+			testFixtureBuilder.buildRoutineAndUpdateAuditFields(PUBLIC_MONDAY_MORNING_ROUTINE(user).build());
+		}
 
 		// when
 		boolean result = perfectionistBadgeChecker.checkCondition(user);

@@ -9,6 +9,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import im.toduck.domain.badge.persistence.entity.Badge;
 import im.toduck.domain.badge.persistence.entity.UserBadge;
+import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.persistence.entity.KeywordCategory;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
@@ -152,5 +153,9 @@ public class TestFixtureBuilder {
 			.build();
 		ReflectionTestUtils.setField(userBadge, "isRepresentative", isRepresentative);
 		return bs.userBadgeRepository().save(userBadge);
+	}
+
+	public Concentration buildConcentration(final Concentration concentration) {
+		return bs.concentrationRepository().save(concentration);
 	}
 }
