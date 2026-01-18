@@ -31,4 +31,8 @@ public interface DiaryRepository extends JpaRepository<Diary, Long>, DiaryReposi
 	long countDistinctUsers();
 
 	Optional<Diary> getDiaryByUserIdAndId(Long userId, Long diaryId);
+
+	@Query("SELECT COUNT(DISTINCT d.date) FROM Diary d WHERE d.user = :user AND d.date BETWEEN :startDate AND :endDate")
+	long countDistinctDateByUserAndDateBetween(@Param("user") User user, @Param("startDate") LocalDate startDate,
+		@Param("endDate") LocalDate endDate);
 }

@@ -10,11 +10,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.domain.diary.common.mapper.DiaryImageFileMapper;
 import im.toduck.domain.diary.common.mapper.DiaryMapper;
+import im.toduck.domain.diary.domain.event.DiaryCreatedEvent;
 import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.persistence.entity.DiaryImage;
 import im.toduck.domain.diary.persistence.repository.DiaryImageRepository;
@@ -35,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DiaryService {
 	private final DiaryRepository diaryRepository;
 	private final DiaryImageRepository diaryImageRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public Diary createDiary(
@@ -42,7 +45,11 @@ public class DiaryService {
 		final DiaryCreateRequest request
 	) {
 		Diary diary = DiaryMapper.toDiary(user, request);
-		return diaryRepository.save(diary);
+		Diary savedDiary = diaryRepository.save(diary);
+
+		eventPublisher.publishEvent(new DiaryCreatedEvent(user.getId()));
+
+		return savedDiary;
 	}
 
 	@Transactional

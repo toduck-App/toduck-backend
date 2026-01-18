@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import im.toduck.domain.concentration.common.mapper.ConcentrationMapper;
+import im.toduck.domain.concentration.domain.event.ConcentrationSavedEvent;
 import im.toduck.domain.concentration.persistence.entity.Concentration;
 import im.toduck.domain.concentration.persistence.repository.ConcentrationRepository;
 import im.toduck.domain.concentration.presentation.dto.request.ConcentrationRequest;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ConcentrationService {
 	private final ConcentrationRepository concentrationRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public Concentration saveConcentration(User user, ConcentrationRequest request) {
@@ -30,7 +33,11 @@ public class ConcentrationService {
 		concentration.addSettingCount(request.settingCount());
 		concentration.addTime(request.time());
 
-		return concentrationRepository.save(concentration);
+		Concentration saved = concentrationRepository.save(concentration);
+
+		eventPublisher.publishEvent(new ConcentrationSavedEvent(user.getId()));
+
+		return saved;
 	}
 
 	@Transactional

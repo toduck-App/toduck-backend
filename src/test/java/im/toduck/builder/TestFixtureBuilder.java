@@ -9,6 +9,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import im.toduck.domain.badge.persistence.entity.Badge;
 import im.toduck.domain.badge.persistence.entity.UserBadge;
+import im.toduck.domain.concentration.persistence.entity.Concentration;
+import im.toduck.domain.diary.persistence.entity.Diary;
 import im.toduck.domain.diary.persistence.entity.KeywordCategory;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -120,6 +122,10 @@ public class TestFixtureBuilder {
 		return bs.scheduleRecordRepository().save(scheduleRecord);
 	}
 
+	public Diary buildDiary(final Diary diary) {
+		return bs.diaryRepository().save(diary);
+	}
+
 	public Follow buildFollow(final User follower, final User followed) {
 		Follow follow = Follow.builder()
 			.follower(follower)
@@ -147,5 +153,9 @@ public class TestFixtureBuilder {
 			.build();
 		ReflectionTestUtils.setField(userBadge, "isRepresentative", isRepresentative);
 		return bs.userBadgeRepository().save(userBadge);
+	}
+
+	public Concentration buildConcentration(final Concentration concentration) {
+		return bs.concentrationRepository().save(concentration);
 	}
 }
