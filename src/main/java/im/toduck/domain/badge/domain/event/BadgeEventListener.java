@@ -12,6 +12,7 @@ import im.toduck.domain.badge.domain.checker.BadgeConditionChecker;
 import im.toduck.domain.badge.domain.usecase.BadgeUseCase;
 import im.toduck.domain.badge.persistence.entity.BadgeCode;
 import im.toduck.domain.concentration.domain.event.ConcentrationSavedEvent;
+import im.toduck.domain.diary.domain.event.DiaryCreatedEvent;
 import im.toduck.domain.routine.domain.event.RoutineCreatedEvent;
 import im.toduck.domain.social.domain.event.SocialCreatedEvent;
 import im.toduck.domain.user.domain.event.UserSignedUpEvent;
@@ -74,6 +75,17 @@ public class BadgeEventListener {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		checkAndGrantBadge(user, BadgeCode.FOCUS_GENIUS);
+	}
+
+	@Async
+	@EventListener
+	@Transactional
+	public void handleDiaryCreated(final DiaryCreatedEvent event) {
+		log.info("일기 생성 이벤트 수신 - UserId: {}", event.getUserId());
+		User user = userService.getUserById(event.getUserId())
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		checkAndGrantBadge(user, BadgeCode.DAILY_DIARY);
 	}
 
 	private void checkAndGrantBadge(final User user, final BadgeCode badgeCode) {

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import im.toduck.domain.badge.persistence.repository.BadgeRepository;
 import im.toduck.domain.badge.persistence.repository.UserBadgeRepository;
+import im.toduck.domain.diary.persistence.repository.DiaryRepository;
 import im.toduck.domain.diary.persistence.repository.MasterKeywordRepository;
 import im.toduck.domain.diary.persistence.repository.UserKeywordRepository;
 import im.toduck.domain.routine.persistence.repository.RoutineRecordRepository;
@@ -78,6 +79,9 @@ public class BuilderSupporter {
 	private UserKeywordRepository userKeywordRepository;
 
 	@Autowired
+	private DiaryRepository diaryRepository;
+
+	@Autowired
 	private BadgeRepository badgeRepository;
 
 	@Autowired
@@ -149,6 +153,10 @@ public class BuilderSupporter {
 
 	public UserKeywordRepository userKeywordRepository() {
 		return userKeywordRepository;
+	}
+
+	public DiaryRepository diaryRepository() {
+		return diaryRepository;
 	}
 
 	public BadgeRepository badgeRepository() {
