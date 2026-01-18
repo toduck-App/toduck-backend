@@ -46,4 +46,9 @@ public interface RoutineRepository extends JpaRepository<Routine, Long>, Routine
 
 	@Query("SELECT COUNT(DISTINCT r.user) FROM Routine r WHERE r.deletedAt IS NULL")
 	long countDistinctUsers();
+
+	long countByUserAndDeletedAtIsNull(User user);
+
+	@Query("SELECT COUNT(DISTINCT r.category) FROM Routine r WHERE r.user = :user AND r.deletedAt IS NULL")
+	long countDistinctCategoryByUser(@Param("user") User user);
 }

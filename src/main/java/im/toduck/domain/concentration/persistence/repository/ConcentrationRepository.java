@@ -22,4 +22,7 @@ public interface ConcentrationRepository extends JpaRepository<Concentration, Lo
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE Concentration c SET c.deletedAt = NOW() WHERE c.user = :user")
 	void deleteAllByUser(@Param("user") User user);
+
+	@Query("SELECT COALESCE(SUM(c.targetCount), 0) FROM Concentration c WHERE c.user = :user AND c.deletedAt IS NULL")
+	long sumTargetCountByUser(@Param("user") User user);
 }

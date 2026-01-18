@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import im.toduck.domain.routine.persistence.entity.Routine;
 import im.toduck.domain.social.common.mapper.SocialCategoryLinkMapper;
 import im.toduck.domain.social.common.mapper.SocialImageFileMapper;
 import im.toduck.domain.social.common.mapper.SocialMapper;
+import im.toduck.domain.social.domain.event.SocialCreatedEvent;
 import im.toduck.domain.social.persistence.entity.Comment;
 import im.toduck.domain.social.persistence.entity.CommentImageFile;
 import im.toduck.domain.social.persistence.entity.CommentLike;
@@ -55,6 +57,7 @@ public class SocialBoardService {
 	private final CommentLikeRepository commentLikeRepository;
 	private final CommentImageFileRepository commentImageFileRepository;
 	private final LikeRepository likeRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional(readOnly = true)
 	public Optional<Social> getSocialById(final Long socialId) {
@@ -74,7 +77,11 @@ public class SocialBoardService {
 			request.content(),
 			request.isAnonymous()
 		);
-		return socialRepository.save(socialBoard);
+		Social savedSocial = socialRepository.save(socialBoard);
+
+		eventPublisher.publishEvent(new SocialCreatedEvent(user.getId()));
+
+		return savedSocial;
 	}
 
 	@Transactional
