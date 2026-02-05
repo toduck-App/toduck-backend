@@ -18,15 +18,7 @@ public class AdminMapper {
 		);
 	}
 
-	public static AdminListResponse toLAdminListResponse(final List<AdminResponse> admins) {
+	public static AdminListResponse toAdminListResponse(final List<AdminResponse> admins) {
 		return AdminListResponse.toListAdminResponse(admins);
-	}
-
-	public static AdminResponse fromAdmin(final Admin admin) {
-		return new AdminResponse(
-			admin.getId(),
-			admin.getUser().getId(),
-			admin.getDisplayName()
-		);
 	}
 }

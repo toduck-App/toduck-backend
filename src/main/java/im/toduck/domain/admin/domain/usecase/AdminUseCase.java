@@ -36,7 +36,7 @@ public class AdminUseCase {
 	public AdminListResponse getAdmins() {
 		List<AdminResponse> admins = adminService.getAdmins();
 
-		return AdminMapper.toLAdminListResponse(admins);
+		return AdminMapper.toAdminListResponse(admins);
 	}
 
 	@Transactional

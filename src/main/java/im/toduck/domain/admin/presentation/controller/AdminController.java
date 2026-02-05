@@ -20,6 +20,7 @@ import im.toduck.domain.admin.presentation.dto.request.AdminUpdateRequest;
 import im.toduck.domain.admin.presentation.dto.response.AdminListResponse;
 import im.toduck.domain.admin.presentation.dto.response.AdminResponse;
 import im.toduck.global.presentation.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -53,7 +54,7 @@ public class AdminController implements AdminApi {
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> createAdmin(
-		@RequestBody final AdminCreateRequest request
+		@RequestBody @Valid final AdminCreateRequest request
 	) {
 		adminUseCase.createAdmin(request);
 
@@ -65,7 +66,7 @@ public class AdminController implements AdminApi {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse<Map<String, Object>>> updateAdmin(
 		@PathVariable final Long userId,
-		@RequestBody final AdminUpdateRequest request
+		@RequestBody @Valid final AdminUpdateRequest request
 	) {
 		adminUseCase.updateAdmin(userId, request);
 

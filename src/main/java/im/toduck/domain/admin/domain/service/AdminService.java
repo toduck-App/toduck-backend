@@ -54,7 +54,7 @@ public class AdminService {
 	public List<AdminResponse> getAdmins() {
 		List<Admin> admins = adminRepository.findAllActiveAdmins();
 		return admins.stream()
-			.map(AdminMapper::fromAdmin)
+			.map(AdminMapper::toAdminResponse)
 			.toList();
 	}
 
