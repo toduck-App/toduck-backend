@@ -1,8 +1,6 @@
 package im.toduck.domain.inquiry.presentation.controller;
 
 import static im.toduck.fixtures.user.UserFixtures.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.junit.Assert.*;
 
@@ -181,7 +179,10 @@ class InquiryAnswerControllerTest extends ServiceTest {
 				inquiryAnswerUseCase.createInquiryAnswer(request, admin.getUser().getId())
 			);
 
-			assertThat(exception.getErrorCode()).isEqualTo(ExceptionCode.ALREADY_ANSWERED_INQUIRY.getErrorCode());
+			assertSoftly(softly -> {
+				softly.assertThat(exception.getErrorCode())
+					.isEqualTo(ExceptionCode.ALREADY_ANSWERED_INQUIRY.getErrorCode());
+			});
 		}
 
 		@Transactional
