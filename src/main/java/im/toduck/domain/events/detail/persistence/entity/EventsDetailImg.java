@@ -1,11 +1,11 @@
 package im.toduck.domain.events.detail.persistence.entity;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import java.time.LocalDateTime;
 
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,14 +20,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "events_detail_img")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE events_detail_img SET deleted_at = NOW() where id=?")
-@SQLRestriction(value = "deleted_at is NULL")
 public class EventsDetailImg extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "events_detail_id", nullable = false)
 	private EventsDetail eventsDetail;
 
@@ -46,5 +44,9 @@ public class EventsDetailImg extends BaseEntity {
 
 	public void updateDetailImgUrl(final String detailImgUrl) {
 		this.detailImgUrl = detailImgUrl;
+	}
+
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
 	}
 }
