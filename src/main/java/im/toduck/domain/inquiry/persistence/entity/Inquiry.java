@@ -45,7 +45,7 @@ public class Inquiry extends BaseEntity {
 	@Column(nullable = false)
 	private Type type;
 
-	@Column(length = 1024)
+	@Column(length = 1024, nullable = false)
 	private String content;
 
 	@Enumerated(EnumType.STRING)

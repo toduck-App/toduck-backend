@@ -40,7 +40,7 @@ public class InquiryAnswer extends BaseEntity {
 	@JoinColumn(name = "inquiry_id", nullable = false, unique = true)
 	private Inquiry inquiry;
 
-	@Column(length = 1024)
+	@Column(length = 1024, nullable = false)
 	private String content;
 
 	@Builder

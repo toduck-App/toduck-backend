@@ -408,6 +408,57 @@ CREATE TABLE events_social
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE admin
+(
+    id                      BIGINT          PRIMARY KEY auto_increment,
+    user_id                 BIGINT          NOT NULL UNIQUE,
+    display_name            VARCHAR(255)    NOT NULL,
+    created_at              DATETIME        NOT NULL,
+    updated_at              DATETIME        NOT NULL,
+    deleted_at              DATETIME        NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE inquiry
+(
+    id                      BIGINT          PRIMARY KEY auto_increment,
+    user_id                 BIGINT          NOT NULL,
+    type                    VARCHAR(50)     NOT NULL,
+    content                 VARCHAR(1024)   NOT NULL,
+    status                  VARCHAR(50)     NOT NULL,
+    created_at              DATETIME        NOT NULL,
+    updated_at              DATETIME        NOT NULL,
+    deleted_at              DATETIME        NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE inquiry_image_file
+(
+    id                      BIGINT          PRIMARY KEY auto_increment,
+    inquiry_id              BIGINT          NOT NULL,
+    url                     VARCHAR(1024)   NOT NULL,
+    created_at              DATETIME        NOT NULL,
+    updated_at              DATETIME        NOT NULL,
+    deleted_at              DATETIME        NULL,
+    FOREIGN KEY (inquiry_id) REFERENCES inquiry (id)
+);
+
+CREATE TABLE inquiry_answer
+(
+    id                      BIGINT          PRIMARY KEY auto_increment,
+    admin_id                BIGINT          NOT NULL,
+    inquiry_id              BIGINT          NOT NULL,
+    content                 VARCHAR(1024)   NOT NULL,
+    created_at              DATETIME        NOT NULL,
+    updated_at              DATETIME        NOT NULL,
+    deleted_at              DATETIME        NULL,
+
+    CONSTRAINT uq_inquiry_answer UNIQUE (inquiry_id),
+
+    FOREIGN KEY (admin_id) REFERENCES admin (id),
+    FOREIGN KEY (inquiry_id) REFERENCES inquiry (id)
+);
+
 CREATE TABLE account_deletion_log
 (
     id          BIGINT PRIMARY KEY auto_increment,
