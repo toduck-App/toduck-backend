@@ -4,6 +4,7 @@ import java.util.List;
 
 import im.toduck.domain.inquiry.persistence.entity.Type;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -11,12 +12,12 @@ import lombok.Builder;
 @Builder
 @Schema(description = "사용자 문의 생성 요청 DTO")
 public record InquiryCreateRequest(
-	@NotNull(message = "유형은 비어있을 수 없습니다.")
-	@Schema(description = "유형", example = "ERROR")
+	@NotNull(message = "문의 유형은 비어있을 수 없습니다.")
+	@Schema(description = "문의 유형", example = "ERROR")
 	Type type,
 
 	@Size(max = 500, message = "내용은 500자를 초과할 수 없습니다.")
-	@NotNull(message = "내용은 비어있을 수 없습니다.")
+	@NotBlank(message = "내용은 비어있을 수 없습니다.")
 	@Schema(description = "문의 내용", example = "설정한 루틴의 순서를 바꾸고 싶은데 어떻게 하는지 모르겠어요 ㅠㅠ")
 	String content,
 
