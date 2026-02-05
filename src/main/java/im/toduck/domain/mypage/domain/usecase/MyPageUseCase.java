@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import im.toduck.domain.admin.domain.service.AdminService;
+import im.toduck.domain.admin.persistence.entity.Admin;
 import im.toduck.domain.mypage.common.mapper.MyPageMapper;
 import im.toduck.domain.mypage.domain.service.MyPageService;
 import im.toduck.domain.mypage.presentation.dto.request.NickNameUpdateRequest;
@@ -16,6 +18,7 @@ import im.toduck.domain.social.domain.service.SocialBoardService;
 import im.toduck.domain.user.domain.service.FollowService;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.domain.user.persistence.entity.UserRole;
 import im.toduck.global.annotation.UseCase;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -32,6 +35,7 @@ public class MyPageUseCase {
 	private final MyPageService myPageService;
 	private final FollowService followService;
 	private final SocialBoardService socialBoardService;
+	private final AdminService adminService;
 
 	@Transactional
 	public void updateNickname(Long userId, NickNameUpdateRequest request) {
@@ -64,6 +68,10 @@ public class MyPageUseCase {
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
 		myPageService.recordUserDeletionLog(user, request);
+		if (user.getRole() == UserRole.ADMIN) {
+			Admin admin = adminService.getAdmin(user.getId());
+			adminService.deleteAdmin(admin);
+		}
 		this.deleteUserData(user);
 	}
 
