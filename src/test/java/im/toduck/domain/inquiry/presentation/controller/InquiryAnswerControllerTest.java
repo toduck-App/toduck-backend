@@ -1,8 +1,8 @@
 package im.toduck.domain.inquiry.presentation.controller;
 
 import static im.toduck.fixtures.user.UserFixtures.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.SoftAssertions.*;
-import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
@@ -175,14 +175,13 @@ class InquiryAnswerControllerTest extends ServiceTest {
 				admin.getUser().getId());
 
 			// when - then
-			CommonException exception = assertThrows(CommonException.class, () ->
+			assertThatThrownBy(() ->
 				inquiryAnswerUseCase.createInquiryAnswer(request, admin.getUser().getId())
-			);
-
-			assertSoftly(softly -> {
-				softly.assertThat(exception.getErrorCode())
-					.isEqualTo(ExceptionCode.ALREADY_ANSWERED_INQUIRY.getErrorCode());
-			});
+			)
+				.isInstanceOfSatisfying(CommonException.class, e ->
+					assertThat(e.getErrorCode())
+						.isEqualTo(ExceptionCode.ALREADY_ANSWERED_INQUIRY.getErrorCode())
+				);
 		}
 
 		@Transactional
