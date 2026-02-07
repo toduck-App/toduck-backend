@@ -55,7 +55,7 @@ public class Inquiry extends BaseEntity {
 	@OneToMany(mappedBy = "inquiry", cascade = CascadeType.ALL)
 	private List<InquiryImage> inquiryImages = new ArrayList<>();
 
-	@OneToOne(mappedBy = "inquiry", fetch = FetchType.LAZY)
+	@OneToOne(mappedBy = "inquiry", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private InquiryAnswer inquiryAnswer;
 
 	@Builder
@@ -88,7 +88,7 @@ public class Inquiry extends BaseEntity {
 
 	public void removeAnswer() {
 		if (this.inquiryAnswer != null) {
-			this.inquiryAnswer.setInquiry(null);
+			this.inquiryAnswer.delete();
 			this.inquiryAnswer = null;
 		}
 	}

@@ -1,7 +1,5 @@
 package im.toduck.domain.inquiry.persistence.repository.querydsl;
 
-import static im.toduck.domain.admin.persistence.entity.QAdmin.*;
-
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -28,12 +26,13 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
 
 		return queryFactory
 			.selectFrom(iq)
-			.leftJoin(iq.inquiryImages, iqi).on(iqi.deletedAt.isNull())
-			.leftJoin(iq.inquiryAnswer, iqa).on(iqa.deletedAt.isNull())
-			.leftJoin(iqa.admin, admin)
+			.leftJoin(iq.inquiryImages, iqi).fetchJoin()
+			.leftJoin(iq.inquiryAnswer, iqa).fetchJoin()
+			.leftJoin(iqa.admin).fetchJoin()
 			.where(
 				iq.user.id.eq(userId),
-				iq.deletedAt.isNull())
+				iq.deletedAt.isNull()
+			)
 			.orderBy(iq.createdAt.desc())
 			.distinct()
 			.fetch();
@@ -47,9 +46,9 @@ public class InquiryRepositoryCustomImpl implements InquiryRepositoryCustom {
 
 		return queryFactory
 			.selectFrom(iq)
-			.leftJoin(iq.inquiryImages, iqi).on(iqi.deletedAt.isNull())
-			.leftJoin(iq.inquiryAnswer, iqa).on(iqa.deletedAt.isNull())
-			.leftJoin(iqa.admin, admin)
+			.leftJoin(iq.inquiryImages, iqi).fetchJoin()
+			.leftJoin(iq.inquiryAnswer, iqa).fetchJoin()
+			.leftJoin(iqa.admin).fetchJoin()
 			.where(iq.deletedAt.isNull())
 			.orderBy(iq.createdAt.desc())
 			.distinct()

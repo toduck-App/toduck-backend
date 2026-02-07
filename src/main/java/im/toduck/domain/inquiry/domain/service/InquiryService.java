@@ -67,11 +67,12 @@ public class InquiryService {
 			inquiry.updateContent(request.content());
 		}
 
-		if (request.inquiryImgs() != null && !request.inquiryImgs().isEmpty()) {
-			inquiryImgRepository.deleteAllByInquiry(inquiry);
-			addInquiryImages(inquiry, request.inquiryImgs());
-		} else {
-			inquiryImgRepository.deleteAllByInquiry(inquiry);
+		if (request.inquiryImgs() != null) {
+			List<InquiryImage> images = inquiryImgRepository.findAllByInquiry(inquiry);
+			images.forEach(inquiryImgRepository::delete);
+			if (!request.inquiryImgs().isEmpty()) {
+				addInquiryImages(inquiry, request.inquiryImgs());
+			}
 		}
 	}
 

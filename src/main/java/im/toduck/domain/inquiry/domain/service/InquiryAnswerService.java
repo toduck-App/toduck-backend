@@ -44,6 +44,7 @@ public class InquiryAnswerService {
 			}
 
 			existing.revive(request.content(), admin);
+			existing.setInquiry(inquiry);
 			inquiry.addAnswer(existing);
 			inquiry.changeStatus(Status.ANSWERED);
 			return inquiryAnswerRepository.save(existing);
@@ -56,7 +57,6 @@ public class InquiryAnswerService {
 			.build();
 
 		inquiry.addAnswer(newAnswer);
-		inquiryAnswerRepository.save(newAnswer);
 		inquiry.changeStatus(Status.ANSWERED);
 
 		return newAnswer;

@@ -126,6 +126,7 @@ public enum ExceptionCode {
 
 	/* 420xx Inquiry */
 	NOT_FOUND_INQUIRY(HttpStatus.NOT_FOUND, 42001, "문의 정보를 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_INQUIRY(HttpStatus.FORBIDDEN, 42002, "문의에 접근 권한이 없습니다."),
 
 	/* 421xx InquiryAnswer */
 	NOT_FOUND_INQUIRY_ANSWER(HttpStatus.NOT_FOUND, 42101, "문의 답변 정보를 찾을 수 없습니다."),
