@@ -58,6 +58,10 @@ public class InquiryUseCase {
 		Inquiry inquiry = inquiryService.getInquiryById(inquiryId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_INQUIRY));
 
+		if (!inquiry.getUser().getId().equals(userId)) {
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_INQUIRY);
+		}
+
 		InquiryAnswer answer = inquiry.getInquiryAnswer();
 		if (answer != null && answer.getDeletedAt() == null) {
 			throw CommonException.from(ExceptionCode.ALREADY_ANSWERED_INQUIRY);
@@ -74,6 +78,10 @@ public class InquiryUseCase {
 
 		Inquiry inquiry = inquiryService.findById(inquiryId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_INQUIRY));
+
+		if (!inquiry.getUser().getId().equals(userId)) {
+			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_INQUIRY);
+		}
 
 		InquiryAnswer answer = inquiry.getInquiryAnswer();
 		if (answer != null && answer.getDeletedAt() == null) {

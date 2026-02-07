@@ -1,5 +1,7 @@
 package im.toduck.domain.inquiry.persistence.entity;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -59,5 +61,9 @@ public class InquiryAnswer extends BaseEntity {
 		this.deletedAt = null;
 		this.content = content;
 		this.admin = admin;
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
 	}
 }

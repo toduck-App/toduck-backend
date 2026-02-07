@@ -13,6 +13,7 @@ import im.toduck.domain.admin.presentation.dto.request.AdminCreateRequest;
 import im.toduck.domain.admin.presentation.dto.request.AdminUpdateRequest;
 import im.toduck.domain.admin.presentation.dto.response.AdminResponse;
 import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.domain.user.persistence.entity.UserRole;
 import im.toduck.domain.user.persistence.repository.UserRepository;
 import im.toduck.global.exception.CommonException;
 import im.toduck.global.exception.ExceptionCode;
@@ -41,6 +42,10 @@ public class AdminService {
 	private Admin createDefaultAdmin(final Long userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		if (user.getRole() != UserRole.ADMIN) {
+			throw CommonException.from(ExceptionCode.NOT_FOUND_ADMIN);
+		}
 
 		Admin admin = Admin.builder()
 			.user(user)
