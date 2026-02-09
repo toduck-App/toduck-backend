@@ -12,10 +12,6 @@ import lombok.Builder;
 @Builder
 @Schema(description = "문의 수정 요청 DTO")
 public record InquiryUpdateRequest(
-	@NotNull(message = "문의 ID는 비어있을 수 없습니다.")
-	@Schema(description = "문의 ID", example = "1")
-	Long inquiryId,
-
 	@NotNull(message = "문의 유형은 비어있을 수 없습니다.")
 	@Schema(description = "문의 유형", example = "USAGE")
 	Type type,

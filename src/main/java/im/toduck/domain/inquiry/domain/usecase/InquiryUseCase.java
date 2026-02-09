@@ -76,7 +76,7 @@ public class InquiryUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		Inquiry inquiry = inquiryService.findById(inquiryId)
+		Inquiry inquiry = inquiryService.getInquiryById(inquiryId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_INQUIRY));
 
 		if (!inquiry.getUser().getId().equals(userId)) {

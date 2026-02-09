@@ -87,10 +87,6 @@ public class AdminUseCase {
 	public void deleteAdmin(final Long userId) {
 		Admin admin = adminService.getAdmin(userId);
 
-		if (admin.getDeletedAt() != null) {
-			return;
-		}
-
 		User user = admin.getUser();
 		user.demoteToUser();
 

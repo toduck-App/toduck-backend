@@ -77,11 +77,6 @@ public class InquiryService {
 	}
 
 	@Transactional
-	public Optional<Inquiry> findById(final Long inquiryId) {
-		return inquiryRepository.findById(inquiryId);
-	}
-
-	@Transactional
 	public void deleteInquiry(final Inquiry inquiry) {
 		inquiryRepository.delete(inquiry);
 	}

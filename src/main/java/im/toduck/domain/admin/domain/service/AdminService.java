@@ -38,7 +38,6 @@ public class AdminService {
 			.orElseGet(() -> createDefaultAdmin(userId));
 	}
 
-	@Transactional
 	private Admin createDefaultAdmin(final Long userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
