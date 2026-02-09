@@ -8,7 +8,6 @@ import im.toduck.domain.inquiry.common.mapper.InquiryMapper;
 import im.toduck.domain.inquiry.domain.service.InquiryService;
 import im.toduck.domain.inquiry.persistence.entity.Inquiry;
 import im.toduck.domain.inquiry.persistence.entity.InquiryAnswer;
-import im.toduck.domain.inquiry.persistence.entity.InquiryImage;
 import im.toduck.domain.inquiry.presentation.dto.request.InquiryCreateRequest;
 import im.toduck.domain.inquiry.presentation.dto.request.InquiryUpdateRequest;
 import im.toduck.domain.inquiry.presentation.dto.response.InquiryListResponse;
@@ -87,8 +86,6 @@ public class InquiryUseCase {
 		if (answer != null && answer.getDeletedAt() == null) {
 			throw CommonException.from(ExceptionCode.ALREADY_ANSWERED_INQUIRY);
 		}
-
-		inquiry.getInquiryImages().forEach(InquiryImage::softDelete);
 
 		inquiryService.deleteInquiry(inquiry);
 	}
