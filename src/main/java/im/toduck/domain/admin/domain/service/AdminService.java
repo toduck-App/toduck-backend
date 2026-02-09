@@ -79,9 +79,9 @@ public class AdminService {
 
 	@Transactional
 	public void updateAdmin(final Long userId, final AdminUpdateRequest request) {
+		Admin admin = adminRepository.findActiveAdminByUserId(userId)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ADMIN));
 		if (request.displayName() != null) {
-			Admin admin = adminRepository.findActiveAdminByUserId(userId)
-				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_ADMIN));
 			admin.updateDisplayName(request.displayName());
 		}
 	}

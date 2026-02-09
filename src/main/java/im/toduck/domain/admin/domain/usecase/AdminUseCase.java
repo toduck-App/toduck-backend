@@ -78,8 +78,6 @@ public class AdminUseCase {
 		User user = userService.getUserById(userId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
 
-		Admin admin = adminService.getAdmin(userId);
-
 		adminService.updateAdmin(userId, request);
 	}
 
