@@ -1,5 +1,9 @@
 package im.toduck.domain.notification.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import im.toduck.domain.schedule.persistence.vo.ScheduleAlram;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +12,19 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ScheduleReminderData extends AbstractNotificationData {
-	// TODO: 필요한 필드 추가
-	// 예상 필드: 일정 ID, 일정 제목, 일정 시작 시간, 남은 시간 등
+	private Long scheduleId;
+	private String scheduleTitle;
+	private ScheduleAlram reminderType;
+	@JsonProperty("allDay")
+	private boolean isAllDay;
+
+	public static ScheduleReminderData of(
+			final Long scheduleId,
+			final String scheduleTitle,
+			final ScheduleAlram reminderType,
+			final boolean isAllDay) {
+		return new ScheduleReminderData(scheduleId, scheduleTitle, reminderType, isAllDay);
+	}
 }
