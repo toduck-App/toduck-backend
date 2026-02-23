@@ -29,6 +29,7 @@ public class SecurityConfig {
 		"/exception-codes"};
 	private static final String[] PUBLIC_ENDPOINTS = {"/", "/error", "v1/backoffice/app/version-check"};
 	private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/users/find/**"};
+	private static final String[] AUTHENTICATED_AUTH_ENDPOINTS = {"/v1/auth/web/authorize"};
 	private static final String[] ATUATOR_ENDPOINTS = {"/actuator/**"};
 
 	private final CorsConfigurationSource corsConfigurationSource;
@@ -73,6 +74,7 @@ public class SecurityConfig {
 		AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
 		return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 			.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+			.requestMatchers(AUTHENTICATED_AUTH_ENDPOINTS).authenticated()
 			.requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
 	}
 }
