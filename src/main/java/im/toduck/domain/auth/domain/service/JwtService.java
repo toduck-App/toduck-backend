@@ -71,6 +71,13 @@ public class JwtService {
 		return Pair.of(userId, JwtPair.of(newAccessToken, newRefreshToken.getToken()));
 	}
 
+	public String createWebAccessToken(final Long userId, final String role) {
+		return accessTokenProvider.generateTokenWithCustomExpiry(
+			AccessTokenClaim.of(userId, role),
+			Duration.ofDays(3)
+		);
+	}
+
 	public void removeAccessTokenAndRefreshToken(Long userId, String accessToken, String refreshToken) {
 		JwtClaims jwtClaims = null;
 		if (refreshToken != null) {

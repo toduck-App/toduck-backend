@@ -48,6 +48,18 @@ public class AccessTokenProvider implements JwtProvider {
 			.compact();
 	}
 
+	public String generateTokenWithCustomExpiry(JwtClaims claims, Duration customExpiry) {
+		Date now = new Date();
+
+		return Jwts.builder()
+			.header().add(createHeader())
+			.and()
+			.claims(claims.getClaims())
+			.signWith(secretKey)
+			.expiration(createExpireDate(now, customExpiry.toMillis()))
+			.compact();
+	}
+
 	@Override
 	public JwtClaims getJwtClaimsFromToken(String token) {
 		Claims claims = getClaimsFromToken(token);
