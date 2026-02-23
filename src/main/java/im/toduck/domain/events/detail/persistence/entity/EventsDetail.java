@@ -47,7 +47,7 @@ public class EventsDetail extends BaseEntity {
 	@Column(length = 63)
 	private String buttonText;
 
-	@OneToMany(mappedBy = "eventsDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "eventsDetail", cascade = CascadeType.ALL)
 	private List<EventsDetailImg> eventsDetailImgs = new ArrayList<>();
 
 	@Builder

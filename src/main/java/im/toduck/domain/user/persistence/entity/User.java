@@ -121,4 +121,12 @@ public class User extends BaseEntity {
 		this.suspendedUntil = null;
 		this.suspensionReason = null;
 	}
+
+	public void promoteToAdmin() {
+		this.role = UserRole.ADMIN;
+	}
+
+	public void demoteToUser() {
+		this.role = UserRole.USER;
+	}
 }

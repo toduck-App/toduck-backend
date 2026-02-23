@@ -124,6 +124,18 @@ public enum ExceptionCode {
 	NOT_FOUND_EVENTS_SOCIAL(HttpStatus.NOT_FOUND, 41203, "소셜 이벤트 참여 정보를 찾을 수 없습니다."),
 	INVALID_CONTENT_LENGTH(HttpStatus.BAD_REQUEST, 41204, "소셜 게시글 글자 수가 이벤트 참여 조건에 부합하지 않습니다."),
 
+	/* 420xx Inquiry */
+	NOT_FOUND_INQUIRY(HttpStatus.NOT_FOUND, 42001, "문의 정보를 찾을 수 없습니다."),
+	UNAUTHORIZED_ACCESS_INQUIRY(HttpStatus.FORBIDDEN, 42002, "문의에 접근 권한이 없습니다."),
+
+	/* 421xx InquiryAnswer */
+	NOT_FOUND_INQUIRY_ANSWER(HttpStatus.NOT_FOUND, 42101, "문의 답변 정보를 찾을 수 없습니다."),
+	ALREADY_ANSWERED_INQUIRY(HttpStatus.CONFLICT, 42102, "이미 문의 답변이 존재합니다."),
+
+	/* 422xx Admin */
+	NOT_FOUND_ADMIN(HttpStatus.NOT_FOUND, 42201, "관리자 정보를 찾을 수 없습니다."),
+	DUPLICATE_ADMIN(HttpStatus.CONFLICT, 42202, "이미 관리자 정보가 존재합니다."),
+
 	/* 431xx schedule */
 	NOT_FOUND_SCHEDULE_RECORD(HttpStatus.NOT_FOUND, 43101, "일정 기록을 찾을 수 없습니다.",
 		"일정 기록을 찾을 수 없을 때 발생하는 오류입니다."),

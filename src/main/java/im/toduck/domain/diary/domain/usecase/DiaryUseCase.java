@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.diary.common.mapper.DiaryMapper;
 import im.toduck.domain.diary.domain.service.DiaryService;
 import im.toduck.domain.diary.persistence.entity.Diary;
+import im.toduck.domain.diary.persistence.entity.DiaryImage;
 import im.toduck.domain.diary.presentation.dto.request.DiaryCreateRequest;
 import im.toduck.domain.diary.presentation.dto.request.DiaryUpdateRequest;
 import im.toduck.domain.diary.presentation.dto.response.DiaryListResponse;
@@ -54,6 +55,8 @@ public class DiaryUseCase {
 			log.warn("권한이 없는 유저가 소셜 게시판 삭제 시도 - UserId: {}, DiaryId: {}, ", user.getId(), diary.getId());
 			throw CommonException.from(ExceptionCode.UNAUTHORIZED_ACCESS_DIARY);
 		}
+
+		diary.getDiaryImages().forEach(DiaryImage::softDelete);
 
 		diaryService.deleteDiary(diary);
 		log.info("일기 삭제 - UserId: {}, DiaryId: {}", userId, diaryId);

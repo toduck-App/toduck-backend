@@ -43,7 +43,7 @@ public class EventsDetailService {
 	}
 
 	@Transactional
-	public void addEventsDetailImges(final EventsDetail eventsDetail, final List<String> imgUrls) {
+	public void addEventsDetailImages(final EventsDetail eventsDetail, final List<String> imgUrls) {
 		List<String> safeImgs = Optional.ofNullable(imgUrls).orElse(Collections.emptyList());
 
 		List<EventsDetailImg> eventsDetailImgs = safeImgs.stream()
@@ -95,7 +95,7 @@ public class EventsDetailService {
 
 		if (request.eventsDetailImgs() != null && !request.eventsDetailImgs().isEmpty()) {
 			eventsDetailImgRepository.deleteAllByEventsDetail(eventsDetail);
-			addEventsDetailImges(eventsDetail, request.eventsDetailImgs());
+			addEventsDetailImages(eventsDetail, request.eventsDetailImgs());
 		} else {
 			eventsDetailImgRepository.deleteAllByEventsDetail(eventsDetail);
 		}

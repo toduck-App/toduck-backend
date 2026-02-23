@@ -26,7 +26,7 @@ public record EventsDetailCreateRequest(
 	@Schema(description = "버튼 내용", example = "당첨 확인하기")
 	String buttonText,
 
-	@Schema(description = "이벤트 디테일 URL 목록", example = "[\"https://cdn.toduck.app/image1.jpg\"]")
+	@Schema(description = "이벤트 디테일 사진 URL 목록", example = "[\"https://cdn.toduck.app/image1.jpg\"]")
 	List<String> eventsDetailImgs
 ) {
 

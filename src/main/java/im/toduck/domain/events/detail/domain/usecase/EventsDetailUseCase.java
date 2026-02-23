@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import im.toduck.domain.events.detail.common.mapper.EventsDetailMapper;
 import im.toduck.domain.events.detail.domain.service.EventsDetailService;
 import im.toduck.domain.events.detail.persistence.entity.EventsDetail;
+import im.toduck.domain.events.detail.persistence.entity.EventsDetailImg;
 import im.toduck.domain.events.detail.presentation.dto.request.EventsDetailCreateRequest;
 import im.toduck.domain.events.detail.presentation.dto.request.EventsDetailUpdateRequest;
 import im.toduck.domain.events.detail.presentation.dto.response.EventsDetailListResponse;
@@ -47,7 +48,7 @@ public class EventsDetailUseCase {
 		}
 
 		EventsDetail eventsDetail = eventsDetailService.createEventsDetail(request);
-		eventsDetailService.addEventsDetailImges(eventsDetail, request.eventsDetailImgs());
+		eventsDetailService.addEventsDetailImages(eventsDetail, request.eventsDetailImgs());
 
 		return eventsDetail;
 	}
@@ -75,6 +76,8 @@ public class EventsDetailUseCase {
 
 		EventsDetail eventsDetail = eventsDetailService.findById(eventsDetailId)
 			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_EVENTS_DETAIL));
+
+		eventsDetail.getEventsDetailImgs().forEach(EventsDetailImg::softDelete);
 
 		eventsDetailService.deleteEventsDetail(eventsDetail);
 	}

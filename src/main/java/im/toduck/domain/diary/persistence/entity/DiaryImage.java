@@ -2,9 +2,6 @@ package im.toduck.domain.diary.persistence.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
 import im.toduck.global.base.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,8 +19,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "diary_image_file")
 @Getter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE diary_image_file SET deleted_at = NOW() where id=?")
-@SQLRestriction(value = "deleted_at is NULL")
 public class DiaryImage extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
