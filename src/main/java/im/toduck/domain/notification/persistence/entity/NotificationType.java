@@ -1,5 +1,6 @@
 package im.toduck.domain.notification.persistence.entity;
 
+import im.toduck.domain.notification.domain.data.BadgeAcquiredNotificationData;
 import im.toduck.domain.notification.domain.data.BroadcastNotificationData;
 import im.toduck.domain.notification.domain.data.CommentNotificationData;
 import im.toduck.domain.notification.domain.data.DiaryReminderData;
@@ -34,6 +35,8 @@ public enum NotificationType {
 
 	DIARY_REMINDER(NotificationCategory.DIARY, DiaryReminderData.class, "일기 작성 유도", Priority.NORMAL, false),
 	INACTIVITY_REMINDER(NotificationCategory.NOTICE, InactivityReminderData.class, "미접속 알림", Priority.LOW, false),
+
+	BADGE_ACQUIRED(NotificationCategory.NOTICE, BadgeAcquiredNotificationData.class, "뱃지 획득", Priority.HIGH),
 
 	BROADCAST(NotificationCategory.NOTICE, BroadcastNotificationData.class, "공지사항", Priority.HIGH, false);
 

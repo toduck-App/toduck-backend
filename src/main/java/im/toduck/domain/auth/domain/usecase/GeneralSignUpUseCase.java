@@ -2,6 +2,7 @@ package im.toduck.domain.auth.domain.usecase;
 
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,7 @@ import im.toduck.domain.diary.domain.service.MasterKeywordService;
 import im.toduck.domain.diary.domain.service.UserKeywordService;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.user.common.mapper.UserMapper;
+import im.toduck.domain.user.domain.event.UserSignedUpEvent;
 import im.toduck.domain.user.domain.service.UserService;
 import im.toduck.domain.user.persistence.entity.User;
 import im.toduck.global.annotation.UseCase;
@@ -31,6 +33,7 @@ public class GeneralSignUpUseCase {
 	private final NickNameGenerateService nickNameGenerateService;
 	private final UserKeywordService userKeywordService;
 	private final MasterKeywordService masterKeywordService;
+	private final ApplicationEventPublisher eventPublisher;
 
 	public void sendVerifiedCodeToPhoneNumber(String phoneNumber) {
 		userService.findUserByPhoneNumber(phoneNumber).ifPresent(user -> {
@@ -72,5 +75,7 @@ public class GeneralSignUpUseCase {
 
 		List<MasterKeyword> masterKeywords = masterKeywordService.findAll();
 		userKeywordService.setupKeywordsFromMaster(newUser, masterKeywords);
+
+		eventPublisher.publishEvent(new UserSignedUpEvent(newUser.getId()));
 	}
 }

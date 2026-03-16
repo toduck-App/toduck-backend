@@ -1,0 +1,62 @@
+package im.toduck.domain.badge.domain.event;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import im.toduck.domain.badge.domain.checker.BadgeConditionChecker;
+import im.toduck.domain.badge.domain.usecase.BadgeUseCase;
+import im.toduck.domain.badge.persistence.entity.BadgeCode;
+import im.toduck.domain.user.domain.event.UserSignedUpEvent;
+import im.toduck.domain.user.domain.service.UserService;
+import im.toduck.domain.user.persistence.entity.User;
+import im.toduck.global.exception.CommonException;
+import im.toduck.global.exception.ExceptionCode;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class BadgeEventListener {
+
+	private final BadgeUseCase badgeUseCase;
+	private final UserService userService;
+	private final List<BadgeConditionChecker> badgeConditionCheckers;
+
+	@Async
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void handleUserSignedUp(final UserSignedUpEvent event) {
+		log.info("회원가입 이벤트 수신 - UserId: {}", event.getUserId());
+		User user = userService.getUserById(event.getUserId())
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_USER));
+
+		checkAndGrantBadge(user, BadgeCode.BABY_DUCK);
+	}
+
+	private void checkAndGrantBadge(final User user, final BadgeCode badgeCode) {
+		findCheckerByBadgeCode(badgeCode)
+			.filter(checker -> checker.checkCondition(user))
+			.ifPresent(checker -> {
+				if (badgeUseCase.hasBadge(user, badgeCode)) {
+					log.info("이미 보유 중인 뱃지입니다 - UserId: {}, BadgeCode: {}", user.getId(), badgeCode);
+					return;
+				}
+				badgeUseCase.grantBadge(user, badgeCode);
+				log.info("뱃지 부여 완료 - UserId: {}, BadgeCode: {}", user.getId(), badgeCode);
+			});
+	}
+
+	private Optional<BadgeConditionChecker> findCheckerByBadgeCode(final BadgeCode badgeCode) {
+		return badgeConditionCheckers.stream()
+			.filter(checker -> checker.getBadgeCode() == badgeCode)
+			.findFirst();
+	}
+}

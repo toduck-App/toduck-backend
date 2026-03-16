@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import im.toduck.domain.badge.persistence.entity.Badge;
+import im.toduck.domain.badge.persistence.entity.UserBadge;
 import im.toduck.domain.diary.persistence.entity.KeywordCategory;
 import im.toduck.domain.diary.persistence.entity.MasterKeyword;
 import im.toduck.domain.routine.persistence.entity.Routine;
@@ -132,5 +134,13 @@ public class TestFixtureBuilder {
 			.keyword(keyword)
 			.build();
 		return bs.masterKeywordRepository().save(masterKeyword);
+	}
+
+	public Badge buildBadge(final Badge badge) {
+		return bs.badgeRepository().save(badge);
+	}
+
+	public UserBadge buildUserBadge(final UserBadge userBadge) {
+		return bs.userBadgeRepository().save(userBadge);
 	}
 }
