@@ -12,4 +12,13 @@ public class BadgeFixtures {
 			.imageUrl("https://example.com/images/badges/baby-duck.png")
 			.build();
 	}
+
+	public static Badge PERFECTIONIST_BADGE() {
+		return Badge.builder()
+			.code(BadgeCode.PERFECTIONIST)
+			.name("완벽주의")
+			.description("루틴 개수가 10개 이상입니다.")
+			.imageUrl("https://example.com/images/badges/perfectionist.png")
+			.build();
+	}
 }

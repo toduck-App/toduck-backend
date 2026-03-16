@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import im.toduck.ServiceTest;
-import im.toduck.domain.badge.common.dto.response.BadgeResponse;
 import im.toduck.domain.badge.domain.service.BadgeService;
 import im.toduck.domain.badge.persistence.entity.Badge;
 import im.toduck.domain.badge.persistence.entity.UserBadge;
+import im.toduck.domain.badge.presentation.dto.response.BadgeResponse;
 import im.toduck.domain.user.persistence.entity.User;
 
 @Transactional
@@ -48,7 +48,7 @@ class BadgeUseCaseTest extends ServiceTest {
 
 		// then
 		assertThat(newBadges).hasSize(1);
-		assertThat(newBadges.get(0).getCode()).isEqualTo(badge.getCode().name());
+		assertThat(newBadges.get(0).code()).isEqualTo(badge.getCode().name());
 
 		List<UserBadge> unseenBadges = badgeService.getUnseenBadges(user);
 		assertThat(unseenBadges).isEmpty();

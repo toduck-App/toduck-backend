@@ -51,4 +51,8 @@ public class UserBadge extends BaseEntity {
 	public void markAsSeen() {
 		this.isSeen = true;
 	}
+
+	public void updateRepresentativeStatus(boolean isRepresentative) {
+		this.isRepresentative = isRepresentative;
+	}
 }
