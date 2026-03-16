@@ -35,19 +35,19 @@ public class ScheduleReadService {
 	public ScheduleHeadResponse getRangeSchedule(User user, LocalDate startDate, LocalDate endDate) {
 		List<ScheduleHeadResponse.ScheduleHeadDto> scheduleHeadDtos = new ArrayList<>();
 		scheduleRepository.findSchedules(user.getId(), startDate, endDate)
-			.forEach(schedule -> {
-				List<ScheduleRecord> scheduleRecordList = scheduleRecordRepository
-					.findByScheduleAndBetweenStartDateAndEndDate(schedule.getId(), startDate, endDate);
-				scheduleHeadDtos.add(ScheduleMapper.toScheduleHeadDto(schedule, scheduleRecordList));
-			});
+				.forEach(schedule -> {
+					List<ScheduleRecord> scheduleRecordList = scheduleRecordRepository
+							.findByScheduleAndBetweenStartDateAndEndDate(schedule.getId(), startDate, endDate);
+					scheduleHeadDtos.add(ScheduleMapper.toScheduleHeadDto(schedule, scheduleRecordList));
+				});
 		return ScheduleMapper.toScheduleHeadResponse(startDate, endDate, scheduleHeadDtos);
 	}
 
 	@Transactional(readOnly = true)
 	public ScheduleInfoResponse getSchedule(Long scheduleRecordId) {
 		return scheduleRecordRepository.findScheduleRecordFetchJoinSchedule(scheduleRecordId)
-			.map(ScheduleMapper::toScheduleInfoResponse)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE_RECORD));
+				.map(ScheduleMapper::toScheduleInfoResponse)
+				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE_RECORD));
 	}
 
 	public Optional<Schedule> getScheduleById(Long scheduleId) {
@@ -56,7 +56,7 @@ public class ScheduleReadService {
 
 	public Schedule validateScheduleById(Long scheduleId) {
 		return scheduleRepository.findById(scheduleId)
-			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
+				.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_SCHEDULE));
 	}
 
 	@Transactional(readOnly = true)
@@ -80,16 +80,19 @@ public class ScheduleReadService {
 
 	@Transactional(readOnly = true)
 	public Map<LocalDate, Long> getSchedulesCountByDateRangeGroupByDate(
-		final LocalDate startDate,
-		final LocalDate endDate
-	) {
+			final LocalDate startDate,
+			final LocalDate endDate) {
 		LocalDateTime startDateTime = startDate.atStartOfDay();
 		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
 		List<DailyCount> dailyCounts = scheduleRepository.countByCreatedAtBetweenGroupByDate(
-			startDateTime, endDateTime
-		);
+				startDateTime, endDateTime);
 
 		return dailyCounts.stream().collect(Collectors.toMap(DailyCount::date, DailyCount::count));
+	}
+
+	@Transactional(readOnly = true)
+	public List<Schedule> findActiveSchedulesWithAlarmForDates(final LocalDate startDate, final LocalDate endDate) {
+		return scheduleRepository.findActiveSchedulesWithAlarmForDates(startDate, endDate);
 	}
 }

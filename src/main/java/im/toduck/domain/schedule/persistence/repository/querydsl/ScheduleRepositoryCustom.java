@@ -11,7 +11,8 @@ public interface ScheduleRepositoryCustom {
 	List<Schedule> findSchedules(Long userId, LocalDate startDate, LocalDate endDate);
 
 	List<DailyCount> countByCreatedAtBetweenGroupByDate(
-		final LocalDateTime startDateTime,
-		final LocalDateTime endDateTime
-	);
+			final LocalDateTime startDateTime,
+			final LocalDateTime endDateTime);
+
+	List<Schedule> findActiveSchedulesWithAlarmForDates(final LocalDate startDate, final LocalDate endDate);
 }
