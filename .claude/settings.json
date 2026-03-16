@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read file; if echo \"$file\" | grep -qE '\\.java$'; then ./gradlew checkstyleMain -q 2>&1 | tail -20; fi; }"
+          }
+        ]
+      }
+    ]
+  }
+}
