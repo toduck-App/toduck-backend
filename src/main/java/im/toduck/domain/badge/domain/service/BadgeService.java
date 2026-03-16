@@ -50,6 +50,13 @@ public class BadgeService {
 		return savedBadge;
 	}
 
+	@Transactional(readOnly = true)
+	public boolean hasBadge(final User user, final BadgeCode badgeCode) {
+		Badge badge = badgeRepository.findByCode(badgeCode)
+			.orElseThrow(() -> CommonException.from(ExceptionCode.NOT_FOUND_BADGE));
+		return userBadgeRepository.existsByUserAndBadge(user, badge);
+	}
+
 	/**
 	 * 사용자가 아직 확인하지 않은 획득 뱃지 목록을 조회합니다.
 	 *

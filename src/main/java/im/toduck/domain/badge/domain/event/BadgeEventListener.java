@@ -44,10 +44,13 @@ public class BadgeEventListener {
 		findCheckerByBadgeCode(badgeCode)
 			.filter(checker -> checker.checkCondition(user))
 			.ifPresent(checker -> {
+				if (badgeUseCase.hasBadge(user, badgeCode)) {
+					log.info("이미 보유 중인 뱃지입니다 - UserId: {}, BadgeCode: {}", user.getId(), badgeCode);
+					return;
+				}
 				badgeUseCase.grantBadge(user, badgeCode);
+				log.info("뱃지 부여 완료 - UserId: {}, BadgeCode: {}", user.getId(), badgeCode);
 			});
-
-		log.info("뱃지 부여 완료 - UserId: {}, BadgeCode: {}", user.getId(), badgeCode);
 	}
 
 	private Optional<BadgeConditionChecker> findCheckerByBadgeCode(final BadgeCode badgeCode) {

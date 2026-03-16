@@ -45,6 +45,18 @@ public class BadgeUseCase {
 	}
 
 	/**
+	 * 사용자가 특정 뱃지를 보유하고 있는지 확인합니다.
+	 *
+	 * @param user 확인할 사용자
+	 * @param badgeCode 확인할 뱃지 코드
+	 * @return 보유 여부
+	 */
+	@Transactional(readOnly = true)
+	public boolean hasBadge(final User user, final BadgeCode badgeCode) {
+		return badgeService.hasBadge(user, badgeCode);
+	}
+
+	/**
 	 * 사용자가 아직 확인하지 않은 획득 뱃지 목록을 조회하고, 읽음 처리합니다.
 	 *
 	 * @param userId 조회할 사용자 ID
