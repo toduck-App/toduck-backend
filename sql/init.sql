@@ -821,6 +821,7 @@ CREATE TABLE user_badge
     user_id           BIGINT   NOT NULL,
     badge_id          BIGINT   NOT NULL,
     is_representative BOOLEAN  NOT NULL DEFAULT FALSE,
+    is_seen           BOOLEAN  NOT NULL DEFAULT FALSE,
     created_at        DATETIME NOT NULL,
     updated_at        DATETIME NOT NULL,
     deleted_at        DATETIME NULL,
