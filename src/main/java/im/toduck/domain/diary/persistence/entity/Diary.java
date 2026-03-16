@@ -56,7 +56,7 @@ public class Diary extends BaseEntity {
 	@Lob
 	private String memo;
 
-	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
 	private List<DiaryImage> diaryImages = new ArrayList<>();
 
 	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
