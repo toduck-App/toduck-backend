@@ -3,10 +3,11 @@ package im.toduck.domain.badge.domain.event;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import im.toduck.domain.badge.domain.checker.BadgeConditionChecker;
 import im.toduck.domain.badge.domain.usecase.BadgeUseCase;
@@ -29,7 +30,7 @@ public class BadgeEventListener {
 	private final List<BadgeConditionChecker> badgeConditionCheckers;
 
 	@Async
-	@EventListener
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional
 	public void handleUserSignedUp(final UserSignedUpEvent event) {
 		log.info("회원가입 이벤트 수신 - UserId: {}", event.getUserId());
