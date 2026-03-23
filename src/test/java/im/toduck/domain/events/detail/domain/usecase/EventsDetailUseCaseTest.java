@@ -116,15 +116,6 @@ class EventsDetailUseCaseTest extends ServiceTest {
 					.eventsDetailImgs(Arrays.asList("asdf", "ㅁㄴㅇㄹ"))
 					.build();
 
-			EventsDetailCreateRequest eventsDetailCreateRequest2 =
-				EventsDetailCreateRequest.builder()
-					.eventsId(savedEvent.getId())
-					.routingUrl("toduck://anotherPost")
-					.buttonVisible(true)
-					.buttonText("당첨 확인하기")
-					.eventsDetailImgs(Arrays.asList("xyz", "123"))
-					.build();
-
 			EventsDetail eventsDetail1 = eventsDetailUseCase.createEventsDetail(eventsDetailCreateRequest,
 				savedAdminUser.getId());
 
